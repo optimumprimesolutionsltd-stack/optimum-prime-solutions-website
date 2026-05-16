@@ -28,19 +28,25 @@ function Inner() {
 
   useEffect(() => {
     const check = () => {
-      if (window.location.hash === '#admin') {
-        setView(sessionStorage.getItem('ops_admin') === '1' ? 'admin' : 'login');
+      const hash = window.location.hash.toLowerCase();
+      console.log('Current hash:', hash); // Debug
+      
+      if (hash.includes('admin')) {
+        const isAuthenticated = sessionStorage.getItem('ops_admin') === '1' || localStorage.getItem('ops_admin') === '1';
+        console.log('Auth check:', isAuthenticated); // Debug
+        setView(isAuthenticated ? 'admin' : 'login');
       } else {
         setView('site');
       }
     };
+    
     check();
     window.addEventListener('hashchange', check);
     return () => window.removeEventListener('hashchange', check);
   }, []);
 
-  if (view === 'login') return <AdminLogin onLogin={() => setView('admin')} />;
-  if (view === 'admin') return <AdminLayout onLogout={() => { sessionStorage.removeItem('ops_admin'); window.location.hash = ''; setView('site'); }} />;
+  if (view === 'login') return <AdminLogin onLogin={() => { sessionStorage.setItem('ops_admin', '1'); localStorage.setItem('ops_admin', '1'); setView('admin'); }} />;
+  if (view === 'admin') return <AdminLayout onLogout={() => { sessionStorage.removeItem('ops_admin'); localStorage.removeItem('ops_admin'); window.location.hash = ''; window.location.reload(); }} />;
 
   return (
     <div className="min-h-screen bg-white dark:bg-navy-950">

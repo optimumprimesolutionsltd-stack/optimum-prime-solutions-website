@@ -3,7 +3,7 @@ import { Lock, Eye, EyeOff } from 'lucide-react';
 interface P{onLogin:()=>void}
 export default function AdminLogin({onLogin}:P){
   const [u,setU]=useState('');const [p,setP]=useState('');const [s,setS]=useState(false);const [e,setE]=useState('');
-  const go=(ev:React.FormEvent)=>{ev.preventDefault();if(u==='admin'&&p==='optimum2024'){sessionStorage.setItem('ops_admin','1');onLogin();}else setE('Invalid credentials');};
+  const go=(ev:React.FormEvent)=>{ev.preventDefault();if(u==='admin'&&p==='optimum2024'){sessionStorage.setItem('ops_admin','1');localStorage.setItem('ops_admin','1');onLogin();}else setE('Invalid credentials');};
   return<div className="flex min-h-screen items-center justify-center bg-navy-950 px-4"><div className="w-full max-w-md">
     <div className="text-center mb-8"><div className="inline-flex items-center gap-2 mb-3"><div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center font-black text-sm text-white">OP</div></div><p className="text-xl font-bold text-white">Admin Panel</p><p className="text-sm text-navy-400">Sign in to manage your website</p></div>
     <form onSubmit={go} className="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur">
