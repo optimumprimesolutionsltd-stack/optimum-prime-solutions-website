@@ -23,7 +23,7 @@
 }
 
 html { scroll-behavior: smooth; }
-body { font-family: var(--font-sans); background: linear-gradient(135deg, #ffffff 0%, #f0f4f8 50%, #1f3a5f 100%); }
+body { font-family: var(--font-sans); background-color: #152b47; color: #f8fafb; }
 body.dark { --tw-bg-opacity: 1; background-color: rgb(10 25 41 / var(--tw-bg-opacity)); color: #e2e8f0; }
 
 @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-12px)} }

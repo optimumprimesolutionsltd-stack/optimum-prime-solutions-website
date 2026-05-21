@@ -46,7 +46,7 @@ function Inner() {
   if (view === 'admin') return <AdminLayout onLogout={() => { sessionStorage.removeItem('ops_admin'); localStorage.removeItem('ops_admin'); window.location.hash = ''; setView('site'); }} />;
 
   return (
-    <div className="min-h-screen bg-white dark:bg-navy-950">
+    <div className="min-h-screen bg-navy-950 text-white">
       <StickyDownloadBar />
       <Navbar />
       <Hero3D />
