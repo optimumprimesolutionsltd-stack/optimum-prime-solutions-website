@@ -38,7 +38,7 @@ export default function Hero3D() {
     <section 
       id="home" 
       ref={containerRef}
-      className="relative min-h-screen overflow-hidden bg-gradient-to-br from-navy-900 via-navy-800 to-navy-700"
+      className="relative h-screen overflow-hidden bg-gradient-to-br from-navy-950 via-navy-900 to-navy-800"
       style={{ perspective: '1200px' }}
     >
       {/* 3D Background Shapes - Rotating */}
@@ -51,11 +51,11 @@ export default function Hero3D() {
             rotateZ: [0, 180]
           }}
           transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
-          className="absolute top-1/4 left-1/4 w-80 h-80 border-2 border-blue-500/20 rounded-3xl"
+          className="absolute top-1/3 left-1/3 w-screen h-screen border-2 border-blue-500/30 rounded-3xl"
           style={{ perspective: "1000px" }}
         />
         
-        {/* Secondary rotating shape */}
+        {/* Secondary rotating shape - larger */}
         <motion.div
           animate={{ 
             rotateX: [360, 0],
@@ -63,7 +63,7 @@ export default function Hero3D() {
             rotateZ: [180, 0]
           }}
           transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-          className="absolute bottom-1/4 right-1/3 w-64 h-64 border-2 border-yellow-500/20"
+          className="absolute -bottom-1/4 -right-1/4 w-screen h-screen border-2 border-yellow-500/20"
           style={{ 
             perspective: "1000px",
             clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)'
@@ -73,23 +73,23 @@ export default function Hero3D() {
         {/* Animated gradient blobs with depth */}
         <motion.div 
           animate={{ 
-            y: [0, 40, 0],
-            x: [-20, 20, -20],
-            scale: [1, 1.2, 1],
-            opacity: [0.15, 0.25, 0.15]
+            y: [0, 60, 0],
+            x: [-40, 40, -40],
+            scale: [1, 1.3, 1],
+            opacity: [0.2, 0.35, 0.2]
           }}
           transition={{ duration: 10, repeat: Infinity }}
-          className="absolute top-20 left-10 w-96 h-96 bg-gradient-to-br from-yellow-400/40 to-transparent rounded-full blur-3xl" 
+          className="absolute top-10 -left-40 w-screen h-screen bg-gradient-to-br from-yellow-400/50 to-transparent rounded-full blur-3xl" 
         />
         <motion.div 
           animate={{ 
-            y: [0, -40, 0],
-            x: [20, -20, 20],
-            scale: [1, 1.1, 1],
-            opacity: [0.1, 0.2, 0.1]
+            y: [0, -60, 0],
+            x: [40, -40, 40],
+            scale: [1, 1.2, 1],
+            opacity: [0.15, 0.3, 0.15]
           }}
           transition={{ duration: 12, repeat: Infinity, delay: 2 }}
-          className="absolute bottom-10 right-10 w-96 h-96 bg-gradient-to-tl from-blue-400/30 to-transparent rounded-full blur-3xl" 
+          className="absolute -bottom-40 -right-40 w-screen h-screen bg-gradient-to-tl from-blue-400/40 to-transparent rounded-full blur-3xl" 
         />
 
         {/* 3D Grid background */}
@@ -124,8 +124,8 @@ export default function Hero3D() {
       </div>
 
       {/* Main Content with 3D Card Effect */}
-      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-32 pb-24 lg:pt-40 lg:pb-32 h-full flex items-center">
-        <div className="grid lg:grid-cols-2 gap-12 items-center w-full">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 h-full flex items-center justify-center">
+        <div className="grid lg:grid-cols-2 gap-12 items-center justify-center w-full h-full">
           {/* Left Column - Content */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
