@@ -15,7 +15,7 @@ export default function Blog() {
       <section id="blog" className="py-24 bg-navy-50/50 dark:bg-navy-900/50">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} className="text-center max-w-3xl mx-auto">
-            <span className="inline-block rounded-full bg-yellow-400/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-yellow-600">Blog & Insights</span>
+            <span className="inline-block rounded-full bg-yellow-400/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white">Blog & Insights</span>
             <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-navy-900 dark:text-white">Latest From Our Blog</h2>
           </motion.div>
           

@@ -184,15 +184,7 @@ export default function Hero3D() {
               <div className="mt-2 h-1 w-24 bg-gradient-to-r from-yellow-400 to-blue-600 rounded-full" />
             </motion.div>
 
-            {/* Description with blur effect */}
-            <motion.p 
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.8, duration: 0.6 }}
-              className="text-lg text-white leading-relaxed max-w-lg mb-10"
-            >
-              Transform your business with enterprise-grade Tally Prime solutions. From installation to KRA compliance, we're your complete partner in growth.
-            </motion.p>
+
 
             {/* 3D Buttons */}
             <motion.div
