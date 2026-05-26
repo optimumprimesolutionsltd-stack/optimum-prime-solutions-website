@@ -14,6 +14,10 @@
   --color-slate-100: #f1f5f9;
   --color-slate-50: #f8fafc;
   --color-white: #ffffff;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-red-100: #fee2e2;
+  --color-red-50: #fef2f2;
 }
 
 html {
@@ -22,7 +26,7 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background: var(--color-slate-50);
+  background: radial-gradient(circle at top right, rgba(239, 68, 68, 0.12), transparent 16%), radial-gradient(circle at bottom left, rgba(239, 68, 68, 0.08), transparent 24%), var(--color-slate-50);
   color: var(--color-slate-950);
   min-height: 100vh;
   text-rendering: optimizeLegibility;
@@ -40,7 +44,7 @@ select {
 }
 
 ::selection {
-  background-color: var(--color-slate-900);
+  background-color: var(--color-red-700);
   color: white;
 }
 
@@ -77,10 +81,10 @@ h6 {
     @apply bg-slate-50;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center rounded-full bg-slate-950 text-white px-6 py-3 text-sm font-semibold shadow-sm shadow-slate-900/10 hover:bg-slate-800 transition;
+    @apply inline-flex items-center justify-center rounded-full bg-red-600 text-white px-6 py-3 text-sm font-semibold shadow-sm shadow-red-900/10 hover:bg-red-700 transition;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-full border border-slate-900 bg-white text-slate-950 px-6 py-3 text-sm font-semibold hover:bg-slate-100 transition;
+    @apply inline-flex items-center justify-center rounded-full border border-red-600 bg-white text-red-600 px-6 py-3 text-sm font-semibold hover:bg-red-50 transition;
   }
   .section-divider {
     @apply h-px bg-slate-200;

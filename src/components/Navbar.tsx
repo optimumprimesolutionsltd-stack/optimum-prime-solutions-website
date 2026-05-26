@@ -58,7 +58,7 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
+              className="inline-flex items-center gap-2 rounded-full bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
             >
               <Phone className="h-4 w-4" />
               Request Demo
@@ -102,7 +102,7 @@ export default function Navbar() {
               <Link
                 to="/contact"
                 onClick={() => setOpen(false)}
-                className="block rounded-full bg-slate-950 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-slate-800"
+                className="block rounded-full bg-red-600 px-4 py-3 text-center text-sm font-semibold text-white transition hover:bg-red-700"
               >
                 Request Demo
               </Link>

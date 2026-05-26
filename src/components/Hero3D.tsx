@@ -52,21 +52,21 @@ export default function Hero3D() {
 
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}>
             <div className="relative overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-soft">
-              <div className="bg-slate-950 p-6 text-white">
+              <div className="bg-red-600 p-6 text-white">
                 <div className="flex items-center justify-between gap-4">
                   <div>
-                    <p className="text-xs uppercase tracking-[0.35em] text-slate-400">Business overview</p>
+                    <p className="text-xs uppercase tracking-[0.35em] text-red-100">Business overview</p>
                     <h2 className="mt-3 text-3xl font-semibold">Performance by metric</h2>
                   </div>
-                  <div className="rounded-3xl bg-white/10 px-4 py-2 text-xs text-slate-200">Live</div>
+                  <div className="rounded-3xl bg-white/10 px-4 py-2 text-xs text-white/80">Live</div>
                 </div>
               </div>
 
               <div className="space-y-6 p-6">
                 {[
-                  { label: 'Clients', value: '85%', accent: 'bg-slate-950' },
-                  { label: 'Compliance', value: '98%', accent: 'bg-slate-900' },
-                  { label: 'Uptime', value: '99.9%', accent: 'bg-slate-800' },
+                  { label: 'Clients', value: '85%', accent: 'bg-red-600' },
+                  { label: 'Compliance', value: '98%', accent: 'bg-red-700' },
+                  { label: 'Uptime', value: '99.9%', accent: 'bg-red-500' },
                 ].map((item) => (
                   <div key={item.label} className="space-y-2">
                     <div className="flex items-center justify-between text-sm text-slate-600">

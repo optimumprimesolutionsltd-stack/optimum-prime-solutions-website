@@ -169,7 +169,7 @@ export default function Contact() {
               href={`https://wa.me/${c.whatsapp}`}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-slate-200 bg-slate-950 px-6 py-4 text-sm font-semibold text-white transition hover:bg-slate-800"
+              className="inline-flex w-full items-center justify-center gap-3 rounded-full border border-red-600 bg-red-600 px-6 py-4 text-sm font-semibold text-white transition hover:bg-red-700"
             >
               <MessageCircle className="h-4 w-4" /> Chat on WhatsApp
             </a>
@@ -253,7 +253,7 @@ export default function Contact() {
                   <button
                     type="submit"
                     disabled={loading || !isOnline}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-slate-950 px-6 py-4 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-600 px-6 py-4 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {loading ? (
                       <>

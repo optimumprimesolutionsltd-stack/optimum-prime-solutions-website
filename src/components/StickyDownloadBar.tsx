@@ -44,7 +44,7 @@ export default function StickyDownloadBar() {
                   href="https://tallysolutions.com/ssa/download/"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-xs font-semibold text-white transition hover:bg-slate-800"
+                  className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-red-700"
                 >
                   Download Now
                   <ArrowRight className="h-3 w-3" />
