@@ -66,7 +66,8 @@ export default function Footer() {
                     to="/features"
                     className="block rounded-2xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-sky-700"
                   >
-                    {service.title}
+                    <div className="font-semibold">{service.title}</div>
+                    <div className="text-xs text-slate-500 mt-1 line-clamp-2">{service.desc}</div>
                   </Link>
                 </li>
               ))}

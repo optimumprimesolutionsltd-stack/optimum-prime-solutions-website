@@ -108,13 +108,13 @@ export default function Features() {
                 <h3 className={`text-base font-bold flex items-center gap-2 ${isHeroCard ? 'text-slate-950' : 'text-slate-900'} ${!isHeroCard ? 'group-hover:text-sky-600' : ''}`}>
                   {svc.title}
                 </h3>
-                <p className={`mt-3 text-sm leading-relaxed line-clamp-2 ${isHeroCard ? 'text-slate-700' : 'text-slate-600'}`}>
+                <p className={`mt-3 text-sm leading-relaxed ${isHeroCard ? 'text-slate-700' : 'text-slate-600'}`}>
                   {svc.desc}
                 </p>
 
                 {/* Features list */}
                 <ul className="mt-4 space-y-2">
-                  {svc.features.slice(0, 2).map((f) => (
+                  {svc.features.map((f) => (
                     <motion.li
                       key={f}
                       whileHover={{ x: 4 }}
@@ -127,14 +127,9 @@ export default function Features() {
                       {f}
                     </motion.li>
                   ))}
-                  {svc.features.length > 2 && (
-                    <li className={`text-xs font-semibold ${isHeroCard ? 'text-slate-300' : 'text-slate-700'}`}>
-                      +{svc.features.length - 2} more
-                    </li>
-                  )}
                 </ul>
                 <motion.a
-                  href={svc.cta}
+                  href={svc.link || svc.cta || '#'}
                   target="_blank"
                   rel="noreferrer"
                   whileHover={{ y: -2 }}
