@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import { Package, BookOpen, Wallet, Factory, FileCheck, Code, Headphones, BarChart3, Sparkles, type LucideIcon } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import TallyPrimeIcon from './TallyPrimeIcon';
@@ -9,6 +11,17 @@ const iconMap: Record<string, LucideIcon> = {
 
 export default function Features() {
   const { data } = useSite();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname !== '/features') return;
+    const targetId = location.hash?.replace('#', '');
+    if (!targetId) return;
+    const element = document.getElementById(targetId);
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [location.pathname, location.hash]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -64,6 +77,7 @@ export default function Features() {
             const isHeroCard = i === 0;
             return (
               <motion.div
+                id={`service-${svc.id}`}
                 key={svc.id}
                 variants={itemVariants}
                 whileHover={{ y: -12, rotateX: -5, transition: { duration: 0.3 } }}

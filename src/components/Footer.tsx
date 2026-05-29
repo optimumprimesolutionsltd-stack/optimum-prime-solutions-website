@@ -48,6 +48,7 @@ export default function Footer() {
                 <li key={link.h}>
                   <Link
                     to={link.h}
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     className="block rounded-2xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-sky-700"
                   >
                     {link.l}
@@ -63,7 +64,7 @@ export default function Footer() {
               {data.services.slice(0, 6).map((service) => (
                 <li key={service.id}>
                   <Link
-                    to="/features"
+                    to={`/features#service-${service.id}`}
                     className="block rounded-2xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-sky-700"
                   >
                     <div className="font-semibold">{service.title}</div>

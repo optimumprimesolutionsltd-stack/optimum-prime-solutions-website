@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Routes, Route, useNavigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { SiteProvider } from './context/SiteContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { OfflineBanner } from './components/OfflineBanner';
@@ -23,6 +23,13 @@ type View = 'site' | 'login' | 'admin';
 function Inner() {
   const [view, setView] = useState<View>('site');
   const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (view === 'site') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [location.pathname, view]);
 
   useEffect(() => {
     const check = () => {

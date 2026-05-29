@@ -13,7 +13,13 @@ export default function About() {
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{once:true}} variants={{visible:{transition:{staggerChildren:0.15}}}}>
-            <motion.span variants={fade} custom={0} className="inline-block rounded-full bg-sky-100 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-sky-700">About Optimum Prime Solutions</motion.span>
+            <motion.span
+              variants={fade}
+              custom={0}
+              className="inline-block rounded-full bg-gradient-to-r from-sky-500 to-cyan-400 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white shadow-lg shadow-cyan-200/30"
+            >
+              About Optimum Prime Solutions
+            </motion.span>
             <motion.h2 variants={fade} custom={1} className="mt-4 text-3xl sm:text-4xl font-bold text-slate-950">Systems That Help Businesses Grow</motion.h2>
             <motion.p variants={fade} custom={2} className="mt-4 text-slate-700 leading-relaxed">Optimum Prime Solutions combines technology implementation, secure cloud infrastructure, and operational consulting to deliver financial clarity, centralized reporting, and scalable systems for multi-branch businesses.</motion.p>
             <motion.p variants={fade} custom={3} className="mt-4 text-slate-600 leading-relaxed">We move companies beyond basic accounting into reliable systems that improve decision-making, accountability, and operational efficiency — from implementation and training to ongoing optimization and support.</motion.p>
