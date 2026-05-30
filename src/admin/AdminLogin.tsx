@@ -36,7 +36,7 @@ export default function AdminLogin({ onLogin }: Props) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-navy-950 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#001f3f] px-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-3">
