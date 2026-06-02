@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { MessageCircle, X, Send, Bot, User, Minimize2, Sparkles, RotateCcw } from 'lucide-react';
+import { X, Send, Bot, User, Minimize2, Sparkles, RotateCcw } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { useSite } from '../context/SiteContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -293,16 +293,19 @@ export default function Chatbot() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
-            className="fixed bottom-6 right-6 z-40 h-14 w-14 rounded-full bg-gradient-to-br from-sky-500 via-blue-600 to-blue-700 text-white shadow-2xl shadow-blue-600/40 hover:scale-110 transition-all flex items-center justify-center gap-2 px-3 group"
-            aria-label="Chat"
+            className="fixed bottom-6 right-6 z-40 h-16 w-16 rounded-full bg-[#25D366] text-white shadow-2xl shadow-[#25D366]/40 hover:scale-110 transition-all flex items-center justify-center"
+            aria-label="Open chat and WhatsApp"
+            title="Open chat and WhatsApp"
           >
-            <WhatsAppIcon className="h-4 w-4 text-green-400" />
+            <div className="absolute left-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/20 shadow-sm">
+              <WhatsAppIcon className="h-4 w-4 text-white" />
+            </div>
             <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
-              <MessageCircle className="h-6 w-6" />
+              <WhatsAppIcon className="h-8 w-8 text-white" />
             </motion.div>
             <span className="absolute -top-1 -right-1 flex h-4 w-4">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-sky-500 opacity-75" />
-              <span className="relative h-4 w-4 rounded-full bg-sky-500" />
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/30 opacity-60" />
+              <span className="relative h-4 w-4 rounded-full bg-white/60" />
             </span>
           </motion.button>
         )}
@@ -323,23 +326,23 @@ export default function Chatbot() {
             {/* Header */}
             <div className="flex items-center justify-between bg-gradient-to-r from-slate-900 to-slate-700 px-4 py-3 shrink-0">
               <div className="flex items-center gap-2.5">
-                <div className="relative h-8 w-8 rounded-full bg-white/10 flex items-center justify-center">
-                  <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity }}>
-                    <Bot className="h-4 w-4 text-sky-300" />
-                  </motion.div>
-                  <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-slate-950 bg-green-400" />
-                </div>
-                  {/* WhatsApp quick link */}
-                  <a
-                    href={`https://wa.me/${data.contact.whatsapp}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 ml-1"
-                    title="Chat on WhatsApp"
-                    aria-label="WhatsApp"
-                  >
-                    <WhatsAppIcon className="h-5 w-5 text-green-400" />
-                  </a>
+                  <div className="relative h-8 w-8 rounded-full bg-[#25D366] flex items-center justify-center">
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity }}>
+                      <WhatsAppIcon className="h-4 w-4 text-white" />
+                    </motion.div>
+                    <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-white/80" />
+                  </div>
+                    {/* WhatsApp quick link */}
+                    <a
+                      href={`https://wa.me/${data.contact.whatsapp}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 ml-1"
+                      title="Chat on WhatsApp"
+                      aria-label="WhatsApp"
+                    >
+                      <WhatsAppIcon className="h-5 w-5 text-green-400" />
+                    </a>
                 {!min && (
                   <div>
                     <p className="text-sm font-semibold text-white">Optimum Assistant</p>
