@@ -27,77 +27,93 @@ function getBotResponse(q: string, d: SiteData): Msg {
   const responses: Array<{ pattern: RegExp; message: string; action?: Msg['action']; badge?: Msg['badge']; }> = [
     {
       pattern: /^(hi|hello|hey|jambo|habari|sasa|hallo)/,
-      message: `Hello! 👋 Welcome to ${d.company.name}. How can I assist you today? I can help with:\n\n✦ Services & solutions\n✦ Pricing, editions & integrations\n✦ KRA compliance and payroll\n✦ Remote access and training\n✦ Demo requests and FAQs`,
+      message: `Hello! 👋 Welcome to ${d.company.name}. I can help with:\n\n✦ KRA & eTIMS compliance\n✦ Payroll & PAYE setup\n✦ Banking integrations\n✦ Inventory management\n✦ Collections & receivables\n✦ Audit readiness\n✦ System migration\n\nWhat can I help you with?`,
     },
     {
       pattern: /demo|trial|test|try/,
-      message: `🎯 Perfect! I'd love to help you schedule a demo.\n\nClick the demo button below to request one, or:\n\n📞 ${d.contact.phones[0]}\n📧 ${d.contact.emails[0]}\n💬 WhatsApp: wa.me/${d.contact.whatsapp}`,
+      message: `🎯 Perfect! Let me schedule a demo for you.\n\nClick "Open Demo Form" or contact directly:\n📞 ${d.contact.phones[0]}\n📧 ${d.contact.emails[0]}\n💬 WhatsApp: wa.me/${d.contact.whatsapp}`,
       action: 'demo',
     },
     {
-      pattern: /price|cost|how much|silver|gold|edition/,
-      message: `**Tally Prime Pricing:**\n\n${d.products.map((p) => `• **${p.name} ${p.edition}**: ${p.price} (${p.period})`).join('\n')}\n\nContact us for volume discounts and training packages!`,
+      pattern: /price|cost|how much|silver|gold|edition|investment|budget/,
+      message: `💰 **Tally Prime Pricing:**\n\n${d.products.map((p) => `• **${p.name} ${p.edition}**: ${p.price} (${p.period})\n  ${p.features[0]}`).join('\n\n')}\n\n✓ Volume discounts available\n✓ Custom TDL from KES 25,000\n✓ Training included\n\nLet's find the right fit!`,
     },
     {
-      pattern: /service|what (do|can) you|offer|provide/,
-      message: `🚀 **Our Services:**\n\n${d.services.map((s) => `• **${s.title}**: ${s.desc}`).join('\n')}\n\nWhich service interests you?`,
+      pattern: /service|what.*offer|provide|do you/,
+      message: `🚀 **Our Services:**\n\n${d.services.slice(0, 8).map((s, i) => `${i+1}. **${s.title}**\n   ${s.desc}`).join('\n\n')}\n\nWhich interests you most?`,
     },
     {
-      pattern: /edition|compare|silver|gold|plus|enterprise/,
-      message: `**Tally Prime Editions:**\n\n• **Silver**: Single user accounting, ideal for small businesses.\n• **Multi-user**: Multi-user access with remote login.\n• **Plus / Enterprise**: Scalable operations, branch workflows, and cloud-ready deployment.\n\nI can recommend the best edition for your business.`,
-    },
-    {
-      pattern: /integrat|api|pos|bank|third-party|payment/,
-      message: `🔗 **Integrations:**\n\nWe connect Tally Prime with POS, banking, payment, and other systems using custom TDL and supported APIs. This keeps accounting, inventory, and bank feeds synchronized.\n\nTell me which systems you want to link.`,
-    },
-    {
-      pattern: /train|training|staff|users|onboard/,
-      message: `👥 **Training & Onboarding**\n\nWe offer practical training for finance, operations, and management teams. Training can be on-site or remote and covers Tally Prime workflows, reporting, payroll, and compliance.\n\nAsk for a training plan that fits your team.`,
-    },
-    {
-      pattern: /support package|support plan|after-sales|maintenance|support options/,
-      message: `🛠️ **Support Plans**\n\nChoose from remote support, health checks, software updates, and on-site visits. Our response time is typically under 1 hour for urgent issues.\n\nWe can set up a support plan suited to your business size.`,
-    },
-    {
-      pattern: /remote|cloud|access|online|work anywhere|multi-branch/,
-      message: `☁️ **Remote Access & Cloud**\n\nTally Prime supports secure remote access. We also offer cloud hosting options so your team can access centralized Tally Prime data from anywhere.\n\nPerfect for multi-branch and remote teams.`,
-    },
-    {
-      pattern: /kra|tax|vat|etims|compliance|e-filing/,
-      message: `📋 **KRA & eTIMS Compliance**\n\nWe configure Tally Prime for 100% KRA compliance:\n✓ VAT computation & filing\n✓ PAYE calculations\n✓ Income tax reports\n✓ eTIMS integration\n✓ iTax e-Filing setup\n\nNever miss a deadline!`,
+      pattern: /kra|etims|e-filing|tax|vat|compliance|excise|cdf|pin|filing/,
+      message: `📋 **KRA & eTIMS Compliance**\n\nWe configure 100% KRA compliance:\n✓ VAT computation & e-filing\n✓ PAYE auto-calculation\n✓ Income tax reporting\n✓ eTIMS integration\n✓ iTax e-Filing\n✓ Excise duty tracking\n✓ Certificate of Tax Compliance\n✓ Deadline alerts\n\nNever miss a deadline! Ready to set up?`,
       badge: 'kra',
     },
     {
-      pattern: /payroll|salary|paye|nhif|nssf|housing|staff/,
-      message: `💰 **Payroll Management**\n\nOur payroll module handles:\n✓ Auto salary processing\n✓ PAYE, NHIF, NSSF, Housing Levy\n✓ Payslip generation\n✓ Leave management\n✓ Loan deductions\n\nFully configured for Kenya!`,
+      pattern: /payroll|salary|paye|nhif|nssf|housing|staff|employee|wage|deduction|leave|advance/,
+      message: `💰 **Payroll Management**\n\nAutomate payroll processing:\n✓ Auto salary calculation\n✓ PAYE withholding\n✓ NHIF deductions\n✓ NSSF contributions\n✓ Housing Levy (3%)\n✓ Leave tracking\n✓ Loan deductions\n✓ Advance settlements\n\n📊 **Reports:**\n• Individual payslips\n• Bank transfer lists\n• PAYE schedules\n• NHIF/NSSF remittance\n\nFully Kenya compliant!`,
     },
     {
-      pattern: /inventor|stock|inventory|product|item|batch/,
-      message: `📦 **Inventory Management**\n\nReal-time stock tracking:\n✓ Multi-location support\n✓ Batch & expiry management\n✓ Reorder point alerts\n✓ Barcode integration\n✓ Stock transfers\n\nPerfect for retail, wholesale & manufacturing!`,
+      pattern: /bank|payment|gateway|mpesa|reconcil|cash|cheque|transfer|account/,
+      message: `🏦 **Banking & Payment Integration**\n\nSeamless banking workflows:\n✓ Bank reconciliation automation\n✓ M-Pesa payment tracking\n✓ Cheque management\n✓ Payment gateway integration\n✓ Cash flow forecasting\n✓ Multi-bank account support\n✓ Real-time bank feeds\n\n💳 **Supported Banks:**\n• KCB, Equity, I&M, Absa, Standard Chartered\n• M-Pesa for business\n• PayPal & Stripe for e-commerce\n\nSetup takes < 1 hour!`,
     },
     {
-      pattern: /manufactur|produc|bom|bill|cost|quality/,
-      message: `🏭 **Manufacturing Solutions**\n\nStreamline production with:\n✓ Bill of Materials (BOM)\n✓ Production orders\n✓ Work-in-progress tracking\n✓ Cost analysis\n✓ Quality control\n\nIncrease efficiency & reduce costs!`,
+      pattern: /collections|receivable|invoice|credit|customer|debtors|aging|recovery|dso|cash flow/,
+      message: `📲 **Collections & Receivables**\n\nMaximize cash collection:\n✓ Credit limit management\n✓ Invoice aging reports\n✓ Dunning automation\n✓ Payment reminders\n✓ Customer statements\n✓ Collection tracking\n✓ Bad debt provisioning\n\n📈 **Improve Cash Flow:**\n• Automated follow-up\n• Credit scoring\n• Early payment discounts\n• Late payment penalties\n\nReduce DSO by 30-40%!`,
     },
     {
-      pattern: /contact|reach|phone|call|email|where|location|address|ruiru/,
-      message: `📞 **Contact Us:**\n\n${d.contact.phones.map((p) => `📱 ${p}`).join('\n')}\n${d.contact.emails.map((e) => `📧 ${e}`).join('\n')}\n📍 ${d.contact.location}\n\n🕐 ${d.contact.workingHours.join(' | ')}`,
+      pattern: /inventor|stock|warehouse|product|item|sku|batch|expiry|reorder|location|distribution/,
+      message: `📦 **Inventory Management**\n\nReal-time stock control:\n✓ Multi-location warehousing\n✓ Batch & serial tracking\n✓ Expiry date management\n✓ Barcode scanning\n✓ Auto reorder alerts\n✓ Stock transfers\n✓ Consignment tracking\n\n🎯 **Features:**\n• Safety stock calculations\n• FIFO/LIFO valuation\n• Stock loss reporting\n• Inventory cycles\n• Cost analysis\n\nWorks for retail, wholesale, manufacturing & F&B!`,
     },
     {
-      pattern: /support|help|troubleshoot|issue|problem|urgent/,
-      message: `🔧 **24/7 Support Available**\n\n✓ Remote assistance\n✓ On-site visits\n✓ Software updates\n✓ Training sessions\n✓ Response time: < 1 hour\n\n📞 ${d.contact.phones[0]}`,
+      pattern: /branch|multi-branch|distributed|location|site|head office|regional|chain|franchise/,
+      message: `🏢 **Multi-Branch Accounting**\n\nCentralized control, local autonomy:\n✓ Branch-wise P&L\n✓ Consolidated reporting\n✓ Inter-branch transfers\n✓ Central bank account\n✓ Shared master data\n✓ Branch expense tracking\n✓ Performance comparison\n\n📊 **Reports:**\n• Financial statements by branch\n• Variance analysis\n• Sales by location\n• Expense allocation\n\nPerfect for retail chains, service providers & franchises!`,
     },
     {
-      pattern: /tdl|custom|report|integrat|api|automat/,
-      message: `⚙️ **TDL Customization**\n\nCustom Tally Definition Language:\n✓ Custom reports & invoices\n✓ Workflow automation\n✓ Third-party integrations\n✓ API development\n\nPricing starts from KES 25,000 per project.`,
+      pattern: /migrat|upgrade|import|data|legacy|transfer|move from|switch|convert|import data/,
+      message: `🔄 **System Migration & Data Transfer**\n\nSmooth transition to Tally Prime:\n✓ Data import from legacy systems\n✓ Opening balance migration\n✓ Customer/supplier mapping\n✓ Inventory balance transfer\n✓ Historical data archival\n✓ Zero data loss guarantee\n✓ Parallel run support\n\n⚙️ **Our Process:**\n1. Data audit & validation\n2. Mapping & transformation\n3. Test migration\n4. Live cutover\n5. Post-migration support\n\n🎯 Typically 2-4 weeks with training!`,
     },
     {
-      pattern: /about|company|who|mission|vision|history|team/,
-      message: `🏢 **${d.company.name}**\n\n${d.company.about[0]}\n\n${d.company.stats.map((s) => `${s.label}: ${s.value}`).join(' | ')}`,
+      pattern: /manufactur|production|bom|bill of material|process|wip|work in progress|cost|labor|batch|waste/,
+      message: `🏭 **Manufacturing Solutions**\n\nStreamline production:\n✓ Bill of Materials (BOM)\n✓ Production orders\n✓ Work-in-progress tracking\n✓ Job costing\n✓ Quality control\n✓ Labor allocation\n✓ Batch tracking\n✓ Waste management\n\n📊 **Analysis:**\n• Cost per unit\n• Production efficiency\n• Material usage variance\n• Timeline tracking\n\nGreat for food, pharma, textiles & heavy manufacturing!`,
     },
     {
-      pattern: /thank|bye|asante|goodbye|see you|ciao|tata/,
-      message: `You're welcome! 😊 Feel free to reach out anytime.\n\n📞 ${d.contact.phones[0]}\n💬 wa.me/${d.contact.whatsapp}`,
+      pattern: /audit|audit trail|internal control|risk|fraud|sox|sarbanes|compliance check|regulatory/,
+      message: `🔐 **Audit Readiness & Controls**\n\nMeet regulatory requirements:\n✓ Complete audit trail\n✓ User access controls\n✓ Approval workflows\n✓ Exception reporting\n✓ Document retention\n✓ Balance sheet reconciliation\n✓ Fraud detection\n\n📋 **For Auditors:**\n• General ledger with drill-down\n• Journal entries with approvals\n• User activity logs\n• System snapshots\n• Compliance checklist\n\nPrepare for audits in hours, not weeks!`,
+    },
+    {
+      pattern: /train|training|staff|onboard|workshop|cert|skill|learn|course|education/,
+      message: `👥 **Training & Onboarding**\n\nBuild capability in your team:\n✓ On-site training sessions\n✓ Remote workshops\n✓ One-on-one coaching\n✓ Video tutorials\n✓ User manuals\n✓ Role-based training\n✓ Certification programs\n\n📚 **Topics:**\n• Daily operations\n• Reporting & analysis\n• KRA compliance\n• Banking & collections\n• Inventory management\n• Advanced features\n\nTraining included in all packages!`,
+    },
+    {
+      pattern: /remote|cloud|access|online|work from|anywhere|mobile|app|vpn/,
+      message: `☁️ **Remote Access & Cloud Hosting**\n\nAccess Tally Prime anywhere, anytime:\n✓ Secure cloud infrastructure\n✓ Multi-device support\n✓ VPN integration\n✓ Mobile app access\n✓ Automatic hourly backups\n✓ Disaster recovery\n✓ ISO 27001 compliance\n\n🔒 **Security:**\n• 256-bit encryption\n• Multi-factor authentication\n• Regular security audits\n\nPerfect for remote teams & hybrid work!`,
+    },
+    {
+      pattern: /integrat|api|connector|plugin|third-party|sync|webhook|automat|pos|crm|erp|hr/,
+      message: `🔗 **Integrations & API Solutions**\n\nConnect Tally Prime with your ecosystem:\n✓ POS system integration\n✓ E-commerce platform sync\n✓ CRM integration\n✓ HR software link\n✓ Email & document automation\n✓ Custom API development\n✓ Workflow automation\n\n💼 **Common Integrations:**\n• Shopify & WooCommerce\n• LinkedIn & ATS\n• Google Workspace\n• Slack notifications\n• Power BI dashboards\n\nCustom TDL & API from KES 25,000!`,
+    },
+    {
+      pattern: /report|dashboard|analysis|insight|forecast|budget|projection|kpi|metric/,
+      message: `📊 **Advanced Reporting & Analytics**\n\nTurn data into decisions:\n✓ Real-time dashboards\n✓ Financial reports\n✓ Budget vs. actual\n✓ Cash flow forecast\n✓ KPI tracking\n✓ Variance analysis\n✓ Custom reports\n✓ Data export (Excel/PDF)\n\n🎯 **Key Reports:**\n• P&L statements\n• Balance sheets\n• Cash flow analysis\n• Profitability by product\n• Customer/supplier analysis\n• Tax reports\n\nMake data-driven decisions daily!`,
+    },
+    {
+      pattern: /support|help|issue|problem|error|troubleshoot|bug|urgent|sla|response|maintenance|update/,
+      message: `🛠️ **24/7 Support & Maintenance**\n\nWe're always here for you:\n✓ Phone support (24 hours)\n✓ Email ticketing system\n✓ Remote troubleshooting\n✓ On-site visits available\n✓ Software updates\n✓ Preventive maintenance\n✓ Performance optimization\n\n⚡ **Service Levels:**\n• Critical: <1 hour response\n• High: <4 hours response\n• Medium: <24 hours response\n• Low: <48 hours response\n\n📞 ${d.contact.phones[0]}`,
+    },
+    {
+      pattern: /edition|silver|gold|plus|enterprise|compare|difference|choose|which|best/,
+      message: `📦 **Tally Prime Editions**\n\n**Silver** - Small businesses\n✓ Single-user\n✓ Basic inventory\n✓ Multi-currency\n• Best for: Startups, sole traders\n\n**Gold** - Growing businesses\n✓ Multi-user (up to 5)\n✓ Advanced inventory\n✓ Remote access\n• Best for: SMEs, branches\n\n**Plus** - Mid-market\n✓ Multi-location\n✓ Manufacturing\n✓ Advanced reporting\n• Best for: 50-200 employees\n\n**Enterprise** - Large organizations\n✓ Unlimited users\n✓ Full customization\n✓ API access\n• Best for: 200+ employees\n\nNeed help choosing?`,
+    },
+    {
+      pattern: /contact|reach|phone|call|email|location|address|office|visit|meeting|where/,
+      message: `📞 **Contact & Office Information**\n\n${d.contact.phones.map((p) => `📱 ${p}`).join('\n')}\n${d.contact.emails.map((e) => `📧 ${e}`).join('\n')}\n📍 ${d.contact.location}\n\n🕐 **Working Hours:**\n${d.contact.workingHours.map((h) => `• ${h}`).join('\n')}\n\nSchedule a meeting or get a quote!`,
+    },
+    {
+      pattern: /about|company|who|mission|vision|history|team|background|credential|expert|partner/,
+      message: `🏢 **About Optimum Prime Solutions**\n\n${d.company.about[0]}\n\n📈 **By the Numbers:**\n${d.company.stats.map((s) => `• ${s.label}: ${s.value}`).join('\n')}\n\n✓ Certified Tally Gold Partner\n✓ KRA Compliance Experts\n✓ Trusted by 500+ businesses in Kenya\n✓ 10+ years of implementation experience\n\nLet's help your business grow!`,
+    },
+    {
+      pattern: /thank|bye|asante|goodbye|see you|ciao|tata|cheers|exit/,
+      message: `You're welcome! 😊 Feel free to reach out anytime.\n\n📞 ${d.contact.phones[0]}\n💬 wa.me/${d.contact.whatsapp}\n\nHave a great day! 🚀`,
     },
   ];
 
@@ -127,37 +143,43 @@ function getBotResponse(q: string, d: SiteData): Msg {
   return {
     id: Date.now().toString(),
     role: 'bot',
-    text: `Thanks for your question! 🤔 Our team can help you directly:\n\n📞 ${d.contact.phones[0]}\n📧 ${d.contact.emails[0]}\n💬 wa.me/${d.contact.whatsapp}\n\nOr ask about: services, pricing, KRA, payroll, demo`,
+    text: `Great question! 🤔 I didn't catch all the details, but our team can help:\n\n📞 ${d.contact.phones[0]}\n📧 ${d.contact.emails[0]}\n💬 wa.me/${d.contact.whatsapp}\n\nOr try asking about:\n✓ KRA compliance\n✓ Payroll setup\n✓ Banking integrations\n✓ Collections management\n✓ Inventory control\n✓ System migration`,
     time,
   };
 }
 
 function FormatMessage({ text }: { text: string }) {
+  const formatInline = (content: string) => {
+    const parts = content.split(/(\*\*[^*]+\*\*)/g);
+    return parts.map((part, j) =>
+      part.startsWith('**') && part.endsWith('**') ? (
+        <strong key={j} className="font-semibold text-slate-900 dark:text-white">
+          {part.slice(2, -2)}
+        </strong>
+      ) : (
+        <span key={j}>{part}</span>
+      )
+    );
+  };
+
   return (
     <>
       {text.split('\n').map((line, i) => {
-        const parts = line.split(/(\*\*[^*]+\*\*)/g);
-        const formatted = parts.map((part, j) =>
-          part.startsWith('**') && part.endsWith('**') ? (
-            <strong key={j} className="font-semibold text-slate-900 dark:text-white">
-              {part.slice(2, -2)}
-            </strong>
-          ) : (
-            <span key={j}>{part}</span>
-          )
-        );
+        const trimmed = line.trim();
+        if (!trimmed) return <br key={i} />;
 
-        if (!line.trim()) return <br key={i} />;
-        if (line.trim().startsWith('•') || line.trim().startsWith('✓') || line.trim().startsWith('✦')) {
-          const symbol = line.trim()[0];
+        const bulletMatch = trimmed.match(/^([•✓✦])\s*(.*)$/);
+        if (bulletMatch) {
+          const [, symbol, rest] = bulletMatch;
           return (
             <div key={i} className="ml-1 flex gap-1.5">
               <span className="text-sky-500">{symbol}</span>
-              <span>{formatted.slice(1)}</span>
+              <span>{formatInline(rest)}</span>
             </div>
           );
         }
-        return <div key={i}>{formatted}</div>;
+
+        return <div key={i}>{formatInline(line)}</div>;
       })}
     </>
   );
@@ -169,11 +191,11 @@ export default function Chatbot() {
     'Request a demo',
     'Pricing & editions',
     'KRA compliance',
-    'Remote access',
-    'Training & onboarding',
-    'Cloud hosting',
-    'Support plans',
-    'Implementation',
+    'Payroll setup',
+    'Banking integrations',
+    'Inventory management',
+    'Branch accounting',
+    'System migration',
   ];
   const [open, setOpen] = useState(false);
   const [min, setMin] = useState(false);
@@ -464,14 +486,14 @@ export default function Chatbot() {
                     </p>
                     <div className="flex flex-wrap gap-1">
                               {[
-                                'Services & pricing',
-                                'Request a demo',
                                 'KRA compliance',
-                                'Remote access',
-                                'Training options',
-                                'Cloud hosting',
-                                'Support plan',
-                                'Implementation',
+                                'Payroll setup',
+                                'Banking integrations',
+                                'Collections',
+                                'Inventory control',
+                                'System migration',
+                                'Audit readiness',
+                                'Request a demo',
                               ].map((s) => (
                         <motion.button
                           key={s}
