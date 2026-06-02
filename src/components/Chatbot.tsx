@@ -4,6 +4,7 @@ import WhatsAppIcon from './WhatsAppIcon';
 import { useSite } from '../context/SiteContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import DemoRequestModal from './DemoRequestModal';
+import KraLogo from './KraLogo';
 import { getChatGPTReply } from '../utils/chatgpt';
 import type { SiteData } from '../data/siteData';
 
@@ -13,6 +14,7 @@ interface Msg {
   text: string;
   time: string;
   action?: 'demo' | 'contact';
+  badge?: 'kra';
 }
 
 const getTime = () =>
@@ -22,7 +24,7 @@ function getBotResponse(q: string, d: SiteData): Msg {
   const lc = q.toLowerCase();
   const time = getTime();
 
-  const responses = [
+  const responses: Array<{ pattern: RegExp; message: string; action?: Msg['action']; badge?: Msg['badge']; }> = [
     {
       pattern: /^(hi|hello|hey|jambo|habari|sasa|hallo)/,
       message: `Hello! 👋 Welcome to ${d.company.name}. How can I assist you today? I can help with:\n\n✦ Services & solutions\n✦ Pricing, editions & integrations\n✦ KRA compliance and payroll\n✦ Remote access and training\n✦ Demo requests and FAQs`,
@@ -63,6 +65,7 @@ function getBotResponse(q: string, d: SiteData): Msg {
     {
       pattern: /kra|tax|vat|etims|compliance|e-filing/,
       message: `📋 **KRA & eTIMS Compliance**\n\nWe configure Tally Prime for 100% KRA compliance:\n✓ VAT computation & filing\n✓ PAYE calculations\n✓ Income tax reports\n✓ eTIMS integration\n✓ iTax e-Filing setup\n\nNever miss a deadline!`,
+      badge: 'kra',
     },
     {
       pattern: /payroll|salary|paye|nhif|nssf|housing|staff/,
@@ -98,9 +101,9 @@ function getBotResponse(q: string, d: SiteData): Msg {
     },
   ];
 
-  for (const { pattern, message, action } of responses) {
+  for (const { pattern, message, action, badge } of responses) {
     if (pattern.test(lc)) {
-      return { id: Date.now().toString(), role: 'bot', text: message, time, action: action as any };
+      return { id: Date.now().toString(), role: 'bot', text: message, time, action: action as any, badge };
     }
   }
 
@@ -205,20 +208,41 @@ export default function Chatbot() {
       time: getTime(),
     };
 
+    const trimmedText = txt.trim();
+    const isGreeting = /^(hi|hello|hey|jambo|habari|sasa|hallo)\b/i.test(trimmedText);
+    const kraQueryRegex = /\b(kra|etims|e-filing|tax|vat|compliance)\b/i;
+    const replyBadge = kraQueryRegex.test(trimmedText) ? 'kra' : undefined;
+
     setMsgs((p) => [...p, userMsg]);
     setInput('');
+
+    if (isGreeting) {
+      const botMsg = getBotResponse(trimmedText, data);
+      if (botMsg.action === 'demo') setDemoOpen(true);
+      setMsgs((p) => [...p, botMsg]);
+      return;
+    }
+
     setTyping(true);
 
     (async () => {
       try {
-        const reply = await getChatGPTReply(txt, data);
-        const botMsg: Msg = { id: Date.now().toString(), role: 'bot', text: reply, time: getTime() };
+        const reply = await getChatGPTReply(trimmedText, data);
+        if (!reply?.trim()) throw new Error('EMPTY_REPLY');
+
+        const botMsg: Msg = {
+          id: Date.now().toString(),
+          role: 'bot',
+          text: reply,
+          time: getTime(),
+          badge: replyBadge,
+        };
+
         setMsgs((p) => [...p, botMsg]);
       } catch (err) {
-        // fallback to existing rule-based bot if no key or error
-        const botMsg = getBotResponse(txt, data);
+        const botMsg = getBotResponse(trimmedText, data);
         if (botMsg.action === 'demo') setDemoOpen(true);
-        setMsgs((p) => [...p, botMsg]);
+        setMsgs((p) => [...p, { ...botMsg, badge: botMsg.badge || replyBadge }]);
       } finally {
         setTyping(false);
       }
@@ -353,7 +377,7 @@ export default function Chatbot() {
                         }`}
                       >
                         {m.role === 'bot' ? (
-                            <Bot className="h-3.5 w-3.5 text-sky-300" />
+                          <Bot className="h-3.5 w-3.5 text-sky-300" />
                         ) : (
                           <User className="h-3.5 w-3.5 text-white" />
                         )}
@@ -365,7 +389,12 @@ export default function Chatbot() {
                             : 'rounded-tr-sm bg-gradient-to-br from-sky-500 to-blue-600 text-white'
                         }`}
                       >
-                        <FormatMessage text={m.text} />
+                        {m.badge === 'kra' && (
+                          <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700">
+                            <KraLogo className="h-4 w-4" />
+                            <span>KRA / eTIMS</span>
+                          </div>
+                        )} <FormatMessage text={m.text} />
                         {m.role === 'bot' && m.id === '0' && (
                           <div className="mt-3 flex flex-wrap gap-2">
                             {defaultQuickLinks.slice(0, 6).map((s) => (
