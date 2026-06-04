@@ -64,24 +64,22 @@ export default function TallyLanding() {
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
-      {/* Background: prefer people-on-laptop cinematic video. Add files to /public/ */}
+      {/* Background: team image fallback while video support can remain optional */}
+      <div className="absolute inset-0 -z-30 bg-cover bg-center" style={{ backgroundImage: "url('/tally-team-poster.jpg')" }} />
       <video
-        className="absolute inset-0 h-full w-full object-cover will-change-transform animate-videoZoom z-0 filter-bright"
+        className="absolute inset-0 h-full w-full object-cover will-change-transform animate-videoZoom z-10 filter-bright"
         autoPlay
         muted
         loop
         playsInline
-        poster="/tally-people-poster.jpg"
+        poster="/tally-team-poster.jpg"
       >
         <source src="/tally-people.webm" type="video/webm" />
         <source src="/tally-people.mp4" type="video/mp4" />
       </video>
 
-      {/* Image fallback for mobile or when video not available */}
-      <div className="absolute inset-0 -z-30 md:hidden bg-cover bg-center" style={{ backgroundImage: "url('/tally-people.jpg')" }} />
-
       {/* Gradient overlay to add color and contrast */}
-      <div className="absolute inset-0 z-10 bg-gradient-to-br from-[#0f172a66] via-[#0b122f55] to-[#04263a40] opacity-60 animate-[gradientShift_14s_linear_infinite] mix-blend-multiply" />
+      <div className="absolute inset-0 z-20 bg-gradient-to-br from-[#0f172a44] via-[#0b122f22] to-[#04263a20] opacity-40 animate-[gradientShift_14s_linear_infinite] mix-blend-multiply" />
 
       {/* Light streak (adds cinematic motion) */}
       <div className="absolute -left-1/4 top-1/4 z-15 h-1/2 w-3/4 -translate-x-12 transform-gpu overflow-hidden opacity-60">
