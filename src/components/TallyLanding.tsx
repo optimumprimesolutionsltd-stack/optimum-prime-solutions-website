@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import TallyPrimeIcon from './TallyPrimeIcon';
 
 export default function TallyLanding() {
   const confettiRoot = useRef<HTMLDivElement | null>(null);
@@ -63,7 +62,7 @@ export default function TallyLanding() {
   }, []);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden">
+    <section className="relative h-screen w-full overflow-hidden bg-red-700">
       {/* Background: team image fallback while video support can remain optional */}
       <div className="absolute inset-0 -z-30 bg-cover bg-center" style={{ backgroundImage: "url('/tally-team-poster.jpg')" }} />
       <video
@@ -78,8 +77,8 @@ export default function TallyLanding() {
         <source src="/tally-people.mp4" type="video/mp4" />
       </video>
 
-      {/* Light overlay to preserve image visibility */}
-      <div className="absolute inset-0 z-20 bg-black/10" />
+      {/* Red tint overlay for the landing picture */}
+      <div className="absolute inset-0 z-20 bg-red-700/30" />
 
 
       {/* Subtle particle layer using SVG shapes and CSS animation */}
@@ -108,17 +107,21 @@ export default function TallyLanding() {
           transition={{ duration: 0.9 }}
           className="space-y-6"
         >
+          <div className="mx-auto max-w-3xl rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs uppercase tracking-[0.3em] text-slate-100/80 shadow-sm shadow-black/10">
+            Certified Tally Prime partner
+          </div>
+
           <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl drop-shadow-lg">
-            Tally Prime — Kenya’s trusted accounting team
+            Optimum Prime Solutions is Kenya’s certified Tally Prime partner
           </h1>
 
           <p className="mx-auto max-w-2xl text-lg text-slate-200/90">
-            Built for Kenyan businesses, our Tally Prime implementations help local teams stay compliant, connected and confident.
+            We sell, install and support Tally Prime for Kenyan businesses — from accounting and inventory to payroll, KRA compliance and cloud access.
           </p>
 
           <div className="mt-6 flex justify-center gap-4">
-            <a href="#home" className="rounded-full bg-white/90 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg hover:opacity-95">Explore Services</a>
-            <a href="/contact" className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white/90 hover:bg-white/10">Contact Us</a>
+            <a href="#home" className="rounded-full bg-white/90 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg hover:opacity-95">Explore Tally Prime services</a>
+            <a href="/contact" className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white/90 hover:bg-white/10">Book a demo</a>
           </div>
         </motion.div>
       </div>

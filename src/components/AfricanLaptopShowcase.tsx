@@ -115,8 +115,7 @@ function renderThemeDecor(theme: ShowcaseTheme) {
 
 export default function AfricanLaptopShowcase({ tag, title, description, features, theme }: AfricanLaptopShowcaseProps) {
   const style = themeStyles[theme];
-  const { data } = useSite();
-  const bgImage = data?.heroImages?.[theme] || '/tally-team-poster.jpg';
+  const bgImage = '/tally-team-poster.jpg';
 
   const analytics: {
     cards: { label: string; value: string; detail: string }[];
@@ -204,7 +203,7 @@ export default function AfricanLaptopShowcase({ tag, title, description, feature
   }[theme];
 
   return (
-    <section className="relative overflow-hidden bg-slate-50 py-20">
+    <section className="relative overflow-hidden bg-slate-50 py-20 text-slate-950">
       <div className="absolute inset-0 -z-30 bg-cover bg-center" style={{ backgroundImage: `url('${bgImage}')` }} />
       <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-slate-900/5 to-transparent" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
