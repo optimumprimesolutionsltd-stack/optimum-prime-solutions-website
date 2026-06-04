@@ -78,20 +78,8 @@ export default function TallyLanding() {
         <source src="/tally-people.mp4" type="video/mp4" />
       </video>
 
-      {/* Gradient overlay to add color and contrast */}
-      <div className="absolute inset-0 z-20 bg-gradient-to-br from-[#0f172a44] via-[#0b122f22] to-[#04263a20] opacity-40 animate-[gradientShift_14s_linear_infinite] mix-blend-multiply" />
-
-      {/* Light streak (adds cinematic motion) */}
-      <div className="absolute -left-1/4 top-1/4 z-15 h-1/2 w-3/4 -translate-x-12 transform-gpu overflow-hidden opacity-60">
-        <div className="absolute -inset-6 h-full w-full rotate-12 transform-gpu bg-gradient-to-r from-transparent via-white/12 to-transparent blur-2xl animate-streak" />
-      </div>
-
-      {/* Animated bokeh orbs */}
-      <div className="pointer-events-none absolute inset-0 z-12 -z-0">
-        <div className="absolute left-10 top-20 h-40 w-40 rounded-full bg-[#ffd16633] blur-3xl animate-bob-1" />
-        <div className="absolute right-16 top-36 h-28 w-28 rounded-full bg-[#60a5fa33] blur-3xl animate-bob-2" />
-        <div className="absolute left-1/2 top-56 h-56 w-56 -translate-x-1/2 rounded-full bg-[#34d39933] blur-3xl animate-bob-3" />
-      </div>
+      {/* Light overlay to preserve image visibility */}
+      <div className="absolute inset-0 z-20 bg-black/10" />
 
       {/* Subtle particle layer using SVG shapes and CSS animation */}
       <svg className="pointer-events-none absolute inset-0 -z-20 h-full w-full" preserveAspectRatio="none">
@@ -132,24 +120,12 @@ export default function TallyLanding() {
             <TallyPrimeIcon className="h-28 w-28" showText={true} isDark={true} />
           </motion.div>
 
-          {/* Floating translucent UI cards to add life */}
-          <div className="absolute right-12 bottom-24 z-15 hidden lg:block">
-            <div className="mb-4 w-56 rounded-2xl bg-white/6 p-4 backdrop-blur-lg shadow-lg animate-float-slow">
-              <div className="h-3 w-28 rounded-full bg-white/30 mb-3" />
-              <div className="h-28 rounded-lg bg-white/8" />
-            </div>
-            <div className="w-44 rounded-2xl bg-white/6 p-3 backdrop-blur-lg shadow-lg animate-float-slower">
-              <div className="h-3 w-20 rounded-full bg-white/30 mb-2" />
-              <div className="h-20 rounded-lg bg-white/8" />
-            </div>
-          </div>
-
           <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl drop-shadow-lg">
-            Tally Prime — Cloud Hosting & Expert Implementation
+            Tally Prime — Kenya’s trusted accounting team
           </h1>
 
           <p className="mx-auto max-w-2xl text-lg text-slate-200/90">
-            Fast, secure Tally Prime deployments with business-ready reporting, inventory control and multi-location synchronization.
+            Built for Kenyan businesses, our Tally Prime implementations help local teams stay compliant, connected and confident.
           </p>
 
           <div className="mt-6 flex justify-center gap-4">
@@ -184,24 +160,12 @@ export default function TallyLanding() {
         /* Vibrant extras */
         .filter-bright { filter: brightness(1.08) contrast(1.08) saturate(1.12); }
 
-        @keyframes streak {
-          0% { transform: translateX(-30%) rotate(12deg); opacity: 0 }
-          10% { opacity: 0.6 }
-          50% { transform: translateX(30%) rotate(12deg); opacity: 0.35 }
-          100% { transform: translateX(80%) rotate(12deg); opacity: 0 }
-        }
-        .animate-streak { animation: streak 8s linear infinite; }
-
         @keyframes bob1 { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-18px) } }
         @keyframes bob2 { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
         @keyframes bob3 { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-28px) } }
         .animate-bob-1 { animation: bob1 7s ease-in-out infinite; }
         .animate-bob-2 { animation: bob2 9s ease-in-out infinite; }
         .animate-bob-3 { animation: bob3 11s ease-in-out infinite; }
-
-        .animate-float-slow { animation: floatCard 6s ease-in-out infinite; }
-        .animate-float-slower { animation: floatCard 9s ease-in-out infinite; }
-        @keyframes floatCard { 0% { transform: translateY(0) } 50% { transform: translateY(-12px) } 100% { transform: translateY(0) } }
         .confetti-flake {
           position: absolute;
           top: -6vh;
