@@ -64,20 +64,24 @@ export default function TallyLanding() {
 
   return (
     <section className="relative h-screen w-full overflow-hidden">
-      {/* Background video (optional). Add /public/tally-bg.mp4 for cinematic video. */}
+      {/* Background: prefer people-on-laptop cinematic video. Add files to /public/ */}
       <video
         className="absolute inset-0 h-full w-full object-cover will-change-transform animate-videoZoom"
         autoPlay
         muted
         loop
         playsInline
-        poster="/tally-bg-poster.jpg"
+        poster="/tally-people-poster.jpg"
       >
-        <source src="/tally-bg.mp4" type="video/mp4" />
+        <source src="/tally-people.webm" type="video/webm" />
+        <source src="/tally-people.mp4" type="video/mp4" />
       </video>
 
+      {/* Image fallback for mobile or when video not available */}
+      <div className="absolute inset-0 -z-30 md:hidden bg-cover bg-center" style={{ backgroundImage: "url('/tally-people.jpg')" }} />
+
       {/* Gradient overlay to add cinematic contrast */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-slate-900 via-indigo-900 to-sky-900 opacity-80 animate-[gradientShift_14s_linear_infinite]" />
+      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-slate-900 via-indigo-900 to-sky-900 opacity-60 animate-[gradientShift_14s_linear_infinite]" />
 
       {/* Subtle particle layer using SVG shapes and CSS animation */}
       <svg className="pointer-events-none absolute inset-0 -z-20 h-full w-full" preserveAspectRatio="none">
