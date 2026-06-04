@@ -81,6 +81,56 @@ export default function TallyLanding() {
       {/* Light overlay to preserve image visibility */}
       <div className="absolute inset-0 z-20 bg-black/10" />
 
+      {/* Tally Prime screen overlay for laptops */}
+      <div className="pointer-events-none absolute left-16 top-24 z-30 hidden md:block">
+        <div className="relative w-72 rounded-[2rem] border border-white/15 bg-slate-950/70 shadow-2xl backdrop-blur-xl">
+          <div className="h-4 rounded-t-[2rem] bg-white/10" />
+          <div className="p-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#0D5E99]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#F0B21F]" />
+                <span className="h-2.5 w-2.5 rounded-full bg-[#3BA3C9]" />
+              </div>
+              <div className="text-[10px] uppercase tracking-[0.3em] text-slate-300">Tally Prime</div>
+            </div>
+            <div className="space-y-3 rounded-[1.5rem] bg-slate-900/90 p-4 shadow-inner">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="h-3 w-24 rounded-full bg-cyan-400/70" />
+                  <div className="mt-2 h-2.5 w-16 rounded-full bg-slate-500/70" />
+                </div>
+                <div className="h-8 w-8 rounded-full bg-slate-700/80 flex items-center justify-center text-[10px] font-semibold text-slate-200">KP</div>
+              </div>
+              <div className="grid gap-2">
+                <div className="h-2.5 w-full rounded-full bg-slate-700/70" />
+                <div className="h-2.5 w-5/6 rounded-full bg-slate-700/70" />
+                <div className="h-2.5 w-4/6 rounded-full bg-slate-700/70" />
+              </div>
+              <div className="mt-4 flex items-center justify-between gap-3 text-xs text-slate-300">
+                <span className="inline-flex items-center gap-2 rounded-full bg-slate-800/70 px-2 py-1">Sales</span>
+                <span className="inline-flex items-center gap-2 rounded-full bg-slate-800/70 px-2 py-1">Inventory</span>
+              </div>
+            </div>
+          </div>
+          <div className="absolute inset-x-4 bottom-4 h-3 rounded-full bg-white/10" />
+        </div>
+      </div>
+
+      <div className="pointer-events-none absolute right-16 bottom-28 z-30 hidden lg:block">
+        <div className="relative w-56 rounded-[1.75rem] border border-white/10 bg-slate-950/70 shadow-2xl backdrop-blur-xl">
+          <div className="h-3 rounded-t-[1.75rem] bg-white/10" />
+          <div className="p-3">
+            <div className="h-2.5 w-20 rounded-full bg-slate-700/70 mb-3" />
+            <div className="space-y-2">
+              <div className="h-2.5 w-full rounded-full bg-cyan-400/60" />
+              <div className="h-2.5 w-5/6 rounded-full bg-slate-700/70" />
+              <div className="h-2.5 w-4/6 rounded-full bg-slate-700/70" />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Subtle particle layer using SVG shapes and CSS animation */}
       <svg className="pointer-events-none absolute inset-0 -z-20 h-full w-full" preserveAspectRatio="none">
         <defs>
