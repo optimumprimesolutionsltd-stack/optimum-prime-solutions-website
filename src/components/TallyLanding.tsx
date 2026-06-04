@@ -62,7 +62,7 @@ export default function TallyLanding() {
   }, []);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-red-700">
+    <section className="relative h-screen w-full overflow-hidden bg-sky-700">
       {/* Background: team image fallback while video support can remain optional */}
       <div className="absolute inset-0 -z-30 bg-cover bg-center" style={{ backgroundImage: "url('/tally-team-poster.jpg')" }} />
       <video
@@ -77,8 +77,8 @@ export default function TallyLanding() {
         <source src="/tally-people.mp4" type="video/mp4" />
       </video>
 
-      {/* Red tint overlay for the landing picture */}
-      <div className="absolute inset-0 z-20 bg-red-700/30" />
+      {/* Blue tint overlay for the landing picture */}
+      <div className="absolute inset-0 z-20 bg-sky-700/30" />
 
 
       {/* Subtle particle layer using SVG shapes and CSS animation */}

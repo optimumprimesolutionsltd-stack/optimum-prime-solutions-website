@@ -1,0 +1,9 @@
+node_modules
+picture-website.bundle
+picture-website.patch
+website.zip
+changed-files.zip
+files.zip
+.DS_Store
+.vscode
+*.log
