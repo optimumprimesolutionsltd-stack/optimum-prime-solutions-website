@@ -66,7 +66,7 @@ export default function TallyLanding() {
     <section className="relative h-screen w-full overflow-hidden">
       {/* Background: prefer people-on-laptop cinematic video. Add files to /public/ */}
       <video
-        className="absolute inset-0 h-full w-full object-cover will-change-transform animate-videoZoom"
+        className="absolute inset-0 h-full w-full object-cover will-change-transform animate-videoZoom z-0"
         autoPlay
         muted
         loop
@@ -80,8 +80,8 @@ export default function TallyLanding() {
       {/* Image fallback for mobile or when video not available */}
       <div className="absolute inset-0 -z-30 md:hidden bg-cover bg-center" style={{ backgroundImage: "url('/tally-people.jpg')" }} />
 
-      {/* Gradient overlay to add cinematic contrast */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-br from-slate-900 via-indigo-900 to-sky-900 opacity-60 animate-[gradientShift_14s_linear_infinite]" />
+      {/* Gradient overlay to add cinematic contrast (above video but subtle) */}
+      <div className="absolute inset-0 z-10 bg-gradient-to-br from-slate-900 via-indigo-900 to-sky-900 opacity-30 animate-[gradientShift_14s_linear_infinite]" />
 
       {/* Subtle particle layer using SVG shapes and CSS animation */}
       <svg className="pointer-events-none absolute inset-0 -z-20 h-full w-full" preserveAspectRatio="none">
@@ -106,7 +106,7 @@ export default function TallyLanding() {
         <div className="text-xs font-semibold text-white">Certified Tally Partner</div>
       </div>
 
-      <div ref={confettiRoot} className="relative z-10 mx-auto flex h-full max-w-7xl items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+      <div ref={confettiRoot} className="relative z-20 mx-auto flex h-full max-w-7xl items-center justify-center px-4 text-center sm:px-6 lg:px-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
