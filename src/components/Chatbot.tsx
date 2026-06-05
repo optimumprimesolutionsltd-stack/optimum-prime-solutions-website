@@ -294,12 +294,9 @@ export default function Chatbot() {
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
             className="fixed bottom-6 right-6 z-40 h-16 w-16 rounded-full bg-[#25D366] text-white shadow-2xl shadow-[#25D366]/40 hover:scale-110 transition-all flex items-center justify-center"
-            aria-label="Open chat and WhatsApp"
-            title="Open chat and WhatsApp"
+            aria-label="Open WhatsApp chat"
+            title="Open WhatsApp chat"
           >
-            <div className="absolute left-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-white/20 shadow-sm">
-              <WhatsAppIcon className="h-4 w-4 text-white" />
-            </div>
             <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
               <WhatsAppIcon className="h-8 w-8 text-white" />
             </motion.div>

@@ -1,0 +1,71 @@
+From ccc992867ecca68f21748d0abe44cc5d0fff3d87 Mon Sep 17 00:00:00 2001
+From: optimumprimesolutionsltd-stack <optimumprimesolutionsltd@gmail.com>
+Date: Thu, 4 Jun 2026 20:29:09 +0000
+Subject: [PATCH] Update landing page tint and Vercel static asset routing
+
+---
+ .vercelignore                   | 9 +++++++++
+ src/components/TallyLanding.tsx | 6 +++---
+ vercel.json                     | 6 +++++-
+ 3 files changed, 17 insertions(+), 4 deletions(-)
+ create mode 100644 .vercelignore
+
+diff --git a/.vercelignore b/.vercelignore
+new file mode 100644
+index 0000000..b24cb40
+--- /dev/null
++++ b/.vercelignore
+@@ -0,0 +1,9 @@
++node_modules
++picture-website.bundle
++picture-website.patch
++website.zip
++changed-files.zip
++files.zip
++.DS_Store
++.vscode
++*.log
+diff --git a/src/components/TallyLanding.tsx b/src/components/TallyLanding.tsx
+index 7304836..eb1fa35 100644
+--- a/src/components/TallyLanding.tsx
++++ b/src/components/TallyLanding.tsx
+@@ -62,7 +62,7 @@ export default function TallyLanding() {
+   }, []);
+ 
+   return (
+-    <section className="relative h-screen w-full overflow-hidden bg-red-700">
++    <section className="relative h-screen w-full overflow-hidden bg-sky-700">
+       {/* Background: team image fallback while video support can remain optional */}
+       <div className="absolute inset-0 -z-30 bg-cover bg-center" style={{ backgroundImage: "url('/tally-team-poster.jpg')" }} />
+       <video
+@@ -77,8 +77,8 @@ export default function TallyLanding() {
+         <source src="/tally-people.mp4" type="video/mp4" />
+       </video>
+ 
+-      {/* Red tint overlay for the landing picture */}
+-      <div className="absolute inset-0 z-20 bg-red-700/30" />
++      {/* Blue tint overlay for the landing picture */}
++      <div className="absolute inset-0 z-20 bg-sky-700/30" />
+ 
+ 
+       {/* Subtle particle layer using SVG shapes and CSS animation */}
+diff --git a/vercel.json b/vercel.json
+index 261424c..4e086f5 100644
+--- a/vercel.json
++++ b/vercel.json
+@@ -8,7 +8,11 @@
+   ],
+   "routes": [
+     {
+-      "src": "/(.*)",
++      "src": "^/(.*\\..+)$",
++      "dest": "/$1"
++    },
++    {
++      "src": "^/(.*)$",
+       "dest": "/index.html"
+     }
+   ]
+-- 
+2.53.0
+

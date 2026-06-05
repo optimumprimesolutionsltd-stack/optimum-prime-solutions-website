@@ -12,6 +12,8 @@ export interface SiteData {
   company: CompanyInfo; contact: ContactInfo; services: ServiceItem[]; products: ProductItem[];
   testimonials: TestimonialItem[]; faqs: FaqItem[]; industries: IndustryItem[];
   blogs: BlogPost[]; leads: Lead[];
+  // Optional mapping of page/theme -> hero image URL (use real photos of African users)
+  heroImages?: Record<string, string>;
 }
 
 export const defaultData: SiteData = {
@@ -33,6 +35,15 @@ export const defaultData: SiteData = {
     workingHours:['Mon – Fri: 8:00 AM – 6:00 PM','Sat: 9:00 AM – 1:00 PM'],
     whatsapp:'254116246074',
     mapUrl:'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.37!2d36.96!3d-1.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRuiru!5e0!3m2!1sen!2ske!4v1',
+  },
+  heroImages: {
+    about: 'https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    products: 'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    features: 'https://images.pexels.com/photos/3769717/pexels-photo-3769717.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    faq: 'https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    testimonials: 'https://images.pexels.com/photos/1181466/pexels-photo-1181466.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    blog: 'https://images.pexels.com/photos/3771113/pexels-photo-3771113.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    contact: 'https://images.pexels.com/photos/7570483/pexels-photo-7570483.jpeg?auto=compress&cs=tinysrgb&w=1600',
   },
   services: [
     {id:'1',title:'Tally Prime Installation & Setup',desc:'Complete installation, configuration, and data migration for Tally Prime Silver & Gold editions. Get up and running in 24 hours.',icon:'Download',features:['License activation','Data migration','Multi-user setup','Initial training'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
