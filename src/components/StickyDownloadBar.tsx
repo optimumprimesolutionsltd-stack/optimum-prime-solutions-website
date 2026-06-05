@@ -1,20 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X, ArrowRight } from 'lucide-react';
-import TallyLogo from './TallyLogo';
 
 export default function StickyDownloadBar() {
   const [show, setShow] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (dismissed) return;
-      setShow(window.scrollY > 800);
-    };
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    if (dismissed) return;
+    setShow(true);
   }, [dismissed]);
 
   if (dismissed) return null;
@@ -26,18 +20,17 @@ export default function StickyDownloadBar() {
           initial={{ y: -80, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: -80, opacity: 0 }}
-          className="fixed top-0 inset-x-0 z-[60] border-b border-slate-200 bg-white shadow-xl"
+          className="fixed top-0 inset-x-0 z-[60] border-b border-slate-800 bg-slate-950 shadow-2xl"
         >
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-wrap items-center justify-between gap-4 py-3 text-sm text-slate-700">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-900 text-white">
-                  <Download className="h-4 w-4" />
-                </div>
-                <div className="inline-flex items-center gap-2">
-                  <TallyLogo className="h-5 w-auto" />
-                  <span>Try TallyPrime free — Education Mode, no license needed.</span>
-                </div>
+            <div className="flex flex-wrap items-center justify-between gap-4 py-4 text-white">
+              <div className="flex flex-wrap items-center gap-4">
+                <img
+                  src="/tally-solutions-new-logo.png"
+                  alt="Tally Solutions logo"
+                  className="h-20 w-auto min-w-[80px] rounded-2xl border border-white/20 bg-white/10 p-2 shadow-xl"
+                />
+                <span className="text-base sm:text-xl font-bold text-white leading-tight">Try TallyPrime free — Education Mode, no license needed.</span>
               </div>
               <div className="flex items-center gap-3">
                 <a
