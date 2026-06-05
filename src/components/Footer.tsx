@@ -2,6 +2,7 @@ import { ArrowUp, Mail, MapPin, Phone } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
+import Logo from './Logo';
 
 const links = [
   { l: 'Home', h: '/' },
@@ -37,12 +38,13 @@ export default function Footer() {
       <div className="mx-auto max-w-7xl space-y-12 px-4 py-16 sm:px-6 lg:px-8">
         <div className="rounded-4xl bg-white/90 p-8 grid gap-8 lg:grid-cols-[1.4fr_0.9fr_0.9fr_1fr] shadow-2xl shadow-slate-200/20 ring-1 ring-slate-200/70">
           <div className="space-y-5">
-            <div className="flex flex-col items-start gap-3">
+            <div className="flex flex-col items-start gap-4">
               <img
                 src="/tally-solutions-new-logo.png"
                 alt="Tally Solutions logo"
                 className="w-full max-w-[320px] h-auto object-contain"
               />
+              <Logo className="h-20 w-auto mx-auto transform translate-x-6" />
             </div>
             <p className="max-w-md text-sm leading-relaxed text-slate-500">
               {data.company.tagline}. Your trusted Tally Prime partner in Kenya.
@@ -112,13 +114,14 @@ export default function Footer() {
                 Join
               </button>
             </form>
-            <div className="mt-6 flex justify-center">
+            <div className="mt-6 flex flex-col items-center gap-4">
               <img
                 src="/tally-solutions-new-logo.png"
                 alt="Tally Solutions logo"
                 className="mx-auto h-auto max-w-[320px] w-auto object-contain"
                 loading="lazy"
               />
+              <Logo className="h-20 w-auto mx-auto transform translate-x-6" />
             </div>
           </div>
         </div>

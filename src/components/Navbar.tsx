@@ -30,7 +30,7 @@ export default function Navbar() {
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 backdrop-blur bg-white/95 ${scrolled ? 'shadow-xl' : 'shadow-none'}`}
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 backdrop-blur-sm bg-gradient-to-b from-slate-100/95 via-slate-50/80 to-transparent border-b border-slate-200/10 ${scrolled ? 'shadow-[0_20px_80px_-40px_rgba(15,23,42,0.16)] border-slate-200/20' : 'shadow-none'}`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-18 items-center justify-between gap-4 py-3">
@@ -46,7 +46,7 @@ export default function Navbar() {
                   key={link.href}
                   to={link.href}
                   className={`px-4 py-2 text-sm font-medium transition ${
-                    isActive ? 'text-slate-950' : 'text-slate-700 hover:text-slate-950'
+                    isActive ? 'text-slate-950' : 'text-slate-600 hover:text-slate-950'
                   }`}
                 >
                   {link.label}
@@ -58,7 +58,7 @@ export default function Navbar() {
           <div className="hidden lg:flex items-center gap-3">
             <Link
               to="/contact"
-              className="inline-flex items-center gap-2 rounded-full bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-slate-800"
             >
               <Phone className="h-4 w-4" />
               Request Demo
@@ -81,7 +81,7 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden border-t border-slate-200 bg-white"
+            className="lg:hidden border-t border-slate-200 bg-gradient-to-b from-slate-50/95 via-slate-50/80 to-slate-50/70"
           >
             <div className="px-4 py-4 space-y-2">
               {links.map((link) => {

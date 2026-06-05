@@ -1,20 +1,14 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Download, X, ArrowRight } from 'lucide-react';
-import TallyLogo from './TallyLogo';
 
 export default function StickyDownloadBar() {
   const [show, setShow] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => {
-      if (dismissed) return;
-      setShow(window.scrollY > 800);
-    };
-    window.addEventListener('scroll', handleScroll);
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
+    if (dismissed) return;
+    setShow(true);
   }, [dismissed]);
 
   if (dismissed) return null;
@@ -23,28 +17,27 @@ export default function StickyDownloadBar() {
     <AnimatePresence>
       {show && (
         <motion.div
-          initial={{ y: -80, opacity: 0 }}
+          initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -80, opacity: 0 }}
-          className="fixed top-0 inset-x-0 z-[60] border-b border-slate-200 bg-white shadow-xl"
+          exit={{ y: -20, opacity: 0 }}
+          className="w-full mt-18 border-b border-sky-400/10 bg-gradient-to-r from-sky-800 via-sky-700 to-cyan-700 shadow-[0_20px_70px_-45px_rgba(2,32,91,0.35)]"
         >
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-wrap items-center justify-between gap-4 py-3 text-sm text-slate-700">
-              <div className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-2xl bg-slate-900 text-white">
-                  <Download className="h-4 w-4" />
-                </div>
-                <div className="inline-flex items-center gap-2">
-                  <TallyLogo className="h-5 w-auto" />
-                  <span>Try TallyPrime free — Education Mode, no license needed.</span>
-                </div>
+            <div className="flex flex-wrap items-center justify-between gap-4 py-2 text-white">
+              <div className="flex flex-wrap items-center gap-3">
+                <img
+                  src="/tally-solutions-new-logo.png"
+                  alt="Tally Solutions logo"
+                  className="h-20 w-auto min-w-[72px] rounded-2xl bg-white/90 p-2 shadow-[0_10px_28px_rgba(0,0,0,0.16)]"
+                />
+                <span className="text-sm sm:text-base font-semibold text-white leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.25)]">Try TallyPrime free — Education Mode, no license needed.</span>
               </div>
               <div className="flex items-center gap-3">
                 <a
                   href="https://tallysolutions.com/ssa/download/"
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full bg-red-600 px-4 py-2 text-xs font-semibold text-white transition hover:bg-red-700"
+                  className="inline-flex items-center gap-2 rounded-full bg-slate-100/95 px-4 py-2 text-xs font-semibold text-slate-900 transition hover:bg-white"
                 >
                   Download Now
                   <ArrowRight className="h-3 w-3" />
