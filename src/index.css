@@ -20,8 +20,14 @@
   --color-red-50: #fef2f2;
 }
 
+:root {
+  --header-height: 72px;
+}
+
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: var(--header-height);
+  overflow-x: hidden;
 }
 
 body {
@@ -30,6 +36,7 @@ body {
   color: var(--color-slate-950);
   min-height: 100vh;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
 
 * {

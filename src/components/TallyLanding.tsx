@@ -80,6 +80,8 @@ export default function TallyLanding() {
       {/* Blue tint overlay for the landing picture */}
       <div className="absolute inset-0 z-20 bg-sky-700/30" />
 
+      <div className="absolute inset-x-0 bottom-0 h-48 z-30 bg-gradient-to-t from-slate-100/90 via-slate-100/30 to-transparent" />
+
 
       {/* Subtle particle layer using SVG shapes and CSS animation */}
       <svg className="pointer-events-none absolute inset-0 -z-20 h-full w-full" preserveAspectRatio="none">

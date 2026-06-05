@@ -24,9 +24,9 @@ import { signInAnonymously } from 'firebase/auth';
 function SiteRoutes() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950 flex flex-col">
-      <StickyDownloadBar />
-      <Navbar />
-      <main className="flex-grow pt-18">
+    <Navbar />
+    <StickyDownloadBar />
+      <main className="flex-grow">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
