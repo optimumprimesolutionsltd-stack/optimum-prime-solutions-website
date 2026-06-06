@@ -1,18 +1,23 @@
 interface TallyLogoProps {
   className?: string;
   layout?: 'inline' | 'stacked';
+  variant?: 'svg' | 'image' | 'both';
 }
 
-export default function TallyLogo({ className = 'h-10 w-auto', layout = 'inline' }: TallyLogoProps) {
+export default function TallyLogo({
+  className = 'h-10 w-auto',
+  layout = 'inline',
+  variant = 'svg',
+}: TallyLogoProps) {
   const containerClass = layout === 'stacked' ? 'flex flex-col items-start gap-3' : 'inline-flex items-center gap-3';
-  const svgClass = layout === 'stacked' ? 'h-20 w-auto' : 'h-full w-auto';
-  const imgClass = layout === 'stacked' ? 'h-20 w-auto object-contain' : 'h-full w-auto object-contain';
+  const logoClass = className;
+  const imageClass = `${logoClass} object-contain`;
 
   return (
-    <span className={`${containerClass} ${className}`}>
+    <span className={containerClass}>
       <svg
         viewBox="0 0 220 40"
-        className={svgClass}
+        className={logoClass}
         xmlns="http://www.w3.org/2000/svg"
         role="img"
         aria-label="TallyPrime"
@@ -30,11 +35,13 @@ export default function TallyLogo({ className = 'h-10 w-auto', layout = 'inline'
           PRIME
         </text>
       </svg>
-      <img
-        src="/tally-solutions-new-logo.png"
-        alt="Tally Solutions logo"
-        className={imgClass}
-      />
+      {(variant === 'image' || variant === 'both') && (
+        <img
+          src="/tally-solutions-new-logo.png"
+          alt="Tally Solutions logo"
+          className={imageClass}
+        />
+      )}
     </span>
   );
 }

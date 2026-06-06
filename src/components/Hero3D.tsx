@@ -8,8 +8,8 @@ export default function Hero3D() {
   const { data } = useSite();
 
   return (
-    <section id="home" className="relative overflow-hidden bg-slate-50">
-      <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-slate-100 to-transparent" />
+    <section id="home" className="relative overflow-hidden bg-gradient-to-b from-sky-50 via-slate-100 to-slate-200">
+      <div className="absolute inset-x-0 top-0 h-56 bg-gradient-to-b from-sky-100 to-transparent" />
       <div className="relative mx-auto max-w-7xl px-4 pt-12 pb-24 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.15fr_0.85fr] items-center">
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
