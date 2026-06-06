@@ -6,7 +6,7 @@ export default function ProductsPage() {
       <section className="relative overflow-hidden bg-slate-950 text-white">
         <div className="absolute inset-0">
           <img
-            src="https://images.pexels.com/photos/1181636/pexels-photo-1181636.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600"
+            src="/tally-team-poster.jpg"
             alt="Team working together on laptops"
             className="h-full w-full object-cover"
           />
@@ -41,10 +41,10 @@ export default function ProductsPage() {
 
             <div className="flex items-center justify-center rounded-[2rem] border border-white/10 bg-white/5 p-8 shadow-2xl ring-1 ring-white/10 backdrop-blur-xl">
               <div className="text-center">
-                <p className="text-sm uppercase tracking-[0.28em] text-slate-300">Real workforce imagery</p>
-                <h2 className="mt-4 text-2xl font-semibold text-white">Laptop and team visuals restored</h2>
+                <p className="text-sm uppercase tracking-[0.28em] text-slate-300">Landing page team photo</p>
+                <h2 className="mt-4 text-2xl font-semibold text-white">Original hero imagery now appears here</h2>
                 <p className="mt-3 text-sm leading-6 text-slate-300">
-                  The products page now prominently features the original laptop/team scene for a stronger product story.
+                  This page now uses the same landing page team/laptop image to keep the visual story consistent.
                 </p>
               </div>
             </div>
