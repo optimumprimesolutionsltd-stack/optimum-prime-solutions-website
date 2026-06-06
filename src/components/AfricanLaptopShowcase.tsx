@@ -115,96 +115,19 @@ function renderThemeDecor(theme: ShowcaseTheme) {
 
 export default function AfricanLaptopShowcase({ tag, title, description, features, theme }: AfricanLaptopShowcaseProps) {
   const style = themeStyles[theme];
-  const bgImage = '/tally-team-poster.jpg';
-
-  const analytics: {
-    cards: { label: string; value: string; detail: string }[];
-    chartLabel: string;
-    chartValues: number[];
-    reports: string[];
-  } = {
-    about: {
-      cards: [
-        { label: 'Businesses supported', value: '500+', detail: 'Live Tally Prime clients across Kenya' },
-        { label: 'KRA-ready reports', value: '100%', detail: 'Tax reports generated automatically' },
-        { label: 'On-time delivery', value: '22 days', detail: 'Average implementation period' },
-        { label: 'Remote access', value: '24/7', detail: 'Cloud-hosted Tally Prime availability' },
-      ],
-      chartLabel: 'Business health',
-      chartValues: [42, 56, 71, 63, 82],
-      reports: ['Client billing summary', 'Quote-to-cash', 'Branch financials', 'User activity'],
-    },
-    products: {
-      cards: [
-        { label: 'Active licenses', value: '72', detail: 'Silver, Gold, Plus and Enterprise in use' },
-        { label: 'Monthly invoices', value: '3.4K', detail: 'Invoices processed through Tally Prime' },
-        { label: 'Cloud sessions', value: '98.7%', detail: 'Online availability for remote teams' },
-        { label: 'Support SLA', value: '< 2h', detail: 'Average response time for support' },
-      ],
-      chartLabel: 'Usage trend',
-      chartValues: [55, 62, 75, 68, 84],
-      reports: ['License utilization', 'Inventory turns', 'Receivables aging', 'Stock valuation'],
-    },
-    features: {
-      cards: [
-        { label: 'Cash flow', value: 'KES 4.8M', detail: 'Tracked in real time with collections data' },
-        { label: 'Sales growth', value: '18%', detail: 'Month-over-month revenue increase' },
-        { label: 'Inventory value', value: 'KES 12.2M', detail: 'Stock value updated every transaction' },
-        { label: 'Tax liability', value: 'KES 420K', detail: 'VAT and PAYE due for the period' },
-      ],
-      chartLabel: 'Weekly revenue',
-      chartValues: [38, 52, 67, 59, 76],
-      reports: ['P&L statement', 'Balance sheet', 'GST return', 'Stock movement'],
-    },
-    faq: {
-      cards: [
-        { label: 'Answers available', value: '120+', detail: 'Knowledge base for Tally Prime users' },
-        { label: 'Response time', value: '< 1h', detail: 'Helpdesk response for common queries' },
-        { label: 'Self-service', value: '24/7', detail: 'Access guides and support docs anytime' },
-        { label: 'Setup guides', value: '50+', detail: 'Tally Prime configuration walkthroughs' },
-      ],
-      chartLabel: 'Support performance',
-      chartValues: [72, 78, 81, 89, 94],
-      reports: ['FAQ hits', 'Support tickets', 'Knowledge growth', 'Article views'],
-    },
-    testimonials: {
-      cards: [
-        { label: 'Client satisfaction', value: '99%', detail: 'Positive feedback from deployed clients' },
-        { label: 'Repeat customers', value: '84%', detail: 'Clients renewing support and upgrades' },
-        { label: 'Projects delivered', value: '120+', detail: 'Tally Prime implementations completed' },
-        { label: 'Avg ROI', value: '32%', detail: 'Efficiency gains reported after go-live' },
-      ],
-      chartLabel: 'Customer trust',
-      chartValues: [60, 68, 74, 82, 91],
-      reports: ['Success stories', 'Case studies', 'Training feedback', 'NPS score'],
-    },
-    blog: {
-      cards: [
-        { label: 'Posts published', value: '24', detail: 'Insights on Tally Prime and business automation' },
-        { label: 'Reader reach', value: '14K', detail: 'Total monthly readers and subscribers' },
-        { label: 'Engagement', value: '5.4%', detail: 'Interaction rate on published content' },
-        { label: 'SEO growth', value: '36%', detail: 'Search visibility improvement year-on-year' },
-      ],
-      chartLabel: 'Content traction',
-      chartValues: [34, 46, 58, 69, 80],
-      reports: ['Top articles', 'Topic engagement', 'Newsletter signups', 'Insights shared'],
-    },
-    contact: {
-      cards: [
-        { label: 'Enquiries/week', value: '28', detail: 'New conversations started by prospects' },
-        { label: 'Response rate', value: '97%', detail: 'Leads replied to within business hours' },
-        { label: 'Call conversion', value: '18%', detail: 'Qualified leads booked for demos' },
-        { label: 'Demos booked', value: '12', detail: 'Live Tally Prime demo sessions scheduled' },
-      ],
-      chartLabel: 'Contact momentum',
-      chartValues: [45, 54, 67, 73, 86],
-      reports: ['Latest leads', 'Call schedule', 'Demo readiness', 'Proposal pipeline'],
-    },
-  }[theme];
+  const imageUrls: Record<ShowcaseTheme, string> = {
+    about: 'https://images.pexels.com/photos/1181672/pexels-photo-1181672.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    products: 'https://images.pexels.com/photos/1181636/pexels-photo-1181636.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    features: 'https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    faq: 'https://images.pexels.com/photos/1181333/pexels-photo-1181333.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    testimonials: 'https://images.pexels.com/photos/1181461/pexels-photo-1181461.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    blog: 'https://images.pexels.com/photos/1181684/pexels-photo-1181684.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    contact: 'https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+  };
 
   return (
     <section className="relative overflow-hidden bg-slate-50 py-20 text-slate-950">
-      <div className="absolute inset-0 -z-30 bg-cover bg-center" style={{ backgroundImage: `url('${bgImage}')` }} />
+      <div className="absolute inset-0 -z-30 bg-cover bg-center" style={{ backgroundImage: `url('${imageUrls[theme]}')` }} />
       <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-slate-900/5 to-transparent" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
@@ -243,76 +166,14 @@ export default function AfricanLaptopShowcase({ tag, title, description, feature
           >
             <div className={`absolute inset-0 bg-gradient-to-tr ${style.bgOverlay}`} />
             {renderThemeDecor(theme)}
-            <div className="relative mx-auto h-[28rem] max-w-[32rem] p-8">
-              <div className="absolute inset-0 rounded-[2rem] border border-white/10 bg-slate-950/95 shadow-2xl ring-1 ring-white/10" />
-              <div className="absolute inset-x-6 top-6 flex items-center justify-between rounded-[1.75rem] bg-slate-900/95 px-4 py-3 text-slate-300 ring-1 ring-white/10 shadow-lg">
-                <div className="flex items-center gap-3">
-                  <span className="h-2.5 w-2.5 rounded-full bg-cyan-400 shadow-sm" />
-                  <div>
-                    <p className="text-[11px] uppercase tracking-[0.3em] text-slate-500">Tally Prime dashboard</p>
-                    <p className="text-sm font-semibold text-white/90">Real-time analytics</p>
-                  </div>
-                </div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-slate-800/95 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.3em] text-slate-300 ring-1 ring-white/10">
-                  Live
-                </div>
-              </div>
-              <div className="absolute inset-x-6 top-24 bottom-6 overflow-hidden rounded-[2rem] bg-slate-900/95 p-5 shadow-inner ring-1 ring-white/10">
-                <div className="grid h-full gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-                  <div className="rounded-[1.75rem] bg-slate-950/90 p-5 ring-1 ring-white/10 shadow-xl">
-                    <div className="flex items-start justify-between gap-3">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.3em] text-slate-500">{analytics.chartLabel}</p>
-                        <h3 className="mt-2 text-xl font-semibold text-white">Live Tally Prime insights</h3>
-                      </div>
-                      <span className={`inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] ${style.badge}`}>
-                        Updated
-                      </span>
-                    </div>
-                    <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                      {analytics.cards.map((card) => (
-                        <div key={card.label} className="rounded-3xl bg-slate-900/80 p-4 ring-1 ring-white/10">
-                          <p className="text-[11px] uppercase tracking-[0.3em] text-slate-500">{card.label}</p>
-                          <p className="mt-3 text-2xl font-semibold text-white">{card.value}</p>
-                          <p className="mt-2 text-sm text-slate-400">{card.detail}</p>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-6 rounded-3xl bg-slate-900/80 p-4 ring-1 ring-white/10">
-                      <div className="flex items-center justify-between text-sm text-slate-400">
-                        <span>Trend overview</span>
-                        <span className="text-slate-300">Week view</span>
-                      </div>
-                      <div className="mt-4 flex h-28 items-end gap-2">
-                        {analytics.chartValues.map((value, index) => (
-                          <div key={index} className="relative flex-1 overflow-hidden rounded-full bg-slate-800">
-                            <div className="absolute inset-x-0 bottom-0 rounded-full bg-gradient-to-t from-cyan-400 to-blue-500" style={{ height: `${value}%` }} />
-                          </div>
-                        ))}
-                      </div>
-                      <div className="mt-3 flex justify-between text-[11px] uppercase tracking-[0.28em] text-slate-500">
-                        <span>Mon</span>
-                        <span>Wed</span>
-                        <span>Fri</span>
-                        <span>Sun</span>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="rounded-[1.75rem] bg-slate-950/90 p-5 ring-1 ring-white/10 shadow-xl">
-                    <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Fast reports</p>
-                    <div className="mt-5 space-y-3">
-                      {analytics.reports.map((report) => (
-                        <div key={report} className="rounded-3xl bg-slate-900/80 p-4 ring-1 ring-white/10">
-                          <div className="flex items-center justify-between text-sm text-slate-200">
-                            <span>{report}</span>
-                            <span className="rounded-full bg-slate-800 px-2 py-1 text-[11px] uppercase tracking-[0.28em] text-slate-400">
-                              View
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+            <div className="relative h-[28rem] max-w-[32rem] overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">
+              <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${imageUrls[theme]}')` }} />
+              <div className="absolute inset-0 bg-slate-950/30" />
+              <div className="absolute inset-0 rounded-[2rem] ring-1 ring-white/10" />
+              <div className="relative flex h-full items-end p-6">
+                <div className="rounded-3xl bg-white/10 px-5 py-4 text-sm text-white/90 backdrop-blur-md ring-1 ring-white/15">
+                  <p className="text-xs uppercase tracking-[0.3em] text-slate-200">Live view</p>
+                  <p className="mt-2 font-semibold">{theme === 'products' ? 'Laptop workflow preview' : 'Modern laptop workspace'}</p>
                 </div>
               </div>
             </div>
