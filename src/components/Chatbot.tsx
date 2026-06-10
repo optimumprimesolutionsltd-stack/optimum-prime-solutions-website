@@ -6,7 +6,7 @@ import { useSite } from '../context/SiteContext';
 import { fbSet, fbGet } from '../firebase/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import DemoRequestModal from './DemoRequestModal';
-import { getChatGPTReply } from '../utils/chatgpt';
+import { getChatGPTReply, type ChatMessage } from '../utils/chatgpt';
 import type { SiteData } from '../data/siteData';
 
 interface Msg {
@@ -368,10 +368,18 @@ export default function Chatbot() {
     else if (stage === 'ask_current_software') nextStage = 'recommend';
     else nextStage = 'free';
 
+    // Build conversation history for the AI (exclude the initial bot greeting to save tokens)
+    const aiHistory: ChatMessage[] = msgs
+      .slice(1) // skip the initial greeting message
+      .map((m) => ({
+        role: m.role === 'user' ? 'user' : 'assistant',
+        content: m.text,
+      }));
+
     // Try AI reply first, fall back to rule-based
     (async () => {
       try {
-        const aiReply = await getChatGPTReply(trimmedText, data);
+        const aiReply = await getChatGPTReply(trimmedText, data, aiHistory, updatedLead as Record<string, string | undefined>);
         if (!aiReply?.trim()) throw new Error('EMPTY_REPLY');
 
         // Inject a follow-up question if the AI reply doesn't already have one
