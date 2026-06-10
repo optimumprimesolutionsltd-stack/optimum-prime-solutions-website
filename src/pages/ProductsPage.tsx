@@ -1,8 +1,15 @@
 import Products from '../components/Products';
+import SEO from '../components/SEO';
 
 export default function ProductsPage() {
   return (
     <div className="min-h-screen">
+      <SEO
+        title="TallyPrime Products & Pricing Kenya | Silver, Gold & Enterprise"
+        description="Buy TallyPrime Silver, Gold or Enterprise in Kenya. Official pricing, cloud hosting packages from KES 8,000/month, and EOS® consulting. Kenya's certified TallyPrime reseller."
+        canonical="/products"
+        keywords="TallyPrime price Kenya, TallyPrime Silver Kenya, TallyPrime Gold Kenya, TallyPrime Enterprise Kenya, buy TallyPrime Nairobi, TallyPrime licence Kenya, cloud hosting Kenya price"
+      />
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-slate-100 to-sky-50 text-slate-950">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-red-200/20 blur-3xl" />

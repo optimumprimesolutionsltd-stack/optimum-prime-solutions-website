@@ -9,8 +9,7 @@ Disallow: /api/
 Disallow: /.well-known/
 
 # Sitemaps
-Sitemap: https://optimumprimesolutions.co.ke/sitemap.xml
-Sitemap: https://optimumprimesolutions.co.ke/sitemap-blog.xml
+Sitemap: https://www.optimumprimesolutions.co.ke/sitemap.xml
 
 # Google
 User-agent: Googlebot
@@ -22,6 +21,3 @@ Allow: /
 
 # Crawl delay to prevent overloading server
 Crawl-delay: 1
-
-# Request rate
-Request-rate: 1 requests per 1 second

@@ -1,10 +1,17 @@
 import About from '../components/About';
 import FeatureShowcase from '../components/FeatureShowcase';
 import AfricanLaptopShowcase from '../components/AfricanLaptopShowcase';
+import SEO from '../components/SEO';
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen">
+      <SEO
+        title="About Us | Optimum Prime Solutions — Kenya's TallyPrime Partner"
+        description="Learn about Optimum Prime Solutions — Kenya's certified TallyPrime reseller and licensed EOS® implementer based in Ruiru. We help Kenyan businesses grow with TallyPrime, cloud hosting, and operational consulting."
+        canonical="/about"
+        keywords="about Optimum Prime Solutions, TallyPrime partner Kenya, EOS implementer Kenya, certified Tally reseller Nairobi, business consulting Kenya"
+      />
       <AfricanLaptopShowcase
         tag="Kenya's Certified TallyPrime Partner"
         title="TallyPrime Sales, Cloud Hosting & EOS® Consulting in Kenya"
