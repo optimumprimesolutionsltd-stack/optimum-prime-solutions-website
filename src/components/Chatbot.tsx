@@ -391,9 +391,36 @@ export default function Chatbot() {
     const leadForAI = { ...updatedLead };
 
     // --- DIRECT NAME HANDLER ---
-    // When the bot just asked for the user's name, handle it directly without
-    // sending to the AI — the AI tends to treat name introductions as topic
-    // statements and responds with things like "That's a great point!"
+    // When the bot just asked for the user's name (stage is 'greeting' or 'ask_name'),
+    // handle it directly without sending to the AI — the AI tends to treat name
+    // introductions as topic statements and responds with things like "That's a great point!"
+    // The initial stage is 'greeting' and the bot's first message asks for the name,
+    // so ANY first user message should be treated as a name response.
+    const isNameStage = stage === 'ask_name' || stage === 'greeting';
+    // Extract name from message — handle "My name is Brian", "I'm Brian", "Brian", etc.
+    const nameMatch = trimmedText.match(/(?:my name is|i(?:'m| am)|call me)\s+([A-Za-z]+)/i);
+    const extractedFirstName = nameMatch ? nameMatch[1] : trimmedText.trim().split(/\s+/)[0];
+    const cleanName = extractedFirstName.replace(/[^A-Za-z]/g, '');
+    if (isNameStage && cleanName.length >= 2) {
+      // Update lead with the correctly extracted name
+      const nameOnly = cleanName.charAt(0).toUpperCase() + cleanName.slice(1).toLowerCase();
+      setLead((prev) => ({ ...prev, name: nameOnly }));
+      const nameReply = `Nice to meet you, **${nameOnly}**! 😊\n\nTo help you find the right solution, could you tell me a bit about your business? What type of business do you run?`;
+      const botMsg: Msg = {
+        id: Date.now().toString(),
+        role: 'bot',
+        text: nameReply,
+        time: getTime(),
+      };
+      setTimeout(() => {
+        setMsgs((p) => [...p, botMsg]);
+        setShowTypingIndicator(false);
+        setTyping(false);
+        setStage('ask_business');
+      }, 700);
+      return;
+    }
+
     if (stage === 'ask_name' && updatedLead.name) {
       const firstName = updatedLead.name.split(' ')[0];
       const nameReply = `Nice to meet you, **${firstName}**! 😊\n\nTo help you find the right solution, could you tell me a bit about your business? What type of business do you run?`;
