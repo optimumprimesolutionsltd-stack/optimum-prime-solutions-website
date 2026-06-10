@@ -3,6 +3,7 @@ import { X, Send, Bot, User, Minimize2, RotateCcw } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import WhatsAppButton from './WhatsAppButton';
 import { useSite } from '../context/SiteContext';
+import { fbSet, fbGet } from '../firebase/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import DemoRequestModal from './DemoRequestModal';
 import { getChatGPTReply } from '../utils/chatgpt';
@@ -38,6 +39,13 @@ interface LeadProfile {
   currentSoftware?: string;
   timeline?: string;
 }
+
+const getWeekKey = () => {
+  const d = new Date();
+  const startOfYear = new Date(d.getFullYear(), 0, 1);
+  const week = Math.ceil(((d.getTime() - startOfYear.getTime()) / 86400000 + startOfYear.getDay() + 1) / 7);
+  return `${d.getFullYear()}-W${String(week).padStart(2, '0')}`;
+};
 
 const getTime = () =>
   new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
@@ -246,6 +254,7 @@ export default function Chatbot() {
   const [demoOpen, setDemoOpen] = useState(false);
   const [stage, setStage] = useState<Stage>('greeting');
   const [lead, setLead] = useState<LeadProfile>({});
+  const sessionId = useRef<string>(Date.now().toString(36) + Math.random().toString(36).slice(2, 7));
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       id: '0',
@@ -256,6 +265,41 @@ export default function Chatbot() {
     },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
+
+  // Log chatbot session start to Firebase when chat is opened
+  useEffect(() => {
+    if (open) {
+      const sessionData = {
+        sessionId: sessionId.current,
+        startedAt: new Date().toISOString(),
+        date: new Date().toISOString().split('T')[0],
+        week: getWeekKey(),
+        messageCount: 0,
+        topics: [] as string[],
+        leadCaptured: false,
+      };
+      fbSet(`chatbot_sessions/${sessionId.current}`, sessionData).catch(() => {});
+    }
+  }, [open]);
+
+  // Log each interaction topic and lead status to Firebase
+  const logChatEvent = useCallback((intent: string, isLead: boolean) => {
+    const path = `chatbot_sessions/${sessionId.current}`;
+    fbGet(path).then((existing: any) => {
+      if (!existing) return;
+      const topics: string[] = existing.topics || [];
+      if (intent !== 'unknown' && !topics.includes(intent)) topics.push(intent);
+      fbSet(path, {
+        ...existing,
+        messageCount: (existing.messageCount || 0) + 1,
+        topics,
+        leadCaptured: isLead || existing.leadCaptured,
+        lastMessageAt: new Date().toISOString(),
+        leadName: lead.name || existing.leadName || '',
+        leadBusiness: lead.business || existing.leadBusiness || '',
+      }).catch(() => {});
+    }).catch(() => {});
+  }, [lead]);
 
   const scroll = useCallback(() => {
     setTimeout(() => endRef.current?.scrollIntoView({ behavior: 'smooth' }), 50);
@@ -310,6 +354,9 @@ export default function Chatbot() {
 
     // Determine intent
     const intent = detectIntent(trimmedText);
+    // Log to Firebase
+    const isLead = intent === 'demo' || stage === 'recommend' || stage === 'ask_current_software';
+    logChatEvent(intent, isLead);
 
     // Determine next stage
     let nextStage: Stage = stage;
