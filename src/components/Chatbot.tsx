@@ -421,6 +421,30 @@ export default function Chatbot() {
       return;
     }
 
+    // --- MID-CONVERSATION NAME CORRECTION HANDLER ---
+    // Detects when a user corrects their name at any stage, e.g.:
+    // "Actually my name is James", "Call me James", "It's James", "not Brian, it's James"
+    const nameCorrectionMatch = trimmedText.match(
+      /(?:actually(?:\s+my\s+name\s+is)?|my\s+name\s+is\s+(?:actually|not\s+\w+,?\s+it'?s?)|call\s+me|it'?s?\s+(?:actually\s+)?|not\s+\w+,?\s+(?:it'?s?\s+)?|my\s+(?:real\s+)?name\s+is)\s*([A-Za-z]{2,})/i
+    );
+    if (!isNameStage && nameCorrectionMatch) {
+      const correctedName = nameCorrectionMatch[1].charAt(0).toUpperCase() + nameCorrectionMatch[1].slice(1).toLowerCase();
+      setLead((prev) => ({ ...prev, name: correctedName }));
+      const correctionReply = `Got it, **${correctedName}**! 😊 I've updated that. Now, where were we?`;
+      const botMsg: Msg = {
+        id: Date.now().toString(),
+        role: 'bot',
+        text: correctionReply,
+        time: getTime(),
+      };
+      setTimeout(() => {
+        setMsgs((p) => [...p, botMsg]);
+        setShowTypingIndicator(false);
+        setTyping(false);
+      }, 600);
+      return;
+    }
+
     if (stage === 'ask_name' && updatedLead.name) {
       const firstName = updatedLead.name.split(' ')[0];
       const nameReply = `Nice to meet you, **${firstName}**! 😊\n\nTo help you find the right solution, could you tell me a bit about your business? What type of business do you run?`;
