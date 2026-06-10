@@ -25,11 +25,13 @@ export default function StickyDownloadBar() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="flex flex-wrap items-center justify-between gap-4 py-2 text-white">
               <div className="flex flex-wrap items-center gap-3">
-                <img
-                  src="/tally-solutions-new-logo.png"
-                  alt="Tally Solutions logo"
-                  className="h-20 w-auto min-w-[72px] rounded-2xl bg-white/90 p-2 shadow-[0_10px_28px_rgba(0,0,0,0.16)]"
-                />
+                <div className="flex-shrink-0 h-12 w-28 rounded-xl bg-white/90 p-2 shadow-[0_10px_28px_rgba(0,0,0,0.16)] flex items-center justify-center">
+                  <img
+                    src="/tally-solutions-new-logo.png"
+                    alt="Tally Solutions logo"
+                    className="h-full w-full object-contain"
+                  />
+                </div>
                 <span className="text-sm sm:text-base font-semibold text-white leading-tight drop-shadow-[0_2px_10px_rgba(0,0,0,0.25)]">Try TallyPrime free — Education Mode, no license needed.</span>
               </div>
               <div className="flex items-center gap-3">

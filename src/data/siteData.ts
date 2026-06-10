@@ -19,12 +19,12 @@ export interface SiteData {
 export const defaultData: SiteData = {
   company: {
     name:'Optimum Prime Solutions',
-    tagline:'Cloud Simplified, Business Amplified',
-    mission:'To empower Kenyan businesses with world-class Tally Prime solutions that streamline operations, ensure compliance, and drive sustainable growth.',
-    vision:'To be the leading Tally Prime & ERP solutions provider in East Africa, transforming how businesses manage their finances and operations.',
+    tagline:'Certified TallyPrime Partner · Cloud Hosting · EOS® Consulting',
+    mission:'To empower Kenyan businesses with world-class TallyPrime solutions, secure cloud infrastructure, and the Entrepreneurial Operating System (EOS®) — helping leadership teams get aligned, gain traction, and achieve sustainable growth.',
+    vision:'To be the leading TallyPrime partner and EOS® consulting firm in East Africa, transforming how businesses manage their finances, operations, and leadership systems.',
     about:[
-      'Optimum Prime Solutions is Kenya\'s premier Tally Prime partner, delivering end-to-end business automation solutions. With over 15 years of combined experience, our certified team has helped 500+ businesses across East Africa transform their operations.',
-      'We specialize in Tally Prime implementation, customization, and support — from inventory management and payroll to manufacturing and KRA compliance. Our mission is to simplify technology so you can focus on growing your business.',
+      'Optimum Prime Solutions is Kenya\'s certified TallyPrime partner, delivering end-to-end business automation and cloud solutions. With over 15 years of combined experience, our certified team has helped 500+ businesses across East Africa transform their operations using TallyPrime Silver, Gold, and Enterprise editions.',
+      'Beyond accounting software, we are licensed EOS® implementers — helping entrepreneurial leadership teams run their businesses on the Entrepreneurial Operating System by Gino Wickman. EOS strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. We combine TallyPrime\'s financial power with EOS® operational discipline to give your business both the numbers and the systems to grow.',
     ],
     stats:[{label:'Clients Served',value:'500+'},{label:'Years Experience',value:'15+'},{label:'Uptime Guarantee',value:'99.9%'},{label:'Support Response',value:'< 1hr'}],
   },
@@ -37,13 +37,20 @@ export const defaultData: SiteData = {
     mapUrl:'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.37!2d36.96!3d-1.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRuiru!5e0!3m2!1sen!2ske!4v1',
   },
   heroImages: {
-    about: 'https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    products: 'https://images.pexels.com/photos/3184292/pexels-photo-3184292.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    features: 'https://images.pexels.com/photos/3769717/pexels-photo-3769717.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    faq: 'https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    testimonials: 'https://images.pexels.com/photos/1181466/pexels-photo-1181466.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    blog: 'https://images.pexels.com/photos/3771113/pexels-photo-3771113.jpeg?auto=compress&cs=tinysrgb&w=1600',
-    contact: 'https://images.pexels.com/photos/7570483/pexels-photo-7570483.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    // About: African business team in a modern office setting
+    about: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    // Products: African professional reviewing software/products on laptop
+    products: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    // Features/Services: African IT professional demonstrating software to client
+    features: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    // FAQ: African business professional at desk with laptop
+    faq: 'https://images.pexels.com/photos/4342352/pexels-photo-4342352.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    // Testimonials: African business people in a meeting/discussion
+    testimonials: 'https://images.pexels.com/photos/3184357/pexels-photo-3184357.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    // Blog: African professional reading/writing at a desk
+    blog: 'https://images.pexels.com/photos/4050291/pexels-photo-4050291.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    // Contact: African customer service / support professional
+    contact: 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg?auto=compress&cs=tinysrgb&w=1600',
   },
   services: [
     {id:'1',title:'Tally Prime Installation & Setup',desc:'Complete installation, configuration, and data migration for Tally Prime Silver & Gold editions. Get up and running in 24 hours.',icon:'Download',features:['License activation','Data migration','Multi-user setup','Initial training'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
@@ -53,14 +60,15 @@ export const defaultData: SiteData = {
     {id:'5',title:'KRA Compliance',desc:'Stay 100% compliant with KRA. Automated VAT, income tax, PAYE calculations, and e-filing integration.',icon:'FileCheck',features:['VAT management','e-Filing integration','Tax reports','Audit trail'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
     {id:'6',title:'TDL Customization',desc:'Custom Tally Definition Language development to tailor Tally Prime to your exact business workflows.',icon:'Code',features:['Custom reports','Workflow automation','Integration APIs','Module extensions'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
     {id:'7',title:'Remote & On-site Support',desc:'24/7 remote assistance plus scheduled on-site visits. Average response time under 1 hour.',icon:'Headphones',features:['24/7 remote support','On-site visits','Software updates','Troubleshooting'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
-    {id:'8',title:'ERP & Business Consulting',desc:'Strategic consulting to optimize your business processes, select the right ERP modules, and plan digital transformation.',icon:'BarChart3',features:['Process mapping','ERP selection','Digital strategy','Change management'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
+    {id:'8',title:'EOS® Business Operating System',desc:'We are certified EOS implementers. Help your leadership team get aligned, gain traction, and achieve your vision using the Entrepreneurial Operating System by Gino Wickman.',icon:'BarChart3',features:['EOS® full implementation','Vision/Traction Organizer (V/TO)','Rocks & accountability meetings','L10 meeting cadence','People Analyser & RPRS','Quarterly & annual planning'],link:'/contact'},
+    {id:'9',title:'TallyPrime Cloud Hosting',desc:'Access your TallyPrime data securely from anywhere. We set up and manage cloud infrastructure so your team can work remotely without compromising data security.',icon:'Cloud',features:['Cloud server setup','Remote access configuration','Automated daily backups','99.9% uptime SLA','Multi-user concurrent access','Disaster recovery planning'],link:'/contact'},
+    {id:'10',title:'HubSpot CRM Integration',desc:'We implement and integrate HubSpot CRM with TallyPrime to give your business a 360° view — from first lead to final payment. Manage your sales pipeline, customer relationships, and financial data in one connected ecosystem.',icon:'Users',features:['HubSpot CRM setup & onboarding','TallyPrime + HubSpot data sync','Sales pipeline & deal tracking','Customer communication history','Automated follow-up sequences','Reporting across CRM & accounts'],link:'/contact'},
   ],
   products: [
-    {id:'1',name:'TallyPrime',edition:'Silver',price:'KES 57,600 +vat',period:'one-time',features:['Single user license','Full accounting and invoicing','Inventory and stock reports','Payroll configuration','KRA VAT and eTIMS ready','Free updates for 1 year','Email and remote support'],cta:'Get Silver'},
-    {id:'2',name:'TallyPrime',edition:'Gold',price:'KES 172,800 +vat',period:'one-time',popular:true,features:['Unlimited multi-user access','All Silver features','Remote data access setup','Advanced user security','Multi-location inventory','Priority implementation support','On-site team training'],cta:'Get Gold'},
-    {id:'3',name:'TallyPrime',edition:'Plus',price:'Contact for Quote',period:'annual plan',features:['Cloud-ready access','Automated data backup guidance','Dedicated support plan','Periodic system health checks','KRA compliance review','Management reporting pack','License renewal reminders'],cta:'Ask About Plus'},
-    {id:'4',name:'TallyPrime',edition:'Server / Enterprise',price:'Custom Quote',period:'per deployment',features:['High-performance multi-user setup','Branch and warehouse configuration','Role-based controls','Audit readiness checks','Advanced backup planning','Implementation project manager','Enterprise SLA support'],cta:'Plan Enterprise'},
-    {id:'5',name:'TDL Custom',edition:'Solutions',price:'From KES 25,000',period:'per project',features:['Custom report builder','Invoice and voucher customization','Workflow automation','Third-party integrations','API development','Source code delivery','6 months support'],cta:'Get Quote'},
+    {id:'1',name:'TallyPrime',edition:'Silver',price:'KES 57,600 +VAT',period:'one-time license',features:['Single user license','Full accounting & invoicing','Inventory & stock reports','KRA VAT & eTIMS ready','Payroll — PAYE, NHIF, NSSF','Free updates for 1 year','Email & remote support'],cta:'Get Silver'},
+    {id:'2',name:'TallyPrime',edition:'Gold',price:'KES 172,800 +VAT',period:'one-time license',popular:true,features:['Unlimited multi-user access','All Silver features included','Multi-location inventory control','Advanced user roles & security','Remote data access setup','Priority implementation support','On-site team training included'],cta:'Get Gold — Best Value'},
+    {id:'3',name:'TallyPrime',edition:'Cloud Hosting',price:'From KES 8,000',period:'per month',features:['Secure cloud server setup','Remote access from any device','Automated daily backups','99.9% uptime SLA guarantee','Multi-user concurrent access','Disaster recovery planning','Monthly system health checks'],cta:'Start Cloud Hosting'},
+    {id:'4',name:'EOS®',edition:'Implementation',price:'Contact for Quote',period:'per engagement',features:['Full EOS® implementation program','Vision/Traction Organizer (V/TO)','Rocks & 90-day priority setting','L10 weekly leadership meetings','People Analyser & accountability','Quarterly & annual planning days','Certified EOS Implementer® led'],cta:'Book EOS Session'},
   ],
   testimonials: [
     {id:'1',name:'James Mwangi',role:'CEO',company:'Mwangi Enterprises Ltd',text:'Optimum Prime Solutions transformed our accounting. The KRA compliance module alone has saved us countless hours. Their team is professional and responsive.',rating:5},
@@ -86,6 +94,11 @@ export const defaultData: SiteData = {
     {id:'13',q:'How do you train our staff on Tally Prime?',a:'We provide tailored training sessions for accountants, managers, and operations teams. Training is available on-site or remote and includes real-world workflows, compliance reports, and support best practices.',cat:'Training'},
     {id:'14',q:'What support options do you offer after implementation?',a:'We offer support plans covering remote assistance, regular health checks, software updates, and on-site visits. Our support response is typically under 1 hour for urgent issues.',cat:'Support'},
     {id:'15',q:'How can I access Tally Prime remotely?',a:'Tally Prime Gold supports remote access. We can also set up secure cloud hosting so your team accesses Tally Prime from multiple locations while keeping your data centralized and backed up.',cat:'Remote Access'},
+    {id:'16',q:'What is EOS® and how can it help my business?',a:'EOS® (Entrepreneurial Operating System) is a complete business operating system developed by Gino Wickman and detailed in his book \"Traction\". It strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. As certified EOS implementers, we help your leadership team get aligned on where the business is going, who is doing what, and how you will get there — through proven tools like the Vision/Traction Organizer (V/TO), Rocks, L10 meetings, and the People Analyser.',cat:'EOS'},
+    {id:'17',q:'How does EOS® work with TallyPrime?',a:'EOS® provides the operating system for your leadership team — clarity on vision, accountability, and meeting rhythms. TallyPrime provides the financial and operational data that feeds into your EOS scorecards and dashboards. Together, they give your business both the management discipline and the real-time numbers to make better decisions faster.',cat:'EOS'},
+    {id:'18',q:'What is the EOS® implementation process?',a:'Our EOS® implementation typically runs over 12–24 months. We start with a 90-minute meeting to introduce the tools, then a Focus Day to align the leadership team, followed by quarterly and annual planning sessions. Between sessions, we coach your team on running L10 meetings, setting 90-day Rocks, and using the People Analyser. The result is a business that runs on a consistent, proven rhythm.',cat:'EOS'},
+    {id:'19',q:'Do you offer TallyPrime cloud hosting?',a:'Yes! We set up and manage secure cloud servers for TallyPrime so your team can access data from anywhere. Our cloud hosting includes automated daily backups, 99.9% uptime SLA, multi-user concurrent access, and disaster recovery planning. Pricing starts from KES 8,000 per month depending on the number of users and data volume.',cat:'Cloud'},
+    {id:'20',q:'What is the difference between TallyPrime on-premise and cloud?',a:'On-premise TallyPrime runs on your local computer or office server — fast and secure but limited to your physical location. Cloud-hosted TallyPrime runs on a remote server managed by us, allowing your team to access it from anywhere with an internet connection. Cloud hosting is ideal for businesses with multiple branches, remote workers, or owners who need visibility on the go.',cat:'Cloud'},
   ],
   industries: [
     {id:'1',name:'Retail & Shops',icon:'ShoppingBag',desc:'POS integration, stock management, and multi-branch retail solutions.'},
@@ -354,6 +367,122 @@ The Bottom Line
 Don't overthink it. Both Silver and Gold are excellent investments. Silver gets you started affordably. Gold is when you've outgrown single-user limitations. Many successful businesses started with Silver and upgraded—that's perfectly normal.
 
 Ready to get started? Our team can help you choose and implement the right edition for your situation.`},
+    {id:'4',title:'What is EOS® and Why Kenyan Businesses Are Adopting It',excerpt:'The Entrepreneurial Operating System (EOS®) by Gino Wickman is transforming how leadership teams in Kenya run their businesses. Here\'s what it is and how to get started.',date:'2025-03-01',category:'EOS',readTime:'7 min',content:`The Entrepreneurial Operating System (EOS®) is a complete, practical system for running a business. Developed by Gino Wickman and detailed in his bestselling book \"Traction\", EOS is used by over 280,000 companies worldwide to get more of what they want from their businesses.
+
+What Problem Does EOS Solve?
+
+Most entrepreneurial businesses struggle with the same issues:
+- Lack of clear vision shared by the whole team
+- The wrong people in the wrong seats
+- No reliable data to make decisions
+- Issues that keep coming back without resolution
+- Inconsistent processes
+- Lack of execution and accountability
+
+EOS addresses all six of these through its Six Key Components framework.
+
+The Six Key Components of EOS®
+
+1. Vision — Where are you going and how will you get there? EOS uses the Vision/Traction Organizer (V/TO) to capture your 10-year target, 3-year picture, 1-year plan, and 90-day Rocks.
+
+2. People — The right people in the right seats. EOS uses the People Analyser and the GWC (Get it, Want it, Capacity to do it) framework to evaluate your team.
+
+3. Data — A handful of numbers that give you a pulse on the business. Your EOS Scorecard tracks weekly metrics so you always know where you stand.
+
+4. Issues — Identify, discuss, and solve issues permanently. The IDS (Identify, Discuss, Solve) process ensures problems don\'t recur.
+
+5. Process — Document and follow your core processes. When everyone follows the same way, you get consistent, scalable results.
+
+6. Traction — Execution. Rocks (90-day priorities), L10 meetings (weekly leadership meetings), and a meeting pulse that keeps the team focused and accountable.
+
+How EOS Works with TallyPrime
+
+TallyPrime gives you the financial and operational data. EOS gives you the management system to act on it. Your EOS Scorecard can pull key metrics directly from TallyPrime — sales, collections, inventory levels, payroll costs — giving your leadership team a real-time view of the business every week.
+
+Getting Started with EOS in Kenya
+
+As certified EOS implementers, Optimum Prime Solutions can guide your leadership team through the full EOS journey. We start with a 90-minute introductory meeting, then a Focus Day, followed by quarterly and annual planning sessions over 12-24 months.
+
+The result: a business where everyone is aligned, accountable, and moving in the same direction.
+
+Ready to gain traction? Contact us to book your first EOS session.`},
+    {id:'5',title:'TallyPrime Cloud Hosting: Access Your Business Data From Anywhere',excerpt:'Learn how cloud-hosted TallyPrime gives your team secure, real-time access to accounting and inventory data from any location in Kenya and beyond.',date:'2025-03-15',category:'Cloud',readTime:'5 min',content:`One of the most common challenges for growing Kenyan businesses is data access. Your accountant is at the office, your sales manager is in the field, and you\'re at a client meeting — but the TallyPrime data is locked on one computer.
+
+Cloud hosting solves this completely.
+
+What is TallyPrime Cloud Hosting?
+
+Instead of running TallyPrime on a local computer or office server, cloud hosting places TallyPrime on a secure remote server that your team can access from anywhere with an internet connection. All your data stays centralized, backed up, and available 24/7.
+
+Benefits of TallyPrime Cloud Hosting
+
+1. Access From Anywhere
+Your accountant can work from home. Your MD can check reports from their phone. Branch managers can enter data from their location. Everyone works on the same live data.
+
+2. Automatic Daily Backups
+No more worrying about hard drive failures or accidental deletions. Your data is backed up automatically every day and stored securely off-site.
+
+3. Multi-User Concurrent Access
+With TallyPrime Gold on the cloud, multiple users can work simultaneously from different locations — perfect for businesses with branches across Kenya.
+
+4. 99.9% Uptime SLA
+Our cloud infrastructure is monitored 24/7. We guarantee 99.9% uptime so your business operations are never interrupted.
+
+5. Disaster Recovery
+In the event of a hardware failure, power outage, or cyber incident, your data is safe and can be restored quickly from our cloud backups.
+
+Is Cloud Hosting Right for Your Business?
+
+Cloud hosting is ideal if you:
+✓ Have multiple branches or locations
+✓ Have team members who work remotely
+✓ Want the MD/owner to have real-time visibility on the go
+✓ Are concerned about data security and backup
+✓ Want to eliminate IT infrastructure costs
+
+Getting Started
+
+Our cloud hosting packages start from KES 8,000 per month. Setup takes 1-2 days and includes migration of your existing TallyPrime data to the cloud, user access configuration, and training on remote access.
+
+Contact us today to get your TallyPrime on the cloud.`},
+    {id:'6',title:'TallyPrime 7.1 Is Here: What\'s New and What It Means for Your Business',excerpt:'Tally Solutions has released TallyPrime 7.1 Beta with major upgrades to invoicing, banking, compliance, and reporting. Here\'s everything you need to know as a Kenyan business owner.',date:'2026-06-01',category:'Product Update',readTime:'6 min',content:`Tally Solutions has officially released TallyPrime 7.1 as an early access Beta — and it is packed with features that will make a real difference for Kenyan businesses.
+
+As Kenya\'s certified TallyPrime partner, we have reviewed all the new features and here is what you need to know.
+
+What\'s New in TallyPrime 7.1?
+
+1. 8 Professional Invoice Print Templates
+Your invoices now look as professional as your business. TallyPrime 7.1 includes eight ready-to-use invoice templates that you can personalise with your logo, watermark, brand colours, header and footer images, and terms & conditions. Set your preferred template as the default for each voucher type.
+
+2. Connected Banking — Now with ICICI Bank
+TallyPrime 7.1 extends its connected banking ecosystem to include ICICI Bank, joining Axis Bank, State Bank of India, and Kotak Mahindra Bank. You can now initiate direct payments, view real-time account balances, and reconcile transactions — all without leaving TallyPrime.
+
+3. HSN/SAC Online Validation
+Validate your HSN and SAC codes directly within TallyPrime using live data from the GST portal. This ensures your invoices and returns are always accurate and reduces the risk of compliance notices.
+
+4. Schedule III Financial Statements
+For companies with net worth below Rs 250 Crore, TallyPrime 7.1 introduces an Excel-based tool to generate Schedule III compliant financial statements — ready for auditors and stakeholders.
+
+5. IMS Reconciliation Upgrades
+The Inward Supplies (IMS) module now lets you fetch supplier details using GSTIN directly from the GST portal, even if the party ledger is not yet created. A new Books View shows reconciled, mismatched, and unmatched vouchers at a glance.
+
+6. Auto-Wrap Text
+Long vendor names, descriptions, and notes now wrap automatically across reports and printouts — no more truncated text.
+
+7. Flexible Discounts & Voucher Enhancements
+Apply discounts as a percentage, an amount, or both in purchase and sales transactions. Reuse deleted voucher numbers to maintain clean numbering sequences.
+
+When Will TallyPrime 7.1 Be Fully Released?
+
+TallyPrime 7.1 is currently in Beta (early access). The full release is expected soon. As your certified TallyPrime partner, we will handle your upgrade seamlessly — including data migration, staff training, and post-upgrade support.
+
+How to Get TallyPrime 7.1
+
+You can download the Beta directly from the official Tally Solutions website at: https://tallysolutions.com/download-tallyprime-7-1-beta/
+
+Or contact us to book an upgrade consultation. We will assess your current setup, plan the upgrade, and ensure zero disruption to your business operations.
+
+Ready to upgrade? Get in touch with our team today.`},
   ],
   leads: [],
 };

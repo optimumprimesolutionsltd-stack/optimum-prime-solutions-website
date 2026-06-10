@@ -6,7 +6,6 @@ import { OfflineBanner } from './components/OfflineBanner';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
-import StickyDownloadBar from './components/StickyDownloadBar';
 import AdminLogin from './admin/AdminLogin';
 import AdminLayout from './admin/AdminLayout';
 import HomePage from './pages/HomePage';
@@ -24,9 +23,8 @@ import { signInAnonymously } from 'firebase/auth';
 function SiteRoutes() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950 flex flex-col">
-    <Navbar />
-    <StickyDownloadBar />
-      <main className="flex-grow">
+      <Navbar />
+      <main className="flex-grow pt-[72px]">
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
@@ -51,20 +49,44 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const unsubscribe = fbOnAuthStateChanged((currentUser) => {
-      setUser(currentUser);
+    // Timeout fallback: if Firebase auth takes too long or is unavailable, proceed anyway
+    const timeout = setTimeout(() => {
       setAuthReady(true);
-    });
+    }, 2000);
 
-    return () => unsubscribe();
+    let unsubscribe: (() => void) | null = null;
+    try {
+      unsubscribe = fbOnAuthStateChanged((currentUser) => {
+        clearTimeout(timeout);
+        setUser(currentUser);
+        setAuthReady(true);
+      });
+      // If fbOnAuthStateChanged returned a no-op (Firebase not ready), set ready immediately
+      if (!unsubscribe || unsubscribe.toString() === '() => {}') {
+        clearTimeout(timeout);
+        setAuthReady(true);
+      }
+    } catch {
+      clearTimeout(timeout);
+      setAuthReady(true);
+    }
+
+    return () => {
+      clearTimeout(timeout);
+      if (unsubscribe) unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
     if (user === null) {
-      const authInstance = fbAuth();
-      signInAnonymously(authInstance).catch(() => {
-        // If anon sign-in fails, site may still work with public DB access.
-      });
+      try {
+        const authInstance = fbAuth();
+        signInAnonymously(authInstance).catch(() => {
+          // If anon sign-in fails, site may still work with public DB access.
+        });
+      } catch {
+        // Firebase auth not available, continue without it
+      }
     }
   }, [user]);
 

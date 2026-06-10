@@ -1,10 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { X, Send, Bot, User, Minimize2, Sparkles, RotateCcw } from 'lucide-react';
+import { X, Send, Bot, User, Minimize2, RotateCcw } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
+import WhatsAppButton from './WhatsAppButton';
 import { useSite } from '../context/SiteContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import DemoRequestModal from './DemoRequestModal';
-import KraLogo from './KraLogo';
 import { getChatGPTReply } from '../utils/chatgpt';
 import type { SiteData } from '../data/siteData';
 
@@ -13,201 +13,246 @@ interface Msg {
   role: 'bot' | 'user';
   text: string;
   time: string;
-  action?: 'demo' | 'contact';
-  badge?: 'kra';
+  action?: 'demo' | 'contact' | 'whatsapp';
+  quickReplies?: string[];
+}
+
+// Conversation stages for lead qualification
+type Stage =
+  | 'greeting'
+  | 'ask_name'
+  | 'ask_business'
+  | 'ask_challenge'
+  | 'ask_users'
+  | 'ask_current_software'
+  | 'ask_timeline'
+  | 'recommend'
+  | 'free';
+
+interface LeadProfile {
+  name?: string;
+  business?: string;
+  industry?: string;
+  challenge?: string;
+  users?: string;
+  currentSoftware?: string;
+  timeline?: string;
 }
 
 const getTime = () =>
   new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
-function getBotResponse(q: string, d: SiteData): Msg {
-  const lc = q.toLowerCase();
-  const time = getTime();
-
-  const responses: Array<{ pattern: RegExp; message: string; action?: Msg['action']; badge?: Msg['badge']; }> = [
-    {
-      pattern: /^(hi|hello|hey|jambo|habari|sasa|hallo)/,
-      message: `Hello! 👋 Welcome to ${d.company.name}. I can help with:\n\n✦ KRA & eTIMS compliance\n✦ Payroll & PAYE setup\n✦ Banking integrations\n✦ Inventory management\n✦ Collections & receivables\n✦ Audit readiness\n✦ System migration\n\nWhat can I help you with?`,
-    },
-    {
-      pattern: /demo|trial|test|try/,
-      message: `🎯 Perfect! Let me schedule a demo for you.\n\nClick "Open Demo Form" or contact directly:\n📞 ${d.contact.phones[0]}\n📧 ${d.contact.emails[0]}\n💬 WhatsApp: wa.me/${d.contact.whatsapp}`,
-      action: 'demo',
-    },
-    {
-      pattern: /price|cost|how much|silver|gold|edition|investment|budget/,
-      message: `💰 **Tally Prime Pricing:**\n\n${d.products.map((p) => `• **${p.name} ${p.edition}**: ${p.price} (${p.period})\n  ${p.features[0]}`).join('\n\n')}\n\n✓ Volume discounts available\n✓ Custom TDL from KES 25,000\n✓ Training included\n\nLet's find the right fit!`,
-    },
-    {
-      pattern: /service|what.*offer|provide|do you/,
-      message: `🚀 **Our Services:**\n\n${d.services.slice(0, 8).map((s, i) => `${i+1}. **${s.title}**\n   ${s.desc}`).join('\n\n')}\n\nWhich interests you most?`,
-    },
-    {
-      pattern: /kra|etims|e-filing|tax|vat|compliance|excise|cdf|pin|filing/,
-      message: `📋 **KRA & eTIMS Compliance**\n\nWe configure 100% KRA compliance:\n✓ VAT computation & e-filing\n✓ PAYE auto-calculation\n✓ Income tax reporting\n✓ eTIMS integration\n✓ iTax e-Filing\n✓ Excise duty tracking\n✓ Certificate of Tax Compliance\n✓ Deadline alerts\n\nNever miss a deadline! Ready to set up?`,
-      badge: 'kra',
-    },
-    {
-      pattern: /payroll|salary|paye|nhif|nssf|housing|staff|employee|wage|deduction|leave|advance/,
-      message: `💰 **Payroll Management**\n\nAutomate payroll processing:\n✓ Auto salary calculation\n✓ PAYE withholding\n✓ NHIF deductions\n✓ NSSF contributions\n✓ Housing Levy (3%)\n✓ Leave tracking\n✓ Loan deductions\n✓ Advance settlements\n\n📊 **Reports:**\n• Individual payslips\n• Bank transfer lists\n• PAYE schedules\n• NHIF/NSSF remittance\n\nFully Kenya compliant!`,
-    },
-    {
-      pattern: /bank|payment|gateway|mpesa|reconcil|cash|cheque|transfer|account/,
-      message: `🏦 **Banking & Payment Integration**\n\nSeamless banking workflows:\n✓ Bank reconciliation automation\n✓ M-Pesa payment tracking\n✓ Cheque management\n✓ Payment gateway integration\n✓ Cash flow forecasting\n✓ Multi-bank account support\n✓ Real-time bank feeds\n\n💳 **Supported Banks:**\n• KCB, Equity, I&M, Absa, Standard Chartered\n• M-Pesa for business\n• PayPal & Stripe for e-commerce\n\nSetup takes < 1 hour!`,
-    },
-    {
-      pattern: /collections|receivable|invoice|credit|customer|debtors|aging|recovery|dso|cash flow/,
-      message: `📲 **Collections & Receivables**\n\nMaximize cash collection:\n✓ Credit limit management\n✓ Invoice aging reports\n✓ Dunning automation\n✓ Payment reminders\n✓ Customer statements\n✓ Collection tracking\n✓ Bad debt provisioning\n\n📈 **Improve Cash Flow:**\n• Automated follow-up\n• Credit scoring\n• Early payment discounts\n• Late payment penalties\n\nReduce DSO by 30-40%!`,
-    },
-    {
-      pattern: /inventor|stock|warehouse|product|item|sku|batch|expiry|reorder|location|distribution/,
-      message: `📦 **Inventory Management**\n\nReal-time stock control:\n✓ Multi-location warehousing\n✓ Batch & serial tracking\n✓ Expiry date management\n✓ Barcode scanning\n✓ Auto reorder alerts\n✓ Stock transfers\n✓ Consignment tracking\n\n🎯 **Features:**\n• Safety stock calculations\n• FIFO/LIFO valuation\n• Stock loss reporting\n• Inventory cycles\n• Cost analysis\n\nWorks for retail, wholesale, manufacturing & F&B!`,
-    },
-    {
-      pattern: /branch|multi-branch|distributed|location|site|head office|regional|chain|franchise/,
-      message: `🏢 **Multi-Branch Accounting**\n\nCentralized control, local autonomy:\n✓ Branch-wise P&L\n✓ Consolidated reporting\n✓ Inter-branch transfers\n✓ Central bank account\n✓ Shared master data\n✓ Branch expense tracking\n✓ Performance comparison\n\n📊 **Reports:**\n• Financial statements by branch\n• Variance analysis\n• Sales by location\n• Expense allocation\n\nPerfect for retail chains, service providers & franchises!`,
-    },
-    {
-      pattern: /migrat|upgrade|import|data|legacy|transfer|move from|switch|convert|import data/,
-      message: `🔄 **System Migration & Data Transfer**\n\nSmooth transition to Tally Prime:\n✓ Data import from legacy systems\n✓ Opening balance migration\n✓ Customer/supplier mapping\n✓ Inventory balance transfer\n✓ Historical data archival\n✓ Zero data loss guarantee\n✓ Parallel run support\n\n⚙️ **Our Process:**\n1. Data audit & validation\n2. Mapping & transformation\n3. Test migration\n4. Live cutover\n5. Post-migration support\n\n🎯 Typically 2-4 weeks with training!`,
-    },
-    {
-      pattern: /manufactur|production|bom|bill of material|process|wip|work in progress|cost|labor|batch|waste/,
-      message: `🏭 **Manufacturing Solutions**\n\nStreamline production:\n✓ Bill of Materials (BOM)\n✓ Production orders\n✓ Work-in-progress tracking\n✓ Job costing\n✓ Quality control\n✓ Labor allocation\n✓ Batch tracking\n✓ Waste management\n\n📊 **Analysis:**\n• Cost per unit\n• Production efficiency\n• Material usage variance\n• Timeline tracking\n\nGreat for food, pharma, textiles & heavy manufacturing!`,
-    },
-    {
-      pattern: /audit|audit trail|internal control|risk|fraud|sox|sarbanes|compliance check|regulatory/,
-      message: `🔐 **Audit Readiness & Controls**\n\nMeet regulatory requirements:\n✓ Complete audit trail\n✓ User access controls\n✓ Approval workflows\n✓ Exception reporting\n✓ Document retention\n✓ Balance sheet reconciliation\n✓ Fraud detection\n\n📋 **For Auditors:**\n• General ledger with drill-down\n• Journal entries with approvals\n• User activity logs\n• System snapshots\n• Compliance checklist\n\nPrepare for audits in hours, not weeks!`,
-    },
-    {
-      pattern: /train|training|staff|onboard|workshop|cert|skill|learn|course|education/,
-      message: `👥 **Training & Onboarding**\n\nBuild capability in your team:\n✓ On-site training sessions\n✓ Remote workshops\n✓ One-on-one coaching\n✓ Video tutorials\n✓ User manuals\n✓ Role-based training\n✓ Certification programs\n\n📚 **Topics:**\n• Daily operations\n• Reporting & analysis\n• KRA compliance\n• Banking & collections\n• Inventory management\n• Advanced features\n\nTraining included in all packages!`,
-    },
-    {
-      pattern: /remote|cloud|access|online|work from|anywhere|mobile|app|vpn/,
-      message: `☁️ **Remote Access & Cloud Hosting**\n\nAccess Tally Prime anywhere, anytime:\n✓ Secure cloud infrastructure\n✓ Multi-device support\n✓ VPN integration\n✓ Mobile app access\n✓ Automatic hourly backups\n✓ Disaster recovery\n✓ ISO 27001 compliance\n\n🔒 **Security:**\n• 256-bit encryption\n• Multi-factor authentication\n• Regular security audits\n\nPerfect for remote teams & hybrid work!`,
-    },
-    {
-      pattern: /integrat|api|connector|plugin|third-party|sync|webhook|automat|pos|crm|erp|hr/,
-      message: `🔗 **Integrations & API Solutions**\n\nConnect Tally Prime with your ecosystem:\n✓ POS system integration\n✓ E-commerce platform sync\n✓ CRM integration\n✓ HR software link\n✓ Email & document automation\n✓ Custom API development\n✓ Workflow automation\n\n💼 **Common Integrations:**\n• Shopify & WooCommerce\n• LinkedIn & ATS\n• Google Workspace\n• Slack notifications\n• Power BI dashboards\n\nCustom TDL & API from KES 25,000!`,
-    },
-    {
-      pattern: /report|dashboard|analysis|insight|forecast|budget|projection|kpi|metric/,
-      message: `📊 **Advanced Reporting & Analytics**\n\nTurn data into decisions:\n✓ Real-time dashboards\n✓ Financial reports\n✓ Budget vs. actual\n✓ Cash flow forecast\n✓ KPI tracking\n✓ Variance analysis\n✓ Custom reports\n✓ Data export (Excel/PDF)\n\n🎯 **Key Reports:**\n• P&L statements\n• Balance sheets\n• Cash flow analysis\n• Profitability by product\n• Customer/supplier analysis\n• Tax reports\n\nMake data-driven decisions daily!`,
-    },
-    {
-      pattern: /support|help|issue|problem|error|troubleshoot|bug|urgent|sla|response|maintenance|update/,
-      message: `🛠️ **24/7 Support & Maintenance**\n\nWe're always here for you:\n✓ Phone support (24 hours)\n✓ Email ticketing system\n✓ Remote troubleshooting\n✓ On-site visits available\n✓ Software updates\n✓ Preventive maintenance\n✓ Performance optimization\n\n⚡ **Service Levels:**\n• Critical: <1 hour response\n• High: <4 hours response\n• Medium: <24 hours response\n• Low: <48 hours response\n\n📞 ${d.contact.phones[0]}`,
-    },
-    {
-      pattern: /edition|silver|gold|plus|enterprise|compare|difference|choose|which|best/,
-      message: `📦 **Tally Prime Editions**\n\n**Silver** - Small businesses\n✓ Single-user\n✓ Basic inventory\n✓ Multi-currency\n• Best for: Startups, sole traders\n\n**Gold** - Growing businesses\n✓ Multi-user (up to 5)\n✓ Advanced inventory\n✓ Remote access\n• Best for: SMEs, branches\n\n**Plus** - Mid-market\n✓ Multi-location\n✓ Manufacturing\n✓ Advanced reporting\n• Best for: 50-200 employees\n\n**Enterprise** - Large organizations\n✓ Unlimited users\n✓ Full customization\n✓ API access\n• Best for: 200+ employees\n\nNeed help choosing?`,
-    },
-    {
-      pattern: /contact|reach|phone|call|email|location|address|office|visit|meeting|where/,
-      message: `📞 **Contact & Office Information**\n\n${d.contact.phones.map((p) => `📱 ${p}`).join('\n')}\n${d.contact.emails.map((e) => `📧 ${e}`).join('\n')}\n📍 ${d.contact.location}\n\n🕐 **Working Hours:**\n${d.contact.workingHours.map((h) => `• ${h}`).join('\n')}\n\nSchedule a meeting or get a quote!`,
-    },
-    {
-      pattern: /about|company|who|mission|vision|history|team|background|credential|expert|partner/,
-      message: `🏢 **About Optimum Prime Solutions**\n\n${d.company.about[0]}\n\n📈 **By the Numbers:**\n${d.company.stats.map((s) => `• ${s.label}: ${s.value}`).join('\n')}\n\n✓ Certified Tally Gold Partner\n✓ KRA Compliance Experts\n✓ Trusted by 500+ businesses in Kenya\n✓ 10+ years of implementation experience\n\nLet's help your business grow!`,
-    },
-    {
-      pattern: /thank|bye|asante|goodbye|see you|ciao|tata|cheers|exit/,
-      message: `You're welcome! 😊 Feel free to reach out anytime.\n\n📞 ${d.contact.phones[0]}\n💬 wa.me/${d.contact.whatsapp}\n\nHave a great day! 🚀`,
-    },
-  ];
-
-  for (const { pattern, message, action, badge } of responses) {
-    if (pattern.test(lc)) {
-      return { id: Date.now().toString(), role: 'bot', text: message, time, action: action as any, badge };
-    }
-  }
-
-  const faq = d.faqs.find((f) => {
-    const words = lc.split(/\s+/).filter((x) => x.length > 3);
-    return (
-      words.filter((x) => f.q.toLowerCase().includes(x) || f.a.toLowerCase().includes(x))
-        .length >= 2
-    );
-  });
-
-  if (faq) {
-    return {
-      id: Date.now().toString(),
-      role: 'bot',
-      text: `📋 **${faq.q}**\n\n${faq.a}`,
-      time,
-    };
-  }
-
-  return {
-    id: Date.now().toString(),
-    role: 'bot',
-    text: `Great question! 🤔 I didn't catch all the details, but our team can help:\n\n📞 ${d.contact.phones[0]}\n📧 ${d.contact.emails[0]}\n💬 wa.me/${d.contact.whatsapp}\n\nOr try asking about:\n✓ KRA compliance\n✓ Payroll setup\n✓ Banking integrations\n✓ Collections management\n✓ Inventory control\n✓ System migration`,
-    time,
-  };
+// Detect intent from user message
+function detectIntent(text: string): string {
+  const lc = text.toLowerCase();
+  if (/^(hi|hello|hey|jambo|habari|sasa|hallo|good morning|good afternoon|good evening)\b/.test(lc)) return 'greeting';
+  if (/price|cost|how much|pricing|quote|budget|afford/.test(lc)) return 'pricing';
+  if (/kra|etims|tax|vat|compliance|filing|pin/.test(lc)) return 'kra';
+  if (/payroll|salary|paye|nhif|nssf|housing levy|staff|employee/.test(lc)) return 'payroll';
+  if (/inventory|stock|warehouse|product|sku|barcode|batch/.test(lc)) return 'inventory';
+  if (/cloud|remote|access|anywhere|hosting|vpn/.test(lc)) return 'cloud';
+  if (/hubspot|crm|customer|sales pipeline|lead|contact management/.test(lc)) return 'hubspot';
+  if (/eos|entrepreneurial|operating system|gino wickman|traction|rocks|l10|visionary|integrator/.test(lc)) return 'eos';
+  if (/demo|book|schedule|appointment|meeting|call|consultation/.test(lc)) return 'demo';
+  if (/migrat|switch|move from|upgrade|import|legacy/.test(lc)) return 'migration';
+  if (/bank|mpesa|reconcil|payment|cheque/.test(lc)) return 'banking';
+  if (/report|dashboard|analysis|insight|forecast/.test(lc)) return 'reporting';
+  if (/manufactur|production|bom|bill of material/.test(lc)) return 'manufacturing';
+  if (/branch|multi-branch|location|chain|franchise/.test(lc)) return 'branch';
+  if (/train|workshop|learn|course|onboard/.test(lc)) return 'training';
+  if (/tsplus|ts plus|remote desktop|terminal server/.test(lc)) return 'tsplus';
+  return 'unknown';
 }
 
-function FormatMessage({ text }: { text: string }) {
-  const formatInline = (content: string) => {
-    const parts = content.split(/(\*\*[^*]+\*\*)/g);
-    return parts.map((part, j) =>
-      part.startsWith('**') && part.endsWith('**') ? (
-        <strong key={j} className="font-semibold text-slate-900 dark:text-white">
-          {part.slice(2, -2)}
-        </strong>
-      ) : (
-        <span key={j}>{part}</span>
-      )
-    );
-  };
+function buildBotResponse(
+  intent: string,
+  lead: LeadProfile,
+  stage: Stage,
+  userText: string,
+  data: SiteData
+): { text: string; action?: Msg['action']; quickReplies?: string[]; nextStage?: Stage } {
+  const firstName = lead.name ? lead.name.split(' ')[0] : '';
+  const greet = firstName ? `${firstName}, ` : '';
 
-  return (
-    <>
-      {text.split('\n').map((line, i) => {
-        const trimmed = line.trim();
-        if (!trimmed) return <br key={i} />;
+  switch (intent) {
+    case 'greeting':
+      return {
+        text: `Hey there! 👋 Welcome to **Optimum Prime Solutions** — Kenya's certified TallyPrime partner.\n\nI'm **Aurora**, your business solutions guide. I'm here to help you find the right tools to grow your business.\n\nBefore we dive in — what's your name? I'd love to make this feel a bit more personal! 😊`,
+        nextStage: 'ask_name',
+      };
 
-        const bulletMatch = trimmed.match(/^([•✓✦])\s*(.*)$/);
-        if (bulletMatch) {
-          const [, symbol, rest] = bulletMatch;
-          return (
-            <div key={i} className="ml-1 flex gap-1.5">
-              <span className="text-sky-500">{symbol}</span>
-              <span>{formatInline(rest)}</span>
-            </div>
-          );
-        }
+    case 'pricing':
+      return {
+        text: `Great question, ${greet}pricing really depends on what fits your business best! 💡\n\nHere's a quick overview:\n\n• **TallyPrime Silver** — KES 57,600 +VAT *(single user, perfect for small businesses)*\n• **TallyPrime Gold** — KES 172,800 +VAT *(multi-user, growing teams)*\n• **Cloud Hosting** — From KES 8,000/month *(access from anywhere)*\n• **EOS® Implementation** — Custom quote *(transform how your business runs)*\n\nTo give you the most accurate recommendation — **how many people will need to use the system?** 👥`,
+        quickReplies: ['Just me (1 user)', '2–5 users', '6–15 users', '15+ users'],
+        nextStage: 'ask_users',
+      };
 
-        return <div key={i}>{formatInline(line)}</div>;
-      })}
-    </>
-  );
+    case 'kra':
+      return {
+        text: `Absolutely, ${greet}KRA compliance is something we take very seriously! 📋\n\nWith TallyPrime, you get:\n✓ eTIMS integration — invoices sent directly to KRA\n✓ VAT computation & e-filing\n✓ PAYE auto-calculation\n✓ iTax e-Filing support\n✓ Deadline alerts so you never miss a filing\n\nWe've helped dozens of Kenyan businesses become 100% compliant.\n\n**Are you currently using eTIMS, or is this something you're setting up for the first time?** 🤔`,
+        quickReplies: ['Setting up for the first time', 'Already on eTIMS but need help', 'Not sure what I need'],
+        nextStage: 'free',
+      };
+
+    case 'payroll':
+      return {
+        text: `Payroll can be such a headache — but it doesn't have to be! 😅\n\nWith TallyPrime, ${greet}you can automate:\n✓ Salary calculations\n✓ PAYE withholding\n✓ NHIF & NSSF deductions\n✓ Housing Levy (3%)\n✓ Leave & loan tracking\n✓ Payslip generation\n\nMost businesses save 5–10 hours every month after switching.\n\n**How many employees are you currently running payroll for?** 👥`,
+        quickReplies: ['1–10 employees', '11–50 employees', '51–200 employees', '200+ employees'],
+        nextStage: 'free',
+      };
+
+    case 'inventory':
+      return {
+        text: `Stock management is one of the biggest pain points we hear about! 📦\n\nTallyPrime gives you ${greet}:\n✓ Real-time stock levels across all locations\n✓ Batch & expiry date tracking\n✓ Auto reorder alerts\n✓ Barcode scanning support\n✓ FIFO/LIFO valuation\n\nWe've helped retail shops, wholesalers, and manufacturers get full visibility.\n\n**Are you managing inventory across one location or multiple?** 📍`,
+        quickReplies: ['One location', 'Multiple locations/branches', 'Warehouse + retail', 'Manufacturing + stock'],
+        nextStage: 'free',
+      };
+
+    case 'cloud':
+      return {
+        text: `Great timing — cloud hosting is one of our most popular services right now! ☁️\n\nWith our TallyPrime Cloud Hosting, ${greet}you get:\n✓ Access your accounts from anywhere — laptop, phone, tablet\n✓ Automatic daily backups\n✓ 99.9% uptime SLA\n✓ Secure 256-bit encryption\n✓ No IT infrastructure needed\n\nStarting from **KES 8,000/month** — less than one employee's daily wage!\n\n**Do you have a team working remotely or from multiple locations?** 🌍`,
+        quickReplies: ['Yes, remote team', 'Multiple office locations', 'Just want backup & security', 'Tell me more'],
+        nextStage: 'free',
+      };
+
+    case 'hubspot':
+      return {
+        text: `Excellent — HubSpot + TallyPrime is a powerful combination! 🚀\n\nHere's how they work together for ${greet}your business:\n\n**HubSpot CRM** handles:\n✓ Lead tracking & sales pipeline\n✓ Customer communication history\n✓ Email sequences & follow-ups\n✓ Deal management\n\n**TallyPrime** handles:\n✓ Invoicing & collections\n✓ Inventory & stock\n✓ KRA compliance & tax\n✓ Financial reporting\n\nTogether, you get a **360° view** — from first contact to final payment. No more data silos!\n\n**Are you currently using any CRM, or would this be your first?** 💼`,
+        quickReplies: ['First CRM', 'Moving from another CRM', 'Already on HubSpot', 'Just exploring'],
+        nextStage: 'free',
+      };
+
+    case 'eos':
+      return {
+        text: `Oh, I love this question! EOS® is a game-changer for growing businesses. 🎯\n\nThe **Entrepreneurial Operating System** by Gino Wickman gives your company a simple, proven framework built on **6 Key Components**:\n\n1. **Vision** — Everyone knows where you're going\n2. **People** — Right people, right seats\n3. **Data** — Run on numbers, not gut feel\n4. **Issues** — Solve problems permanently\n5. **Process** — Document your way of doing things\n6. **Traction** — Execute with discipline\n\nWe're certified EOS® implementers — we run quarterly sessions, L10 meetings, and help you build your V/TO (Vision/Traction Organizer).\n\n**Have you read Traction by Gino Wickman, or is EOS® new to you?** 📚`,
+        quickReplies: ["Yes, I've read Traction", 'Heard of it, want to learn more', 'Brand new to EOS®', 'Already running EOS®'],
+        nextStage: 'free',
+      };
+
+    case 'demo':
+      return {
+        text: `Fantastic — a demo is the best way to see if we're the right fit! 🎉\n\nOur demos are:\n✓ 30–45 minutes, tailored to your industry\n✓ Live walkthrough of TallyPrime, Cloud, and/or EOS®\n✓ Q&A session with our team\n✓ Zero obligation\n\n${greet}I'll connect you with our team right away. You can also reach us directly on WhatsApp for a faster response! 📱`,
+        action: 'demo',
+        quickReplies: ['Book via form', 'WhatsApp us directly'],
+        nextStage: 'free',
+      };
+
+    case 'migration':
+      return {
+        text: `Switching systems can feel daunting — but we make it smooth! 🔄\n\nOur migration process for ${greet}:\n1. **Data audit** — we review what you have\n2. **Mapping** — match your data to TallyPrime structure\n3. **Test migration** — verify everything before go-live\n4. **Live cutover** — switch with zero data loss\n5. **Post-migration support** — we stay with you\n\nTypically takes **2–4 weeks** including training.\n\n**What system are you currently using?** (e.g. QuickBooks, Sage, Excel, custom system)`,
+        quickReplies: ['QuickBooks', 'Sage / Pastel', 'Excel / manual', 'Custom/other system'],
+        nextStage: 'free',
+      };
+
+    case 'banking':
+      return {
+        text: `Bank reconciliation is one of those things that eats hours every month — we fix that! 🏦\n\nWith TallyPrime, ${greet}you get:\n✓ Automated bank reconciliation\n✓ M-Pesa payment tracking\n✓ Multi-bank account support\n✓ Real-time bank feeds\n✓ Cheque management\n✓ Cash flow forecasting\n\nSupported banks: KCB, Equity, I&M, Absa, Standard Chartered, and more.\n\n**Which bank(s) do you primarily use for your business?** 🏛️`,
+        quickReplies: ['KCB', 'Equity Bank', 'Absa / Barclays', 'Multiple banks'],
+        nextStage: 'free',
+      };
+
+    case 'tsplus':
+      return {
+        text: `TSplus is our preferred tool for secure remote desktop access to TallyPrime! 💻\n\nWith TSplus, ${greet}your team can:\n✓ Access TallyPrime from any device, anywhere\n✓ Work on a secure, isolated session\n✓ No need for expensive VPN setups\n✓ Works on Windows, Mac, iOS, and Android\n\nWe bundle TSplus with our **Cloud Hosting** package for a seamless remote experience.\n\n**How many users would need remote access?** 👥`,
+        quickReplies: ['1–3 users', '4–10 users', '10+ users', 'Tell me about pricing'],
+        nextStage: 'free',
+      };
+
+    case 'manufacturing':
+      return {
+        text: `Manufacturing businesses have unique needs — and TallyPrime handles them well! 🏭\n\nFor ${greet}your production operations:\n✓ Bill of Materials (BOM) management\n✓ Production order tracking\n✓ Work-in-progress (WIP) visibility\n✓ Job costing & labour allocation\n✓ Batch tracking & quality control\n✓ Waste management reporting\n\n**What type of manufacturing does your business do?** (e.g. food, pharma, textiles, metal fabrication)`,
+        quickReplies: ['Food & beverage', 'Pharmaceuticals', 'Textiles / garments', 'Other manufacturing'],
+        nextStage: 'free',
+      };
+
+    case 'reporting':
+      return {
+        text: `Good data = good decisions. Let's get you there! 📊\n\nTallyPrime gives ${greet}your business:\n✓ Real-time P&L statements\n✓ Balance sheets & cash flow\n✓ Budget vs. actual analysis\n✓ Customer & supplier ageing\n✓ Profitability by product/branch\n✓ KPI dashboards\n✓ Export to Excel & PDF\n\n**What reporting challenge are you trying to solve?** For example — are you spending too long pulling reports manually, or struggling to understand your cash position?`,
+        quickReplies: ['Manual reports take too long', 'Need real-time visibility', 'Board/investor reporting', 'KRA compliance reports'],
+        nextStage: 'free',
+      };
+
+    case 'training':
+      return {
+        text: `Training is included in all our packages — we don't just install and leave! 👥\n\nFor ${greet}your team, we offer:\n✓ On-site training sessions\n✓ Remote workshops via Zoom/Teams\n✓ Role-based training (accounts, sales, warehouse)\n✓ Video tutorials & user manuals\n✓ Ongoing support after go-live\n\n**How many staff members would need training?** And do you prefer on-site or remote sessions?`,
+        quickReplies: ['1–3 people, on-site', '4–10 people, on-site', 'Remote training preferred', 'Mix of both'],
+        nextStage: 'free',
+      };
+
+    default: {
+      // Contextual fallback based on stage
+      if (stage === 'ask_name') {
+        const name = userText.trim().split(' ')[0];
+        return {
+          text: `Nice to meet you, **${name}**! 😊\n\nSo, tell me — what kind of business do you run? Knowing your industry helps me point you to exactly the right solution.\n\nFor example: retail, wholesale, manufacturing, services, NGO, hospitality...`,
+          quickReplies: ['Retail / Shop', 'Wholesale / Distribution', 'Manufacturing', 'Services / Consulting', 'NGO / Non-profit', 'Hospitality / F&B'],
+          nextStage: 'ask_business',
+        };
+      }
+
+      if (stage === 'ask_business') {
+        return {
+          text: `Interesting! ${greet}${userText} businesses often come to us with a few common challenges.\n\nOut of these, **which one is your biggest pain point right now?** 🎯`,
+          quickReplies: ['KRA & tax compliance', 'Slow or manual invoicing', 'Inventory going out of control', 'Payroll taking too long', 'No visibility into cash flow', 'Growing team, need better systems'],
+          nextStage: 'ask_challenge',
+        };
+      }
+
+      if (stage === 'ask_challenge') {
+        return {
+          text: `That's a really common challenge — and honestly, one we solve every week! 💪\n\nJust so I can give you the most relevant recommendation: **how many people currently work in your business?**`,
+          quickReplies: ['Just me', '2–10 people', '11–50 people', '50+ people'],
+          nextStage: 'ask_users',
+        };
+      }
+
+      if (stage === 'ask_users') {
+        return {
+          text: `Perfect. And one more thing — **what software or system are you currently using** to manage your accounts or business operations?\n\nEven if it's just Excel or WhatsApp groups — no judgment! 😄`,
+          quickReplies: ['Excel / manual', 'QuickBooks', 'Sage / Pastel', 'Another system', 'Nothing yet'],
+          nextStage: 'ask_current_software',
+        };
+      }
+
+      if (stage === 'ask_current_software') {
+        return {
+          text: `Got it! Based on everything you've shared, I have a clear picture of what you need. 🎯\n\nHere's what I'd recommend:\n\n${lead.users && parseInt(lead.users) <= 2
+            ? '• **TallyPrime Silver** — perfect for your team size, KES 57,600 +VAT'
+            : '• **TallyPrime Gold** — multi-user access, KES 172,800 +VAT'}\n• **Cloud Hosting** — so your team can access from anywhere, from KES 8,000/month\n${lead.challenge?.includes('cash flow') || lead.challenge?.includes('grow') ? '• **EOS® Implementation** — to build the operating system your business needs to scale\n' : ''}• **HubSpot CRM** — to manage your sales pipeline and customer relationships\n\nThe best next step is a **free 30-minute demo** where we show you exactly how this works for a business like yours.\n\n**Would you like to book that demo now?** 📅`,
+          action: 'demo',
+          quickReplies: ['Yes, book a demo!', 'Send me more info first', 'WhatsApp me instead'],
+          nextStage: 'recommend',
+        };
+      }
+
+      // Generic helpful fallback
+      return {
+        text: `That's a great point! 🤔 Let me make sure I understand what you need.\n\nWe specialise in:\n✦ **TallyPrime** — accounting, inventory, payroll & KRA compliance\n✦ **Cloud Hosting** — access your data from anywhere\n✦ **HubSpot CRM** — manage your sales pipeline & customers\n✦ **EOS®** — run your business on a proven operating system\n\nCould you tell me a bit more about what you're trying to solve? Or if it's easier, let's just **book a quick call** and we'll figure it out together! 😊`,
+        quickReplies: ['Book a call', 'Tell me about TallyPrime', 'What is EOS®?', 'HubSpot + TallyPrime'],
+        nextStage: 'free',
+      };
+    }
+  }
 }
 
 export default function Chatbot() {
   const { data } = useSite();
-  const defaultQuickLinks = [
-    'Request a demo',
-    'Pricing & editions',
-    'KRA compliance',
-    'Payroll setup',
-    'Banking integrations',
-    'Inventory management',
-    'Branch accounting',
-    'System migration',
-  ];
   const [open, setOpen] = useState(false);
   const [min, setMin] = useState(false);
   const [input, setInput] = useState('');
   const [typing, setTyping] = useState(false);
+  const [showTypingIndicator, setShowTypingIndicator] = useState(false);
   const [demoOpen, setDemoOpen] = useState(false);
+  const [stage, setStage] = useState<Stage>('greeting');
+  const [lead, setLead] = useState<LeadProfile>({});
   const [msgs, setMsgs] = useState<Msg[]>([
     {
       id: '0',
       role: 'bot',
-      text: `👋 Hello! I'm the Optimum Prime Assistant. I can help you with services, pricing, compliance, remote access, demos and training. Choose a quick link below or type your question.`,
+      text: `Hey there! 👋 Welcome to **Optimum Prime Solutions** — Kenya's certified TallyPrime partner.\n\nI'm **Aurora**, your business solutions guide. Whether you need help with accounting, KRA compliance, cloud hosting, HubSpot CRM, or running your business on EOS® — I'm here to help.\n\nWhat's your name? I'd love to make this feel a bit more personal! 😊`,
       time: getTime(),
+      quickReplies: [],
     },
   ]);
   const endRef = useRef<HTMLDivElement>(null);
@@ -220,67 +265,133 @@ export default function Chatbot() {
     scroll();
   }, [msgs, typing, scroll]);
 
-  const send = (txt: string) => {
-    if (!txt.trim()) return;
+  // Extract lead info from user message
+  const extractLeadInfo = (txt: string, currentStage: Stage): Partial<LeadProfile> => {
+    const updates: Partial<LeadProfile> = {};
+    if (currentStage === 'ask_name') {
+      updates.name = txt.trim().split(/\s+/).slice(0, 2).join(' ');
+    }
+    if (currentStage === 'ask_business' || /retail|wholesale|manufactur|service|ngo|hospitality|farm|school|clinic/i.test(txt)) {
+      updates.business = txt.trim();
+      if (/retail|shop|store/i.test(txt)) updates.industry = 'retail';
+      else if (/wholesale|distribut/i.test(txt)) updates.industry = 'wholesale';
+      else if (/manufactur|factory|production/i.test(txt)) updates.industry = 'manufacturing';
+      else if (/service|consult|agency/i.test(txt)) updates.industry = 'services';
+    }
+    if (currentStage === 'ask_challenge') updates.challenge = txt.trim();
+    if (currentStage === 'ask_users' || /(\d+)\s*(user|person|people|staff|employee)/i.test(txt)) {
+      const m = txt.match(/(\d+)/);
+      if (m) updates.users = m[1];
+      else updates.users = txt.trim();
+    }
+    if (currentStage === 'ask_current_software') updates.currentSoftware = txt.trim();
+    return updates;
+  };
 
+  const send = (txt: string) => {
+    if (!txt.trim() || typing) return;
+
+    const trimmedText = txt.trim();
     const userMsg: Msg = {
       id: Date.now().toString(),
       role: 'user',
-      text: txt.trim(),
+      text: trimmedText,
       time: getTime(),
     };
 
-    const trimmedText = txt.trim();
-    const isGreeting = /^(hi|hello|hey|jambo|habari|sasa|hallo)\b/i.test(trimmedText);
-    const kraQueryRegex = /\b(kra|etims|e-filing|tax|vat|compliance)\b/i;
-    const replyBadge = kraQueryRegex.test(trimmedText) ? 'kra' : undefined;
-
+    // Update lead profile
+    const leadUpdates = extractLeadInfo(trimmedText, stage);
+    const updatedLead = { ...lead, ...leadUpdates };
+    setLead(updatedLead);
     setMsgs((p) => [...p, userMsg]);
     setInput('');
-
-    if (isGreeting) {
-      const botMsg = getBotResponse(trimmedText, data);
-      if (botMsg.action === 'demo') setDemoOpen(true);
-      setMsgs((p) => [...p, botMsg]);
-      return;
-    }
-
     setTyping(true);
+    setShowTypingIndicator(true);
 
+    // Determine intent
+    const intent = detectIntent(trimmedText);
+
+    // Determine next stage
+    let nextStage: Stage = stage;
+    if (stage === 'greeting' || intent === 'greeting') nextStage = 'ask_name';
+    else if (stage === 'ask_name') nextStage = 'ask_business';
+    else if (stage === 'ask_business') nextStage = 'ask_challenge';
+    else if (stage === 'ask_challenge') nextStage = 'ask_users';
+    else if (stage === 'ask_users') nextStage = 'ask_current_software';
+    else if (stage === 'ask_current_software') nextStage = 'recommend';
+    else nextStage = 'free';
+
+    // Try AI reply first, fall back to rule-based
     (async () => {
       try {
-        const reply = await getChatGPTReply(trimmedText, data);
-        if (!reply?.trim()) throw new Error('EMPTY_REPLY');
+        const aiReply = await getChatGPTReply(trimmedText, data);
+        if (!aiReply?.trim()) throw new Error('EMPTY_REPLY');
+
+        // Inject a follow-up question if the AI reply doesn't already have one
+        const hasQuestion = aiReply.includes('?');
+        const followUps: Record<string, string> = {
+          ask_name: '\n\nWhat\'s your name so I can personalise this for you? 😊',
+          ask_business: '\n\nWhat industry or type of business are you in?',
+          ask_challenge: '\n\nWhat\'s your biggest challenge right now?',
+          ask_users: '\n\nHow many people will need access to the system?',
+          ask_current_software: '\n\nWhat are you currently using to manage your accounts?',
+        };
+
+        const enrichedReply = hasQuestion
+          ? aiReply
+          : aiReply + (followUps[nextStage] || '\n\nWhat else can I help you with?');
 
         const botMsg: Msg = {
           id: Date.now().toString(),
           role: 'bot',
-          text: reply,
+          text: enrichedReply,
           time: getTime(),
-          badge: replyBadge,
         };
 
-        setMsgs((p) => [...p, botMsg]);
-      } catch (err) {
-        const botMsg = getBotResponse(trimmedText, data);
-        if (botMsg.action === 'demo') setDemoOpen(true);
-        setMsgs((p) => [...p, { ...botMsg, badge: botMsg.badge || replyBadge }]);
-      } finally {
-        setTyping(false);
+        setTimeout(() => {
+          setMsgs((p) => [...p, botMsg]);
+          setShowTypingIndicator(false);
+          setTyping(false);
+          setStage(nextStage);
+        }, 800);
+      } catch {
+        // Rule-based fallback
+        const response = buildBotResponse(intent, updatedLead, stage, trimmedText, data);
+        if (response.action === 'demo') {
+          setTimeout(() => setDemoOpen(true), 1200);
+        }
+        const botMsg: Msg = {
+          id: Date.now().toString(),
+          role: 'bot',
+          text: response.text,
+          time: getTime(),
+          action: response.action,
+          quickReplies: response.quickReplies,
+        };
+
+        setTimeout(() => {
+          setMsgs((p) => [...p, botMsg]);
+          setShowTypingIndicator(false);
+          setTyping(false);
+          if (response.nextStage) setStage(response.nextStage);
+          else setStage(nextStage);
+        }, 900);
       }
     })();
   };
 
   const handleClear = () => {
-    if (confirm('Clear all messages?')) {
+    if (confirm('Start a fresh conversation?')) {
       setMsgs([
         {
           id: '0',
           role: 'bot',
-          text: `👋 Chat cleared! How can I help you today?`,
+          text: `Hey! 👋 Let's start fresh. I'm **Aurora** from Optimum Prime Solutions.\n\nWhat's your name? 😊`,
           time: getTime(),
         },
       ]);
+      setLead({});
+      setStage('greeting');
     }
   };
 
@@ -294,8 +405,8 @@ export default function Chatbot() {
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
             className="fixed bottom-6 right-6 z-40 h-16 w-16 rounded-full bg-[#25D366] text-white shadow-2xl shadow-[#25D366]/40 hover:scale-110 transition-all flex items-center justify-center"
-            aria-label="Open WhatsApp chat"
-            title="Open WhatsApp chat"
+            aria-label="Chat with Aurora"
+            title="Chat with Aurora — AI Assistant"
           >
             <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
               <WhatsAppIcon className="h-8 w-8 text-white" />
@@ -304,6 +415,7 @@ export default function Chatbot() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-white/30 opacity-60" />
               <span className="relative h-4 w-4 rounded-full bg-white/60" />
             </span>
+            <span className="absolute -bottom-2 -left-2 bg-white text-[#25D366] text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">✓</span>
           </motion.button>
         )}
       </AnimatePresence>
@@ -317,229 +429,142 @@ export default function Chatbot() {
             className={`fixed z-50 transition-all duration-300 ${
               min
                 ? 'bottom-6 right-6 h-14 w-72'
-                : 'bottom-0 right-0 sm:bottom-6 sm:right-6 h-[100dvh] w-full sm:h-[600px] sm:w-[420px]'
-            } flex flex-col overflow-hidden border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-2xl sm:rounded-2xl`}
+                : 'bottom-0 right-0 sm:bottom-6 sm:right-6 h-[100dvh] w-full sm:h-[620px] sm:w-[420px]'
+            } flex flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl sm:rounded-2xl`}
           >
             {/* Header */}
-            <div className="flex items-center justify-between bg-gradient-to-r from-slate-900 to-slate-700 px-4 py-3 shrink-0">
+            <div className="flex items-center justify-between bg-gradient-to-r from-slate-900 to-slate-800 px-4 py-3 shrink-0">
               <div className="flex items-center gap-2.5">
-                  <div className="relative h-8 w-8 rounded-full bg-[#25D366] flex items-center justify-center">
-                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 3, repeat: Infinity }}>
-                      <WhatsAppIcon className="h-4 w-4 text-white" />
-                    </motion.div>
-                    <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-white/80" />
-                  </div>
-                    {/* WhatsApp quick link */}
-                    <a
-                      href={`https://wa.me/${data.contact.whatsapp}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-white/10 hover:bg-white/20 ml-1"
-                      title="Chat on WhatsApp"
-                      aria-label="WhatsApp"
-                    >
-                      <WhatsAppIcon className="h-5 w-5 text-green-400" />
-                    </a>
-                {!min && (
-                  <div>
-                    <p className="text-sm font-semibold text-white">Optimum Assistant</p>
-                    <p className="text-[10px] text-green-300">● Online & Ready</p>
-                  </div>
-                )}
-                {min && <p className="text-sm font-semibold text-white">Optimum Assistant</p>}
+                <div className="relative h-9 w-9 rounded-full bg-[#25D366] flex items-center justify-center">
+                  <Bot className="h-4 w-4 text-white" />
+                  <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-green-400" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-white font-semibold text-sm">Aurora — Optimum Assistant</span>
+                  <span className="text-green-300 text-xs">● Online · Typically replies instantly</span>
+                </div>
               </div>
-              <div className="flex gap-1">
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={handleClear}
-                  className="p-1.5 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition"
-                  title="Clear chat"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setMin(!min)}
-                  className="p-1.5 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition"
-                >
-                  <Minimize2 className="h-3.5 w-3.5" />
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => {
-                    setOpen(false);
-                    setMin(false);
-                  }}
-                  className="p-1.5 text-white/50 hover:text-white hover:bg-white/10 rounded-lg transition"
-                >
-                  <X className="h-3.5 w-3.5" />
-                </motion.button>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setMin(!min)} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Minimize">
+                  <Minimize2 className="h-4 w-4 text-white" />
+                </button>
+                <button onClick={handleClear} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Clear chat">
+                  <RotateCcw className="h-4 w-4 text-white" />
+                </button>
+                <button onClick={() => setOpen(false)} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors" aria-label="Close chat">
+                  <X className="h-4 w-4 text-white" />
+                </button>
               </div>
             </div>
 
+            {/* Messages */}
             {!min && (
-              <>
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3 bg-slate-100 dark:bg-slate-950">
-                  {msgs.map((m) => (
+              <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-slate-50 to-white">
+                <AnimatePresence>
+                  {msgs.map((msg) => (
                     <motion.div
-                      key={m.id}
+                      key={msg.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      className={`flex gap-2 ${m.role === 'user' ? 'flex-row-reverse' : ''}`}
+                      className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                     >
-                      <div
-                        className={`h-7 w-7 rounded-full flex items-center justify-center shrink-0 ${
-                          m.role === 'bot'
-                            ? 'bg-slate-900'
-                            : 'bg-gradient-to-br from-sky-500 to-blue-600'
-                        }`}
-                      >
-                        {m.role === 'bot' ? (
-                          <Bot className="h-3.5 w-3.5 text-sky-300" />
-                        ) : (
-                          <User className="h-3.5 w-3.5 text-white" />
-                        )}
-                      </div>
-                      <div
-                        className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 text-[13px] leading-relaxed ${
-                          m.role === 'bot'
-                            ? 'rounded-tl-sm bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 shadow-sm border border-slate-100 dark:border-slate-700'
-                            : 'rounded-tr-sm bg-gradient-to-br from-sky-500 to-blue-600 text-white'
-                        }`}
-                      >
-                        {m.badge === 'kra' && (
-                          <div className="mb-2 inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-semibold text-slate-700">
-                            <KraLogo className="h-4 w-4" />
-                            <span>KRA / eTIMS</span>
-                          </div>
-                        )} <FormatMessage text={m.text} />
-                        {m.role === 'bot' && m.id === '0' && (
-                          <div className="mt-3 flex flex-wrap gap-2">
-                            {defaultQuickLinks.slice(0, 6).map((s) => (
-                              <motion.button
-                                key={s}
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.97 }}
-                                onClick={() => send(s)}
-                                className="rounded-full border border-sky-300/20 bg-sky-400/5 px-3 py-1 text-[12px] font-medium text-sky-600 hover:bg-sky-400/10 transition"
+                      {msg.role === 'bot' && (
+                        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center mt-1">
+                          <Bot className="h-3.5 w-3.5 text-white" />
+                        </div>
+                      )}
+                      <div className="flex flex-col gap-2 max-w-[80%]">
+                        <div
+                          className={`px-4 py-3 rounded-2xl text-sm leading-relaxed ${
+                            msg.role === 'user'
+                              ? 'bg-[#25D366] text-white rounded-br-sm'
+                              : 'bg-white border border-slate-200 text-slate-800 rounded-bl-sm shadow-sm'
+                          }`}
+                        >
+                          <p className="whitespace-pre-wrap break-words">{msg.text}</p>
+                          <p className={`text-xs mt-1.5 ${msg.role === 'user' ? 'text-white/70 text-right' : 'text-slate-400'}`}>
+                            {msg.time}
+                          </p>
+                        </div>
+
+                        {/* Quick reply buttons */}
+                        {msg.role === 'bot' && msg.quickReplies && msg.quickReplies.length > 0 && (
+                          <div className="flex flex-wrap gap-2 mt-1">
+                            {msg.quickReplies.map((qr) => (
+                              <button
+                                key={qr}
+                                onClick={() => send(qr)}
+                                disabled={typing}
+                                className="px-3 py-1.5 bg-white border border-red-200 text-red-700 text-xs font-medium rounded-full hover:bg-red-50 hover:border-red-400 transition-colors disabled:opacity-50 whitespace-nowrap"
                               >
-                                {s}
-                              </motion.button>
+                                {qr}
+                              </button>
                             ))}
                           </div>
                         )}
-                        {m.action === 'demo' && (
-                          <motion.button
-                            initial={{ opacity: 0, y: 5 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            whileHover={{ scale: 1.05 }}
-                            onClick={() => setDemoOpen(true)}
-                            className="mt-2 inline-block rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 transition"
-                          >
-                            <Sparkles className="h-3 w-3 inline mr-1" />
-                            Open Demo Form
-                          </motion.button>
-                        )}
-                        <p
-                          className={`mt-1 text-[9px] ${
-                            m.role === 'bot'
-                              ? 'text-slate-600'
-                              : 'text-white/40'
-                          }`}
-                        >
-                          {m.time}
-                        </p>
                       </div>
+
+                      {msg.role === 'user' && (
+                        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-slate-200 flex items-center justify-center mt-1">
+                          <User className="h-3.5 w-3.5 text-slate-600" />
+                        </div>
+                      )}
                     </motion.div>
                   ))}
-                  {typing && (
-                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex gap-2">
-                      <div className="h-7 w-7 rounded-full bg-slate-900 flex items-center justify-center">
-                        <Bot className="h-3.5 w-3.5 text-sky-300" />
-                      </div>
-                      <div className="rounded-2xl rounded-tl-sm bg-white dark:bg-slate-900 px-4 py-3 shadow-sm border border-slate-100 dark:border-slate-700">
-                        <div className="flex gap-1">
-                          {[0, 1, 2].map((i) => (
-                            <motion.span
-                              key={i}
-                              animate={{ y: [0, -4, 0] }}
-                              transition={{ delay: i * 0.15, duration: 0.6, repeat: Infinity }}
-                              className="h-1.5 w-1.5 rounded-full bg-slate-400"
-                            />
-                          ))}
-                        </div>
-                      </div>
-                    </motion.div>
-                  )}
-                  <div ref={endRef} />
-                </div>
+                </AnimatePresence>
 
-                {/* Quick Questions */}
-                        {msgs.length <= 2 && (
-                  <div className="border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2 shrink-0">
-                    <p className="mb-1.5 text-[9px] font-medium uppercase tracking-wider text-slate-600">
-                      Quick questions
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                              {[
-                                'KRA compliance',
-                                'Payroll setup',
-                                'Banking integrations',
-                                'Collections',
-                                'Inventory control',
-                                'System migration',
-                                'Audit readiness',
-                                'Request a demo',
-                              ].map((s) => (
-                        <motion.button
-                          key={s}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          onClick={() => send(s)}
-                          className="rounded-full border border-sky-300/20 bg-sky-400/5 px-2.5 py-1 text-[10px] font-medium text-sky-600 hover:bg-sky-400/10 transition"
-                        >
-                          {s}
-                        </motion.button>
-                      ))}
+                {showTypingIndicator && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="flex gap-2 items-start">
+                    <div className="flex-shrink-0 w-7 h-7 rounded-full bg-slate-800 flex items-center justify-center">
+                      <Bot className="h-3.5 w-3.5 text-white" />
                     </div>
-                  </div>
+                    <div className="bg-white border border-slate-200 px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm flex gap-1 items-center">
+                      <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 0.6, repeat: Infinity }} className="w-2 h-2 bg-slate-400 rounded-full" />
+                      <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: 0.15 }} className="w-2 h-2 bg-slate-400 rounded-full" />
+                      <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: 0.3 }} className="w-2 h-2 bg-slate-400 rounded-full" />
+                      <span className="text-xs text-slate-400 ml-1">Aurora is typing...</span>
+                    </div>
+                  </motion.div>
                 )}
 
-                {/* Input */}
-                <form onSubmit={(e) => {e.preventDefault(); send(input);}} className="flex items-center gap-2 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-950 px-3 py-2.5 shrink-0">
-                  <input
-                    value={input}
-                    onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type a message..."
-                    className="flex-1 rounded-xl border border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-900 px-3.5 py-2 text-sm outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/30 text-slate-950 dark:text-white placeholder-slate-500 dark:placeholder-slate-400 caret-sky-600"
-                  />
-                  <motion.button
-                    type="submit"
-                    disabled={!input.trim()}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="h-9 w-9 rounded-xl bg-blue-600 text-white flex items-center justify-center hover:bg-blue-700 transition disabled:opacity-40 disabled:cursor-not-allowed"
-                  >
-                    <Send className="h-3.5 w-3.5" />
-                  </motion.button>
-                </form>
-              </>
+                <div ref={endRef} />
+              </div>
+            )}
+
+            {/* Minimised state */}
+            {min && (
+              <div className="flex-1 flex items-center px-4">
+                <span className="text-sm text-slate-600">Chat with Aurora — tap to expand</span>
+              </div>
+            )}
+
+            {/* Input */}
+            {!min && (
+              <div className="flex gap-2 p-3 border-t border-slate-100 bg-white shrink-0">
+                <input
+                  type="text"
+                  placeholder="Type a message..."
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && send(input)}
+                  className="flex-1 px-3 py-2 bg-slate-100 text-slate-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-red-400 text-sm"
+                />
+                <button
+                  onClick={() => send(input)}
+                  disabled={!input.trim() || typing}
+                  className="p-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-40 transition-colors"
+                  aria-label="Send message"
+                >
+                  <Send className="h-4 w-4" />
+                </button>
+                <WhatsAppButton message={`Hi, I need help with: ${input || 'Optimum Prime Solutions'}`} />
+              </div>
             )}
           </motion.div>
         )}
       </AnimatePresence>
 
-      <DemoRequestModal
-        isOpen={demoOpen}
-        onClose={() => setDemoOpen(false)}
-        companyPhone={data.contact.phones[0]}
-        companyEmail={data.contact.emails[0]}
-        companyWhatsapp={data.contact.whatsapp}
-      />
+      {demoOpen && <DemoRequestModal open={demoOpen} onOpenChange={setDemoOpen} />}
     </>
   );
 }

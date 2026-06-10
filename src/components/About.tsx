@@ -21,8 +21,8 @@ export default function About() {
               About Optimum Prime Solutions
             </motion.span>
             <motion.h2 variants={fade} custom={1} className="mt-4 text-3xl sm:text-4xl font-bold text-slate-950">Systems That Help Businesses Grow</motion.h2>
-            <motion.p variants={fade} custom={2} className="mt-4 text-slate-700 leading-relaxed">Optimum Prime Solutions combines technology implementation, secure cloud infrastructure, and operational consulting to deliver financial clarity, centralized reporting, and scalable systems for multi-branch businesses.</motion.p>
-            <motion.p variants={fade} custom={3} className="mt-4 text-slate-600 leading-relaxed">We move companies beyond basic accounting into reliable systems that improve decision-making, accountability, and operational efficiency — from implementation and training to ongoing optimization and support.</motion.p>
+            <motion.p variants={fade} custom={2} className="mt-4 text-slate-700 leading-relaxed">Optimum Prime Solutions is Kenya's certified TallyPrime partner — selling, implementing, and supporting TallyPrime Silver, Gold, and Enterprise editions across East Africa. We also provide secure cloud hosting so your team can access TallyPrime from anywhere, and we are licensed EOS® implementers helping leadership teams run their businesses on the Entrepreneurial Operating System by Gino Wickman.</motion.p>
+            <motion.p variants={fade} custom={3} className="mt-4 text-slate-600 leading-relaxed">EOS® strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. Combined with TallyPrime's financial intelligence, our clients gain both the numbers and the management system to grow with confidence and accountability.</motion.p>
             <motion.div variants={fade} custom={4} className="mt-8 grid grid-cols-2 gap-5">
               {c.stats.map((s:{label:string;value:string},i:number)=>{const I=icons[i%icons.length];return(
                 <div key={s.label} className="rounded-3xl bg-white/90 border border-slate-200 p-4 shadow-sm flex items-center gap-3">
@@ -35,7 +35,7 @@ export default function About() {
           <motion.div initial={{opacity:0,x:40}} whileInView={{opacity:1,x:0}} viewport={{once:true}} className="relative">
             <div className="rounded-3xl bg-gradient-to-br from-white to-slate-100 p-8 lg:p-10 shadow-2xl shadow-slate-200 ring-1 ring-slate-200/60">
               <div className="space-y-7">
-                {[{icon:Target,title:'Our Mission',text:c.mission},{icon:Eye,title:'Our Vision',text:c.vision},{icon:Zap,title:'Why Choose Us',text:'Certified Tally experts, rapid implementation, 24/7 support, and solutions customized for the Kenyan market.'}].map(({icon:Ic,title,text})=>(
+                {[{icon:Target,title:'Our Mission',text:c.mission},{icon:Eye,title:'Our Vision',text:c.vision},{icon:Zap,title:'Why Choose Us',text:'Kenya\'s certified TallyPrime reseller, licensed EOS® implementer, and cloud hosting provider — with 24/7 support and solutions built for the Kenyan market.'}].map(({icon:Ic,title,text})=>(
                   <div key={title} className="flex items-start gap-4">
                     <div className="h-11 w-11 rounded-3xl bg-gradient-to-br from-sky-500 to-cyan-400 text-white flex items-center justify-center shrink-0 shadow-lg shadow-cyan-200/30"><Ic className="h-5 w-5"/></div>
                     <div><h4 className="text-base font-bold text-slate-950">{title}</h4><p className="mt-1 text-sm text-slate-600 leading-relaxed">{text}</p></div>

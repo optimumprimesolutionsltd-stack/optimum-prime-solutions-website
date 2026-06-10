@@ -1,14 +1,28 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function TallyLanding() {
   const confettiRoot = useRef<HTMLDivElement | null>(null);
   const logoRef = useRef<HTMLDivElement | null>(null);
+  const navigate = useNavigate();
+  const benefits = [
+    'Certified TallyPrime partner — Silver, Gold & Enterprise',
+    'Secure cloud hosting & remote access setup',
+    'KRA & eTIMS compliant accounting out of the box',
+    'EOS® business operating system implementation',
+    'Scalable systems for growing Kenyan businesses',
+  ];
 
   useEffect(() => {
     // Simple DOM confetti: create colorful flakes and animate then remove
     const root = confettiRoot.current;
     if (!root) return;
+    // Disable confetti on small screens or when user prefers reduced motion
+    if (typeof window !== 'undefined') {
+      const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (prefersReduced || window.innerWidth < 640) return;
+    }
 
     const colors = ['#F59E0B', '#06B6D4', '#0EA5E9', '#F97316', '#60A5FA', '#34D399'];
     const flakes: HTMLDivElement[] = [];
@@ -39,58 +53,44 @@ export default function TallyLanding() {
   useEffect(() => {
     const el = logoRef.current;
     if (!el) return;
+    const node = el as HTMLDivElement;
 
     function onMove(e: MouseEvent) {
-      const rect = el.getBoundingClientRect();
+      const rect = node.getBoundingClientRect();
       const x = e.clientX - rect.left - rect.width / 2;
       const y = e.clientY - rect.top - rect.height / 2;
       const rx = (-y / rect.height) * 6; // tilt intensity
       const ry = (x / rect.width) * 6;
-      el.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(6px)`;
+      node.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(6px)`;
     }
 
     function onLeave() {
-      el.style.transform = 'none';
+      node.style.transform = 'none';
     }
 
-    el.addEventListener('mousemove', onMove);
-    el.addEventListener('mouseleave', onLeave);
+    node.addEventListener('mousemove', onMove);
+    node.addEventListener('mouseleave', onLeave);
     return () => {
-      el.removeEventListener('mousemove', onMove);
-      el.removeEventListener('mouseleave', onLeave);
+      node.removeEventListener('mousemove', onMove);
+      node.removeEventListener('mouseleave', onLeave);
     };
   }, []);
 
   return (
-    <section className="relative h-screen w-full overflow-hidden bg-sky-700">
-      {/* Background: team image fallback while video support can remain optional */}
-      <div className="absolute inset-0 -z-30 bg-cover bg-center" style={{ backgroundImage: "url('/tally-team-poster.jpg')" }} />
-      <video
-        className="absolute inset-0 h-full w-full object-cover will-change-transform animate-videoZoom z-10 filter-bright"
-        autoPlay
-        muted
-        loop
-        playsInline
-        poster="/tally-team-poster.jpg"
-      >
-        <source src="/tally-people.webm" type="video/webm" />
-        <source src="/tally-people.mp4" type="video/mp4" />
-      </video>
+    <section className="relative min-h-screen w-full overflow-hidden bg-black">
+      <div className="absolute inset-0 z-10 bg-black/70 pointer-events-none" />
 
-      {/* Blue tint overlay for the landing picture */}
-      <div className="absolute inset-0 z-20 bg-sky-700/30" />
-
-      <div className="absolute inset-x-0 bottom-0 h-48 z-30 bg-gradient-to-t from-slate-100/90 via-slate-100/30 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-48 z-30 bg-gradient-to-t from-slate-100/90 via-slate-100/30 to-transparent pointer-events-none" />
 
 
       {/* Subtle particle layer using SVG shapes and CSS animation */}
       <svg className="pointer-events-none absolute inset-0 -z-20 h-full w-full" preserveAspectRatio="none">
         <defs>
-          <linearGradient id="p" x1="0" x2="1">
-            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
-            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.02" />
-          </linearGradient>
-        </defs>
+            <linearGradient id="p" x1="0" x2="1">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0.02" />
+            </linearGradient>
+          </defs>
         <g className="animate-particles" fill="url(#p)">
           <circle cx="10%" cy="20%" r="2" />
           <circle cx="30%" cy="10%" r="1.5" />
@@ -101,7 +101,7 @@ export default function TallyLanding() {
       </svg>
 
 
-      <div ref={confettiRoot} className="relative z-20 mx-auto flex h-full max-w-7xl items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+      <div ref={confettiRoot} className="relative z-40 mx-auto flex h-full max-w-7xl items-center justify-center px-4 text-center sm:px-6 lg:px-8">
         <motion.div
           ref={logoRef}
           initial={{ opacity: 0, y: 20 }}
@@ -110,20 +110,54 @@ export default function TallyLanding() {
           className="space-y-6"
         >
           <div className="mx-auto max-w-3xl rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs uppercase tracking-[0.3em] text-slate-100/80 shadow-sm shadow-black/10">
-            Certified Tally Prime partner
+            Kenya's Certified TallyPrime Partner · Cloud Support · EOS® Consulting
           </div>
 
-          <h1 className="mx-auto max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-white sm:text-5xl lg:text-6xl drop-shadow-lg">
-            Optimum Prime Solutions is Kenya’s certified Tally Prime partner
+          <h1 className="mx-auto max-w-full text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl drop-shadow-lg">
+            <span className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
+              <span>Grow</span>
+              <motion.span
+                animate={{ opacity: [1, 0, 0, 1] }}
+                transition={{ duration: 5.5, repeat: Infinity, repeatDelay: 0.5, times: [0, 0.15, 0.85, 1], ease: 'easeInOut' }}
+                className="text-yellow-300"
+              >
+                Sales.
+              </motion.span>
+              <span>Improve</span>
+              <motion.span
+                animate={{ opacity: [1, 0, 0, 1] }}
+                transition={{ duration: 5.5, repeat: Infinity, repeatDelay: 0.5, times: [0, 0.15, 0.85, 1], ease: 'easeInOut', delay: 1.8 }}
+                className="text-cyan-200"
+              >
+                Collections.
+              </motion.span>
+              <span>Control</span>
+              <motion.span
+                animate={{ opacity: [1, 0, 0, 1] }}
+                transition={{ duration: 5.5, repeat: Infinity, repeatDelay: 0.5, times: [0, 0.15, 0.85, 1], ease: 'easeInOut', delay: 3.6 }}
+                className="text-emerald-200"
+              >
+                Inventory.
+              </motion.span>
+            </span>
           </h1>
 
           <p className="mx-auto max-w-2xl text-lg text-slate-200/90">
-            We sell, install and support Tally Prime for Kenyan businesses — from accounting and inventory to payroll, KRA compliance and cloud access.
+            Kenya's certified TallyPrime partner. We sell, implement, and support TallyPrime — plus provide secure cloud hosting and help businesses run on the Entrepreneurial Operating System (EOS®) by Gino Wickman.
           </p>
 
-          <div className="mt-6 flex justify-center gap-4">
-            <a href="#home" className="rounded-full bg-white/90 px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg hover:opacity-95">Explore Tally Prime services</a>
-            <a href="/contact" className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold text-white/90 hover:bg-white/10">Book a demo</a>
+          <div className="mx-auto mt-8 grid max-w-2xl gap-3 grid-cols-1 sm:grid-cols-2">
+            {benefits.map((benefit) => (
+              <div key={benefit} className="flex items-start gap-3 rounded-3xl border border-white/15 bg-white/10 px-4 py-3 text-left backdrop-blur-sm text-sm text-white/90 shadow-sm shadow-black/10">
+                <span className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-xs font-bold text-emerald-200">✓</span>
+                <span>{benefit}</span>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
+            <button type="button" onClick={() => navigate('/features')} className="rounded-full bg-white/90 px-6 py-3 text-sm sm:text-base font-semibold text-slate-900 shadow-lg hover:bg-white hover:shadow-2xl hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Explore Services</button>
+            <button type="button" onClick={() => navigate('/contact')} className="rounded-full border border-white/30 px-6 py-3 text-sm sm:text-base font-semibold text-white/90 hover:bg-white/30 hover:border-white/70 hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Book a Demo</button>
           </div>
         </motion.div>
       </div>

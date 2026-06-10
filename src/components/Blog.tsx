@@ -70,9 +70,9 @@ export default function Blog() {
                     </span>
                     {b.youtubeUrl && <span className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700"><Play className="h-3 w-3"/>Video</span>}
                   </div>
-                  <h3 className="text-lg font-bold text-slate-950 group-hover:text-sky-600 transition-colors">{b.title}</h3>
+                  <h3 className="text-lg font-bold text-slate-950 group-hover:text-red-600 transition-colors">{b.title}</h3>
                   <p className="mt-3 text-sm leading-6 text-slate-600 line-clamp-3">{b.excerpt}</p>
-                  <span className={`mt-5 inline-flex items-center gap-1 text-sm font-semibold ${b.youtubeUrl ? 'text-red-500' : 'text-sky-600'}`}>
+                  <span className={`mt-5 inline-flex items-center gap-1 text-sm font-semibold ${b.youtubeUrl ? 'text-red-500' : 'text-red-600'}`}>
                     {b.youtubeUrl ? 'Watch Video' : 'Read more'} 
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform"/>
                   </span>
@@ -88,7 +88,7 @@ export default function Blog() {
               viewport={{ once: true }}
               className="mt-12 text-center"
             >
-              <button className="inline-flex items-center gap-2 rounded-xl bg-sky-600 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 hover:bg-sky-700 transition">
+              <button className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-3 text-sm font-semibold text-white shadow-sm shadow-red-900/10 hover:bg-red-700 transition">
                 View All Articles
                 <ArrowRight className="h-4 w-4" />
               </button>

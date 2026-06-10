@@ -37,13 +37,13 @@ export default function Products() {
           className="text-center max-w-4xl mx-auto mb-20"
         >
           <span className="inline-block rounded-full bg-gradient-to-r from-sky-500 to-cyan-500 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white shadow-lg shadow-sky-300/20">
-            Services Overview
+            Products & Packages
           </span>
           <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight">
-            Solutions for Systems, Cloud & Scalable Operations
+            TallyPrime Editions, Cloud Hosting & EOS® Consulting Packages
           </h2>
           <p className="mt-6 text-lg text-slate-600 leading-relaxed">
-            From implementation and hosting to process optimization and reporting, choose the combination of services that delivers operational traction and growth for your business.
+            Choose the right TallyPrime edition for your business — Silver, Gold, or Enterprise. Add cloud hosting for remote access, or engage us for EOS® implementation to strengthen your leadership operating system.
           </p>
         </motion.div>
 
@@ -167,10 +167,11 @@ export default function Products() {
               >
                 <Link
                   to="/contact"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                   className={`block text-center rounded-xl py-3 text-sm font-semibold transition relative z-10 ${
                     p.popular
                       ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-500/20'
-                      : 'bg-sky-600 text-white hover:bg-sky-500'
+                      : 'bg-slate-900 text-white hover:bg-slate-800'
                   }`}
                 >
                   {p.cta}

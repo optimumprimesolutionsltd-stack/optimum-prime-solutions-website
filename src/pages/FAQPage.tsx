@@ -5,10 +5,10 @@ export default function FAQPage() {
   return (
     <div className="min-h-screen bg-slate-50">
       <AfricanLaptopShowcase
-        tag="Support & answers"
-        title="One person, one laptop, one trusted source for FAQ answers"
-        description="The FAQ page is built around practical questions from business owners who need fast answers while working with Tally Prime."
-        features={['Common setup questions', 'Training and compliance guidance', 'Remote access help', 'Billing and support clarity']}
+        tag="Frequently Asked Questions"
+        title="TallyPrime, Cloud Hosting & EOS® — Your Questions Answered"
+        description="Find answers to common questions about TallyPrime licensing, KRA compliance, cloud hosting, remote access, and the Entrepreneurial Operating System (EOS®) by Gino Wickman."
+        features={['TallyPrime editions & pricing', 'Cloud hosting & remote access', 'EOS® implementation process', 'KRA compliance & eTIMS setup']}
         theme="faq"
       />
       <FAQ />

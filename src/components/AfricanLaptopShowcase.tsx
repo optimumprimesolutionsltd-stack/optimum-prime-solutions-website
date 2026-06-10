@@ -116,13 +116,20 @@ function renderThemeDecor(theme: ShowcaseTheme) {
 export default function AfricanLaptopShowcase({ tag, title, description, features, theme }: AfricanLaptopShowcaseProps) {
   const style = themeStyles[theme];
   const imageUrls: Record<ShowcaseTheme, string> = {
-    about: 'https://images.pexels.com/photos/1181672/pexels-photo-1181672.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    products: 'https://images.pexels.com/photos/1181636/pexels-photo-1181636.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    features: 'https://images.pexels.com/photos/1181690/pexels-photo-1181690.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    faq: 'https://images.pexels.com/photos/1181333/pexels-photo-1181333.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    testimonials: 'https://images.pexels.com/photos/1181461/pexels-photo-1181461.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    blog: 'https://images.pexels.com/photos/1181684/pexels-photo-1181684.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    contact: 'https://images.pexels.com/photos/1181675/pexels-photo-1181675.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    // About: African business team collaborating in a modern office
+    about: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    // Products: African professionals reviewing business software on laptops
+    products: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    // Features/Services: African team in a business strategy meeting
+    features: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    // FAQ: African professional working at a laptop in an office
+    faq: 'https://images.pexels.com/photos/4342352/pexels-photo-4342352.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    // Testimonials: African business people in a discussion/meeting
+    testimonials: 'https://images.pexels.com/photos/3184357/pexels-photo-3184357.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    // Blog: African professional writing/reading at a desk
+    blog: 'https://images.pexels.com/photos/4050291/pexels-photo-4050291.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    // Contact: African customer support professional with headset
+    contact: 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
   };
 
   return (
@@ -172,8 +179,8 @@ export default function AfricanLaptopShowcase({ tag, title, description, feature
               <div className="absolute inset-0 rounded-[2rem] ring-1 ring-white/10" />
               <div className="relative flex h-full items-end p-6">
                 <div className="rounded-3xl bg-white/10 px-5 py-4 text-sm text-white/90 backdrop-blur-md ring-1 ring-white/15">
-                  <p className="text-xs uppercase tracking-[0.3em] text-slate-200">Live view</p>
-                  <p className="mt-2 font-semibold">{theme === 'products' ? 'Laptop workflow preview' : 'Modern laptop workspace'}</p>
+                  <p className="text-xs uppercase tracking-[0.3em] text-slate-200"></p>
+                  <p className="mt-2 font-semibold">{theme === 'products' ? 'Laptop workflow preview' : 'Financial clarity and operational growth'}</p>
                 </div>
               </div>
             </div>

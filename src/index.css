@@ -88,10 +88,16 @@ h6 {
     @apply bg-slate-50;
   }
   .btn-primary {
+    @apply inline-flex items-center justify-center rounded-full bg-slate-900 text-white px-6 py-3 text-sm font-semibold shadow-sm hover:bg-slate-800 transition;
+  }
+  .btn-accent {
     @apply inline-flex items-center justify-center rounded-full bg-red-600 text-white px-6 py-3 text-sm font-semibold shadow-sm shadow-red-900/10 hover:bg-red-700 transition;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center rounded-full border border-red-600 bg-white text-red-600 px-6 py-3 text-sm font-semibold hover:bg-red-50 transition;
+    @apply inline-flex items-center justify-center rounded-full border border-slate-300 bg-white text-slate-800 px-6 py-3 text-sm font-semibold hover:bg-slate-50 hover:border-slate-400 transition;
+  }
+  .btn-outline-red {
+    @apply inline-flex items-center justify-center rounded-full border border-red-600 bg-transparent text-red-600 px-6 py-3 text-sm font-semibold hover:bg-red-50 transition;
   }
   .section-divider {
     @apply h-px bg-slate-200;

@@ -250,7 +250,7 @@ export default function Contact() {
                   <button
                     type="submit"
                     disabled={loading || !isOnline}
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-br from-sky-600 via-cyan-500 to-sky-500 px-6 py-4 text-sm font-semibold text-white shadow-2xl shadow-sky-500/30 transition hover:from-sky-700 hover:to-cyan-600 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-red-600 px-6 py-4 text-sm font-semibold text-white shadow-xl shadow-red-600/20 transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {loading ? (
                       <>

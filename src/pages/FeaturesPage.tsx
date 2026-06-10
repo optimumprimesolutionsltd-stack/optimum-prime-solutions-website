@@ -6,10 +6,10 @@ export default function FeaturesPage() {
   return (
     <div className="min-h-screen">
       <AfricanLaptopShowcase
-        tag="Core features"
-        title="See the features that help one person run things faster"
-        description="From inventory control to invoicing, this single-laptop view highlights the capabilities that make Tally Prime essential for modern Kenyan business."
-        features={['Real-time reporting', 'Mobile-ready access', 'Inventory and bank reconciliation', 'Custom workflows for small teams']}
+        tag="Our Services"
+        title="TallyPrime Implementation, Cloud Hosting & EOS® Consulting"
+        description="From TallyPrime installation and KRA compliance to secure cloud hosting and Entrepreneurial Operating System (EOS®) implementation — we provide the full stack of tools and systems your business needs to grow."
+        features={['TallyPrime Silver, Gold & Enterprise setup', 'Cloud hosting & remote access', 'EOS® business operating system', 'KRA, eTIMS & payroll compliance']}
         theme="features"
       />
       <Features />

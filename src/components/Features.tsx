@@ -55,7 +55,7 @@ export default function Features() {
           <motion.span animate={{ rotate: [0, 360] }} transition={{ duration: 3, repeat: Infinity }} className="inline-block">
             <Sparkles className="h-5 w-5 text-sky-500" />
           </motion.span>
-          <span className="inline-block rounded-full bg-gradient-to-r from-sky-500 to-cyan-400 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white ml-2">Our Services</span>
+          <span className="inline-block rounded-full bg-red-600 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white ml-2">Our Services</span>
           <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight">
             Business Systems, Cloud Hosting & Operational Consulting
           </h2>
@@ -90,7 +90,7 @@ export default function Features() {
               >
                 {/* Gradient border on hover */}
                 <motion.div
-                className="absolute top-0 inset-x-0 h-1 rounded-t-2xl bg-gradient-to-r from-sky-400 via-cyan-400 to-emerald-400"
+                className="absolute top-0 inset-x-0 h-1 rounded-t-2xl bg-gradient-to-r from-red-500 via-red-400 to-rose-400"
                 initial={{ scaleX: 0 }}
                 whileHover={{ scaleX: 1 }}
                 transition={{ duration: 0.3 }}
@@ -107,19 +107,19 @@ export default function Features() {
 
               {/* Icon background animation */}
               <motion.div
-                className="h-12 w-12 rounded-xl bg-gradient-to-br from-sky-500/20 to-white/80 flex items-center justify-center mb-4 relative overflow-hidden"
+                className="h-12 w-12 rounded-xl bg-gradient-to-br from-red-500/15 to-white/80 flex items-center justify-center mb-4 relative overflow-hidden"
                 whileHover={{ scale: 1.15, rotate: 10 }}
               >
                 <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-sky-400/30 to-transparent"
+                  className="absolute inset-0 bg-gradient-to-r from-red-400/20 to-transparent"
                   initial={{ x: '-100%' }}
                   whileHover={{ x: '100%' }}
                   transition={{ duration: 0.5 }}
                 />
-                <Ic className="h-6 w-6 text-sky-600 relative z-10" />
+                <Ic className="h-6 w-6 text-red-600 relative z-10" />
               </motion.div>
 
-                <h3 className={`text-base font-bold flex items-center gap-2 ${isHeroCard ? 'text-slate-950' : 'text-slate-900'} ${!isHeroCard ? 'group-hover:text-sky-600' : ''}`}>
+                <h3 className={`text-base font-bold flex items-center gap-2 ${isHeroCard ? 'text-slate-950' : 'text-slate-900'} ${!isHeroCard ? 'group-hover:text-red-600' : ''}`}>
                   {svc.title}
                 </h3>
                 <p className={`mt-3 text-sm leading-relaxed ${isHeroCard ? 'text-slate-700' : 'text-slate-600'}`}>
@@ -135,7 +135,7 @@ export default function Features() {
                       className={`flex items-center gap-2 text-xs ${isHeroCard ? 'text-slate-300' : 'text-slate-600'}`}
                     >
                       <motion.span
-                        className="h-2 w-2 rounded-full bg-gradient-to-r from-sky-500 to-cyan-400"
+                        className="h-2 w-2 rounded-full bg-red-500"
                         whileHover={{ scale: 1.2 }}
                       />
                       {f}
@@ -147,7 +147,7 @@ export default function Features() {
                   target="_blank"
                   rel="noreferrer"
                   whileHover={{ y: -2 }}
-                  className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-sky-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-sky-500/20 transition duration-300 hover:bg-sky-700"
+                  className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition duration-300 hover:bg-slate-800"
                 >
                   <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15">
                     <TallyPrimeIcon className="h-4 w-4" showText={false} isDark />
