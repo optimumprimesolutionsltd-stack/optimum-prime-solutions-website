@@ -390,6 +390,28 @@ export default function Chatbot() {
     // Always pass the fully updated lead (with name) to the AI
     const leadForAI = { ...updatedLead };
 
+    // --- DIRECT NAME HANDLER ---
+    // When the bot just asked for the user's name, handle it directly without
+    // sending to the AI — the AI tends to treat name introductions as topic
+    // statements and responds with things like "That's a great point!"
+    if (stage === 'ask_name' && updatedLead.name) {
+      const firstName = updatedLead.name.split(' ')[0];
+      const nameReply = `Nice to meet you, **${firstName}**! 😊\n\nTo help you find the right solution, could you tell me a bit about your business? What type of business do you run?`;
+      const botMsg: Msg = {
+        id: Date.now().toString(),
+        role: 'bot',
+        text: nameReply,
+        time: getTime(),
+      };
+      setTimeout(() => {
+        setMsgs((p) => [...p, botMsg]);
+        setShowTypingIndicator(false);
+        setTyping(false);
+        setStage(nextStage);
+      }, 700);
+      return;
+    }
+
     // Try AI reply first, fall back to rule-based
     (async () => {
       try {
