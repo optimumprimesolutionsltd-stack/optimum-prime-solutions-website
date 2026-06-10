@@ -132,7 +132,7 @@ export default function Features() {
                     <motion.li
                       key={f}
                       whileHover={{ x: 4 }}
-                      className={`flex items-center gap-2 text-xs ${isHeroCard ? 'text-slate-300' : 'text-slate-600'}`}
+                      className={`flex items-center gap-2 text-xs ${isHeroCard ? 'text-slate-600' : 'text-slate-600'}`}
                     >
                       <motion.span
                         className="h-2 w-2 rounded-full bg-red-500"
