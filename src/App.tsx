@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { SiteProvider } from './context/SiteContext';
+import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import { OfflineBanner } from './components/OfflineBanner';
 import Navbar from './components/Navbar';
@@ -23,6 +24,7 @@ import { signInAnonymously } from 'firebase/auth';
 function SiteRoutes() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950 flex flex-col">
+      <ScrollToTop />
       <Navbar />
       <main className="flex-grow pt-[72px]">
         <Routes>

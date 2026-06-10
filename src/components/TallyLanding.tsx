@@ -156,8 +156,8 @@ export default function TallyLanding() {
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
-            <button type="button" onClick={() => navigate('/features')} className="rounded-full bg-white/90 px-6 py-3 text-sm sm:text-base font-semibold text-slate-900 shadow-lg hover:bg-white hover:shadow-2xl hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Explore Services</button>
-            <button type="button" onClick={() => navigate('/contact')} className="rounded-full border border-white/30 px-6 py-3 text-sm sm:text-base font-semibold text-white/90 hover:bg-white/30 hover:border-white/70 hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Book a Demo</button>
+            <button type="button" onClick={() => { navigate('/features'); window.scrollTo({ top: 0, behavior: 'instant' }); }} className="rounded-full bg-white/90 px-6 py-3 text-sm sm:text-base font-semibold text-slate-900 shadow-lg hover:bg-white hover:shadow-2xl hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Explore Services</button>
+            <button type="button" onClick={() => { navigate('/contact'); window.scrollTo({ top: 0, behavior: 'instant' }); }} className="rounded-full border border-white/30 px-6 py-3 text-sm sm:text-base font-semibold text-white/90 hover:bg-white/30 hover:border-white/70 hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Book a Demo</button>
           </div>
         </motion.div>
       </div>
