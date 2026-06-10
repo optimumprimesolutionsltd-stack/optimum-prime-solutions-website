@@ -50,9 +50,10 @@ function App() {
 
   useEffect(() => {
     // Timeout fallback: if Firebase auth takes too long or is unavailable, proceed anyway
+    // Use a very short timeout so regular visitors never see a loading screen
     const timeout = setTimeout(() => {
       setAuthReady(true);
-    }, 2000);
+    }, 200);
 
     let unsubscribe: (() => void) | null = null;
     try {
@@ -106,11 +107,9 @@ function App() {
   };
 
   if (!authReady) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-950">
-        <p className="text-sm text-slate-600">Checking admin access…</p>
-      </div>
-    );
+    // Show a blank screen instead of "Checking admin access" so visitors
+    // never see an admin-related message while Firebase initialises.
+    return <div className="min-h-screen bg-slate-50" />;
   }
 
   return (
