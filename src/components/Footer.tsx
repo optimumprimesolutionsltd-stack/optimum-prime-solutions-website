@@ -42,11 +42,11 @@ export default function Footer() {
         <div className="rounded-4xl bg-white/90 p-8 grid gap-8 lg:grid-cols-[1.4fr_0.9fr_0.9fr_1fr] shadow-2xl shadow-slate-200/20 ring-1 ring-slate-200/70">
           <div className="space-y-5">
             <div className="flex flex-col items-start gap-4">
-              <div className="w-full max-w-[160px]">
+              <div className="w-full max-w-[200px]">
                 <img
                   src="/tally-solutions-new-logo.png"
                   alt="Tally Solutions logo"
-                  className="h-auto w-full max-h-14 object-contain object-left"
+                  className="h-auto w-full max-h-20 object-contain object-left"
                 />
               </div>
               <Logo className="h-12 w-auto" />
@@ -165,7 +165,7 @@ export default function Footer() {
                 </div>
                 <h4 className="text-base font-bold text-slate-900">TallyPrime 7.1 — The Next Generation of Business Management</h4>
                 <p className="mt-1 text-sm text-slate-600 max-w-2xl">
-                  Tally Solutions has released TallyPrime 7.1 Beta with powerful new features: <strong>8 professional invoice templates</strong>, <strong>connected banking with ICICI, Axis, SBI & Kotak</strong>, <strong>HSN/SAC online validation</strong>, <strong>Schedule III financial statements</strong>, <strong>IMS reconciliation upgrades</strong>, and <strong>auto-wrap text</strong> for cleaner reports. As your certified TallyPrime partner, we will upgrade and support your transition seamlessly.
+                  TallyPrime 7.1 is here with features built for Kenyan businesses: <strong>8 professional invoice templates</strong> including eTIMS-ready formats, <strong>enhanced KRA & eTIMS compliance</strong> with faster e-filing, <strong>M-Pesa & local bank reconciliation upgrades</strong>, <strong>improved multi-currency support</strong> for USD/EUR transactions, <strong>faster payroll processing</strong> with updated PAYE, NHIF, NSSF & Housing Levy rates, and <strong>auto-wrap text</strong> for cleaner reports. As your certified TallyPrime partner, we will upgrade and support your transition seamlessly.
                 </p>
               </div>
             </div>
@@ -195,7 +195,7 @@ export default function Footer() {
               <img
                 src="/tally-solutions-new-logo.png"
                 alt="Tally Solutions logo"
-                className="h-16 w-auto rounded-2xl bg-white/10 p-2 shadow-lg shadow-black/10"
+                className="h-12 w-auto max-w-[160px] object-contain rounded-2xl bg-white/10 p-2 shadow-lg shadow-black/10"
               />
               <span className="max-w-xl text-sm font-semibold leading-6 text-white">
                 Try TallyPrime free — Education Mode. Or contact us for official Silver, Gold & Enterprise licensing.

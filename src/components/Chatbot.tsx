@@ -343,10 +343,20 @@ export default function Chatbot() {
       time: getTime(),
     };
 
-    // Update lead profile
+    // Update lead profile — extract name immediately and synchronously
     const leadUpdates = extractLeadInfo(trimmedText, stage);
+    // If we are in ask_name stage and no name yet, extract it right away
+    if (stage === 'ask_name' && !leadUpdates.name) {
+      const possibleName = trimmedText.trim().split(/\s+/).slice(0, 2).join(' ');
+      if (possibleName) leadUpdates.name = possibleName;
+    }
     const updatedLead = { ...lead, ...leadUpdates };
-    setLead(updatedLead);
+    // Flush name to state immediately so all subsequent renders have it
+    if (leadUpdates.name && leadUpdates.name !== lead.name) {
+      setLead(updatedLead);
+    } else {
+      setLead((prev) => ({ ...prev, ...leadUpdates }));
+    }
     setMsgs((p) => [...p, userMsg]);
     setInput('');
     setTyping(true);
@@ -369,6 +379,7 @@ export default function Chatbot() {
     else nextStage = 'free';
 
     // Build conversation history for the AI (exclude the initial bot greeting to save tokens)
+    // Include the current user message so the AI has full context including the name just given
     const aiHistory: ChatMessage[] = msgs
       .slice(1) // skip the initial greeting message
       .map((m) => ({
@@ -376,10 +387,13 @@ export default function Chatbot() {
         content: m.text,
       }));
 
+    // Always pass the fully updated lead (with name) to the AI
+    const leadForAI = { ...updatedLead };
+
     // Try AI reply first, fall back to rule-based
     (async () => {
       try {
-        const aiReply = await getChatGPTReply(trimmedText, data, aiHistory, updatedLead as Record<string, string | undefined>);
+        const aiReply = await getChatGPTReply(trimmedText, data, aiHistory, leadForAI as Record<string, string | undefined>);
         if (!aiReply?.trim()) throw new Error('EMPTY_REPLY');
 
         // Inject a follow-up question if the AI reply doesn't already have one
