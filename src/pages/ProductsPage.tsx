@@ -24,7 +24,7 @@ export default function ProductsPage() {
               <div className="mt-10 grid gap-3 sm:grid-cols-2">
                 {[
                   'Official TallyPrime Silver, Gold & Enterprise',
-                  'Cloud hosting from KES 8,000/month',
+                  'Cloud hosting from KES 3,000/month',
                   'EOS® implementation by certified implementer',
                   'KRA & eTIMS compliance built in',
                 ].map((feature) => (

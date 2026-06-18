@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Check, Star, TrendingUp, Zap, Crown } from 'lucide-react';
+import { Check, Star, TrendingUp, Zap, Crown, Cloud, Sparkles } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 
 export default function Products() {
@@ -74,6 +74,18 @@ export default function Products() {
                 >
                   <Star className="h-3.5 w-3.5" />
                   Most Popular
+                </motion.div>
+              )}
+              {/* NEW PRICE badge for Cloud Hosting */}
+              {p.edition === 'Cloud Hosting' && (
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                  className="absolute -top-3 -right-3 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-3 py-1.5 text-xs font-bold text-white flex items-center gap-1 shadow-lg shadow-blue-500/40 z-20"
+                >
+                  <Sparkles className="h-3 w-3" />
+                  NEW PRICE
                 </motion.div>
               )}
 

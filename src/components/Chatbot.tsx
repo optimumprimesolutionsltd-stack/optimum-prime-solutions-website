@@ -91,7 +91,7 @@ function buildBotResponse(
 
     case 'pricing':
       return {
-        text: `Great question, ${greet}pricing really depends on what fits your business best! 💡\n\nHere's a quick overview:\n\n• **TallyPrime Silver** — KES 57,600 +VAT *(single user, perfect for small businesses)*\n• **TallyPrime Gold** — KES 172,800 +VAT *(multi-user, growing teams)*\n• **Cloud Hosting** — From KES 8,000/month *(access from anywhere)*\n• **EOS® Implementation** — Custom quote *(transform how your business runs)*\n\nTo give you the most accurate recommendation — **how many people will need to use the system?** 👥`,
+        text: `Great question, ${greet}pricing really depends on what fits your business best! 💡\n\nHere's a quick overview:\n\n• **TallyPrime Silver** — KES 57,600 +VAT *(single user, perfect for small businesses)*\n• **TallyPrime Gold** — KES 172,800 +VAT *(multi-user, growing teams)*\n• **Cloud Hosting** — From KES 3,000/month *(access from anywhere)*\n• **EOS® Implementation** — Custom quote *(transform how your business runs)*\n\nTo give you the most accurate recommendation — **how many people will need to use the system?** 👥`,
         quickReplies: ['Just me (1 user)', '2–5 users', '6–15 users', '15+ users'],
         nextStage: 'ask_users',
       };
@@ -119,7 +119,7 @@ function buildBotResponse(
 
     case 'cloud':
       return {
-        text: `Great timing — cloud hosting is one of our most popular services right now! ☁️\n\nWith our TallyPrime Cloud Hosting, ${greet}you get:\n✓ Access your accounts from anywhere — laptop, phone, tablet\n✓ Automatic daily backups\n✓ 99.9% uptime SLA\n✓ Secure 256-bit encryption\n✓ No IT infrastructure needed\n\nStarting from **KES 8,000/month** — less than one employee's daily wage!\n\n**Do you have a team working remotely or from multiple locations?** 🌍`,
+        text: `Great timing — cloud hosting is one of our most popular services right now! ☁️\n\nWith our TallyPrime Cloud Hosting, ${greet}you get:\n✓ Access your accounts from anywhere — laptop, phone, tablet\n✓ Automatic daily backups\n✓ 99.9% uptime SLA\n✓ Secure 256-bit encryption\n✓ No IT infrastructure needed\n\nStarting from **KES 3,000/month** — less than one employee's daily wage!\n\n**Do you have a team working remotely or from multiple locations?** 🌍`,
         quickReplies: ['Yes, remote team', 'Multiple office locations', 'Just want backup & security', 'Tell me more'],
         nextStage: 'free',
       };
@@ -227,7 +227,7 @@ function buildBotResponse(
         return {
           text: `Got it! Based on everything you've shared, I have a clear picture of what you need. 🎯\n\nHere's what I'd recommend:\n\n${lead.users && parseInt(lead.users) <= 2
             ? '• **TallyPrime Silver** — perfect for your team size, KES 57,600 +VAT'
-            : '• **TallyPrime Gold** — multi-user access, KES 172,800 +VAT'}\n• **Cloud Hosting** — so your team can access from anywhere, from KES 8,000/month\n${lead.challenge?.includes('cash flow') || lead.challenge?.includes('grow') ? '• **EOS® Implementation** — to build the operating system your business needs to scale\n' : ''}• **HubSpot CRM** — to manage your sales pipeline and customer relationships\n\nThe best next step is a **free 30-minute demo** where we show you exactly how this works for a business like yours.\n\n**Would you like to book that demo now?** 📅`,
+            : '• **TallyPrime Gold** — multi-user access, KES 172,800 +VAT'}\n• **Cloud Hosting** — so your team can access from anywhere, from KES 3,000/month\n${lead.challenge?.includes('cash flow') || lead.challenge?.includes('grow') ? '• **EOS® Implementation** — to build the operating system your business needs to scale\n' : ''}• **HubSpot CRM** — to manage your sales pipeline and customer relationships\n\nThe best next step is a **free 30-minute demo** where we show you exactly how this works for a business like yours.\n\n**Would you like to book that demo now?** 📅`,
           action: 'demo',
           quickReplies: ['Yes, book a demo!', 'Send me more info first', 'WhatsApp me instead'],
           nextStage: 'recommend',
