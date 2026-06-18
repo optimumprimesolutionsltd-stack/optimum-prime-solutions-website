@@ -3,6 +3,7 @@ import Hero3D from '../components/Hero3D';
 import TrustBanner from '../components/TrustBanner';
 import Partners from '../components/Partners';
 import SEO from '../components/SEO';
+import CloudPromo from '../components/CloudPromo';
 
 export default function HomePage() {
   return (
@@ -17,6 +18,7 @@ export default function HomePage() {
       <Hero3D />
       <Partners />
       <TrustBanner />
+      <CloudPromo />
     </div>
   );
 }

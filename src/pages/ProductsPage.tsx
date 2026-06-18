@@ -6,7 +6,7 @@ export default function ProductsPage() {
     <div className="min-h-screen">
       <SEO
         title="TallyPrime Products & Pricing Kenya | Silver, Gold & Enterprise"
-        description="Buy TallyPrime Silver, Gold or Enterprise in Kenya. Official pricing, cloud hosting packages from KES 8,000/month, and EOS® consulting. Kenya's certified TallyPrime reseller."
+        description="Buy TallyPrime Silver, Gold or Enterprise in Kenya. Official pricing, cloud hosting packages from KES 3,000/month, and EOS® consulting. Kenya's certified TallyPrime reseller."
         canonical="/products"
         keywords="TallyPrime price Kenya, TallyPrime Silver Kenya, TallyPrime Gold Kenya, TallyPrime Enterprise Kenya, buy TallyPrime Nairobi, TallyPrime licence Kenya, cloud hosting Kenya price"
       />
@@ -31,7 +31,7 @@ export default function ProductsPage() {
               <div className="mt-10 grid gap-3 sm:grid-cols-2">
                 {[
                   'Official TallyPrime Silver, Gold & Enterprise',
-                  'Cloud hosting from KES 8,000/month',
+                  'Cloud hosting from KES 3,000/month',
                   'EOS® implementation by certified implementer',
                   'KRA & eTIMS compliance built in',
                 ].map((feature) => (
