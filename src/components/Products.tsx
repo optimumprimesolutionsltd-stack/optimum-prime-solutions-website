@@ -52,7 +52,7 @@ export default function Products() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="grid md:grid-cols-2 xl:grid-cols-5 gap-5"
+          className="grid md:grid-cols-2 lg:grid-cols-4 gap-8"
         >
           {data.products.map((p, i) => {
             const isCloud = p.edition === 'Cloud Hosting';
@@ -171,7 +171,7 @@ export default function Products() {
                 whileHover={{ y: p.popular ? 0 : -8 }}
                 className={`group relative rounded-2xl border p-8 transition-all duration-300 overflow-visible ${
                   p.popular
-                    ? 'border-red-500/40 bg-gradient-to-br from-red-50 via-white to-red-50 shadow-xl shadow-red-900/10 xl:scale-[1.05] text-white'
+                    ? 'border-red-500/40 bg-gradient-to-br from-slate-800 via-slate-800 to-slate-800 shadow-xl shadow-red-900/20 text-white ring-1 ring-red-500/30'
                     : 'border-white/10 bg-slate-800 shadow-xl hover:shadow-slate-300/30'
                 }`}
               >
@@ -244,6 +244,11 @@ export default function Products() {
                     </span>
                   </motion.div>
                   <p className="text-xs text-slate-400 mt-1">{p.period}</p>
+                  {p.note && (
+                    <p className="mt-2 text-xs text-amber-400 font-medium">
+                      💡 {p.note}
+                    </p>
+                  )}
                   {p.popular && (
                     <p className="mt-4 text-sm font-medium text-slate-300">
                       Best value for growing teams that need multi-user access, remote connectivity, and priority support.
