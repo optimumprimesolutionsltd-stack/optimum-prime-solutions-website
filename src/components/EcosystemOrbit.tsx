@@ -42,39 +42,60 @@ function OrbitIcon({ partner, radius, duration, delay }: {
         animate={{ rotate: -360 }}
         transition={{ duration, repeat: Infinity, ease: 'linear', delay }}
         title={partner.name}
+        whileHover={{ scale: 1.15 }}
       >
-        <div
-          className="w-14 h-14 rounded-full flex items-center justify-center p-2 shadow-lg transition-transform hover:scale-110 cursor-default"
+        <motion.div
+          className="w-16 h-16 rounded-full flex items-center justify-center p-2 shadow-2xl transition-all cursor-pointer group relative"
           style={{
             background: `${partner.color}22`,
-            border: `1.5px solid ${partner.color}55`,
-            boxShadow: `0 0 16px ${partner.color}33`,
+            border: `2px solid ${partner.color}88`,
+            boxShadow: `0 0 24px ${partner.color}55, inset 0 0 12px ${partner.color}22`,
+          }}
+          whileHover={{
+            boxShadow: `0 0 40px ${partner.color}99, inset 0 0 20px ${partner.color}44, 0 0 60px ${partner.color}66`,
+            scale: 1.1,
           }}
         >
+          {/* Glow ring on hover */}
+          <motion.div
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: `radial-gradient(circle, ${partner.color}33 0%, transparent 70%)`,
+            }}
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileHover={{ opacity: 1, scale: 1.3 }}
+            transition={{ duration: 0.3 }}
+          />
+          
           <img
             src={partner.logo}
             alt={partner.name}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-contain relative z-10"
             onError={(e) => {
               const el = e.target as HTMLImageElement;
               el.style.display = 'none';
               const parent = el.parentElement;
               if (parent) {
-                parent.innerHTML = `<span style="color:${partner.color};font-size:11px;font-weight:900">${partner.name.slice(0, 2)}</span>`;
+                parent.innerHTML = `<span style="color:${partner.color};font-size:12px;font-weight:900;position:relative;z-index:10">${partner.name.slice(0, 2)}</span>`;
               }
             }}
           />
-        </div>
-        <span
-          className="rounded-full px-2 py-0.5 text-[10px] font-semibold whitespace-nowrap backdrop-blur-sm"
+        </motion.div>
+        <motion.span
+          className="rounded-full px-3 py-1 text-[11px] font-bold whitespace-nowrap backdrop-blur-md shadow-lg"
           style={{
-            background: 'rgba(15,23,42,0.85)',
+            background: 'rgba(15,23,42,0.95)',
             color: partner.color,
-            border: `1px solid ${partner.color}44`,
+            border: `1.5px solid ${partner.color}66`,
+            boxShadow: `0 0 12px ${partner.color}44`,
+          }}
+          whileHover={{
+            background: 'rgba(15,23,42,1)',
+            boxShadow: `0 0 20px ${partner.color}77`,
           }}
         >
           {partner.name}
-        </span>
+        </motion.span>
       </motion.div>
     </motion.div>
   );
@@ -82,17 +103,38 @@ function OrbitIcon({ partner, radius, duration, delay }: {
 
 export default function EcosystemOrbit() {
   return (
-    <section className="relative overflow-hidden bg-slate-900 py-24 text-white">
-      {/* Background glow blobs */}
+    <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 py-32 text-white">
+      {/* Enhanced background glow blobs with multiple layers */}
       <div className="pointer-events-none absolute inset-0 -z-10">
-        <div className="absolute -left-40 top-1/4 h-[28rem] w-[28rem] rounded-full bg-red-600/10 blur-3xl" />
-        <div className="absolute -right-40 bottom-1/4 h-[28rem] w-[28rem] rounded-full bg-sky-500/10 blur-3xl" />
-        <div className="absolute left-1/2 top-1/2 h-64 w-64 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/8 blur-3xl" />
+        {/* Primary red glow */}
+        <motion.div
+          className="absolute -left-32 top-1/3 h-96 w-96 rounded-full bg-red-600/20 blur-3xl"
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        
+        {/* Primary sky glow */}
+        <motion.div
+          className="absolute -right-32 bottom-1/3 h-96 w-96 rounded-full bg-sky-500/20 blur-3xl"
+          animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+        />
+        
+        {/* Center violet glow */}
+        <motion.div
+          className="absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-violet-500/15 blur-3xl"
+          animate={{ scale: [1, 1.3, 1], opacity: [0.2, 0.4, 0.2] }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
+        />
+
+        {/* Additional accent glows */}
+        <div className="absolute -left-40 -top-40 h-80 w-80 rounded-full bg-orange-500/10 blur-3xl" />
+        <div className="absolute -right-40 -bottom-40 h-80 w-80 rounded-full bg-teal-500/10 blur-3xl" />
       </div>
 
-      {/* Subtle grid */}
+      {/* Animated grid background */}
       <div
-        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.035]"
+        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.08]"
         style={{
           backgroundImage:
             'linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)',
@@ -105,33 +147,54 @@ export default function EcosystemOrbit() {
 
           {/* ── LEFT: Orbit Graphic ── */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.85 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.8 }}
             className="flex items-center justify-center"
           >
-            <div className="relative" style={{ width: 360, height: 360 }}>
+            <div className="relative" style={{ width: 400, height: 400 }}>
+              {/* Outer glow ring */}
+              <motion.div
+                className="absolute rounded-full"
+                style={{
+                  top: '50%', left: '50%',
+                  width: 360, height: 360,
+                  marginTop: -180, marginLeft: -180,
+                  background: 'radial-gradient(circle, rgba(220,38,38,0.15) 0%, rgba(14,165,233,0.08) 50%, transparent 100%)',
+                  boxShadow: 'inset 0 0 60px rgba(220,38,38,0.2), inset 0 0 40px rgba(14,165,233,0.1)',
+                }}
+                animate={{ scale: [1, 1.05, 1] }}
+                transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              />
+
               {/* Outer dashed orbit ring */}
-              <div
+              <motion.div
                 className="absolute rounded-full"
                 style={{
                   top: '50%', left: '50%',
                   width: 320, height: 320,
                   marginTop: -160, marginLeft: -160,
-                  border: '1.5px dashed rgba(255,255,255,0.12)',
+                  border: '2px dashed rgba(220,38,38,0.4)',
+                  boxShadow: '0 0 30px rgba(220,38,38,0.3)',
                 }}
+                animate={{ rotate: 360 }}
+                transition={{ duration: 30, repeat: Infinity, ease: 'linear' }}
               />
-              {/* Solid inner ring */}
-              <div
+
+              {/* Inner orbit ring */}
+              <motion.div
                 className="absolute rounded-full"
                 style={{
                   top: '50%', left: '50%',
-                  width: 200, height: 200,
-                  marginTop: -100, marginLeft: -100,
-                  border: '1px solid rgba(255,255,255,0.07)',
-                  background: 'radial-gradient(circle, rgba(220,38,38,0.06) 0%, rgba(14,165,233,0.04) 100%)',
+                  width: 240, height: 240,
+                  marginTop: -120, marginLeft: -120,
+                  border: '1.5px solid rgba(14,165,233,0.5)',
+                  boxShadow: '0 0 20px rgba(14,165,233,0.3), inset 0 0 20px rgba(14,165,233,0.1)',
+                  background: 'radial-gradient(circle, rgba(14,165,233,0.08) 0%, transparent 100%)',
                 }}
+                animate={{ rotate: -180 }}
+                transition={{ duration: 40, repeat: Infinity, ease: 'linear' }}
               />
 
               {/* Orbiting partner icons */}
@@ -139,50 +202,56 @@ export default function EcosystemOrbit() {
                 <OrbitIcon
                   key={p.name}
                   partner={p}
-                  radius={160}
-                  duration={20 + i * 2}
-                  delay={-(i * (20 / partners.length))}
+                  radius={180}
+                  duration={24 + i * 2}
+                  delay={-(i * (24 / partners.length))}
                 />
               ))}
 
-              {/* Centre logo */}
+              {/* Centre logo with enhanced glow */}
               <div
                 className="absolute flex flex-col items-center justify-center"
-                style={{ top: '50%', left: '50%', width: 120, height: 120, marginTop: -60, marginLeft: -60 }}
+                style={{ top: '50%', left: '50%', width: 140, height: 140, marginTop: -70, marginLeft: -70 }}
               >
+                {/* Outer glow ring */}
                 <motion.div
-                  animate={{ scale: [1, 1.05, 1] }}
+                  className="absolute rounded-full"
+                  style={{
+                    width: 160, height: 160,
+                    top: '50%', left: '50%',
+                    marginTop: -80, marginLeft: -80,
+                    background: 'radial-gradient(circle, rgba(220,38,38,0.3) 0%, rgba(14,165,233,0.15) 50%, transparent 100%)',
+                    boxShadow: '0 0 50px rgba(220,38,38,0.4), 0 0 80px rgba(14,165,233,0.2)',
+                  }}
+                  animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                  className="w-24 h-24 rounded-full flex flex-col items-center justify-center shadow-2xl"
+                />
+
+                <motion.div
+                  animate={{ scale: [1, 1.08, 1] }}
+                  transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                  className="w-28 h-28 rounded-full flex flex-col items-center justify-center shadow-2xl relative z-10"
                   style={{
                     background: 'linear-gradient(135deg, #1e293b 0%, #0f172a 100%)',
-                    border: '2px solid rgba(255,255,255,0.1)',
-                    boxShadow: '0 0 40px rgba(220,38,38,0.25), 0 0 80px rgba(14,165,233,0.1)',
+                    border: '2.5px solid rgba(220,38,38,0.6)',
+                    boxShadow: '0 0 60px rgba(220,38,38,0.4), 0 0 100px rgba(14,165,233,0.2), inset 0 0 20px rgba(220,38,38,0.2)',
                   }}
                 >
                   <img
                     src="/logo.png"
                     alt="Optimum Prime Solutions"
-                    className="w-14 h-14 object-contain"
+                    className="w-16 h-16 object-contain"
                     onError={(e) => {
                       const el = e.target as HTMLImageElement;
                       el.style.display = 'none';
                       const parent = el.parentElement;
                       if (parent) {
-                        parent.innerHTML = '<span class="text-[10px] font-black text-white text-center leading-tight px-2">Optimum<br/>Prime</span>';
+                        parent.innerHTML = '<span class="text-xs font-black text-white text-center leading-tight px-2">Optimum<br/>Prime</span>';
                       }
                     }}
                   />
                 </motion.div>
               </div>
-
-              {/* Pulse glow behind centre */}
-              <motion.div
-                className="absolute rounded-full"
-                style={{ top: '50%', left: '50%', width: 140, height: 140, marginTop: -70, marginLeft: -70, background: 'radial-gradient(circle, rgba(220,38,38,0.18) 0%, transparent 70%)' }}
-                animate={{ scale: [1, 1.4, 1], opacity: [0.5, 0.9, 0.5] }}
-                transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-              />
             </div>
           </motion.div>
 
@@ -198,38 +267,41 @@ export default function EcosystemOrbit() {
               <span className="inline-flex items-center gap-2 rounded-full bg-red-600/15 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-red-400 ring-1 ring-red-500/30">
                 Our Ecosystem
               </span>
-              <h2 className="mt-4 text-3xl font-extrabold leading-tight tracking-tight sm:text-4xl">
-                One Partner.{' '}
-                <span className="bg-gradient-to-r from-red-400 via-orange-400 to-sky-400 bg-clip-text text-transparent">
-                  A Complete Business Ecosystem.
-                </span>
+              <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-white leading-tight">
+                One Partner. A Complete Solution.
               </h2>
-              <p className="mt-4 max-w-lg text-base leading-7 text-slate-400">
-                We bring together Kenya's most powerful business tools under one roof — TallyPrime for accounting and inventory, EOS® for operational excellence, HubSpot for CRM, and TSplus for secure remote access. All certified, all integrated, all supported by our local team.
+              <p className="mt-4 text-lg text-slate-300 leading-relaxed">
+                We bring together the best-in-class tools — TallyPrime for accounting, EOS® for business leadership, HubSpot for sales, and secure cloud infrastructure — so you get everything you need in one trusted partnership.
               </p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              {cards.map((c) => (
+            <div className="space-y-4">
+              {cards.map((card, idx) => (
                 <motion.div
-                  key={c.label}
-                  whileHover={{ scale: 1.04, y: -2 }}
-                  transition={{ type: 'spring', stiffness: 300 }}
-                  className={`rounded-2xl border ${c.border} ${c.bg} p-4 backdrop-blur-sm`}
+                  key={card.label}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  viewport={{ once: true }}
+                  className={`rounded-xl border p-4 backdrop-blur-sm transition-all hover:scale-105 hover:shadow-lg ${card.border} ${card.bg}`}
                 >
-                  <p className={`text-sm font-bold ${c.text}`}>{c.label}</p>
-                  <p className="mt-1 text-xs leading-5 text-slate-400">{c.desc}</p>
+                  <p className={`font-bold text-sm ${card.text}`}>{card.label}</p>
+                  <p className="mt-1 text-sm text-slate-300">{card.desc}</p>
                 </motion.div>
               ))}
             </div>
 
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               <Link
                 to="/contact"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="inline-flex items-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-bold text-slate-900 shadow-lg transition hover:bg-slate-100 hover:shadow-xl"
+                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-red-600 to-red-700 px-6 py-3 font-semibold text-white shadow-lg shadow-red-600/30 transition hover:from-red-500 hover:to-red-600"
               >
-                Talk to an Expert <ArrowRight className="h-4 w-4" />
+                Talk to an Expert
+                <ArrowRight className="h-4 w-4" />
               </Link>
             </motion.div>
           </motion.div>
