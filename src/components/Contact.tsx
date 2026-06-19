@@ -129,20 +129,20 @@ export default function Contact() {
   ];
 
   return (
-    <section id="contact" className="relative overflow-hidden bg-slate-50 py-24">
+    <section id="contact" className="relative overflow-hidden bg-slate-900 py-24">
       <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-sky-200/40 to-transparent" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-5 lg:gap-12">
-          <div className="lg:col-span-2 space-y-6 overflow-hidden rounded-[2rem] bg-white border border-slate-200 p-8 shadow-xl text-slate-950">
+          <div className="lg:col-span-2 space-y-6 overflow-hidden rounded-[2rem] bg-slate-800 border border-white/10 p-8 shadow-xl text-white">
             <div className="space-y-4">
-              <span className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-700">
+              <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-900 px-4 py-2 text-xs font-semibold uppercase tracking-[0.24em] text-slate-300">
                 Contact
               </span>
               <div>
-                <h2 className="text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+                <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
                   Request a demo with the team that helps businesses grow faster.
                 </h2>
-                <p className="mt-4 text-base text-slate-600">
+                <p className="mt-4 text-base text-slate-400">
                   Complete the form and a specialist will contact you with a custom TallyPrime plan for your organization.
                 </p>
               </div>
@@ -150,15 +150,15 @@ export default function Contact() {
 
             <div className="space-y-4">
               {info.map(({ icon: Icon, title, lines }) => (
-                <div key={title} className="rounded-3xl border border-slate-200 bg-slate-50 p-5 shadow-sm">
-                  <div className="flex items-center gap-3 text-slate-950">
+                <div key={title} className="rounded-3xl border border-white/10 bg-slate-900 p-5 shadow-sm">
+                  <div className="flex items-center gap-3 text-white">
                     <div className="flex h-11 w-11 items-center justify-center rounded-3xl bg-sky-100 text-sky-700">
                       <Icon className="h-5 w-5" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-950">{title}</p>
+                      <p className="text-sm font-semibold text-white">{title}</p>
                       {lines.map((line) => (
-                        <p key={line} className="mt-1 text-sm text-slate-600">{line}</p>
+                        <p key={line} className="mt-1 text-sm text-slate-400">{line}</p>
                       ))}
                     </div>
                   </div>
@@ -177,13 +177,13 @@ export default function Contact() {
           </div>
 
           <div className="lg:col-span-3">
-            <div className="rounded-[2rem] border border-slate-200 bg-white p-8 shadow-xl text-slate-950">
+            <div className="rounded-[2rem] border border-white/10 bg-slate-800 p-8 shadow-xl text-white">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500">Demo request</p>
-                  <h3 className="mt-3 text-2xl font-bold text-slate-950">Let's build your next TallyPrime solution.</h3>
+                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Demo request</p>
+                  <h3 className="mt-3 text-2xl font-bold text-white">Let's build your next TallyPrime solution.</h3>
                 </div>
-                <div className="rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-semibold text-slate-700">
+                <div className="rounded-full border border-white/10 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-300">
                   {isOnline ? 'Online' : 'Offline'}
                 </div>
               </div>
@@ -195,10 +195,10 @@ export default function Contact() {
               )}
 
               {ok ? (
-                <div className="mt-8 rounded-[1.5rem] border border-slate-200 bg-slate-50 p-10 text-center">
+                <div className="mt-8 rounded-[1.5rem] border border-white/10 bg-slate-900 p-10 text-center">
                   <CheckCircle className="mx-auto h-12 w-12 text-sky-500" />
-                  <h4 className="mt-4 text-xl font-semibold text-slate-950">Request submitted</h4>
-                  <p className="mt-2 text-sm text-slate-600">Our team will get back to you within 24 hours.</p>
+                  <h4 className="mt-4 text-xl font-semibold text-white">Request submitted</h4>
+                  <p className="mt-2 text-sm text-slate-400">Our team will get back to you within 24 hours.</p>
                 </div>
               ) : (
                 <form onSubmit={submit} className="mt-8 grid gap-4">
@@ -223,7 +223,7 @@ export default function Contact() {
                             placeholder={field.p}
                             required={field.l.includes('*')}
                             className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition ${
-                              error ? 'border-red-500/70 bg-slate-50 text-slate-950 placeholder:text-red-400' : 'border-slate-200 bg-slate-50 text-slate-950 placeholder:text-slate-500'
+                              error ? 'border-red-500/70 bg-slate-900 text-white placeholder:text-red-400' : 'border-white/10 bg-slate-900 text-white placeholder:text-slate-400'
                             }`}
                           />
                           {error && <p className="mt-2 text-xs text-red-400">{error}</p>}
@@ -241,7 +241,7 @@ export default function Contact() {
                       rows={4}
                       placeholder="Tell us about your needs... (optional)"
                       className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition ${
-                        getFieldError(errors, 'message') ? 'border-red-500/70 bg-slate-50 text-slate-950 placeholder:text-red-400' : 'border-slate-200 bg-slate-50 text-slate-950 placeholder:text-slate-500'
+                        getFieldError(errors, 'message') ? 'border-red-500/70 bg-slate-900 text-white placeholder:text-red-400' : 'border-white/10 bg-slate-900 text-white placeholder:text-slate-400'
                       }`}
                     />
                     {getFieldError(errors, 'message') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'message')}</p>}

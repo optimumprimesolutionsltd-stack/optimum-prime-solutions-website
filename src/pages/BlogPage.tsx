@@ -4,7 +4,7 @@ import SEO from '../components/SEO';
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-900">
       <SEO
         title="Blog | TallyPrime, KRA Compliance & Business Tips for Kenya"
         description="Practical guides, case studies, and expert insights on TallyPrime implementation, KRA compliance, eTIMS, cloud hosting, payroll, and EOS® — tailored for Kenyan business owners."

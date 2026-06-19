@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
-import TallyPrimeIcon from './TallyPrimeIcon';
-import { useSite } from '../context/SiteContext';
+import { CheckCircle2 } from 'lucide-react';
 
 type ShowcaseTheme = 'about' | 'products' | 'features' | 'faq' | 'testimonials' | 'blog' | 'contact';
 
@@ -12,182 +11,223 @@ type AfricanLaptopShowcaseProps = {
   theme: ShowcaseTheme;
 };
 
-const themeStyles: Record<ShowcaseTheme, { badge: string; accentDot: string; bgOverlay: string; label: string }> = {
+const themeConfig: Record<ShowcaseTheme, {
+  accent: string;
+  glow1: string;
+  glow2: string;
+  tagBg: string;
+  tagText: string;
+  tagRing: string;
+  dotColor: string;
+  imageUrl: string;
+  imageCaption: string;
+  stat: string;
+  statLabel: string;
+}> = {
   about: {
-    badge: 'bg-amber-500/10 text-amber-700 ring-amber-200',
-    accentDot: 'bg-amber-300',
-    bgOverlay: 'from-amber-400/20 via-transparent to-transparent',
-    label: 'About the team',
+    accent: 'from-amber-400 to-orange-500',
+    glow1: 'bg-amber-500/15',
+    glow2: 'bg-orange-500/10',
+    tagBg: 'bg-amber-500/15',
+    tagText: 'text-amber-300',
+    tagRing: 'ring-amber-500/30',
+    dotColor: '#f59e0b',
+    imageUrl: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageCaption: "Kenya's certified TallyPrime & EOS® team",
+    stat: '10+ Years',
+    statLabel: 'Business expertise',
   },
   products: {
-    badge: 'bg-emerald-500/10 text-emerald-700 ring-emerald-200',
-    accentDot: 'bg-emerald-300',
-    bgOverlay: 'from-emerald-400/20 via-transparent to-transparent',
-    label: 'Product plans',
+    accent: 'from-emerald-400 to-teal-500',
+    glow1: 'bg-emerald-500/15',
+    glow2: 'bg-teal-500/10',
+    tagBg: 'bg-emerald-500/15',
+    tagText: 'text-emerald-300',
+    tagRing: 'ring-emerald-500/30',
+    dotColor: '#10b981',
+    imageUrl: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageCaption: 'TallyPrime Silver, Gold & Enterprise editions',
+    stat: '3 Editions',
+    statLabel: 'Silver · Gold · Enterprise',
   },
   features: {
-    badge: 'bg-sky-500/10 text-sky-700 ring-sky-200',
-    accentDot: 'bg-sky-300',
-    bgOverlay: 'from-sky-400/20 via-transparent to-transparent',
-    label: 'Feature focus',
+    accent: 'from-sky-400 to-blue-500',
+    glow1: 'bg-sky-500/15',
+    glow2: 'bg-blue-500/10',
+    tagBg: 'bg-sky-500/15',
+    tagText: 'text-sky-300',
+    tagRing: 'ring-sky-500/30',
+    dotColor: '#0ea5e9',
+    imageUrl: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageCaption: 'End-to-end implementation & support',
+    stat: '5-Step',
+    statLabel: 'Implementation process',
   },
   faq: {
-    badge: 'bg-violet-500/10 text-violet-700 ring-violet-200',
-    accentDot: 'bg-violet-300',
-    bgOverlay: 'from-violet-400/20 via-transparent to-transparent',
-    label: 'Help center',
+    accent: 'from-violet-400 to-purple-500',
+    glow1: 'bg-violet-500/15',
+    glow2: 'bg-purple-500/10',
+    tagBg: 'bg-violet-500/15',
+    tagText: 'text-violet-300',
+    tagRing: 'ring-violet-500/30',
+    dotColor: '#8b5cf6',
+    imageUrl: 'https://images.pexels.com/photos/4342352/pexels-photo-4342352.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageCaption: 'Get answers from our certified consultants',
+    stat: '24/7',
+    statLabel: 'Support available',
   },
   testimonials: {
-    badge: 'bg-teal-500/10 text-teal-700 ring-teal-200',
-    accentDot: 'bg-teal-300',
-    bgOverlay: 'from-teal-400/20 via-transparent to-transparent',
-    label: 'Client stories',
+    accent: 'from-teal-400 to-cyan-500',
+    glow1: 'bg-teal-500/15',
+    glow2: 'bg-cyan-500/10',
+    tagBg: 'bg-teal-500/15',
+    tagText: 'text-teal-300',
+    tagRing: 'ring-teal-500/30',
+    dotColor: '#14b8a6',
+    imageUrl: 'https://images.pexels.com/photos/3184357/pexels-photo-3184357.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageCaption: 'Trusted by businesses across Kenya',
+    stat: '500+',
+    statLabel: 'Happy clients',
   },
   blog: {
-    badge: 'bg-orange-500/10 text-orange-700 ring-orange-200',
-    accentDot: 'bg-orange-300',
-    bgOverlay: 'from-orange-400/20 via-transparent to-transparent',
-    label: 'Insights',
+    accent: 'from-orange-400 to-red-500',
+    glow1: 'bg-orange-500/15',
+    glow2: 'bg-red-500/10',
+    tagBg: 'bg-orange-500/15',
+    tagText: 'text-orange-300',
+    tagRing: 'ring-orange-500/30',
+    dotColor: '#f97316',
+    imageUrl: 'https://images.pexels.com/photos/4050291/pexels-photo-4050291.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageCaption: 'Expert insights for Kenyan businesses',
+    stat: 'Weekly',
+    statLabel: 'New articles',
   },
   contact: {
-    badge: 'bg-pink-500/10 text-pink-700 ring-pink-200',
-    accentDot: 'bg-pink-300',
-    bgOverlay: 'from-pink-400/20 via-transparent to-transparent',
-    label: 'Contact us',
+    accent: 'from-red-400 to-rose-500',
+    glow1: 'bg-red-500/15',
+    glow2: 'bg-rose-500/10',
+    tagBg: 'bg-red-500/15',
+    tagText: 'text-red-300',
+    tagRing: 'ring-red-500/30',
+    dotColor: '#dc2626',
+    imageUrl: 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageCaption: 'Our team is ready to help you today',
+    stat: '<24h',
+    statLabel: 'Response time',
   },
 };
 
-function renderThemeDecor(theme: ShowcaseTheme) {
-  switch (theme) {
-    case 'about':
-      return (
-        <>
-          <div className="absolute -left-16 top-12 h-44 w-44 rounded-full bg-amber-400/20 blur-2xl" />
-          <div className="absolute right-10 bottom-16 h-20 w-20 rounded-2xl bg-amber-400/25 blur-2xl" />
-        </>
-      );
-    case 'products':
-      return (
-        <>
-          <div className="absolute right-8 top-16 h-28 w-28 rounded-full bg-emerald-400/20 blur-2xl" />
-          <div className="absolute left-10 bottom-24 h-20 w-20 rounded-full bg-emerald-400/25 blur-2xl" />
-        </>
-      );
-    case 'features':
-      return (
-        <>
-          <div className="absolute left-8 top-20 h-24 w-24 rounded-full bg-sky-400/20 blur-2xl" />
-          <div className="absolute right-12 bottom-14 h-24 w-24 rounded-full bg-sky-400/25 blur-2xl" />
-        </>
-      );
-    case 'faq':
-      return (
-        <>
-          <div className="absolute right-16 top-14 h-28 w-28 rounded-full bg-violet-400/20 blur-2xl" />
-          <div className="absolute left-12 bottom-18 h-20 w-20 rounded-full bg-violet-400/25 blur-2xl" />
-        </>
-      );
-    case 'testimonials':
-      return (
-        <>
-          <div className="absolute left-10 top-14 h-32 w-32 rounded-full bg-teal-400/20 blur-2xl" />
-          <div className="absolute right-12 bottom-20 h-20 w-20 rounded-full bg-teal-400/25 blur-2xl" />
-        </>
-      );
-    case 'blog':
-      return (
-        <>
-          <div className="absolute left-16 top-12 h-32 w-32 rounded-full bg-orange-400/20 blur-2xl" />
-          <div className="absolute right-14 bottom-16 h-24 w-24 rounded-full bg-orange-400/25 blur-2xl" />
-        </>
-      );
-    case 'contact':
-      return (
-        <>
-          <div className="absolute right-12 top-12 h-28 w-28 rounded-full bg-pink-400/20 blur-2xl" />
-          <div className="absolute left-10 bottom-22 h-20 w-20 rounded-full bg-pink-400/25 blur-2xl" />
-        </>
-      );
-    default:
-      return null;
-  }
-}
-
 export default function AfricanLaptopShowcase({ tag, title, description, features, theme }: AfricanLaptopShowcaseProps) {
-  const style = themeStyles[theme];
-  const imageUrls: Record<ShowcaseTheme, string> = {
-    // About: African business team collaborating in a modern office
-    about: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    // Products: African professionals reviewing business software on laptops
-    products: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    // Features/Services: African team in a business strategy meeting
-    features: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    // FAQ: African professional working at a laptop in an office
-    faq: 'https://images.pexels.com/photos/4342352/pexels-photo-4342352.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    // Testimonials: African business people in a discussion/meeting
-    testimonials: 'https://images.pexels.com/photos/3184357/pexels-photo-3184357.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    // Blog: African professional writing/reading at a desk
-    blog: 'https://images.pexels.com/photos/4050291/pexels-photo-4050291.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-    // Contact: African customer support professional with headset
-    contact: 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
-  };
+  const cfg = themeConfig[theme];
+  const words = title.split(' ');
+  const firstHalf = words.slice(0, Math.ceil(words.length / 2)).join(' ');
+  const secondHalf = words.slice(Math.ceil(words.length / 2)).join(' ');
 
   return (
-    <section className="relative overflow-hidden bg-slate-50 py-20 text-slate-950">
-      <div className="absolute inset-0 -z-30 bg-cover bg-center" style={{ backgroundImage: `url('${imageUrls[theme]}')` }} />
-      <div className="absolute inset-x-0 top-0 h-48 bg-gradient-to-b from-slate-900/5 to-transparent" />
+    <section className="relative overflow-hidden bg-slate-900 py-24 text-white">
+      {/* Background glow blobs */}
+      <div className="pointer-events-none absolute inset-0 -z-10">
+        <div className={`absolute -left-40 -top-20 h-[32rem] w-[32rem] rounded-full ${cfg.glow1} blur-3xl`} />
+        <div className={`absolute -right-40 bottom-0 h-[28rem] w-[28rem] rounded-full ${cfg.glow2} blur-3xl`} />
+      </div>
+
+      {/* Subtle grid */}
+      <div
+        className="pointer-events-none absolute inset-0 -z-10 opacity-[0.04]"
+        style={{
+          backgroundImage:
+            'linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)',
+          backgroundSize: '48px 48px',
+        }}
+      />
+
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-10 lg:grid-cols-[1.1fr_0.9fr] items-center">
+        <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
+
+          {/* LEFT: Text */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
+            initial={{ opacity: 0, y: 28 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7 }}
-            className="space-y-6"
+            className="space-y-7"
           >
-            <div className={`inline-flex items-center gap-3 rounded-full ${style.badge} px-4 py-2 text-sm font-semibold ring-1 ${style.badge.replace('bg-', 'ring-')}`}>
-              <TallyPrimeIcon className="h-5 w-5" showText={false} isDark={false} />
+            <span
+              className={`inline-flex items-center gap-2 rounded-full ${cfg.tagBg} px-4 py-1.5 text-xs font-bold uppercase tracking-widest ${cfg.tagText} ring-1 ${cfg.tagRing}`}
+            >
+              <span className="h-2 w-2 rounded-full animate-pulse" style={{ background: cfg.dotColor }} />
               {tag}
-            </div>
-            <h2 className="text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">
-              {title}
-            </h2>
-            <p className="max-w-2xl text-base leading-8 text-slate-600">
-              {description}
-            </p>
+            </span>
+
+            <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+              <span className={`bg-gradient-to-r ${cfg.accent} bg-clip-text text-transparent`}>{firstHalf}</span>{' '}
+              <span className="text-white">{secondHalf}</span>
+            </h1>
+
+            <p className="max-w-xl text-base leading-7 text-slate-400">{description}</p>
+
             <div className="grid gap-3 sm:grid-cols-2">
               {features.map((feature) => (
-                <div key={feature} className="rounded-3xl bg-white p-4 text-sm text-slate-700 shadow-sm ring-1 ring-slate-200">
+                <motion.div
+                  key={feature}
+                  whileHover={{ scale: 1.02 }}
+                  className="flex items-center gap-3 rounded-2xl border border-white/8 bg-white/5 px-4 py-3 text-sm text-slate-300 backdrop-blur-sm"
+                >
+                  <CheckCircle2 className="h-4 w-4 shrink-0" style={{ color: cfg.dotColor }} />
                   {feature}
-                </div>
+                </motion.div>
               ))}
             </div>
           </motion.div>
 
+          {/* RIGHT: Image card */}
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, amount: 0.3 }}
-            transition={{ delay: 0.1, duration: 0.7 }}
-            className="group relative overflow-hidden rounded-[2rem] border border-slate-200 bg-slate-950/5 shadow-2xl"
+            initial={{ opacity: 0, x: 32 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.15, duration: 0.7 }}
+            className="relative"
           >
-            <div className={`absolute inset-0 bg-gradient-to-tr ${style.bgOverlay}`} />
-            {renderThemeDecor(theme)}
-            <div className="relative h-[28rem] max-w-[32rem] overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">
-              <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${imageUrls[theme]}')` }} />
-              <div className="absolute inset-0 bg-slate-950/30" />
-              <div className="absolute inset-0 rounded-[2rem] ring-1 ring-white/10" />
-              <div className="relative flex h-full items-end p-6">
-                <div className="rounded-3xl bg-white/10 px-5 py-4 text-sm text-white/90 backdrop-blur-md ring-1 ring-white/15">
-                  <p className="text-xs uppercase tracking-[0.3em] text-slate-200"></p>
-                  <p className="mt-2 font-semibold">{theme === 'products' ? 'Laptop workflow preview' : 'Financial clarity and operational growth'}</p>
+            {/* Glow ring behind image */}
+            <div
+              className="absolute -inset-4 rounded-[2.5rem] blur-2xl opacity-25"
+              style={{ background: `linear-gradient(135deg, ${cfg.dotColor}66, transparent)` }}
+            />
+
+            <div className="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">
+              <div className="relative h-[26rem]">
+                <div
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{ backgroundImage: `url('${cfg.imageUrl}')` }}
+                />
+                <div className="absolute inset-0 bg-slate-900/50" />
+                <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-900/90 to-transparent" />
+
+                {/* Caption */}
+                <div className="absolute bottom-5 left-5 right-5">
+                  <div className="flex items-center gap-3 rounded-2xl bg-white/10 px-4 py-3 backdrop-blur-md ring-1 ring-white/15">
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full animate-pulse" style={{ background: cfg.dotColor }} />
+                    <p className="text-sm font-semibold text-white">{cfg.imageCaption}</p>
+                  </div>
+                </div>
+
+                {/* Top badge */}
+                <div className="absolute left-5 top-5">
+                  <span className={`inline-flex items-center gap-2 rounded-full ${cfg.tagBg} px-3 py-1 text-xs font-bold ${cfg.tagText} ring-1 ${cfg.tagRing} backdrop-blur-sm`}>
+                    {tag}
+                  </span>
                 </div>
               </div>
             </div>
-            <div className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-full bg-slate-900/75 px-4 py-2 text-xs font-semibold text-white/90 backdrop-blur">
-              <span className={`h-2.5 w-2.5 rounded-full ${style.accentDot}`} />
-              {style.label}
-            </div>
+
+            {/* Floating stat card */}
+            <motion.div
+              animate={{ y: [0, -6, 0] }}
+              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+              className="absolute -bottom-5 -right-4 rounded-2xl border border-white/10 bg-slate-800/90 px-5 py-3 shadow-2xl backdrop-blur-md"
+            >
+              <p className="text-xs font-semibold text-slate-400">Certified Partner</p>
+              <p className="mt-0.5 text-lg font-black text-white">{cfg.stat}</p>
+              <p className="text-xs text-slate-400">{cfg.statLabel}</p>
+            </motion.div>
           </motion.div>
         </div>
       </div>

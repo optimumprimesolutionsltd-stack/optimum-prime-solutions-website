@@ -34,7 +34,7 @@ const partners = [
     logo: '/partner-tsplus.png',
     description: 'TSplus enables secure remote desktop access to TallyPrime from any device, anywhere. We deploy and manage TSplus infrastructure so your team can access business data remotely without complex VPN setups or expensive Citrix licensing.',
     badge: 'Deployment Partner',
-    badgeColor: 'bg-slate-100 text-slate-700',
+    badgeColor: 'bg-slate-100 text-slate-300',
     url: 'https://tsplus.net',
     logoClass: 'h-10 object-contain',
   },
@@ -42,7 +42,7 @@ const partners = [
 
 export default function Partners() {
   return (
-    <section className="bg-white py-16 sm:py-24">
+    <section className="bg-slate-800 py-16 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <div className="text-center mb-12">
@@ -52,7 +52,7 @@ export default function Partners() {
           <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
             Powered by the Best in the Industry
           </h2>
-          <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-600">
+          <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-400">
             We partner with world-class technology providers to deliver complete, integrated solutions for your business.
           </p>
         </div>
@@ -69,7 +69,7 @@ export default function Partners() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="group flex flex-col rounded-2xl border border-slate-200 bg-slate-50 p-6 hover:border-red-200 hover:bg-red-50/30 hover:shadow-md transition-all duration-200"
+              className="group flex flex-col rounded-2xl border border-white/10 bg-slate-900 p-6 hover:border-red-200 hover:bg-red-50/30 hover:shadow-md transition-all duration-200"
             >
               {/* Logo */}
               <div className="flex items-center justify-center h-16 mb-4">
@@ -88,7 +88,7 @@ export default function Partners() {
               </div>
 
               {/* Description */}
-              <p className="text-sm leading-relaxed text-slate-600 flex-1">
+              <p className="text-sm leading-relaxed text-slate-400 flex-1">
                 {partner.description}
               </p>
 
@@ -102,15 +102,15 @@ export default function Partners() {
         </div>
 
         {/* Bottom trust bar */}
-        <div className="mt-12 rounded-2xl bg-slate-50 border border-slate-200 px-6 py-5 flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
+        <div className="mt-12 rounded-2xl bg-slate-900 border border-white/10 px-6 py-5 flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
           <div className="flex -space-x-3">
             {partners.map((p) => (
-              <div key={p.name} className="h-10 w-10 rounded-full bg-white border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
+              <div key={p.name} className="h-10 w-10 rounded-full bg-slate-800 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
                 <img src={p.logo} alt={p.name} className="h-7 w-7 object-contain" />
               </div>
             ))}
           </div>
-          <p className="text-sm text-slate-600">
+          <p className="text-sm text-slate-400">
             <span className="font-semibold text-slate-900">Certified across 4 platforms.</span>{' '}
             One trusted partner to implement, integrate, and support them all for your business.
           </p>

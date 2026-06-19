@@ -44,10 +44,10 @@ export default function Features() {
   };
 
   return (
-    <section id="services" className="relative py-32 bg-gradient-to-br from-slate-100 via-slate-50 to-sky-100 overflow-hidden perspective text-slate-900">
+    <section id="services" className="relative py-32 bg-gradient-to-br from-slate-100 via-slate-50 to-sky-100 overflow-hidden perspective text-white">
       {/* Animated background elements */}
       <div className="absolute -top-40 -right-40 w-80 h-80 bg-sky-400/20 rounded-full blur-3xl opacity-40" />
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-white/80 rounded-full blur-3xl opacity-30" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-800/80 rounded-full blur-3xl opacity-30" />
       <div className="absolute left-1/2 top-16 -translate-x-1/2 h-72 w-72 rounded-full bg-slate-300/10 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -56,10 +56,10 @@ export default function Features() {
             <Sparkles className="h-5 w-5 text-sky-500" />
           </motion.span>
           <span className="inline-block rounded-full bg-red-600 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white ml-2">Our Services</span>
-          <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight">
+          <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-white leading-tight">
             Business Systems, Cloud Hosting & Operational Consulting
           </h2>
-          <p className="mt-6 text-lg text-slate-600 leading-relaxed">
+          <p className="mt-6 text-lg text-slate-400 leading-relaxed">
             We design and implement systems that deliver financial clarity, centralized reporting, and operational traction — combining TallyPrime expertise with secure cloud hosting and process optimization.
           </p>
         </motion.div>
@@ -83,8 +83,8 @@ export default function Features() {
                 whileHover={{ y: -12, rotateX: -5, transition: { duration: 0.3 } }}
                 className={`group relative rounded-[2rem] border p-6 transition-all duration-300 overflow-hidden ${
                   isHeroCard
-                    ? 'border-slate-200 bg-white text-slate-950 shadow-[0_24px_60px_-30px_rgba(15,23,42,0.12)] hover:shadow-2xl hover:shadow-slate-300/30'
-                    : 'border-slate-200 bg-white shadow-[0_24px_60px_-30px_rgba(15,23,42,0.15)] hover:shadow-2xl hover:shadow-slate-300/30'
+                    ? 'border-white/10 bg-slate-800 text-white shadow-[0_24px_60px_-30px_rgba(15,23,42,0.12)] hover:shadow-2xl hover:shadow-slate-300/30'
+                    : 'border-white/10 bg-slate-800 shadow-[0_24px_60px_-30px_rgba(15,23,42,0.15)] hover:shadow-2xl hover:shadow-slate-300/30'
                 }`}
                 style={{ transformStyle: 'preserve-3d' }}
               >
@@ -119,10 +119,10 @@ export default function Features() {
                 <Ic className="h-6 w-6 text-red-600 relative z-10" />
               </motion.div>
 
-                <h3 className={`text-base font-bold flex items-center gap-2 ${isHeroCard ? 'text-slate-950' : 'text-slate-900'} ${!isHeroCard ? 'group-hover:text-red-600' : ''}`}>
+                <h3 className={`text-base font-bold flex items-center gap-2 ${isHeroCard ? 'text-white' : 'text-white'} ${!isHeroCard ? 'group-hover:text-red-600' : ''}`}>
                   {svc.title}
                 </h3>
-                <p className={`mt-3 text-sm leading-relaxed ${isHeroCard ? 'text-slate-700' : 'text-slate-600'}`}>
+                <p className={`mt-3 text-sm leading-relaxed ${isHeroCard ? 'text-slate-300' : 'text-slate-400'}`}>
                   {svc.desc}
                 </p>
 
@@ -132,7 +132,7 @@ export default function Features() {
                     <motion.li
                       key={f}
                       whileHover={{ x: 4 }}
-                      className={`flex items-center gap-2 text-xs ${isHeroCard ? 'text-slate-600' : 'text-slate-600'}`}
+                      className={`flex items-center gap-2 text-xs ${isHeroCard ? 'text-slate-400' : 'text-slate-400'}`}
                     >
                       <motion.span
                         className="h-2 w-2 rounded-full bg-red-500"
@@ -149,7 +149,7 @@ export default function Features() {
                   whileHover={{ y: -2 }}
                   className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition duration-300 hover:bg-slate-800"
                 >
-                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-white/15">
+                  <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-slate-800/15">
                     <TallyPrimeIcon className="h-4 w-4" showText={false} isDark />
                   </span>
                   View on Tally

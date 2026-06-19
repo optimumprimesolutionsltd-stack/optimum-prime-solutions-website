@@ -4,7 +4,7 @@ import SEO from '../components/SEO';
 
 export default function ContactPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-900">
       <SEO
         title="Contact Us | Optimum Prime Solutions — TallyPrime Kenya"
         description="Get in touch with Optimum Prime Solutions. Book a TallyPrime demo, request a quote, or ask about cloud hosting, KRA compliance, or EOS® consulting. Based in Ruiru, Kenya. Call +254 116 246 074."

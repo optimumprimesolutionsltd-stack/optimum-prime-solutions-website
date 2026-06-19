@@ -15,7 +15,7 @@ export default function Industries() {
         <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {data.industries.map((ind,i)=>{const Ic=iconMap[ind.icon]||ShoppingBag;return(
             <motion.div key={ind.id} initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} transition={{delay:i*0.05}}
-              className="group rounded-2xl border border-navy-100 dark:border-navy-700 bg-white dark:bg-navy-800/50 p-6 text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
+              className="group rounded-2xl border border-navy-100 dark:border-navy-700 bg-slate-800 dark:bg-navy-800/50 p-6 text-center hover:-translate-y-1 hover:shadow-xl transition-all duration-300">
               <div className="mx-auto h-14 w-14 rounded-2xl bg-yellow-400/10 flex items-center justify-center mb-4 group-hover:bg-yellow-400/20 transition"><Ic className="h-7 w-7 text-yellow-600"/></div>
               <h3 className="text-base font-bold text-navy-900 dark:text-white">{ind.name}</h3>
               <p className="mt-2 text-sm text-navy-600 dark:text-navy-600">{ind.desc}</p>

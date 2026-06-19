@@ -4,7 +4,7 @@ import SEO from '../components/SEO';
 
 export default function FAQPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-900">
       <SEO
         title="FAQ | TallyPrime Kenya — Pricing, Licensing & KRA Compliance Questions"
         description="Answers to the most common questions about TallyPrime Kenya pricing, licensing, KRA & eTIMS compliance, cloud hosting, remote access, payroll setup, and EOS® consulting."

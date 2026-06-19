@@ -27,7 +27,7 @@ export default function Products() {
     <section id="products" className="relative py-32 bg-gradient-to-br from-slate-100 via-slate-50 to-sky-100 overflow-hidden text-slate-900">
       {/* Background animation */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-sky-200/50 rounded-full blur-3xl opacity-40 -mr-48 -mt-48" />
-      <div className="absolute bottom-0 left-0 w-96 h-96 bg-white/80 rounded-full blur-3xl opacity-30 -ml-48 -mb-48" />
+      <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-800/80 rounded-full blur-3xl opacity-30 -ml-48 -mb-48" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 font-sans">
         <motion.div
@@ -42,7 +42,7 @@ export default function Products() {
           <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight">
             TallyPrime Editions, Cloud Hosting & EOS® Consulting Packages
           </h2>
-          <p className="mt-6 text-lg text-slate-600 leading-relaxed">
+          <p className="mt-6 text-lg text-slate-400 leading-relaxed">
             Choose the right TallyPrime edition for your business — Silver, Gold, or Enterprise. Add cloud hosting for remote access, or engage us for EOS® implementation to strengthen your leadership operating system.
           </p>
         </motion.div>
@@ -171,8 +171,8 @@ export default function Products() {
                 whileHover={{ y: p.popular ? 0 : -8 }}
                 className={`group relative rounded-2xl border p-8 transition-all duration-300 overflow-visible ${
                   p.popular
-                    ? 'border-red-500/40 bg-gradient-to-br from-red-50 via-white to-red-50 shadow-xl shadow-red-900/10 xl:scale-[1.05] text-slate-950'
-                    : 'border-slate-200 bg-white shadow-xl hover:shadow-slate-300/30'
+                    ? 'border-red-500/40 bg-gradient-to-br from-red-50 via-white to-red-50 shadow-xl shadow-red-900/10 xl:scale-[1.05] text-white'
+                    : 'border-white/10 bg-slate-800 shadow-xl hover:shadow-slate-300/30'
                 }`}
               >
                 {/* Badge */}
@@ -209,7 +209,7 @@ export default function Products() {
                   )}
                   {['Plus', 'Enterprise'].some(e => p.edition.includes(e)) && (
                     <div className="inline-block p-3 rounded-xl bg-slate-200/80">
-                      <TrendingUp className="h-6 w-6 text-slate-700" />
+                      <TrendingUp className="h-6 w-6 text-slate-300" />
                     </div>
                   )}
                 </motion.div>
@@ -220,7 +220,7 @@ export default function Products() {
                   <motion.p
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
-                    className={`text-2xl font-bold mt-2 ${p.popular ? 'text-slate-950' : 'text-slate-900'}`}
+                    className={`text-2xl font-bold mt-2 ${p.popular ? 'text-white' : 'text-slate-900'}`}
                   >
                     {p.edition}
                   </motion.p>
@@ -229,7 +229,7 @@ export default function Products() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     className="mt-4"
                   >
-                    <span className={`text-3xl font-extrabold ${p.popular ? 'text-slate-950' : 'text-slate-900'}`}>
+                    <span className={`text-3xl font-extrabold ${p.popular ? 'text-white' : 'text-slate-900'}`}>
                       {p.price.includes('KES') && p.price.match(/\d+/)?.[0] ? (
                         <motion.span
                           key={p.price}
@@ -243,9 +243,9 @@ export default function Products() {
                       )}
                     </span>
                   </motion.div>
-                  <p className="text-xs text-slate-500 mt-1">{p.period}</p>
+                  <p className="text-xs text-slate-400 mt-1">{p.period}</p>
                   {p.popular && (
-                    <p className="mt-4 text-sm font-medium text-slate-700">
+                    <p className="mt-4 text-sm font-medium text-slate-300">
                       Best value for growing teams that need multi-user access, remote connectivity, and priority support.
                     </p>
                   )}
@@ -259,7 +259,7 @@ export default function Products() {
                       initial={{ opacity: 0, x: -10 }}
                       whileInView={{ opacity: 1, x: 0 }}
                       transition={{ delay: idx * 0.05 }}
-                      className={`flex items-start gap-3 text-xs ${p.popular ? 'text-slate-700' : 'text-slate-600'}`}
+                      className={`flex items-start gap-3 text-xs ${p.popular ? 'text-slate-300' : 'text-slate-400'}`}
                     >
                       <motion.div whileHover={{ scale: 1.2 }}>
                         <Check className={`mt-0.5 h-4 w-4 shrink-0 ${p.popular ? 'text-red-500' : 'text-yellow-600'}`} />
