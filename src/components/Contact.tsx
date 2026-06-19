@@ -130,7 +130,7 @@ export default function Contact() {
 
   return (
     <section id="contact" className="relative overflow-hidden bg-slate-900 py-24">
-      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-sky-200/40 to-transparent" />
+      <div className="absolute inset-x-0 top-0 h-40 bg-gradient-to-b from-sky-500/5 to-transparent" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid gap-10 lg:grid-cols-5 lg:gap-12">
           <div className="lg:col-span-2 space-y-6 overflow-hidden rounded-[2rem] bg-slate-800 border border-white/10 p-8 shadow-xl text-white">

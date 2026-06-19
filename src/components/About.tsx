@@ -7,9 +7,9 @@ export default function About() {
   const { data } = useSite();
   const c = data.company;
   return (
-    <section id="about" className="relative py-24 overflow-hidden bg-gradient-to-br from-slate-50 via-cyan-50 to-white text-white">
-      <div className="absolute left-1/2 top-0 h-80 w-80 -translate-x-1/2 rounded-full bg-cyan-200/40 blur-3xl" />
-      <div className="absolute -right-20 bottom-10 h-72 w-72 rounded-full bg-sky-200/30 blur-3xl" />
+    <section id="about" className="relative py-24 overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+      <div className="absolute left-1/2 top-0 h-80 w-80 -translate-x-1/2 rounded-full bg-sky-500/10 blur-3xl" />
+      <div className="absolute -right-20 bottom-10 h-72 w-72 rounded-full bg-red-500/10 blur-3xl" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           <motion.div initial="hidden" whileInView="visible" viewport={{once:true}} variants={{visible:{transition:{staggerChildren:0.15}}}}>
@@ -33,12 +33,12 @@ export default function About() {
             </motion.div>
           </motion.div>
           <motion.div initial={{opacity:0,x:40}} whileInView={{opacity:1,x:0}} viewport={{once:true}} className="relative">
-            <div className="rounded-3xl bg-gradient-to-br from-white to-slate-100 p-8 lg:p-10 shadow-2xl shadow-slate-900 ring-1 ring-white/10/60">
+            <div className="rounded-3xl bg-slate-800/60 border border-white/10 p-8 lg:p-10 shadow-2xl shadow-black/40">
               <div className="space-y-7">
                 {[{icon:Target,title:'Our Mission',text:c.mission},{icon:Eye,title:'Our Vision',text:c.vision},{icon:Zap,title:'Why Choose Us',text:'Kenya\'s certified TallyPrime reseller, licensed EOS® implementer, and cloud hosting provider — with 24/7 support and solutions built for the Kenyan market.'}].map(({icon:Ic,title,text})=>(
                   <div key={title} className="flex items-start gap-4">
                     <div className="h-11 w-11 rounded-3xl bg-gradient-to-br from-sky-500 to-cyan-400 text-white flex items-center justify-center shrink-0 shadow-lg shadow-cyan-200/30"><Ic className="h-5 w-5"/></div>
-                    <div><h4 className="text-base font-bold text-white">{title}</h4><p className="mt-1 text-sm text-slate-400 leading-relaxed">{text}</p></div>
+                    <div><h4 className="text-base font-bold text-white">{title}</h4><p className="mt-1 text-sm text-slate-300 leading-relaxed">{text}</p></div>
                   </div>
                 ))}
               </div>

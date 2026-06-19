@@ -173,7 +173,7 @@ export default function Hero() {
                 href="#how-it-works"
                 whileHover={{ scale: 1.03, y: -2 }}
                 whileTap={{ scale: 0.97 }}
-                className="flex items-center gap-2 px-6 py-3.5 bg-white hover:bg-gray-50 border border-gray-200 font-semibold text-gray-700 rounded-xl shadow-sm transition-all"
+                className="flex items-center gap-2 px-6 py-3.5 bg-slate-800 hover:bg-slate-700 border border-white/10 font-semibold text-white rounded-xl shadow-sm transition-all"
               >
                 <Play size={14} className="text-blue-600 fill-blue-600" />
                 {ctaSecondary}
@@ -195,7 +195,7 @@ export default function Hero() {
               variants={floatVariants}
               // @ts-ignore
               whileInView="animate"
-              className="relative z-10 bg-white/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-gray-100 p-5 w-72"
+              className="relative z-10 bg-slate-800/90 backdrop-blur-sm rounded-2xl shadow-2xl border border-white/10 p-5 w-72"
             >
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-3 h-3 rounded-full bg-red-400" />
@@ -239,7 +239,7 @@ export default function Hero() {
                   initial="hidden"
                   animate="visible"
                   whileHover={{ scale: 1.05, y: -4 }}
-                  className={`${positions[i]} z-20 bg-white/90 backdrop-blur-sm rounded-xl shadow-lg border border-gray-100 p-3 flex items-center gap-3 min-w-[160px]`}
+                  className={`${positions[i]} z-20 bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-lg border border-white/10 p-3 flex items-center gap-3 min-w-[160px]`}
                 >
                   <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center text-lg flex-shrink-0`}>
                     {card.icon}

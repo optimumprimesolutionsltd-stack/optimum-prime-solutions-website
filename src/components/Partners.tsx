@@ -49,7 +49,7 @@ export default function Partners() {
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-red-600 mb-3">
             Technology Partners
           </p>
-          <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Powered by the Best in the Industry
           </h2>
           <p className="mt-4 max-w-2xl mx-auto text-lg text-slate-400">
@@ -111,7 +111,7 @@ export default function Partners() {
             ))}
           </div>
           <p className="text-sm text-slate-400">
-            <span className="font-semibold text-slate-900">Certified across 4 platforms.</span>{' '}
+            <span className="font-semibold text-white">Certified across 4 platforms.</span>{' '}
             One trusted partner to implement, integrate, and support them all for your business.
           </p>
         </div>

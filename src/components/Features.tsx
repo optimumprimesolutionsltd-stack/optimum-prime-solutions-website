@@ -44,10 +44,10 @@ export default function Features() {
   };
 
   return (
-    <section id="services" className="relative py-32 bg-gradient-to-br from-slate-100 via-slate-50 to-sky-100 overflow-hidden perspective text-white">
+    <section id="services" className="relative py-32 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden perspective text-white">
       {/* Animated background elements */}
-      <div className="absolute -top-40 -right-40 w-80 h-80 bg-sky-400/20 rounded-full blur-3xl opacity-40" />
-      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-800/80 rounded-full blur-3xl opacity-30" />
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-sky-500/10 rounded-full blur-3xl" />
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-red-500/10 rounded-full blur-3xl" />
       <div className="absolute left-1/2 top-16 -translate-x-1/2 h-72 w-72 rounded-full bg-slate-300/10 blur-3xl" />
 
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -107,7 +107,7 @@ export default function Features() {
 
               {/* Icon background animation */}
               <motion.div
-                className="h-12 w-12 rounded-xl bg-gradient-to-br from-red-500/15 to-white/80 flex items-center justify-center mb-4 relative overflow-hidden"
+                className="h-12 w-12 rounded-xl bg-gradient-to-br from-red-500/15 to-slate-800/80 flex items-center justify-center mb-4 relative overflow-hidden"
                 whileHover={{ scale: 1.15, rotate: 10 }}
               >
                 <motion.div

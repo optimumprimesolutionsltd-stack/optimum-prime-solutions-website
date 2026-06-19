@@ -33,7 +33,7 @@ export default function Testimonials() {
   ];
 
   return (
-    <section id="testimonials" className="relative py-32 bg-gradient-to-b from-white to-navy-50/50 dark:from-navy-950 dark:to-navy-900/50 overflow-hidden">
+    <section id="testimonials" className="relative py-32 bg-gradient-to-b from-slate-950 to-slate-900 overflow-hidden">
       {/* Decorative elements */}
       <div className="absolute top-20 left-10 w-72 h-72 bg-blue-500/5 rounded-full blur-3xl" />
       <div className="absolute bottom-20 right-10 w-80 h-80 bg-yellow-400/5 rounded-full blur-3xl" />

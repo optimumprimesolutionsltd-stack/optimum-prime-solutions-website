@@ -24,7 +24,7 @@ export default function Products() {
   };
 
   return (
-    <section id="products" className="relative py-32 bg-gradient-to-br from-slate-100 via-slate-50 to-sky-100 overflow-hidden text-slate-900">
+    <section id="products" className="relative py-32 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 overflow-hidden text-white">
       {/* Background animation */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-sky-200/50 rounded-full blur-3xl opacity-40 -mr-48 -mt-48" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-800/80 rounded-full blur-3xl opacity-30 -ml-48 -mb-48" />
@@ -39,7 +39,7 @@ export default function Products() {
           <span className="inline-block rounded-full bg-gradient-to-r from-sky-500 to-cyan-500 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white shadow-lg shadow-sky-300/20">
             Products & Packages
           </span>
-          <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight">
+          <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-white leading-tight">
             TallyPrime Editions, Cloud Hosting & EOS® Consulting Packages
           </h2>
           <p className="mt-6 text-lg text-slate-400 leading-relaxed">
@@ -220,7 +220,7 @@ export default function Products() {
                   <motion.p
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
-                    className={`text-2xl font-bold mt-2 ${p.popular ? 'text-white' : 'text-slate-900'}`}
+                    className={`text-2xl font-bold mt-2 text-white`}
                   >
                     {p.edition}
                   </motion.p>
@@ -229,7 +229,7 @@ export default function Products() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     className="mt-4"
                   >
-                    <span className={`text-3xl font-extrabold ${p.popular ? 'text-white' : 'text-slate-900'}`}>
+                    <span className={`text-3xl font-extrabold text-white`}>
                       {p.price.includes('KES') && p.price.match(/\d+/)?.[0] ? (
                         <motion.span
                           key={p.price}

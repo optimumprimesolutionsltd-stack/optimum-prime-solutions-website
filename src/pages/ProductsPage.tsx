@@ -10,7 +10,7 @@ export default function ProductsPage() {
         canonical="/products"
         keywords="TallyPrime price Kenya, TallyPrime Silver Kenya, TallyPrime Gold Kenya, TallyPrime Enterprise Kenya, buy TallyPrime Nairobi, TallyPrime licence Kenya, cloud hosting Kenya price"
       />
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-50 via-slate-100 to-sky-50 text-slate-950">
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-0 right-0 w-96 h-96 rounded-full bg-red-200/20 blur-3xl" />
           <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full bg-sky-200/20 blur-3xl" />
@@ -42,7 +42,7 @@ export default function ProductsPage() {
               </div>
             </div>
 
-            <div className="flex items-center justify-center rounded-[2rem] border border-slate-200 bg-white/80 p-8 shadow-2xl shadow-slate-200/40 ring-1 ring-slate-200/70 backdrop-blur-sm">
+            <div className="flex items-center justify-center rounded-[2rem] border border-white/10 bg-slate-800/60 p-8 shadow-2xl shadow-black/40 ring-1 ring-white/5 backdrop-blur-sm">
               <div className="text-center">
                 <p className="text-sm uppercase tracking-[0.28em] text-slate-500">Certified TallyPrime Partner</p>
                 <h2 className="mt-4 text-2xl font-semibold text-slate-950">Official TallyPrime reseller · Cloud · EOS®</h2>

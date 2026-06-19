@@ -80,7 +80,7 @@ export default function TallyLanding() {
     <section className="relative min-h-screen w-full overflow-hidden bg-black">
       <div className="absolute inset-0 z-10 bg-black/70 pointer-events-none" />
 
-      <div className="absolute inset-x-0 bottom-0 h-48 z-30 bg-gradient-to-t from-slate-100/90 via-slate-100/30 to-transparent pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-48 z-30 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent pointer-events-none" />
 
 
       {/* Subtle particle layer using SVG shapes and CSS animation */}

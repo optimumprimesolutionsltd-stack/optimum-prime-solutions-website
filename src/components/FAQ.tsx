@@ -28,7 +28,7 @@ export default function FAQ() {
             <div className="rounded-3xl bg-slate-800 border border-white/10 p-6 shadow-lg shadow-black/40">
               <div className="relative">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400"/>
-                <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search questions..." className="w-full rounded-3xl border border-white/10 bg-slate-700 pl-11 pr-4 py-3.5 text-sm text-slate-900 outline-none shadow-sm focus:ring-2 focus:ring-red-500"/>
+                <input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Search questions..." className="w-full rounded-3xl border border-white/10 bg-slate-700 pl-11 pr-4 py-3.5 text-sm text-white outline-none shadow-sm focus:ring-2 focus:ring-red-500"/>
               </div>
 
               <div className="mt-4 flex flex-wrap gap-2">{cats.map((c) => {
@@ -37,7 +37,7 @@ export default function FAQ() {
                       <button
                         key={c}
                         onClick={() => setActiveCat(c)}
-                        className={`rounded-full px-4 py-2 text-xs font-medium transition ${active ? 'bg-red-600 text-white shadow-red-500/20 shadow' : 'bg-slate-100 text-slate-300 hover:bg-slate-200'}`}
+                        className={`rounded-full px-4 py-2 text-xs font-medium transition ${active ? 'bg-red-600 text-white shadow-red-500/20 shadow' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}`}
                       >
                         {c}
                       </button>
@@ -45,7 +45,7 @@ export default function FAQ() {
                   })}</div>
 
             <div className="mt-6 grid gap-4">
-              {filtered.length===0 && <div className="rounded-lg border border-slate-200 bg-slate-50 p-6 text-center text-sm text-slate-400">No matching questions. Try a different keyword or category.</div>}
+              {filtered.length===0 && <div className="rounded-lg border border-slate-200 bg-slate-800 p-6 text-center text-sm text-slate-400">No matching questions. Try a different keyword or category.</div>}
               {filtered.map(faq=> (
                 <div key={faq.id} className={`rounded-2xl border bg-slate-800 p-4 transition-transform ${openId===faq.id?'shadow-lg scale-100 border-red-500/30':'shadow-sm hover:shadow-md hover:-translate-y-1 border-white/10'} `}>
                   <button onClick={()=>setOpenId(openId===faq.id?null:faq.id)} className="flex w-full items-start gap-3 text-left">
@@ -65,7 +65,7 @@ export default function FAQ() {
                           >
                             <div className="mt-3 text-sm text-slate-400 leading-relaxed">{faq.a}</div>
                             <div className="mt-3">
-                              <span className="inline-block rounded-full bg-slate-100 px-3 py-1 text-[11px] text-slate-300">{faq.cat}</span>
+                              <span className="inline-block rounded-full bg-slate-700 px-3 py-1 text-[11px] text-slate-300">{faq.cat}</span>
                             </div>
                           </motion.div>
                         ) : null}

@@ -37,9 +37,9 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-gradient-to-br from-slate-50 via-sky-50 to-white text-slate-900">
+    <footer className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
       <div className="mx-auto max-w-7xl space-y-12 px-4 py-16 sm:px-6 lg:px-8">
-        <div className="rounded-4xl bg-white/90 p-8 grid gap-8 lg:grid-cols-[1.4fr_0.9fr_0.9fr_1fr] shadow-2xl shadow-slate-200/20 ring-1 ring-slate-200/70">
+        <div className="rounded-4xl bg-slate-800/60 p-8 grid gap-8 lg:grid-cols-[1.4fr_0.9fr_0.9fr_1fr] shadow-2xl shadow-black/40 ring-1 ring-white/10">
           <div className="space-y-5">
             <div className="flex flex-col items-start gap-4">
               <div className="w-full max-w-[200px]">
@@ -89,15 +89,15 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="rounded-3xl bg-slate-50 p-8">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Quick Links</h4>
+          <div className="rounded-3xl bg-slate-800/50 p-8">
+            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-white mb-5">Quick Links</h4>
             <ul className="space-y-3 text-sm text-slate-700">
               {links.map((link) => (
                 <li key={link.h}>
                   <Link
                     to={link.h}
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="block rounded-2xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-red-600"
+                    className="block rounded-2xl px-3 py-2 text-slate-300 transition hover:bg-slate-700 hover:text-red-400"
                   >
                     {link.l}
                   </Link>
@@ -106,15 +106,15 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="rounded-3xl bg-slate-50 p-8">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Services</h4>
+          <div className="rounded-3xl bg-slate-800/50 p-8">
+            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-white mb-5">Services</h4>
             <ul className="space-y-3 text-sm text-slate-700">
               {data.services.slice(0, 6).map((service) => (
                 <li key={service.id}>
                   <Link
                     to={`/features#service-${service.id}`}
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="block rounded-2xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-red-600"
+                    className="block rounded-2xl px-3 py-2 text-slate-300 transition hover:bg-slate-700 hover:text-red-400"
                   >
                     <div className="font-semibold">{service.title}</div>
                     <div className="text-xs text-slate-500 mt-1 line-clamp-2">{service.desc}</div>
@@ -124,8 +124,8 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="rounded-3xl bg-slate-50 p-8">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Stay updated</h4>
+          <div className="rounded-3xl bg-slate-800/50 p-8">
+            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-white mb-5">Stay updated</h4>
             <p className="text-sm text-slate-700 mb-4">Receive TallyPrime tips, cloud hosting guides, and EOS® business insights.</p>
             {submitted ? (
               <div className="rounded-2xl bg-green-50 border border-green-200 px-4 py-4 text-sm text-green-700 font-medium text-center">
@@ -138,7 +138,7 @@ export default function Footer() {
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder="Your email"
-                  className="rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 placeholder:text-slate-500"
+                  className="rounded-2xl border border-white/10 bg-slate-700 px-4 py-3 text-sm text-white outline-none transition focus:border-sky-500 placeholder:text-slate-400"
                 />
                 <button
                   type="submit"
@@ -163,7 +163,7 @@ export default function Footer() {
                   <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-white">Coming Soon</span>
                   <span className="text-xs text-amber-700 font-semibold">Early Access Beta Available Now</span>
                 </div>
-                <h4 className="text-base font-bold text-slate-900">TallyPrime 7.1 — The Next Generation of Business Management</h4>
+                <h4 className="text-base font-bold text-white">TallyPrime 7.1 — The Next Generation of Business Management</h4>
                 <p className="mt-1 text-sm text-slate-600 max-w-2xl">
                   TallyPrime 7.1 is here with features built for Kenyan businesses: <strong>8 professional invoice templates</strong> including eTIMS-ready formats, <strong>enhanced KRA & eTIMS compliance</strong> with faster e-filing, <strong>M-Pesa & local bank reconciliation upgrades</strong>, <strong>improved multi-currency support</strong> for USD/EUR transactions, <strong>faster payroll processing</strong> with updated PAYE, NHIF, NSSF & Housing Levy rates, and <strong>auto-wrap text</strong> for cleaner reports. As your certified TallyPrime partner, we will upgrade and support your transition seamlessly.
                 </p>
@@ -181,7 +181,7 @@ export default function Footer() {
               </a>
               <a
                 href="/contact"
-                className="inline-flex items-center justify-center rounded-full border border-amber-300 bg-white hover:bg-amber-50 px-6 py-3 text-sm font-semibold text-amber-700 transition"
+                className="inline-flex items-center justify-center rounded-full border border-amber-400 bg-amber-500/10 hover:bg-amber-500/20 px-6 py-3 text-sm font-semibold text-amber-400 transition"
               >
                 Book an Upgrade Consultation
               </a>
@@ -205,7 +205,7 @@ export default function Footer() {
               href="https://tallysolutions.com/ssa/download/"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/10 transition hover:bg-slate-100"
+              className="inline-flex items-center justify-center rounded-full bg-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:bg-sky-700"
             >
               Download Now
               <ArrowRight className="ml-2 h-4 w-4" />
