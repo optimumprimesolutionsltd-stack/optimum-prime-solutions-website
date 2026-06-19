@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Check, Star, TrendingUp, Zap, Crown, Cloud, Sparkles } from 'lucide-react';
+import { Check, Star, TrendingUp, Zap, Crown, Cloud, Sparkles, Wifi } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 
 export default function Products() {
@@ -54,146 +54,244 @@ export default function Products() {
           viewport={{ once: true }}
           className="grid md:grid-cols-2 xl:grid-cols-5 gap-5"
         >
-          {data.products.map((p, i) => (
-            <motion.div
-              key={p.id}
-              variants={itemVariants}
-              whileHover={{ y: p.popular ? 0 : -8 }}
-              className={`group relative rounded-2xl border p-8 transition-all duration-300 overflow-visible ${
-                p.popular
-                  ? 'border-red-500/40 bg-gradient-to-br from-red-50 via-white to-red-50 shadow-xl shadow-red-900/10 xl:scale-[1.05] text-slate-950'
-                  : 'border-slate-200 bg-white shadow-xl hover:shadow-slate-300/30'
-              }`}
-            >
-              {/* Badge */}
-              {p.popular && (
+          {data.products.map((p, i) => {
+            const isCloud = p.edition === 'Cloud Hosting';
+
+            if (isCloud) {
+              return (
                 <motion.div
-                  initial={{ y: -10, opacity: 0 }}
-                  animate={{ y: 0, opacity: 1 }}
-                  className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-red-600 px-4 py-1.5 text-xs font-bold text-white flex items-center gap-1.5 shadow-lg shadow-red-600/30"
+                  key={p.id}
+                  variants={itemVariants}
+                  whileHover={{ y: -6, scale: 1.02 }}
+                  className="group relative rounded-2xl overflow-visible"
+                  style={{ isolation: 'isolate' }}
                 >
-                  <Star className="h-3.5 w-3.5" />
-                  Most Popular
-                </motion.div>
-              )}
-              {/* NEW PRICE badge for Cloud Hosting */}
-              {p.edition === 'Cloud Hosting' && (
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                  className="absolute -top-3 -right-3 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-3 py-1.5 text-xs font-bold text-white flex items-center gap-1 shadow-lg shadow-blue-500/40 z-20"
-                >
-                  <Sparkles className="h-3 w-3" />
-                  NEW PRICE
-                </motion.div>
-              )}
+                  {/* Glowing border ring */}
+                  <div className="absolute -inset-[2px] rounded-2xl bg-gradient-to-br from-sky-400 via-cyan-400 to-blue-500 opacity-80 blur-[2px] group-hover:opacity-100 transition-opacity duration-300 z-0" />
 
-              {/* Background shine effect on hover */}
-              <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100"
-                initial={{ x: '-100%' }}
-                whileHover={{ x: '100%' }}
-                transition={{ duration: 0.6 }}
-              />
+                  {/* Card body */}
+                  <div className="relative z-10 rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-8 h-full flex flex-col shadow-2xl shadow-sky-900/30">
 
-              {/* Icon */}
-              <motion.div className="relative z-10 mb-6">
-                {p.edition === 'Silver' && (
-                  <div className="inline-block p-3 rounded-xl bg-red-500/10">
-                    <Zap className="h-6 w-6 text-red-400" />
-                  </div>
-                )}
-                {p.edition === 'Gold' && (
-                  <div className="inline-block p-3 rounded-xl bg-red-600/10">
-                    <Crown className="h-6 w-6 text-red-300" />
-                  </div>
-                )}
-                {['Plus', 'Enterprise'].some(e => p.edition.includes(e)) && (
-                  <div className="inline-block p-3 rounded-xl bg-slate-200/80">
-                    <TrendingUp className="h-6 w-6 text-slate-700" />
-                  </div>
-                )}
-              </motion.div>
-
-              {/* Pricing */}
-              <div className="relative z-10 text-center">
-                <p className="text-sm font-medium text-slate-400">{p.name}</p>
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
-                  className={`text-2xl font-bold mt-2 ${p.popular ? 'text-slate-950' : 'text-slate-900'}`}
-                >
-                  {p.edition}
-                </motion.p>
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  className="mt-4"
-                >
-                  <span className={`text-3xl font-extrabold ${p.popular ? 'text-slate-950' : 'text-slate-900'}`}>
-                    {p.price.includes('KES') && p.price.match(/\d+/)?.[0] ? (
-                      <motion.span
-                        key={p.price}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                      >
-                        {p.price}
-                      </motion.span>
-                    ) : (
-                      p.price
-                    )}
-                  </span>
-                </motion.div>
-                <p className="text-xs text-slate-500 mt-1">{p.period}</p>
-                {p.popular && (
-                  <p className="mt-4 text-sm font-medium text-slate-700">
-                    Best value for growing teams that need multi-user access, remote connectivity, and priority support.
-                  </p>
-                )}
-              </div>
-
-              {/* Features */}
-              <ul className="mt-8 space-y-3 relative z-10">
-                {p.features.map((f, idx) => (
-                  <motion.li
-                    key={f}
-                    initial={{ opacity: 0, x: -10 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.05 }}
-                    className={`flex items-start gap-3 text-xs ${p.popular ? 'text-slate-700' : 'text-slate-600'}`}
-                  >
-                    <motion.div whileHover={{ scale: 1.2 }}>
-                      <Check className={`mt-0.5 h-4 w-4 shrink-0 ${p.popular ? 'text-red-500' : 'text-yellow-600'}`} />
+                    {/* NEW PRICE badge */}
+                    <motion.div
+                      initial={{ scale: 0, opacity: 0 }}
+                      animate={{ scale: 1, opacity: 1 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                      className="absolute -top-3 -right-3 rounded-full bg-gradient-to-r from-sky-400 to-cyan-400 px-3 py-1.5 text-xs font-bold text-slate-900 flex items-center gap-1 shadow-lg shadow-sky-400/50 z-20"
+                    >
+                      <Sparkles className="h-3 w-3" />
+                      NEW PRICE
                     </motion.div>
-                    <span>{f}</span>
-                  </motion.li>
-                ))}
-              </ul>
 
-              {/* CTA Button */}
+                    {/* Icon */}
+                    <div className="mb-6">
+                      <div className="inline-flex items-center justify-center p-3 rounded-xl bg-gradient-to-br from-sky-500/20 to-cyan-500/20 border border-sky-500/30">
+                        <Cloud className="h-6 w-6 text-sky-400" />
+                      </div>
+                    </div>
+
+                    {/* Name & Edition */}
+                    <div className="text-center mb-2">
+                      <p className="text-sm font-medium text-sky-400/80">{p.name}</p>
+                      <p className="text-2xl font-bold mt-1 text-white">{p.edition}</p>
+                    </div>
+
+                    {/* Price — the hero element */}
+                    <div className="text-center mt-4 mb-1">
+                      <div className="inline-flex flex-col items-center">
+                        <span className="text-xs font-semibold uppercase tracking-widest text-sky-400/70 mb-1">Starting from</span>
+                        <motion.div
+                          key={p.price}
+                          initial={{ opacity: 0, scale: 0.85 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ type: 'spring', stiffness: 300 }}
+                          className="relative"
+                        >
+                          {/* Glow behind price */}
+                          <div className="absolute inset-0 bg-sky-400/20 blur-xl rounded-full" />
+                          <span className="relative text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-sky-300 via-cyan-300 to-white drop-shadow-lg">
+                            KES 3,000
+                          </span>
+                        </motion.div>
+                        <span className="text-sm text-sky-400/70 font-medium mt-1">{p.period}</span>
+                      </div>
+                    </div>
+
+                    {/* Live indicator */}
+                    <div className="flex items-center justify-center gap-1.5 mt-3 mb-6">
+                      <span className="relative flex h-2 w-2">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                      </span>
+                      <span className="text-xs text-green-400 font-medium">99.9% Uptime SLA</span>
+                      <Wifi className="h-3 w-3 text-green-400 ml-1" />
+                    </div>
+
+                    {/* Features */}
+                    <ul className="space-y-3 flex-1">
+                      {p.features.map((f, idx) => (
+                        <motion.li
+                          key={f}
+                          initial={{ opacity: 0, x: -10 }}
+                          whileInView={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.05 }}
+                          className="flex items-start gap-3 text-xs text-slate-300"
+                        >
+                          <motion.div whileHover={{ scale: 1.2 }}>
+                            <Check className="mt-0.5 h-4 w-4 shrink-0 text-sky-400" />
+                          </motion.div>
+                          <span>{f}</span>
+                        </motion.li>
+                      ))}
+                    </ul>
+
+                    {/* CTA Button */}
+                    <motion.div
+                      whileHover={{ scale: 1.03 }}
+                      whileTap={{ scale: 0.97 }}
+                      className="mt-8"
+                    >
+                      <Link
+                        to="/contact"
+                        onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                        className="block text-center rounded-xl py-3 text-sm font-bold transition bg-gradient-to-r from-sky-500 to-cyan-500 text-white hover:from-sky-400 hover:to-cyan-400 shadow-lg shadow-sky-500/30"
+                      >
+                        {p.cta}
+                      </Link>
+                    </motion.div>
+                  </div>
+                </motion.div>
+              );
+            }
+
+            return (
               <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="mt-8"
+                key={p.id}
+                variants={itemVariants}
+                whileHover={{ y: p.popular ? 0 : -8 }}
+                className={`group relative rounded-2xl border p-8 transition-all duration-300 overflow-visible ${
+                  p.popular
+                    ? 'border-red-500/40 bg-gradient-to-br from-red-50 via-white to-red-50 shadow-xl shadow-red-900/10 xl:scale-[1.05] text-slate-950'
+                    : 'border-slate-200 bg-white shadow-xl hover:shadow-slate-300/30'
+                }`}
               >
-                <Link
-                  to="/contact"
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className={`block text-center rounded-xl py-3 text-sm font-semibold transition relative z-10 ${
-                    p.popular
-                      ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-500/20'
-                      : 'bg-slate-900 text-white hover:bg-slate-800'
-                  }`}
+                {/* Badge */}
+                {p.popular && (
+                  <motion.div
+                    initial={{ y: -10, opacity: 0 }}
+                    animate={{ y: 0, opacity: 1 }}
+                    className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-red-600 px-4 py-1.5 text-xs font-bold text-white flex items-center gap-1.5 shadow-lg shadow-red-600/30"
+                  >
+                    <Star className="h-3.5 w-3.5" />
+                    Most Popular
+                  </motion.div>
+                )}
+
+                {/* Background shine effect on hover */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100"
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.6 }}
+                />
+
+                {/* Icon */}
+                <motion.div className="relative z-10 mb-6">
+                  {p.edition === 'Silver' && (
+                    <div className="inline-block p-3 rounded-xl bg-red-500/10">
+                      <Zap className="h-6 w-6 text-red-400" />
+                    </div>
+                  )}
+                  {p.edition === 'Gold' && (
+                    <div className="inline-block p-3 rounded-xl bg-red-600/10">
+                      <Crown className="h-6 w-6 text-red-300" />
+                    </div>
+                  )}
+                  {['Plus', 'Enterprise'].some(e => p.edition.includes(e)) && (
+                    <div className="inline-block p-3 rounded-xl bg-slate-200/80">
+                      <TrendingUp className="h-6 w-6 text-slate-700" />
+                    </div>
+                  )}
+                </motion.div>
+
+                {/* Pricing */}
+                <div className="relative z-10 text-center">
+                  <p className="text-sm font-medium text-slate-400">{p.name}</p>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    className={`text-2xl font-bold mt-2 ${p.popular ? 'text-slate-950' : 'text-slate-900'}`}
+                  >
+                    {p.edition}
+                  </motion.p>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    className="mt-4"
+                  >
+                    <span className={`text-3xl font-extrabold ${p.popular ? 'text-slate-950' : 'text-slate-900'}`}>
+                      {p.price.includes('KES') && p.price.match(/\d+/)?.[0] ? (
+                        <motion.span
+                          key={p.price}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                        >
+                          {p.price}
+                        </motion.span>
+                      ) : (
+                        p.price
+                      )}
+                    </span>
+                  </motion.div>
+                  <p className="text-xs text-slate-500 mt-1">{p.period}</p>
+                  {p.popular && (
+                    <p className="mt-4 text-sm font-medium text-slate-700">
+                      Best value for growing teams that need multi-user access, remote connectivity, and priority support.
+                    </p>
+                  )}
+                </div>
+
+                {/* Features */}
+                <ul className="mt-8 space-y-3 relative z-10">
+                  {p.features.map((f, idx) => (
+                    <motion.li
+                      key={f}
+                      initial={{ opacity: 0, x: -10 }}
+                      whileInView={{ opacity: 1, x: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      className={`flex items-start gap-3 text-xs ${p.popular ? 'text-slate-700' : 'text-slate-600'}`}
+                    >
+                      <motion.div whileHover={{ scale: 1.2 }}>
+                        <Check className={`mt-0.5 h-4 w-4 shrink-0 ${p.popular ? 'text-red-500' : 'text-yellow-600'}`} />
+                      </motion.div>
+                      <span>{f}</span>
+                    </motion.li>
+                  ))}
+                </ul>
+
+                {/* CTA Button */}
+                <motion.div
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="mt-8"
                 >
-                  {p.cta}
-                </Link>
+                  <Link
+                    to="/contact"
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className={`block text-center rounded-xl py-3 text-sm font-semibold transition relative z-10 ${
+                      p.popular
+                        ? 'bg-red-600 text-white hover:bg-red-700 shadow-lg shadow-red-500/20'
+                        : 'bg-slate-900 text-white hover:bg-slate-800'
+                    }`}
+                  >
+                    {p.cta}
+                  </Link>
+                </motion.div>
               </motion.div>
-            </motion.div>
-          ))}
+            );
+          })}
         </motion.div>
       </div>
     </section>
   );
 }
-
