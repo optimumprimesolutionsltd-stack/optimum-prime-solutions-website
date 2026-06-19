@@ -68,7 +68,7 @@ export default function Testimonials() {
               key={t.id}
               variants={itemVariants}
               whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className="group relative rounded-2xl border border-navy-100 dark:border-navy-700 bg-white dark:bg-navy-800/50 p-8 shadow-md hover:shadow-xl hover:shadow-yellow-400/20 transition-all duration-300 overflow-hidden"
+              className="group relative rounded-2xl border border-navy-100 dark:border-navy-700 bg-slate-800 dark:bg-navy-800/50 p-8 shadow-md hover:shadow-xl hover:shadow-yellow-400/20 transition-all duration-300 overflow-hidden"
             >
               {/* Background gradient on hover */}
               <motion.div

@@ -12,10 +12,10 @@ const stats = [
 
 export default function TrustBanner() {
   return (
-    <section className="py-20 bg-slate-50">
+    <section className="py-20 bg-slate-900">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-12 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 shadow-sm">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-slate-800 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-slate-400 shadow-sm">
             <TallyPrimeIcon className="h-4 w-4" showText={false} />
             Certified TallyPrime Partner · eTIMS Compliant ·
             <span className="inline-flex items-center gap-1">
@@ -23,7 +23,7 @@ export default function TrustBanner() {
               KRA Approved
             </span>
           </div>
-          <h2 className="mt-6 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">
+          <h2 className="mt-6 text-3xl font-bold tracking-tight text-white sm:text-4xl">
             Trusted by Kenyan businesses for practical digital transformation
           </h2>
         </div>
@@ -40,11 +40,11 @@ export default function TrustBanner() {
                 transition={{ delay: index * 0.08 }}
                 className="surface rounded-3xl p-6 text-center"
               >
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-200 text-slate-950">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-200 text-white">
                   <Icon className="h-6 w-6" />
                 </div>
-                <p className="text-3xl font-semibold text-slate-950">{item.value}{item.suffix}</p>
-                <p className="mt-3 text-sm font-semibold text-slate-900">{item.label}</p>
+                <p className="text-3xl font-semibold text-white">{item.value}{item.suffix}</p>
+                <p className="mt-3 text-sm font-semibold text-white">{item.label}</p>
               </motion.div>
             );
           })}

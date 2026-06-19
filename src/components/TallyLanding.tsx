@@ -109,7 +109,7 @@ export default function TallyLanding() {
           transition={{ duration: 0.9 }}
           className="space-y-6"
         >
-          <div className="mx-auto max-w-3xl rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs uppercase tracking-[0.3em] text-slate-100/80 shadow-sm shadow-black/10">
+          <div className="mx-auto max-w-3xl rounded-full border border-white/20 bg-slate-800/10 px-4 py-2 text-xs uppercase tracking-[0.3em] text-slate-100/80 shadow-sm shadow-black/10">
             Kenya's Certified TallyPrime Partner · Cloud Support · EOS® Consulting
           </div>
 
@@ -148,16 +148,16 @@ export default function TallyLanding() {
 
           <div className="mx-auto mt-8 grid max-w-2xl gap-3 grid-cols-1 sm:grid-cols-2">
             {benefits.map((benefit) => (
-              <div key={benefit} className="flex items-start gap-3 rounded-3xl border border-white/15 bg-white/10 px-4 py-3 text-left backdrop-blur-sm text-sm text-white/90 shadow-sm shadow-black/10">
-                <span className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-white/15 text-xs font-bold text-emerald-200">✓</span>
+              <div key={benefit} className="flex items-start gap-3 rounded-3xl border border-white/15 bg-slate-800/10 px-4 py-3 text-left backdrop-blur-sm text-sm text-white/90 shadow-sm shadow-black/10">
+                <span className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-800/15 text-xs font-bold text-emerald-200">✓</span>
                 <span>{benefit}</span>
               </div>
             ))}
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
-            <button type="button" onClick={() => { navigate('/features'); window.scrollTo({ top: 0, behavior: 'instant' }); }} className="rounded-full bg-white/90 px-6 py-3 text-sm sm:text-base font-semibold text-slate-900 shadow-lg hover:bg-white hover:shadow-2xl hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Explore Services</button>
-            <button type="button" onClick={() => { navigate('/contact'); window.scrollTo({ top: 0, behavior: 'instant' }); }} className="rounded-full border border-white/30 px-6 py-3 text-sm sm:text-base font-semibold text-white/90 hover:bg-white/30 hover:border-white/70 hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Book a Demo</button>
+            <button type="button" onClick={() => { navigate('/features'); window.scrollTo({ top: 0, behavior: 'instant' }); }} className="rounded-full bg-slate-800/90 px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-lg hover:bg-slate-800 hover:shadow-2xl hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Explore Services</button>
+            <button type="button" onClick={() => { navigate('/contact'); window.scrollTo({ top: 0, behavior: 'instant' }); }} className="rounded-full border border-white/30 px-6 py-3 text-sm sm:text-base font-semibold text-white/90 hover:bg-slate-800/30 hover:border-white/70 hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Book a Demo</button>
           </div>
         </motion.div>
       </div>
