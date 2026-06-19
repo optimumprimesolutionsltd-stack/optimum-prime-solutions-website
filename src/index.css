@@ -79,13 +79,13 @@ h6 {
 
 @layer utilities {
   .surface {
-    @apply bg-white border border-slate-200 shadow-sm;
+    @apply bg-slate-800 border border-white/10 shadow-sm;
   }
   .surface-strong {
-    @apply bg-slate-50 border border-slate-200 shadow-md;
+    @apply bg-slate-800/80 border border-white/10 shadow-md;
   }
   .section-surface {
-    @apply bg-slate-50;
+    @apply bg-slate-900;
   }
   .btn-primary {
     @apply inline-flex items-center justify-center rounded-full bg-slate-900 text-white px-6 py-3 text-sm font-semibold shadow-sm hover:bg-slate-800 transition;

@@ -38,9 +38,9 @@ export default function TrustBanner() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: index * 0.08 }}
-                className="surface rounded-3xl p-6 text-center"
+                className="rounded-3xl p-6 text-center bg-slate-800 border border-white/10 shadow-lg"
               >
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-slate-200 text-white">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-red-600/20 text-red-400 border border-red-500/30">
                   <Icon className="h-6 w-6" />
                 </div>
                 <p className="text-3xl font-semibold text-white">{item.value}{item.suffix}</p>
