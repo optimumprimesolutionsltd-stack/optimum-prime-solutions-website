@@ -3,91 +3,136 @@ export interface ChatMessage {
   content: string;
 }
 
+// Mock AI responses database - conversational, inquisitive, and broad
+const mockResponses: Record<string, (history: ChatMessage[], leadProfile?: Record<string, string | undefined>) => string> = {
+  greeting: () => `Hey there! 👋 Welcome to Optimum Prime Solutions — Kenya's certified TallyPrime partner. I'm **Aurora**, your business solutions guide.
+
+I'm here to help you find the right accounting software, cloud hosting, or business consulting solution for your needs. What brings you here today?`,
+
+  pricing: (history, leadProfile) => {
+    const hasTeamSize = leadProfile?.teamSize;
+    if (!hasTeamSize) {
+      return `Great question! Our pricing depends on what you need:
+
+**TallyPrime Silver:** KES 57,600 +VAT (single user, full accounting & invoicing)
+**TallyPrime Gold:** KES 172,800 +VAT (unlimited multi-user, priority support)
+**Cloud Hosting:** From KES 3,000/month (99.9% uptime, remote access)
+**EOS® Consulting:** Custom quote based on engagement scope
+
+Quick question: How many people on your team would be using the software? That'll help me recommend the best fit.`;
+    }
+    return `Perfect! With ${leadProfile.teamSize} team members, **TallyPrime Gold** would be ideal — it gives unlimited multi-user access, priority support, and on-site training. That's KES 172,800 +VAT.
+
+You can also add **Cloud Hosting** (KES 3,000/month) for remote access from anywhere. Are you currently using any accounting software, or would this be a fresh start?`;
+  },
+
+  payroll: (history, leadProfile) => {
+    return `Absolutely! We handle full **Payroll Automation** configured for Kenya's requirements:
+- PAYE, NHIF, NSSF, Housing Levy calculations
+- Payslip generation & e-filing
+- Leave & loan tracking
+- Multi-branch support
+
+This comes built into TallyPrime Silver and Gold. Do you have any specific payroll challenges right now — like managing multiple branches or complex deductions?`;
+  },
+
+  kra: () => `We're 100% **KRA & eTIMS compliant**. We handle:
+- Automated VAT calculations
+- eTIMS integration for invoice submission
+- PAYE, NHIF, NSSF withholding
+- Income tax compliance
+- Real-time audit trails
+
+Are you currently struggling with eTIMS compliance, or just looking to streamline your tax filing process?`,
+
+  cloud: () => `Our **Cloud Hosting** is built for Kenyan businesses:
+- KES 3,000/month starting price
+- 99.9% uptime SLA
+- Secure remote access from any device
+- Automated daily backups
+- Multi-user concurrent access
+
+Perfect if your team works from different locations. Are you looking to move your TallyPrime to the cloud, or is this for a different system?`,
+
+  eos: () => `We're **Certified EOS® Implementers**. EOS (Entrepreneurial Operating System) helps leadership teams:
+- Clarify vision & traction
+- Align on priorities (Rocks & 90-day plans)
+- Run effective L10 meetings
+- Improve accountability & execution
+
+It's ideal for growing businesses (5–50+ employees). Is your leadership team looking to improve alignment and execution?`,
+
+  services: () => `We offer a full range of services:
+- **TallyPrime Setup & Implementation** (24-hour turnaround)
+- **Inventory Management** (real-time tracking, batch/expiry)
+- **Payroll Automation** (PAYE, NHIF, NSSF configured)
+- **Manufacturing Solutions** (BOM, production tracking)
+- **KRA & eTIMS Compliance**
+- **Cloud Hosting** (secure remote access)
+- **EOS® Consulting** (leadership alignment)
+- **Training & Support** (on-site, remote, video)
+
+What's your biggest business challenge right now?`,
+
+  contact: () => `You can reach us anytime:
+📞 **Phone:** +254 116 246 074 | +254 727 209 720
+📧 **Email:** optimumprimesolutionsltd@gmail.com
+📍 **Location:** Ruiru, Kenya
+💬 **WhatsApp:** +254 116 246 074
+
+Or I can help you book a free consultation right now. What works best for you?`,
+
+  default: (history, leadProfile) => {
+    const lastUserMessage = history.filter(m => m.role === 'user').pop()?.content.toLowerCase() || '';
+    
+    // Detect intent from last message
+    if (lastUserMessage.includes('how') || lastUserMessage.includes('what')) {
+      return `That's a great question! I want to make sure I give you the most relevant answer. Can you tell me a bit more about your business — like what industry you're in or what you're trying to accomplish?`;
+    }
+    
+    if (lastUserMessage.includes('help') || lastUserMessage.includes('support')) {
+      return `Absolutely, I'm here to help! 💪 To point you in the right direction, could you describe what you're working on or what's not working smoothly right now?`;
+    }
+    
+    if (lastUserMessage.includes('thanks') || lastUserMessage.includes('thank you')) {
+      return `You're welcome! 😊 Feel free to ask me anything else about TallyPrime, cloud hosting, payroll, KRA compliance, or EOS consulting. I'm here to help!`;
+    }
+    
+    return `That sounds interesting! To help you better, could you tell me more about your business needs? For example, are you looking to improve accounting, streamline operations, or strengthen your leadership team?`;
+  },
+};
+
+// Detect user intent from message
+function detectIntent(userText: string): string {
+  const text = userText.toLowerCase();
+  
+  if (text.match(/^(hi|hello|hey|greetings?|what's up)/)) return 'greeting';
+  if (text.match(/price|cost|how much|budget|affordable/)) return 'pricing';
+  if (text.match(/payroll|salary|paye|nhif|nssf/)) return 'payroll';
+  if (text.match(/kra|etims|tax|compliance|invoice/)) return 'kra';
+  if (text.match(/cloud|hosting|remote|access|server/)) return 'cloud';
+  if (text.match(/eos|leadership|vision|traction|alignment/)) return 'eos';
+  if (text.match(/service|offer|do you|what do you|capabilities/)) return 'services';
+  if (text.match(/contact|call|phone|email|reach|whatsapp/)) return 'contact';
+  
+  return 'default';
+}
+
 export async function getChatGPTReply(
   userText: string,
   siteData: any,
   history: ChatMessage[] = [],
   leadProfile?: Record<string, string | undefined>
 ) {
-  const key = import.meta.env.VITE_OPENAI_KEY;
-  if (!key) {
-    throw new Error('MISSING_OPENAI_KEY');
-  }
-
-  const leadContext = leadProfile && Object.keys(leadProfile).some((k) => leadProfile[k])
-    ? `\n\nKnown information about this visitor:\n${Object.entries(leadProfile)
-        .filter(([, v]) => v)
-        .map(([k, v]) => `- ${k}: ${v}`)
-        .join('\n')}`
-    : '';
-
-  const system = `You are Aurora, the highly knowledgeable, conversational, and inquisitive AI assistant for Optimum Prime Solutions — Kenya's certified TallyPrime partner, cloud hosting provider, and EOS® consulting firm.
-
-Your primary goal is to understand the visitor's needs deeply, qualify them as a potential lead, and guide them towards the most suitable solution offered by Optimum Prime Solutions. You achieve this by engaging in natural, multi-turn conversations, remembering context, and asking insightful, relevant follow-up questions.
-
-Key facts about Optimum Prime Solutions and its services:
-- **TallyPrime Partner:** Certified for Silver (KES 57,600 +VAT), Gold (KES 172,800 +VAT), and Enterprise solutions. Offers implementation, training, and support.
-- **Cloud Hosting:** Secure, 99.9% uptime, access from anywhere, daily backups. From KES 3,000/month.
-- **EOS® Implementation:** Certified implementers of the Entrepreneurial Operating System (by Gino Wickman). Focuses on Vision, People, Data, Issues, Process, Traction. Custom quotes.
-- **HubSpot CRM Integration:** Seamless integration with TallyPrime for 360° view of sales, customer management, and financials.
-- **KRA & eTIMS Compliance:** Expertise in eTIMS integration, VAT, PAYE, NHIF, NSSF, Housing Levy, iTax e-Filing support.
-- **Payroll Automation:** Comprehensive payroll solutions including PAYE, NHIF, NSSF, Housing Levy, leave/loan tracking, payslip generation.
-- **Inventory Management:** Real-time stock, batch/expiry tracking, reorder alerts, barcode support, FIFO/LIFO valuation.
-- **Banking & Reconciliation:** Automated bank reconciliation, M-Pesa tracking, multi-bank support.
-- **Remote Access (TSplus):** Secure remote desktop access for TallyPrime from any device.
-- **Manufacturing Solutions:** Bill of Materials (BOM), production tracking, WIP, job costing, batch tracking.
-- **Reporting & Analytics:** Real-time P&L, Balance Sheets, cash flow, budget vs. actual, KPI dashboards.
-- **Training:** On-site, remote, role-based training, video tutorials, ongoing support.
-- **Migration Services:** Smooth data migration from other systems (QuickBooks, Sage, Excel).
-- **Location:** Based in Ruiru, Kenya.
-- **Contact:** Phone: +254 116 246 074 | +254 727 209 720, Email: optimumprimesolutionsltd@gmail.com
-
-**Conversation Guidelines:**
-1. **Be Conversational:** Maintain a natural, friendly, and professional tone. Avoid robotic or overly formal language. Use relevant emojis sparingly to convey warmth.
-2. **Be Inquisitive:** After providing information, always ask ONE relevant, open-ended qualifying question to understand the user's specific context, challenges, or goals. This helps you tailor your next response and qualify the lead. Do not info-dump. Example: If they ask about pricing, ask about their team size or current software.
-3. **Be Broad:** Have working knowledge across ALL services listed above. Do not break or refuse to answer off-topic questions; instead, gently steer the conversation back to business solutions after acknowledging their query.
-4. **Remember Context:** Always refer back to information the user has already provided (e.g., their name, business type, challenges). Never ask for information already given.
-5. **Conciseness:** Keep responses concise (under 150 words) unless more detail is explicitly requested or necessary for a comprehensive answer.
-6. **Call to Action:** If the user expresses strong interest or asks for a demo, gently guide them towards booking a consultation or contacting the sales team via WhatsApp.
-7. **Avoid Salesy Language:** Focus on solving problems and providing value, not hard selling.
-
-${leadContext}
-
-Site data for reference: ${JSON.stringify(siteData).slice(0, 3000)}`;
-
-  const messages: ChatMessage[] = [
-    { role: 'system', content: system },
-    ...history,
-    { role: 'user', content: userText },
-  ];
-
-  const body = {
-    model: 'gpt-4o',
-    messages,
-    temperature: 0.5,
-    max_tokens: 500,
-  };
-
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 8000);
-
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${key}`,
-    },
-    body: JSON.stringify(body),
-    signal: controller.signal,
-  }).finally(() => clearTimeout(timeout));
-
-  if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`OpenAI error: ${res.status} ${text}`);
-  }
-
-  const json = await res.json();
-  const msg = json?.choices?.[0]?.message?.content;
-  if (!msg) throw new Error('No response from OpenAI');
-  return msg as string;
+  // Detect intent
+  const intent = detectIntent(userText);
+  
+  // Get mock response
+  const responseGenerator = mockResponses[intent] || mockResponses['default'];
+  const response = responseGenerator(history, leadProfile);
+  
+  // Simulate API delay
+  await new Promise(resolve => setTimeout(resolve, 800));
+  
+  return response;
 }
