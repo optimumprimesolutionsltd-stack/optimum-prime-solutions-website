@@ -80,7 +80,7 @@ export const defaultData: SiteData = {
       text: 'Optimum Prime Solutions has been a critical partner in our growth. Their TallyPrime implementation and ongoing support have given us the financial clarity and operational control we needed to scale Ujenzi Distributors effectively. The integration with KRA eTIMS is seamless, and their team is always ready to assist.',
       rating: 5,
       logo: '/client-ujenzi-logo.png',
-      videoUrl: 'https://www.facebook.com/plugins/video.php?height=314&href=https%3A%2F%2Fwww.facebook.com%2Fshare%2Fv%2F1AcTcParoW%2F%3Fmibextid%3DwwXIfr&show_text=false&width=560&t=0'
+      videoUrl: 'https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Foptimumprimesolutionsltd%2Fvideos%2F1532864768102714%2F&show_text=false&width=560&t=0'
     }
   ],
   faqs: [
