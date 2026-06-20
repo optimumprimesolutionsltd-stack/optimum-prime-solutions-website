@@ -103,7 +103,7 @@ const themeConfig: Record<ShowcaseTheme, {
     tagText: 'text-orange-300',
     tagRing: 'ring-orange-500/30',
     dotColor: '#f97316',
-    imageUrl: '/images/compliance-financial-docs.webp',
+    imageUrl: '/images/blog-african-professional.webp',
     imageCaption: 'Expert insights for Kenyan businesses',
     stat: 'Weekly',
     statLabel: 'New articles',
