@@ -60,39 +60,54 @@ export default function Testimonials() {
 
         {featured && (
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Video Testimonial */}
+            {/* Left: Video Testimonial Cover */}
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
-              className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-slate-800"
+              className="relative aspect-video rounded-3xl overflow-hidden shadow-2xl border border-white/10 bg-slate-800 group cursor-pointer"
+              onClick={() => window.open('https://www.facebook.com/share/v/1AcTcParoW/', '_blank')}
             >
-              <iframe
-                className="absolute inset-0 w-full h-full"
-                src={featured.videoUrl}
-                title="Video Testimonial"
-                frameBorder="0"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              ></iframe>
-              <div className="absolute bottom-4 right-4 z-20 flex gap-2">
-                <a 
-                  href="https://www.facebook.com/profile.php?id=100041376170510" 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="bg-[#1877F2] text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:bg-[#166fe5] transition flex items-center gap-2"
+              <img 
+                src="/ujenzi-video-thumbnail.webp" 
+                alt="Frederick Chege Testimonial Video" 
+                className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-500"
+              />
+              
+              {/* Play Button Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center">
+                <motion.div
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="h-20 w-20 rounded-full bg-red-600 flex items-center justify-center shadow-2xl shadow-red-600/50 border-4 border-white/20"
                 >
-                  <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                  Visit our Facebook Page
-                </a>
-                <a 
-                  href="https://www.facebook.com/share/v/1AcTcParoW/" 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="bg-red-600 text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:bg-red-700 transition"
-                >
-                  Watch Video
-                </a>
+                  <Play className="h-8 w-8 text-white fill-white ml-1" />
+                </motion.div>
+              </div>
+
+              {/* Video Info Overlay */}
+              <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md rounded-full px-4 py-2 text-xs font-bold text-white flex items-center gap-2 border border-white/10">
+                <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                Success Story: Ujenzi Distributors Ltd
+              </div>
+
+              <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
+                <div className="text-white">
+                  <p className="text-sm font-bold">Watch Frederick Chege's Story</p>
+                  <p className="text-xs text-slate-300">Opens in Facebook</p>
+                </div>
+                <div className="flex gap-2">
+                  <a 
+                    href="https://www.facebook.com/profile.php?id=100041376170510" 
+                    target="_blank" 
+                    rel="noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                    className="bg-[#1877F2] text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:bg-[#166fe5] transition flex items-center gap-2"
+                  >
+                    <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+                    Follow Us
+                  </a>
+                </div>
               </div>
             </motion.div>
 
