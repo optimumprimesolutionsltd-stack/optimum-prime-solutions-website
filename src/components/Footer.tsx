@@ -42,14 +42,7 @@ export default function Footer() {
         <div className="rounded-4xl bg-slate-800/60 p-8 grid gap-8 lg:grid-cols-[1.4fr_0.9fr_0.9fr_1fr] shadow-2xl shadow-black/40 ring-1 ring-white/10">
           <div className="space-y-5">
             <div className="flex flex-col items-start gap-4">
-              <div className="w-full max-w-[200px]">
-                <img
-                  src="/tally-solutions-new-logo.png"
-                  alt="Tally Solutions logo"
-                  className="h-auto w-full max-h-20 object-contain object-left"
-                />
-              </div>
-              <Logo className="h-12 w-auto" />
+              <Logo className="h-16 w-auto" />
             </div>
             <p className="max-w-md text-sm leading-relaxed text-slate-500">
               {data.company.tagline}. Kenya's certified TallyPrime reseller, cloud hosting provider & EOS® implementer.
