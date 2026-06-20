@@ -22,10 +22,10 @@ const navItems = [
     href: '/features',
     icon: Zap,
     submenu: [
-      { label: 'TallyPrime Setup', desc: 'Complete installation & configuration', icon: BarChart3 },
-      { label: 'Cloud Hosting', desc: 'Secure remote access & backups', icon: Cloud },
-      { label: 'Payroll Systems', desc: 'KRA-compliant payroll automation', icon: Users },
-      { label: 'KRA Compliance', desc: 'VAT & eTIMS integration', icon: Shield },
+      { label: 'TallyPrime Setup', desc: 'Complete installation & configuration', icon: BarChart3, href: '/features#service-1' },
+      { label: 'Cloud Hosting', desc: 'Secure remote access & backups', icon: Cloud, href: '/features#service-9' },
+      { label: 'Payroll Systems', desc: 'KRA-compliant payroll automation', icon: Users, href: '/features#service-3' },
+      { label: 'KRA Compliance', desc: 'VAT & eTIMS integration', icon: Shield, href: '/features#service-5' },
     ],
   },
   {
@@ -33,10 +33,10 @@ const navItems = [
     href: '/products',
     icon: Cpu,
     submenu: [
-      { label: 'TallyPrime Silver', desc: 'Single-user accounting solution', icon: Zap },
-      { label: 'TallyPrime Gold', desc: 'Multi-user with advanced features', icon: BarChart3 },
-      { label: 'Cloud Hosting', desc: 'From KES 3,000/month', icon: Cloud },
-      { label: 'EOS® Consulting', desc: 'Business operating system', icon: Briefcase },
+      { label: 'TallyPrime Silver', desc: 'Single-user accounting solution', icon: Zap, href: '/products' },
+      { label: 'TallyPrime Gold', desc: 'Multi-user with advanced features', icon: BarChart3, href: '/products' },
+      { label: 'Cloud Hosting', desc: 'From KES 3,000/month', icon: Cloud, href: '/products' },
+      { label: 'EOS® Consulting', desc: 'Business operating system', icon: Briefcase, href: '/products' },
     ],
   },
   {
@@ -122,12 +122,11 @@ export default function Navbar() {
                         onMouseLeave={() => setActiveMenu(null)}
                       >
                         {item.submenu.map((subitem, idx) => (
-                          <motion.div
+                          <Link
                             key={subitem.label}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: idx * 0.05 }}
-                            className="p-3 rounded-lg hover:bg-slate-700/50 transition-all cursor-pointer group/item"
+                            to={subitem.href || item.href}
+                            onClick={() => { setActiveMenu(null); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                            className="block p-3 rounded-lg hover:bg-slate-700/50 transition-all cursor-pointer group/item"
                           >
                             <div className="flex items-start gap-3">
                               <div className="mt-1 p-2 rounded-lg bg-slate-700/50 group-hover/item:bg-red-600/20 transition-all">
@@ -138,7 +137,7 @@ export default function Navbar() {
                                 <p className="text-xs text-slate-400 mt-0.5">{subitem.desc}</p>
                               </div>
                             </div>
-                          </motion.div>
+                          </Link>
                         ))}
                       </motion.div>
                     )}
@@ -202,13 +201,15 @@ export default function Navbar() {
                       {item.submenu && (
                         <div className="ml-4 mt-2 space-y-1 border-l border-slate-700 pl-3">
                           {item.submenu.map((subitem) => (
-                            <div
+                            <Link
                               key={subitem.label}
-                              className="p-2 rounded-lg bg-slate-700/30 text-xs text-slate-300"
+                              to={subitem.href || item.href}
+                              onClick={() => { setOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                              className="block p-2 rounded-lg bg-slate-700/30 text-xs text-slate-300 hover:bg-slate-700 transition"
                             >
                               <p className="font-medium text-slate-200">{subitem.label}</p>
                               <p className="text-slate-400 mt-0.5">{subitem.desc}</p>
-                            </div>
+                            </Link>
                           ))}
                         </div>
                       )}

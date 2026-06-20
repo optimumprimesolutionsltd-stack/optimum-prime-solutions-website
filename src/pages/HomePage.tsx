@@ -5,6 +5,7 @@ import Partners from '../components/Partners';
 import EcosystemOrbit from '../components/EcosystemOrbit';
 import VideoSection from '../components/VideoSection';
 import ProcessFlow from '../components/ProcessFlow';
+import Testimonials from '../components/Testimonials';
 
 export default function HomePage() {
   return (
@@ -14,6 +15,7 @@ export default function HomePage() {
       <EcosystemOrbit />
       <VideoSection />
       <ProcessFlow />
+      <Testimonials />
       <Partners />
       <TrustBanner />
     </div>
