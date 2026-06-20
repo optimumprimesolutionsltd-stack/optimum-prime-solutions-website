@@ -82,20 +82,20 @@ What's your biggest business challenge right now?`,
 
 Or I can help you book a free consultation right now. What works best for you?`,
 
+  smalltalk: () => `Doing great, thanks for asking! 😊 I'm here to help Kenyan businesses streamline their operations with TallyPrime, cloud hosting, and smart business consulting.
+
+How can I help you today? Are you looking to improve your accounting, manage inventory better, or explore new business solutions?`,
+
   default: (history, leadProfile) => {
     const lastUserMessage = history.filter(m => m.role === 'user').pop()?.content.toLowerCase() || '';
     
     // Detect intent from last message
-    if (lastUserMessage.includes('how') || lastUserMessage.includes('what')) {
-      return `That's a great question! I want to make sure I give you the most relevant answer. Can you tell me a bit more about your business — like what industry you're in or what you're trying to accomplish?`;
+    if (lastUserMessage.includes('thanks') || lastUserMessage.includes('thank you')) {
+      return `You're welcome! 😊 Feel free to ask me anything else about TallyPrime, cloud hosting, payroll, KRA compliance, or EOS consulting. I'm here to help!`;
     }
     
     if (lastUserMessage.includes('help') || lastUserMessage.includes('support')) {
       return `Absolutely, I'm here to help! 💪 To point you in the right direction, could you describe what you're working on or what's not working smoothly right now?`;
-    }
-    
-    if (lastUserMessage.includes('thanks') || lastUserMessage.includes('thank you')) {
-      return `You're welcome! 😊 Feel free to ask me anything else about TallyPrime, cloud hosting, payroll, KRA compliance, or EOS consulting. I'm here to help!`;
     }
     
     return `That sounds interesting! To help you better, could you tell me more about your business needs? For example, are you looking to improve accounting, streamline operations, or strengthen your leadership team?`;
@@ -114,6 +114,7 @@ function detectIntent(userText: string): string {
   if (text.match(/eos|leadership|vision|traction|alignment/)) return 'eos';
   if (text.match(/service|offer|do you|what do you|capabilities/)) return 'services';
   if (text.match(/contact|call|phone|email|reach|whatsapp/)) return 'contact';
+  if (text.match(/how.*day|how are you|how's it going|how are things|what's up|how you doing/)) return 'smalltalk';
   
   return 'default';
 }
