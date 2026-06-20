@@ -111,6 +111,15 @@ How can I help you today? Are you looking to improve your accounting, manage inv
       return `Absolutely, I'm here to help! 💪 To point you in the right direction, could you describe what you're working on or what's not working smoothly right now?`;
     }
 
+    // Handle name introductions
+    const nameMatch = lastUserMessage.match(/(?:my name is|i am|i'm|this is) ([a-zA-Z\s]+)/i) || 
+                      (lastUserMessage.split(' ').length <= 2 && !['hello', 'hi', 'hey', 'tally', 'eos'].includes(lastUserMessage.toLowerCase()) ? [null, lastUserMessage] : null);
+    
+    if (nameMatch && nameMatch[1]) {
+      const userName = nameMatch[1].trim();
+      return `Nice to meet you, ${userName}! 👋 I'm Zawadi. How can I assist you with your business today? Are you looking for help with **TallyPrime**, **Cloud Hosting**, or **EOS® Consulting**?`;
+    }
+
     // Context-aware "tell me more" or "elaborate" handling
     const assistantMessages = history.filter(m => m.role === 'assistant');
     const lastBotMsg = assistantMessages[assistantMessages.length - 1]?.content.toLowerCase() || '';
@@ -143,7 +152,8 @@ How large is your leadership team right now?`;
 Just let me know which one, and I'll dive into the details!`;
     }
 
-    return `I'd love to help you with that! To give you the most relevant information, are you looking to improve your **accounting & tax compliance**, move your systems to the **cloud**, or strengthen your **business leadership**?`;
+    // Default fallback - more natural
+    return `I'm here to help you find the best solution for your business. Are you currently looking to improve your **accounting & tax compliance**, move your systems to the **cloud**, or strengthen your **business leadership**?`;
   },
 };
 
