@@ -113,37 +113,12 @@ export default function TallyLanding() {
             Kenya's Certified TallyPrime Partner · Cloud Support · EOS® Consulting
           </div>
 
-          <h1 className="mx-auto max-w-full text-2xl font-extrabold leading-tight tracking-tight text-white sm:text-3xl md:text-4xl lg:text-5xl drop-shadow-lg">
-            <span className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1">
-              <span>Grow</span>
-              <motion.span
-                animate={{ opacity: [1, 0, 0, 1] }}
-                transition={{ duration: 5.5, repeat: Infinity, repeatDelay: 0.5, times: [0, 0.15, 0.85, 1], ease: 'easeInOut' }}
-                className="text-yellow-300"
-              >
-                Sales.
-              </motion.span>
-              <span>Improve</span>
-              <motion.span
-                animate={{ opacity: [1, 0, 0, 1] }}
-                transition={{ duration: 5.5, repeat: Infinity, repeatDelay: 0.5, times: [0, 0.15, 0.85, 1], ease: 'easeInOut', delay: 1.8 }}
-                className="text-cyan-200"
-              >
-                Collections.
-              </motion.span>
-              <span>Control</span>
-              <motion.span
-                animate={{ opacity: [1, 0, 0, 1] }}
-                transition={{ duration: 5.5, repeat: Infinity, repeatDelay: 0.5, times: [0, 0.15, 0.85, 1], ease: 'easeInOut', delay: 3.6 }}
-                className="text-emerald-200"
-              >
-                Inventory.
-              </motion.span>
-            </span>
+          <h1 className="mx-auto max-w-4xl text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl drop-shadow-lg">
+            Gain Complete Control of Your Accounting, Inventory & Business Operations
           </h1>
 
-          <p className="mx-auto max-w-2xl text-lg text-slate-200/90">
-            Kenya's certified TallyPrime partner. We sell, implement, and support TallyPrime — plus provide secure cloud hosting and help businesses run on the Entrepreneurial Operating System (EOS®) by Gino Wickman.
+          <p className="mx-auto max-w-2xl text-lg text-slate-200/90 leading-relaxed">
+            As Kenya's Certified TallyPrime Partner, we help businesses streamline accounting, inventory management, reporting, and compliance through expert implementation, training, support, and secure cloud hosting.
           </p>
 
           <div className="mx-auto mt-8 grid max-w-2xl gap-3 grid-cols-1 sm:grid-cols-2">
@@ -156,8 +131,20 @@ export default function TallyLanding() {
           </div>
 
           <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
-            <button type="button" onClick={() => { navigate('/features'); window.scrollTo({ top: 0, behavior: 'instant' }); }} className="rounded-full bg-slate-800/90 px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-lg hover:bg-slate-800 hover:shadow-2xl hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Explore Services</button>
-            <button type="button" onClick={() => { navigate('/contact'); window.scrollTo({ top: 0, behavior: 'instant' }); }} className="rounded-full border border-white/30 px-6 py-3 text-sm sm:text-base font-semibold text-white/90 hover:bg-slate-800/30 hover:border-white/70 hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto">Book a Demo</button>
+            <button 
+              type="button" 
+              onClick={() => { navigate('/contact'); window.scrollTo({ top: 0, behavior: 'instant' }); }} 
+              className="rounded-full bg-red-600 px-8 py-4 text-sm sm:text-base font-bold text-white shadow-lg shadow-red-600/20 hover:bg-red-500 hover:shadow-red-600/40 hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto"
+            >
+              Book a Free Consultation
+            </button>
+            <button 
+              type="button" 
+              onClick={() => { navigate('/products'); window.scrollTo({ top: 0, behavior: 'instant' }); }} 
+              className="rounded-full border border-white/30 bg-white/5 backdrop-blur-md px-8 py-4 text-sm sm:text-base font-bold text-white hover:bg-white/10 hover:border-white/70 hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto"
+            >
+              Explore TallyPrime Solutions
+            </button>
           </div>
         </motion.div>
       </div>
