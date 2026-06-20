@@ -98,14 +98,14 @@ export default function Testimonials() {
                 </div>
                 <div className="flex gap-2">
                   <a 
-                    href="https://www.facebook.com/profile.php?id=100041376170510" 
+                    href="https://www.facebook.com/TallySolutions" 
                     target="_blank" 
                     rel="noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     className="bg-[#1877F2] text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:bg-[#166fe5] transition flex items-center gap-2"
                   >
                     <svg className="h-3 w-3" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
-                    Follow Us
+                    Watch More Stories
                   </a>
                 </div>
               </div>
