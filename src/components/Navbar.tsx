@@ -82,7 +82,7 @@ export default function Navbar() {
         <div className="h-[72px] flex items-center justify-between gap-8">
           {/* Logo */}
           <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-3 flex-shrink-0">
-            <Logo className="h-10 w-auto text-slate-950" variant="full" />
+            <Logo className="h-10 sm:h-12 w-auto" variant="full" />
           </Link>
 
           {/* Desktop Navigation */}

@@ -131,11 +131,11 @@ export default function Testimonials() {
               </p>
 
               <div className="flex items-center gap-6 pt-8 border-t border-white/10">
-                <div className="h-16 w-16 rounded-full bg-white p-2 flex items-center justify-center shadow-lg">
+                <div className="h-20 w-20 rounded-2xl bg-white p-3 flex items-center justify-center shadow-xl border border-slate-100 overflow-hidden">
                   <img 
-                    src={featured.logo} 
+                    src="/client-ujenzi-logo.png" 
                     alt="Ujenzi Distributors Logo" 
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-contain scale-110"
                   />
                 </div>
                 <div>
