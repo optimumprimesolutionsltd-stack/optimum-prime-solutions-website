@@ -229,7 +229,7 @@ export default function Hero() {
               const positions = [
                 "absolute -top-4 -right-4 lg:-right-8",
                 "absolute bottom-8 -left-4 lg:-left-8",
-                "absolute top-1/2 -right-2 lg:right-0 translate-x-24",
+                "absolute top-1/2 -right-2 lg:right-0 translate-x-12 lg:translate-x-24",
               ];
               return (
                 <motion.div
@@ -239,7 +239,7 @@ export default function Hero() {
                   initial="hidden"
                   animate="visible"
                   whileHover={{ scale: 1.05, y: -4 }}
-                  className={`${positions[i]} z-20 bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-lg border border-white/10 p-3 flex items-center gap-3 min-w-[160px]`}
+                  className={`${positions[i]} z-20 bg-slate-800/90 backdrop-blur-sm rounded-xl shadow-lg border border-white/10 p-3 flex items-center gap-3 min-w-[140px] sm:min-w-[160px] scale-90 sm:scale-100`}
                 >
                   <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${card.color} flex items-center justify-center text-lg flex-shrink-0`}>
                     {card.icon}

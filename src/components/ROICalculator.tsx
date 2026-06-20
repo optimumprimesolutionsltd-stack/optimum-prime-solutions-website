@@ -54,9 +54,9 @@ export default function ROICalculator() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-0">
+      <div className="grid lg:grid-cols-2 gap-0">
         {/* Inputs */}
-        <div className="p-8 space-y-8 border-r border-navy-100 dark:border-navy-700">
+        <div className="p-6 sm:p-8 space-y-8 border-b lg:border-b-0 lg:border-r border-navy-100 dark:border-navy-700">
           <div>
             <label className="flex items-center justify-between text-sm font-bold text-navy-900 dark:text-white mb-4">
               <span className="flex items-center gap-2"><Users className="h-4 w-4 text-red-600" /> Number of Users</span>
@@ -111,7 +111,7 @@ export default function ROICalculator() {
         </div>
 
         {/* Results */}
-        <div className="bg-navy-50 dark:bg-navy-900/50 p-8">
+        <div className="bg-navy-50 dark:bg-navy-900/50 p-6 sm:p-8">
           <div className="mb-6">
             <span className="text-[10px] font-bold uppercase tracking-widest text-navy-500 dark:text-navy-400">Recommended Solution</span>
             <h4 className="text-2xl font-black text-navy-900 dark:text-white mt-1">{recommendation.edition}</h4>

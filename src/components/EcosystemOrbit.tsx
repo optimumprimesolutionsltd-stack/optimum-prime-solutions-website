@@ -126,7 +126,7 @@ export default function EcosystemOrbit() {
             transition={{ duration: 0.8 }}
             className="flex items-center justify-center"
           >
-            <div className="relative" style={{ width: 400, height: 400 }}>
+            <div className="relative scale-75 sm:scale-100" style={{ width: 400, height: 400 }}>
               {/* Orbit rings with solid/dashed borders but NO backdrop-blur */}
               <motion.div
                 className="absolute rounded-full"

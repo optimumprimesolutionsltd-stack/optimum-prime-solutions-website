@@ -166,12 +166,12 @@ export default function AfricanLaptopShowcase({ tag, title, description, feature
               {tag}
             </span>
 
-            <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl">
+            <h1 className="text-3xl font-extrabold leading-tight tracking-tight sm:text-5xl text-center lg:text-left">
               <span className={`bg-gradient-to-r ${cfg.accent} bg-clip-text text-transparent`}>{firstHalf}</span>{' '}
               <span className="text-white">{secondHalf}</span>
             </h1>
 
-            <p className="max-w-xl text-base leading-7 text-slate-400">{description}</p>
+            <p className="max-w-xl text-base leading-7 text-slate-400 text-center lg:text-left mx-auto lg:mx-0">{description}</p>
 
             <div className="grid gap-3 sm:grid-cols-2">
               {features.map((feature) => (
@@ -201,7 +201,7 @@ export default function AfricanLaptopShowcase({ tag, title, description, feature
             />
 
             <div className="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">
-              <div className="relative h-[26rem]">
+              <div className="relative h-[20rem] sm:h-[26rem]">
                 {/* Stock photo — swap for real company photo when available. */}
                 <div
                   className="absolute inset-0 bg-cover bg-center"
