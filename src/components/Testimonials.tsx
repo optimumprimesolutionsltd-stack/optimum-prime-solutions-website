@@ -69,7 +69,7 @@ export default function Testimonials() {
               onClick={() => window.open('https://www.facebook.com/share/v/1AcTcParoW/', '_blank')}
             >
               <img 
-                src="/ujenzi-video-thumbnail.webp" 
+                src="/ujenzi-video-thumbnail.webp?v=2" 
                 alt="Frederick Chege Testimonial Video" 
                 className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-500"
               />
