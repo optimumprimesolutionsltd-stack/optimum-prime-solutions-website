@@ -110,23 +110,40 @@ How can I help you today? Are you looking to improve your accounting, manage inv
     if (lastUserMessage.includes('help') || lastUserMessage.includes('support')) {
       return `Absolutely, I'm here to help! 💪 To point you in the right direction, could you describe what you're working on or what's not working smoothly right now?`;
     }
+
+    // Context-aware "tell me more" or "elaborate" handling
+    const assistantMessages = history.filter(m => m.role === 'assistant');
+    const lastBotMsg = assistantMessages[assistantMessages.length - 1]?.content.toLowerCase() || '';
+    
+    if (lastUserMessage.includes('tell me more') || lastUserMessage.includes('elaborate') || lastUserMessage.includes('explain')) {
+      if (lastBotMsg.includes('tallyprime')) {
+        return `TallyPrime is more than just accounting software. It handles **Inventory** (batch tracking, multi-godown), **Payroll** (KRA compliant), and **Business Reports** (over 400+ types). 
+        
+Would you like to know how it specifically handles KRA eTIMS compliance or perhaps how the multi-user Gold edition works?`;
+      }
+      if (lastBotMsg.includes('cloud')) {
+        return `Our Cloud Hosting puts your TallyPrime on a secure server accessible from anywhere. It includes **automatic daily backups**, **99.9% uptime**, and allows your team to work remotely without losing data speed.
+        
+Is your team currently working from multiple locations, or are you mostly office-based?`;
+      }
+      if (lastBotMsg.includes('eos')) {
+        return `EOS® (Entrepreneurial Operating System) is a management framework that helps leadership teams get **Vision, Traction, and Healthy**. It uses tools like the 'Level 10 Meeting' and 'Scorecards' to ensure everyone is accountable.
+        
+How large is your leadership team right now?`;
+      }
+    }
     
     // Check if we've already asked for business needs recently to avoid repetition
-    const assistantMessages = history.filter(m => m.role === 'assistant');
     const lastAssistantMessage = assistantMessages[assistantMessages.length - 1]?.content || '';
-    const isRepetitive = lastAssistantMessage.includes("tell me more about your business needs");
+    const isRepetitive = lastAssistantMessage.includes("tell me more about your business needs") || lastAssistantMessage.includes("That sounds interesting");
 
     if (isRepetitive) {
-      return `I want to make sure I give you the best advice. Since you asked for a recommendation, here's how we usually help businesses like yours:
-      
-1. **Accounting & Invoicing:** TallyPrime is the gold standard for Kenyan businesses.
-2. **Remote Operations:** Our Cloud Hosting allows your team to work from anywhere.
-3. **Leadership Alignment:** EOS® helps you get more from your business.
+      return `I'd love to give you a specific recommendation. Are you more interested in **Accounting Software (TallyPrime)**, **Cloud Hosting**, or **Business Management (EOS®)**? 
 
-Which of these areas is your top priority right now?`;
+Just let me know which one, and I'll dive into the details!`;
     }
 
-    return `That sounds interesting! To help you better, could you tell me more about your business needs? For example, are you looking to improve accounting, streamline operations, or strengthen your leadership team?`;
+    return `I'd love to help you with that! To give you the most relevant information, are you looking to improve your **accounting & tax compliance**, move your systems to the **cloud**, or strengthen your **business leadership**?`;
   },
 };
 

@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { X, Calendar, Clock, ArrowLeft } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
+import ROICalculator from './ROICalculator';
 
 const categoryStyles: Record<string, { badge: string; shadow: string }> = {
   Insights: { badge: 'from-red-500 to-orange-400 text-white', shadow: 'shadow-red-500/20' },
@@ -133,6 +134,18 @@ export default function BlogDetail({ blogId, onClose }: Props) {
             <div className="text-lg text-navy-700 dark:text-navy-300 leading-relaxed whitespace-pre-wrap">
               {blog.content}
             </div>
+
+            {/* Render Calculator for Comparison blogs */}
+            {blog.category === 'Comparison' && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="mt-12"
+              >
+                <ROICalculator />
+              </motion.div>
+            )}
           </motion.div>
 
           {/* Footer */}
