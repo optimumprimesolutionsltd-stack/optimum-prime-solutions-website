@@ -120,6 +120,19 @@ How can I help you today? Are you looking to improve your accounting, manage inv
       return `Nice to meet you, ${userName}! 👋 I'm Zawadi. How can I assist you with your business today? Are you looking for help with **TallyPrime**, **Cloud Hosting**, or **EOS® Consulting**?`;
     }
 
+    // Handle specific business details (e.g., "one office", "multiple branches")
+    if (lastUserMessage.includes('one office') || lastUserMessage.includes('single office') || lastUserMessage.includes('1 office')) {
+      return `A single office setup is perfect for **TallyPrime Silver**. It's cost-effective and handles all your accounting and KRA compliance needs perfectly. 
+      
+Would you like to see a demo of how it handles invoicing and VAT for a single-location business?`;
+    }
+
+    if (lastUserMessage.includes('multiple') || lastUserMessage.includes('branches') || lastUserMessage.includes('locations')) {
+      return `For multiple locations, I highly recommend **TallyPrime Gold** combined with our **Cloud Hosting**. This allows all your branches to sync data in real-time.
+      
+How many branches are you currently managing?`;
+    }
+
     // Context-aware "tell me more" or "elaborate" handling
     const assistantMessages = history.filter(m => m.role === 'assistant');
     const lastBotMsg = assistantMessages[assistantMessages.length - 1]?.content.toLowerCase() || '';
