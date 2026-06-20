@@ -78,10 +78,14 @@ export default function TallyLanding() {
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-black">
-      <div className="absolute inset-0 z-10 bg-black/70 pointer-events-none" />
+      {/* Stock photo — swap for real company photo when available. */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center animate-videoZoom opacity-60"
+        style={{ backgroundImage: "url('/images/hero-office-professional.webp')" }}
+      />
+      <div className="absolute inset-0 z-10 bg-slate-950/80 pointer-events-none" />
 
       <div className="absolute inset-x-0 bottom-0 h-48 z-30 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent pointer-events-none" />
-
 
       {/* Subtle particle layer using SVG shapes and CSS animation */}
       <svg className="pointer-events-none absolute inset-0 -z-20 h-full w-full" preserveAspectRatio="none">
@@ -99,7 +103,6 @@ export default function TallyLanding() {
           <circle cx="50%" cy="65%" r="1.8" />
         </g>
       </svg>
-
 
       <div ref={confettiRoot} className="relative z-40 mx-auto flex h-full max-w-7xl items-center justify-center px-4 text-center sm:px-6 lg:px-8">
         <motion.div

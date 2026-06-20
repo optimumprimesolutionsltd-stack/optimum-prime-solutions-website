@@ -23,13 +23,13 @@ export default function Testimonials() {
     }
   };
 
-  const avatarColors = [
-    'from-blue-500 to-yellow-600',
-    'from-purple-500 to-blue-500',
-    'from-green-500 to-blue-500',
-    'from-red-500 to-purple-500',
-    'from-yellow-500 to-red-500',
-    'from-teal-500 to-green-500',
+  const avatarImages = [
+    '/images/team-headshot-male.webp',
+    '/images/team-headshot-female.webp',
+    '/images/team-headshot-male.webp',
+    '/images/team-headshot-female.webp',
+    '/images/team-headshot-male.webp',
+    '/images/team-headshot-female.webp',
   ];
 
   return (
@@ -48,10 +48,10 @@ export default function Testimonials() {
           <span className="inline-block rounded-full bg-yellow-400/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-yellow-600">
             Testimonials
           </span>
-          <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-navy-900 dark:text-navy-900 leading-tight">
+          <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-white leading-tight">
             Trusted by <span className="bg-gradient-to-r from-yellow-400 to-blue-600 bg-clip-text text-transparent">Kenyan Businesses</span>
           </h2>
-          <p className="mt-6 text-lg text-navy-600 dark:text-navy-300">
+          <p className="mt-6 text-lg text-slate-300">
             Join 500+ companies transforming their operations with our Tally Prime solutions.
           </p>
         </motion.div>
@@ -68,7 +68,7 @@ export default function Testimonials() {
               key={t.id}
               variants={itemVariants}
               whileHover={{ y: -8, transition: { duration: 0.3 } }}
-              className="group relative rounded-2xl border border-navy-100 dark:border-navy-700 bg-slate-800 dark:bg-navy-800/50 p-8 shadow-md hover:shadow-xl hover:shadow-yellow-400/20 transition-all duration-300 overflow-hidden"
+              className="group relative rounded-2xl border border-white/10 bg-slate-800/50 p-8 shadow-md hover:shadow-xl hover:shadow-yellow-400/20 transition-all duration-300 overflow-hidden"
             >
               {/* Background gradient on hover */}
               <motion.div
@@ -100,29 +100,30 @@ export default function Testimonials() {
               </div>
 
               {/* Testimonial text */}
-              <p className="text-sm text-navy-600 dark:text-navy-700 leading-relaxed relative z-10 mb-6">
+              <p className="text-sm text-slate-300 leading-relaxed relative z-10 mb-6">
                 "{t.text}"
               </p>
 
               {/* Author info */}
               <motion.div
                 whileHover={{ x: 4 }}
-                className="flex items-center gap-4 border-t border-navy-100 dark:border-navy-700 pt-5 relative z-10"
+                className="flex items-center gap-4 border-t border-white/10 pt-5 relative z-10"
               >
+                {/* Stock photo — swap for real company photo when available. */}
                 <motion.div
                   whileHover={{ scale: 1.1 }}
-                  className={`h-12 w-12 rounded-full bg-gradient-to-br ${
-                    avatarColors[i % avatarColors.length]
-                  } flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-lg`}
+                  className="h-12 w-12 rounded-full border-2 border-yellow-400/30 overflow-hidden shrink-0 shadow-lg"
                 >
-                  {t.name
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')}
+                  <img 
+                    src={avatarImages[i % avatarImages.length]} 
+                    alt={`${t.name} - ${t.company} Testimonial`} 
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                  />
                 </motion.div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-navy-900 dark:text-white truncate">{t.name}</p>
-                  <p className="text-xs text-navy-500 dark:text-navy-600 truncate">
+                  <p className="text-sm font-semibold text-white truncate">{t.name}</p>
+                  <p className="text-xs text-slate-400 truncate">
                     {t.role}, {t.company}
                   </p>
                 </div>
@@ -130,7 +131,7 @@ export default function Testimonials() {
 
               {/* Verified badge */}
               <motion.div
-                className="absolute top-4 right-4 flex items-center gap-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full px-2.5 py-1 text-[10px] font-semibold"
+                className="absolute top-4 right-4 flex items-center gap-1 bg-green-900/30 text-green-300 rounded-full px-2.5 py-1 text-[10px] font-semibold"
                 initial={{ opacity: 0, scale: 0 }}
                 whileInView={{ opacity: 1, scale: 1 }}
               >
@@ -143,4 +144,3 @@ export default function Testimonials() {
     </section>
   );
 }
-

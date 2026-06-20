@@ -33,14 +33,26 @@ export default function About() {
             </motion.div>
           </motion.div>
           <motion.div initial={{opacity:0,x:40}} whileInView={{opacity:1,x:0}} viewport={{once:true}} className="relative">
-            <div className="rounded-3xl bg-slate-800/60 border border-white/10 p-8 lg:p-10 shadow-2xl shadow-black/40">
-              <div className="space-y-7">
-                {[{icon:Target,title:'Our Mission',text:c.mission},{icon:Eye,title:'Our Vision',text:c.vision},{icon:Zap,title:'Why Choose Us',text:'Kenya\'s certified TallyPrime reseller, licensed EOS® implementer, and cloud hosting provider — with 24/7 support and solutions built for the Kenyan market.'}].map(({icon:Ic,title,text})=>(
-                  <div key={title} className="flex items-start gap-4">
-                    <div className="h-11 w-11 rounded-3xl bg-gradient-to-br from-sky-500 to-cyan-400 text-white flex items-center justify-center shrink-0 shadow-lg shadow-cyan-200/30"><Ic className="h-5 w-5"/></div>
-                    <div><h4 className="text-base font-bold text-white">{title}</h4><p className="mt-1 text-sm text-slate-300 leading-relaxed">{text}</p></div>
-                  </div>
-                ))}
+            {/* Stock photo — swap for real company photo when available. */}
+            <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-black/40">
+              <img 
+                src="/images/hero-office-professional.webp" 
+                alt="Optimum Prime Solutions professional business office environment" 
+                className="w-full h-full object-cover aspect-[4/3]"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-slate-950/20 mix-blend-multiply pointer-events-none" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent" />
+              
+              <div className="absolute bottom-0 left-0 right-0 p-8">
+                <div className="space-y-4">
+                  {[{icon:Target,title:'Our Mission',text:c.mission},{icon:Eye,title:'Our Vision',text:c.vision},{icon:Zap,title:'Why Choose Us',text:'Kenya\'s certified TallyPrime reseller, licensed EOS® implementer, and cloud hosting provider — with 24/7 support and solutions built for the Kenyan market.'}].map(({icon:Ic,title,text})=>(
+                    <div key={title} className="flex items-start gap-4 bg-slate-900/40 backdrop-blur-md rounded-2xl p-4 border border-white/5">
+                      <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 text-white flex items-center justify-center shrink-0 shadow-lg shadow-cyan-200/30"><Ic className="h-4 w-4"/></div>
+                      <div><h4 className="text-sm font-bold text-white">{title}</h4><p className="mt-1 text-xs text-slate-300 leading-relaxed line-clamp-2">{text}</p></div>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           </motion.div>

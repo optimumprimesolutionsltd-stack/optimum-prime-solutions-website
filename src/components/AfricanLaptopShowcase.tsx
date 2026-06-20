@@ -23,6 +23,7 @@ const themeConfig: Record<ShowcaseTheme, {
   imageCaption: string;
   stat: string;
   statLabel: string;
+  alt: string;
 }> = {
   about: {
     accent: 'from-amber-400 to-orange-500',
@@ -32,10 +33,11 @@ const themeConfig: Record<ShowcaseTheme, {
     tagText: 'text-amber-300',
     tagRing: 'ring-amber-500/30',
     dotColor: '#f59e0b',
-    imageUrl: 'https://images.pexels.com/photos/3962286/pexels-photo-3962286.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageUrl: '/images/hero-office-professional.webp',
     imageCaption: "Kenya's certified TallyPrime & EOS® team",
     stat: '10+ Years',
     statLabel: 'Business expertise',
+    alt: 'Optimum Prime Solutions professional business office environment',
   },
   products: {
     accent: 'from-emerald-400 to-teal-500',
@@ -45,10 +47,11 @@ const themeConfig: Record<ShowcaseTheme, {
     tagText: 'text-emerald-300',
     tagRing: 'ring-emerald-500/30',
     dotColor: '#10b981',
-    imageUrl: 'https://images.pexels.com/photos/5632399/pexels-photo-5632399.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageUrl: '/images/services-fintech-mobile.webp',
     imageCaption: 'TallyPrime Silver, Gold & Enterprise editions',
     stat: '3 Editions',
     statLabel: 'Silver · Gold · Enterprise',
+    alt: 'Fintech mobile dashboard and business software solutions Kenya',
   },
   features: {
     accent: 'from-sky-400 to-blue-500',
@@ -58,10 +61,11 @@ const themeConfig: Record<ShowcaseTheme, {
     tagText: 'text-sky-300',
     tagRing: 'ring-sky-500/30',
     dotColor: '#0ea5e9',
-    imageUrl: 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageUrl: '/images/services-fintech-mobile.webp',
     imageCaption: 'End-to-end implementation & support',
     stat: '5-Step',
     statLabel: 'Implementation process',
+    alt: 'TallyPrime implementation and support services Kenya',
   },
   faq: {
     accent: 'from-violet-400 to-purple-500',
@@ -71,10 +75,11 @@ const themeConfig: Record<ShowcaseTheme, {
     tagText: 'text-violet-300',
     tagRing: 'ring-violet-500/30',
     dotColor: '#8b5cf6',
-    imageUrl: 'https://images.pexels.com/photos/5632401/pexels-photo-5632401.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageUrl: '/images/hero-office-professional.webp',
     imageCaption: 'Get answers from our certified consultants',
     stat: '24/7',
     statLabel: 'Support available',
+    alt: 'Optimum Prime Solutions customer support and consulting',
   },
   testimonials: {
     accent: 'from-teal-400 to-cyan-500',
@@ -84,10 +89,11 @@ const themeConfig: Record<ShowcaseTheme, {
     tagText: 'text-teal-300',
     tagRing: 'ring-teal-500/30',
     dotColor: '#14b8a6',
-    imageUrl: 'https://images.pexels.com/photos/3962285/pexels-photo-3962285.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageUrl: '/images/hero-office-professional.webp',
     imageCaption: 'Trusted by businesses across Kenya',
     stat: '500+',
     statLabel: 'Happy clients',
+    alt: 'Successful Kenyan business professionals using TallyPrime',
   },
   blog: {
     accent: 'from-orange-400 to-red-500',
@@ -97,10 +103,11 @@ const themeConfig: Record<ShowcaseTheme, {
     tagText: 'text-orange-300',
     tagRing: 'ring-orange-500/30',
     dotColor: '#f97316',
-    imageUrl: 'https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageUrl: '/images/compliance-financial-docs.webp',
     imageCaption: 'Expert insights for Kenyan businesses',
     stat: 'Weekly',
     statLabel: 'New articles',
+    alt: 'KRA eTIMS compliant invoice and financial documentation insights',
   },
   contact: {
     accent: 'from-red-400 to-rose-500',
@@ -110,10 +117,11 @@ const themeConfig: Record<ShowcaseTheme, {
     tagText: 'text-red-300',
     tagRing: 'ring-red-500/30',
     dotColor: '#dc2626',
-    imageUrl: 'https://images.pexels.com/photos/5632398/pexels-photo-5632398.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=1600',
+    imageUrl: '/images/hero-office-professional.webp',
     imageCaption: 'Our team is ready to help you today',
     stat: '<24h',
     statLabel: 'Response time',
+    alt: 'Contact Optimum Prime Solutions for TallyPrime support Kenya',
   },
 };
 
@@ -194,9 +202,12 @@ export default function AfricanLaptopShowcase({ tag, title, description, feature
 
             <div className="relative overflow-hidden rounded-[2rem] border border-white/10 shadow-2xl">
               <div className="relative h-[26rem]">
+                {/* Stock photo — swap for real company photo when available. */}
                 <div
                   className="absolute inset-0 bg-cover bg-center"
                   style={{ backgroundImage: `url('${cfg.imageUrl}')` }}
+                  role="img"
+                  aria-label={cfg.alt}
                 />
                 <div className="absolute inset-0 bg-slate-900/50" />
                 <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-900/90 to-transparent" />
