@@ -81,7 +81,7 @@ export default function TallyLanding() {
       {/* Stock photo — swap for real company photo when available. */}
       <div 
         className="absolute inset-0 bg-cover bg-center animate-videoZoom opacity-60"
-        style={{ backgroundImage: "url('/images/hero-office-professional.webp')" }}
+        style={{ backgroundImage: "url('/images/hero-erp-dashboard.webp')" }}
       />
       <div className="absolute inset-0 z-10 bg-slate-950/80 pointer-events-none" />
 

@@ -36,7 +36,7 @@ export default function About() {
             {/* Stock photo — swap for real company photo when available. */}
             <div className="relative rounded-3xl overflow-hidden border border-white/10 shadow-2xl shadow-black/40">
               <img 
-                src="/images/hero-office-professional.webp" 
+                src="/images/about-team-collaboration.webp" 
                 alt="Optimum Prime Solutions professional business office environment" 
                 className="w-full h-full object-cover aspect-[4/3]"
                 loading="lazy"
