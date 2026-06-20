@@ -14,7 +14,7 @@ export default function Logo({ className = 'h-10 w-auto', variant = 'full' }: Lo
       transition={{ duration: 0.3 }}
     >
       <img 
-        src="/optimum-logo-clean.png" 
+        src="/optimum-logo-seamless.png" 
         alt="Optimum Prime Solutions Ltd" 
         className="h-full w-auto object-contain"
       />
