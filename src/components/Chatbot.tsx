@@ -51,7 +51,7 @@ export default function Chatbot() {
   const { data } = useSite();
   const endRef = useRef<HTMLDivElement>(null);
 
-  const botGreeting = `Hey there! 👋 Welcome to **Optimum Prime Solutions** — Kenya's certified TallyPrime partner.\n\nI'm **Aurora**, your business solutions guide. I'm here to help you find the right tools to grow your business.\n\nWhat's your name? I'd love to make this feel a bit more personal! 😊`;
+  const botGreeting = `Hey there! 👋 Welcome to **Optimum Prime Solutions** — Kenya's certified TallyPrime partner.\n\nI'm **Zawadi**, your business solutions guide. I'm here to help you find the right tools to grow your business.\n\nWhat's your name? I'd love to make this feel a bit more personal! 😊`;
 
   useEffect(() => {
     if (open) {
@@ -192,8 +192,8 @@ export default function Chatbot() {
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
             className="fixed bottom-6 right-6 z-40 h-16 w-16 rounded-full bg-[#25D366] text-white shadow-2xl shadow-[#25D366]/40 hover:scale-110 transition-all flex items-center justify-center"
-            aria-label="Chat with Aurora"
-            title="Chat with Aurora — AI Assistant"
+            aria-label="Chat with Zawadi"
+            title="Chat with Zawadi — AI Assistant"
           >
             <motion.div animate={{ rotate: [0, 10, -10, 0] }} transition={{ duration: 2, repeat: Infinity }}>
               <WhatsAppIcon className="h-8 w-8 text-white" />
@@ -227,7 +227,7 @@ export default function Chatbot() {
                   <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white bg-green-400" />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-white font-semibold text-sm">Aurora — Optimum Assistant</span>
+                  <span className="text-white font-semibold text-sm">Zawadi — Optimum Assistant</span>
                   <span className="text-green-300 text-xs">● Online · Typically replies instantly</span>
                 </div>
               </div>
@@ -309,7 +309,7 @@ export default function Chatbot() {
                       <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 0.6, repeat: Infinity }} className="w-2 h-2 bg-slate-400 rounded-full" />
                       <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: 0.15 }} className="w-2 h-2 bg-slate-400 rounded-full" />
                       <motion.div animate={{ y: [0, -4, 0] }} transition={{ duration: 0.6, repeat: Infinity, delay: 0.3 }} className="w-2 h-2 bg-slate-400 rounded-full" />
-                      <span className="text-xs text-slate-400 ml-1">Aurora is typing...</span>
+                      <span className="text-xs text-slate-400 ml-1">Zawadi is typing...</span>
                     </div>
                   </motion.div>
                 )}
@@ -321,7 +321,7 @@ export default function Chatbot() {
             {/* Minimised state */}
             {min && (
               <div className="flex-1 flex items-center px-4">
-                <span className="text-sm text-slate-600">Chat with Aurora — tap to expand</span>
+                <span className="text-sm text-slate-600">Chat with Zawadi — tap to expand</span>
               </div>
             )}
 
