@@ -62,7 +62,11 @@ Perfect if your team works from different locations. Are you looking to move you
 
 It's ideal for growing businesses (5–50+ employees). Is your leadership team looking to improve alignment and execution?`,
 
-  services: () => `We offer a full range of services:
+  services: (history) => {
+    const lastUserMessage = history.filter(m => m.role === 'user').pop()?.content.toLowerCase() || '';
+    const isRecommendation = lastUserMessage.includes('recommend') || lastUserMessage.includes('advice') || lastUserMessage.includes('guide');
+    
+    const baseMessage = `We offer a full range of services:
 - **TallyPrime Setup & Implementation** (24-hour turnaround)
 - **Inventory Management** (real-time tracking, batch/expiry)
 - **Payroll Automation** (PAYE, NHIF, NSSF configured)
@@ -70,9 +74,18 @@ It's ideal for growing businesses (5–50+ employees). Is your leadership team l
 - **KRA & eTIMS Compliance**
 - **Cloud Hosting** (secure remote access)
 - **EOS® Consulting** (leadership alignment)
-- **Training & Support** (on-site, remote, video)
+- **Training & Support** (on-site, remote, video)`;
 
-What's your biggest business challenge right now?`,
+    if (isRecommendation) {
+      return `If you're looking for a recommendation, I'd suggest starting with **TallyPrime Silver or Gold** if you need robust accounting and KRA compliance. 
+
+If your team is working remotely, our **Cloud Hosting** is a game-changer. For larger teams (5+ employees) looking for growth, **EOS® Consulting** is highly recommended.
+
+Which of these sounds most relevant to your current situation?`;
+    }
+
+    return `${baseMessage}\n\nWhat's your biggest business challenge right now?`;
+  },
 
   contact: () => `You can reach us anytime:
 📞 **Phone:** +254 116 246 074 | +254 727 209 720
@@ -98,6 +111,21 @@ How can I help you today? Are you looking to improve your accounting, manage inv
       return `Absolutely, I'm here to help! 💪 To point you in the right direction, could you describe what you're working on or what's not working smoothly right now?`;
     }
     
+    // Check if we've already asked for business needs recently to avoid repetition
+    const assistantMessages = history.filter(m => m.role === 'assistant');
+    const lastAssistantMessage = assistantMessages[assistantMessages.length - 1]?.content || '';
+    const isRepetitive = lastAssistantMessage.includes("tell me more about your business needs");
+
+    if (isRepetitive) {
+      return `I want to make sure I give you the best advice. Since you asked for a recommendation, here's how we usually help businesses like yours:
+      
+1. **Accounting & Invoicing:** TallyPrime is the gold standard for Kenyan businesses.
+2. **Remote Operations:** Our Cloud Hosting allows your team to work from anywhere.
+3. **Leadership Alignment:** EOS® helps you get more from your business.
+
+Which of these areas is your top priority right now?`;
+    }
+
     return `That sounds interesting! To help you better, could you tell me more about your business needs? For example, are you looking to improve accounting, streamline operations, or strengthen your leadership team?`;
   },
 };
@@ -112,7 +140,7 @@ function detectIntent(userText: string): string {
   if (text.match(/kra|etims|tax|compliance|invoice/)) return 'kra';
   if (text.match(/cloud|hosting|remote|access|server/)) return 'cloud';
   if (text.match(/eos|leadership|vision|traction|alignment/)) return 'eos';
-  if (text.match(/service|offer|do you|what do you|capabilities/)) return 'services';
+  if (text.match(/service|offer|do you|what do you|capabilities|recommend|what should i|advice|guide/) && !text.includes('how much')) return 'services';
   if (text.match(/contact|call|phone|email|reach|whatsapp/)) return 'contact';
   if (text.match(/how.*day|how are you|how's it going|how are things|what's up|how you doing/)) return 'smalltalk';
   
