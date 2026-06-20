@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Star, Quote, MessageCircle } from 'lucide-react';
+import { Star, Quote, MessageCircle, Play } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 
 export default function Testimonials() {
