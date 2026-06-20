@@ -16,7 +16,7 @@ export default function Logo({ className = 'h-10 w-auto', variant = 'full' }: Lo
       <img 
         src="/optimum-logo-new.png" 
         alt="Optimum Prime Solutions Ltd" 
-        className="h-full w-auto object-contain"
+        className="h-full w-auto object-contain mix-blend-screen brightness-110"
       />
     </motion.div>
   );
