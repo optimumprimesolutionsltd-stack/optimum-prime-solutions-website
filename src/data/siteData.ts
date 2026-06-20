@@ -38,19 +38,19 @@ export const defaultData: SiteData = {
   },
   heroImages: {
     // About: African business team in a modern office setting
-    about: 'https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    about: '/images/about-team-meeting.webp',
     // Products: African professional reviewing software/products on laptop
-    products: 'https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    products: '/images/about-team-collaboration.webp',
     // Features/Services: African IT professional demonstrating software to client
-    features: 'https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    features: '/images/services-african-consultation.webp',
     // FAQ: African business professional at desk with laptop
-    faq: 'https://images.pexels.com/photos/4342352/pexels-photo-4342352.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    faq: '/images/faq-african-support.webp',
     // Testimonials: African business people in a meeting/discussion
-    testimonials: 'https://images.pexels.com/photos/3184357/pexels-photo-3184357.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    testimonials: '/images/testimonials-business-success.webp',
     // Blog: African professional reading/writing at a desk
-    blog: 'https://images.pexels.com/photos/4050291/pexels-photo-4050291.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    blog: '/images/blog-african-professional.webp',
     // Contact: African customer service / support professional
-    contact: 'https://images.pexels.com/photos/3760263/pexels-photo-3760263.jpeg?auto=compress&cs=tinysrgb&w=1600',
+    contact: '/images/contact-office-setup.webp',
   },
   services: [
     {id:'1',title:'Tally Prime Installation & Setup',desc:'Complete installation, configuration, and data migration for Tally Prime Silver & Gold editions. Get up and running in 24 hours.',icon:'Download',features:['License activation','Data migration','Multi-user setup','Initial training'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
