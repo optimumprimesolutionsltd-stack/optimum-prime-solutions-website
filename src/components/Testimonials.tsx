@@ -51,7 +51,7 @@ export default function Testimonials() {
             Success Story
           </span>
           <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-white leading-tight">
-            Trusted by <span className="bg-gradient-to-r from-red-400 to-rose-600 bg-clip-text text-transparent">Ujenzi Distributors Ltd</span>
+            Trusted by <span className="bg-gradient-to-r from-[#0070c0] to-[#2e3192] bg-clip-text text-transparent">Ujenzi Distributors Ltd</span>
           </h2>
           <p className="mt-6 text-lg text-slate-300">
             See how Frederick Chege transformed his business operations with Optimum Prime Solutions.
