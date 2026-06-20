@@ -14,9 +14,9 @@ export default function Logo({ className = 'h-10 w-auto', variant = 'full' }: Lo
       transition={{ duration: 0.3 }}
     >
       <img 
-        src="/optimum-logo-new.png" 
+        src="/optimum-logo-transparent.png" 
         alt="Optimum Prime Solutions Ltd" 
-        className="h-full w-auto object-contain mix-blend-screen brightness-110"
+        className="h-full w-auto object-contain"
       />
     </motion.div>
   );
