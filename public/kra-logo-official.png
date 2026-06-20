@@ -1,0 +1,81 @@
+<head>
+	<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="https://www.kra.go.ke/templates/kra/favicon.png" />
+    <title> Error: 404 - KRA </title>
+    <meta name="description" content="">
+    <!-- <meta name="keywords" content=""> -->
+		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no"/>
+
+		<link rel="stylesheet" type="text/css" href="https://www.kra.go.ke/templates/kra/css/jquery.fancybox.css" />
+    <link rel="stylesheet" type="text/css" href="https://www.kra.go.ke/templates/kra/css/main.css" />
+
+    <!-- <script src='https://www.google.com/recaptcha/api.js' defer="defer"></script> -->
+    <script type="text/javascript">
+        var BASE_URL='https://www.kra.go.ke/';
+        var TEMPLATE='https://www.kra.go.ke/templates/kra/';
+
+    </script>
+    
+    <!-- Google Tag Manager -->
+
+	<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-P4KQ7PS');
+        </script>
+
+<!-- End Google Tag Manager -->
+
+</head>
+</head>
+<body>
+<div class="error-body" style="background-image:url(https://www.kra.go.ke/images/banners/error.jpg)">
+    <div class="error-body__container container">
+        <div class="align_middle">
+            <div class="large-5">
+                <div class="error-item item-text">
+                    <div class="item-text__container">
+                        <h1>404</h1>
+                        <p>The page you were looking for could not be found!</p>
+                        <div class="four_link">
+                            <a title="Go back home" href="https://www.kra.go.ke/">Go back home</a>
+                            <span>or</span>
+                            <a title="Contact us" href="https://www.kra.go.ke/contact-us">Contact Us</a>
+                            <span>or</span>
+                            <a title="Self Care" href="https://kenya-revenue-authority--tst1.custhelp.com/app/home">Self Care</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script type="text/javascript" src="https://www.kra.go.ke/templates/kra/js/jquery-2.2.1.min.js"></script>
+<script type="text/javascript" src="https://www.kra.go.ke/templates/kra/js/plugins.js"></script>
+<script type="text/javascript" src="https://www.kra.go.ke/templates/kra/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="https://www.kra.go.ke/templates/kra/js/matchHeight.js"></script>
+<script type="text/javascript" src="https://www.kra.go.ke/templates/kra/js/jquery.fancybox.js"></script>
+<script type="text/javascript" src="https://www.kra.go.ke/templates/kra/js/main.js"></script>
+<script>
+    function resizeContent() {
+        $height = $(window).height();
+        $('.error-body').height($height);
+    }
+
+    $(document).ready(function () {
+        //Widow height detect section
+        resizeContent();
+        $(window).resize(function () {
+            resizeContent();
+        });
+    });
+</script>
+</body>
+</html>

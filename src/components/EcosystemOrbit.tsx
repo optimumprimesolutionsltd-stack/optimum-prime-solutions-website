@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
 const partners = [
-  { name: 'TallyPrime', logo: '/partner-tallyprime.png', angle: 0,   color: '#dc2626' },
+  { name: 'TallyPrime', logo: '/partner-tallyprime-official.png', angle: 0,   color: '#dc2626' },
   { name: 'EOS®',       logo: '/partner-eos.png',        angle: 72,  color: '#0ea5e9' },
   { name: 'HubSpot',    logo: '/partner-hubspot.png',    angle: 144, color: '#f97316' },
   { name: 'TSplus',     logo: '/partner-tsplus.png',     angle: 216, color: '#8b5cf6' },
-  { name: 'KRA eTIMS',  logo: '/kra-logo.webp',           angle: 288, color: '#16a34a' },
+  { name: 'KRA eTIMS',  logo: '/kra-logo-official.png', angle: 288, color: '#16a34a' },
 ];
 
 const cards = [
