@@ -3,11 +3,17 @@ import { useEffect } from 'react';
 import { X, Calendar, Clock, ArrowLeft } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import ROICalculator from './ROICalculator';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const categoryStyles: Record<string, { badge: string; shadow: string }> = {
   Insights: { badge: 'from-red-500 to-orange-400 text-white', shadow: 'shadow-red-500/20' },
   Tutorial: { badge: 'from-emerald-500 to-teal-400 text-white', shadow: 'shadow-emerald-500/20' },
   Comparison: { badge: 'from-sky-600 to-indigo-500 text-white', shadow: 'shadow-sky-500/20' },
+  EOS: { badge: 'from-amber-500 to-yellow-400 text-white', shadow: 'shadow-amber-500/20' },
+  Cloud: { badge: 'from-cyan-500 to-teal-400 text-white', shadow: 'shadow-cyan-500/20' },
+  'Product Update': { badge: 'from-violet-600 to-purple-500 text-white', shadow: 'shadow-violet-500/20' },
+  Compliance: { badge: 'from-rose-600 to-red-500 text-white', shadow: 'shadow-rose-500/20' },
 };
 
 interface Props {
@@ -182,11 +188,28 @@ export default function BlogDetail({ blogId, onClose }: Props) {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: embedUrl ? 0.3 : 0.2 }}
-            className="prose dark:prose-invert max-w-none"
+            className="prose prose-lg dark:prose-invert max-w-none"
           >
-            <div className="text-lg text-navy-700 dark:text-navy-300 leading-relaxed whitespace-pre-wrap">
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              components={{
+                h1: ({ children }) => <h1 className="text-3xl font-bold text-navy-900 dark:text-white mt-8 mb-4 leading-tight">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-2xl font-bold text-navy-900 dark:text-white mt-8 mb-3 leading-tight border-b border-navy-200 dark:border-navy-700 pb-2">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-xl font-semibold text-navy-900 dark:text-white mt-6 mb-2">{children}</h3>,
+                p: ({ children }) => <p className="text-lg text-navy-700 dark:text-navy-300 leading-relaxed mb-4">{children}</p>,
+                ul: ({ children }) => <ul className="list-disc list-inside space-y-2 mb-4 text-navy-700 dark:text-navy-300 text-lg">{children}</ul>,
+                ol: ({ children }) => <ol className="list-decimal list-inside space-y-2 mb-4 text-navy-700 dark:text-navy-300 text-lg">{children}</ol>,
+                li: ({ children }) => <li className="leading-relaxed">{children}</li>,
+                strong: ({ children }) => <strong className="font-bold text-navy-900 dark:text-white">{children}</strong>,
+                em: ({ children }) => <em className="italic text-navy-700 dark:text-navy-300">{children}</em>,
+                blockquote: ({ children }) => <blockquote className="border-l-4 border-yellow-400 pl-4 italic text-navy-600 dark:text-navy-400 my-4">{children}</blockquote>,
+                a: ({ href, children }) => <a href={href} className="text-yellow-500 hover:text-yellow-400 underline font-medium transition-colors" target={href?.startsWith('http') ? '_blank' : undefined} rel={href?.startsWith('http') ? 'noopener noreferrer' : undefined}>{children}</a>,
+                hr: () => <hr className="border-navy-200 dark:border-navy-700 my-8" />,
+                code: ({ children }) => <code className="bg-navy-100 dark:bg-navy-800 rounded px-1.5 py-0.5 text-sm font-mono text-navy-800 dark:text-navy-200">{children}</code>,
+              }}
+            >
               {blog.content}
-            </div>
+            </ReactMarkdown>
 
             {/* Render Calculator for Comparison blogs */}
             {blog.category === 'Comparison' && (
