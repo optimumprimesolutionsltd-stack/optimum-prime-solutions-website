@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useEffect } from 'react';
 import { X, Calendar, Clock, ArrowLeft } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import ROICalculator from './ROICalculator';
@@ -39,6 +40,58 @@ export default function BlogDetail({ blogId, onClose }: Props) {
   if (!blog) return null;
 
   const embedUrl = getYoutubeEmbedUrl(blog.youtubeUrl || '');
+
+  useEffect(() => {
+    if (blog) {
+      // Store original title to restore later
+      const originalTitle = document.title;
+      
+      // Handle the specific eTIMS blog post SEO metadata
+      if (blog.id === '7') {
+        document.title = "eTIMS & June 30 Tax Deadline 2026: What Kenyan Businesses Must Do Now | Optimum Prime Solutions";
+        
+        // Update meta description
+        let metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+          metaDesc.setAttribute("content", "KRA's eTIMS validation engine is now checking every return automatically. Here's what changes before June 30, 2026, and how to get compliant fast with TallyPrime.");
+        }
+        
+        // Update meta keywords
+        let metaKeywords = document.querySelector('meta[name="keywords"]');
+        if (!metaKeywords) {
+          metaKeywords = document.createElement('meta');
+          metaKeywords.setAttribute('name', 'keywords');
+          document.head.appendChild(metaKeywords);
+        }
+        metaKeywords.setAttribute("content", "eTIMS deadline 2026, KRA eTIMS compliance, TallyPrime eTIMS Kenya, income tax return deadline Kenya");
+        
+        // Update URL history without reloading (slug mapping)
+        window.history.pushState({}, '', '/blog/etims-income-tax-deadline-june-30-2026');
+      } else {
+        document.title = `${blog.title} | Optimum Prime Solutions`;
+        // Basic fallback for other blogs
+        let metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+          metaDesc.setAttribute("content", blog.excerpt);
+        }
+        // Update URL history without reloading
+        const slug = blog.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+        window.history.pushState({}, '', `/blog/${slug}`);
+      }
+      
+      return () => {
+        document.title = originalTitle;
+        // Restore default description
+        let metaDesc = document.querySelector('meta[name="description"]');
+        if (metaDesc) {
+          metaDesc.setAttribute("content", "Business systems, cloud hosting, and operational consulting. Implementation and secure hosting for TallyPrime, multi-branch connectivity, reporting and process optimization in Kenya.");
+        }
+        // Restore URL history
+        window.history.pushState({}, '', '/blog');
+      };
+    }
+  }, [blog]);
+
 
   return (
     <motion.div
