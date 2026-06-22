@@ -495,78 +495,107 @@ Ready to upgrade? Get in touch with our team today.`},
       date: '2026-06-22',
       category: 'Compliance',
       readTime: '4 min',
-      content: `If you run a business in Kenya, you've probably heard the date by now: **June 30, 2026.** That's when filing for the 2025 Year of Income closes — and this year, the rules around what KRA will actually accept have changed.
+      content: `If you run a business in Kenya, you already know the date: June 30, 2026. That's the deadline for filing your 2025 income tax return — and this year, something fundamental has changed about what KRA will actually accept.
 
-For the first time, KRA isn't just collecting your return. It's automatically checking it against your eTIMS invoices before it decides what you're allowed to deduct. If your expenses aren't backed by valid eTIMS invoices, KRA can disallow them — no auditor required, no manual review, just an automated rejection.
+For the first time, KRA isn't just collecting your return and filing it away. It's running your declared income and expenses through an automated cross-check against your eTIMS invoice data before deciding what you're allowed to deduct. No auditor. No manual review. Just an engine that either matches your numbers — or flags them.
 
-Here's what's actually changed, what it means for your business, and what to do about it before the deadline.
+If your expenses aren't backed by valid eTIMS invoices, they can be disallowed. Automatically. And you might not find out until it's too late to fix it.
 
-## What's Changed: KRA's Validation Engine
+Here's exactly what has changed, what it means for your tax bill, and what you need to do before the clock runs out.
 
-eTIMS itself isn't new — it's been rolling out since 2022. What's new is enforcement.
 
-From January 1, 2026, KRA began cross-checking the income and expenses declared in every tax return against the invoice data sitting in its eTIMS system. In practice, this means:
+## What's Changed: KRA's Validation Engine Is Now Live
 
-- **Expenses without an eTIMS invoice are not deductible.** If you paid a supplier who didn't issue you a proper eTIMS invoice, that cost can no longer reduce your taxable income.
-- **This applies whether or not you're VAT-registered.** The old distinction between VAT and non-VAT businesses no longer protects you — eTIMS now covers practically everyone in business, including landlords earning rental income above KES 24,000 a month.
-- **It's continuous, not seasonal.** This isn't a once-a-year audit risk. Every return filed from now on gets checked the same way.
+eTIMS isn't new — it has been rolling out since 2022. What changed on January 1, 2026 is enforcement.
 
-KRA has paired this with some short-term relief: businesses can still declare legitimate expenses for the 2025 Year of Income even where the supporting invoice isn't yet on eTIMS, provided it's properly documented and uploaded for validation. But that flexibility is explicitly described as transitional — from the 2026 Year of Income onward, KRA has stated plainly that all declared income and expenses must be backed by valid electronic tax invoices. The grace period is closing.
+KRA began cross-checking every tax return against the invoice data sitting in its eTIMS system. That means three things that every business owner needs to understand:
+
+- **Expenses without an eTIMS invoice are no longer deductible.** If a supplier didn't issue you a proper eTIMS invoice, that cost cannot reduce your taxable income — regardless of whether you actually paid it.
+- **This applies to you even if you're not VAT-registered.** The old VAT/non-VAT distinction is gone. eTIMS now covers practically every person in business, including landlords earning rental income above KES 24,000 per month.
+- **It's not a seasonal audit — it's continuous.** Every return you file from now on goes through the same automated check.
+
+KRA has offered some breathing room for the 2025 Year of Income: businesses can still declare legitimate expenses even where the supporting invoice isn't yet on eTIMS, as long as it's properly documented and uploaded for validation. But KRA has been explicit that this flexibility is transitional. From the 2026 Year of Income onward, every declared expense must be backed by a valid electronic tax invoice. The window is closing fast.
+
 
 ## What This Means for the June 30 Deadline
 
-Two separate things are happening at once, and it's easy to confuse them:
+Two things are happening at once, and it's easy to mix them up:
 
-1. **Your 2025 income tax return is due by June 30, 2026.** Miss it, and you're looking at default assessments and the standard late-filing penalties under the Tax Procedures Act.
-2. **What you can claim on that return now depends on your eTIMS records.** Even if you file on time, weak eTIMS compliance can mean a smaller set of allowable deductions — and a higher tax bill than you expected.
+1. **Your 2025 income tax return is due by June 30, 2026.** Miss it, and you're looking at default assessments and late-filing penalties under the Tax Procedures Act.
+2. **What you can actually claim on that return now depends on your eTIMS records.** Even if you file on time, gaps in your eTIMS compliance can shrink your allowable deductions — and push your tax bill higher than you planned for.
 
-In other words, filing on time and filing *well* are no longer the same thing.
+Filing on time and filing well are no longer the same thing. You need both.
+
 
 ## What Happens If You're Not Compliant
 
-This isn't a theoretical risk. Businesses that aren't properly integrated with eTIMS are now more likely to face:
+This isn't a theoretical risk sitting somewhere in the future. Businesses without proper eTIMS integration are already exposed to:
 
-- Automatic disallowance of expenses that aren't backed by a valid invoice
-- Returns flagged for review without any manual trigger
-- Difficulty qualifying for the new Merchant Tax Compliance Certificate, which is increasingly required for tenders and licenses
-- A higher effective tax bill purely from losing deductions you'd normally claim
+- Automatic disallowance of expenses not matched to a valid invoice
+- Returns flagged for review with no manual trigger required
+- Difficulty qualifying for the Merchant Tax Compliance Certificate, which is increasingly required for tenders, licenses, and supplier contracts
+- A higher effective tax bill — not because your business performed better, but because you lost deductions you were entitled to
 
-For SMEs that still rely on manual records, informal supplier relationships, or accounting software with no real eTIMS integration, this is where the exposure sits.
+For SMEs still running on manual records, informal supplier relationships, or accounting software with no real eTIMS connection, this is where the exposure sits. And it compounds every month you don't fix it.
 
-## What to Do Before June 30
 
-1. **Confirm your eTIMS registration is active** — VSCU, OSCU, eTIMS Lite, or System-to-System, depending on how your business operates.
-2. **Audit your major suppliers.** If a supplier can't issue you an eTIMS invoice, that relationship now carries a real tax cost. Flag it before filing, not after.
-3. **Check that your accounting software actually talks to eTIMS in real time** — not just that it can technically produce an invoice, but that it transmits and reconciles automatically.
-4. **Reconcile your books against your eTIMS submissions** before you file, so there are no surprises in what gets accepted.
-5. **File by June 30** — and treat the eTIMS side of compliance as an ongoing monthly habit from here, not a once-a-year scramble.
+## Your June 30 Action Plan
 
-## How TallyPrime Makes This Simple
+Don't leave this to the last week. Here's what to do right now:
 
-This is exactly the gap TallyPrime is built to close. It's a KRA-approved eTIMS solution, which means your ledgers, stock items, and transactions sync to the eTIMS portal in real time — purchases, credit notes, stock movements, the lot — with built-in checks that catch errors before they become disallowed expenses.
+1. **Confirm your eTIMS registration is active** — whether you're on VSCU, OSCU, eTIMS Lite, or System-to-System depends on your business type. If you're not sure, find out today.
+2. **Audit your major suppliers.** If a supplier can't issue you a valid eTIMS invoice, that relationship now carries a real tax cost. Flag it before you file, not after.
+3. **Verify that your accounting software actually transmits to eTIMS in real time** — not just that it can technically produce an invoice, but that it syncs and reconciles automatically without manual steps.
+4. **Reconcile your books against your eTIMS submissions** before you file. Surprises at this stage are expensive.
+5. **File by June 30** — and from here on, treat eTIMS compliance as a monthly habit, not a once-a-year scramble.
 
-For a business already running TallyPrime, getting fully compliant before the deadline is mostly a configuration job, not a system overhaul. For a business still on spreadsheets, manual ETR devices, or accounting software with no real eTIMS link, this deadline is a good forcing function to fix that properly rather than patch around it for another year.
+
+## How TallyPrime Handles All of This For You
+
+TallyPrime is a KRA-approved eTIMS solution — and this is exactly the kind of problem it was built to eliminate.
+
+When you're running TallyPrime, your ledgers, stock items, purchases, credit notes, and transactions sync to the eTIMS portal in real time. There are no manual uploads, no separate systems to reconcile, and no end-of-month panic. Built-in validation catches errors before they become disallowed expenses.
+
+For a business already on TallyPrime, getting fully compliant before June 30 is mostly a configuration exercise — not a system overhaul. For a business still on spreadsheets, a standalone ETR device, or software with no real eTIMS link, this deadline is the right moment to fix that properly. Patching around it for another year only increases your exposure.
+
+We've helped hundreds of Kenyan businesses get eTIMS-ready — and we can do the same for yours, quickly and without disrupting your operations.
+
 
 ## Frequently Asked Questions
 
-**Does eTIMS apply to my business if I'm not VAT-registered?**
-Yes. The VAT/non-VAT distinction no longer applies — eTIMS compliance is now expected of practically all persons in business, including non-VAT SMEs and landlords above the rental income threshold.
 
-**What if my supplier won't or can't issue an eTIMS invoice?**
-That expense is at risk of being disallowed when you file. It's worth raising this with suppliers now, before it affects your return, and considering alternative suppliers who are eTIMS-compliant where the relationship is significant.
+Does eTIMS apply to my business if I'm not VAT-registered?
 
-**Is there still a grace period for missing invoices?**
-For the 2025 Year of Income, KRA has allowed some flexibility for documented expenses not yet matched to an eTIMS invoice. That flexibility is not guaranteed for future filing periods — KRA has stated that from the 2026 Year of Income, all declared income and expenses must be supported by valid electronic tax invoices.
+Yes — and this is one of the most common misconceptions we hear. The VAT/non-VAT distinction no longer applies. eTIMS compliance is now expected of practically all persons in business, including non-VAT SMEs and landlords earning above the rental income threshold.
 
-**Can TallyPrime handle eTIMS for a multi-branch or inventory-heavy business?**
-Yes. TallyPrime's eTIMS integration covers ledgers, stock items, stock positions, and transactions across branches, with bulk or individual upload options depending on transaction volume.
 
-**What if I'm not currently on TallyPrime — can I still get compliant before June 30?**
-Yes, but the runway is short. The fastest path is usually a focused eTIMS readiness review of your current system, followed by either a quick integration fix or a migration plan that doesn't disrupt your filing.
+What if my supplier won't or can't issue an eTIMS invoice?
 
----
+That expense is at risk of being disallowed when you file. Raise it with your suppliers now, before it affects your return. For significant supplier relationships, it's worth considering whether you need to find eTIMS-compliant alternatives.
 
-*Optimum Prime Solutions is a certified TallyPrime partner based in Nairobi, helping Kenyan businesses with TallyPrime licensing, eTIMS compliance, payroll, and cloud hosting. If you're not confident your business is eTIMS-ready before June 30, [book a free TallyPrime compliance review](/contact) before the deadline.*`,
+
+Is there still a grace period for missing invoices?
+
+For the 2025 Year of Income, KRA has allowed some flexibility for documented expenses not yet matched to an eTIMS invoice. That flexibility is not guaranteed going forward — from the 2026 Year of Income, all declared income and expenses must be supported by valid electronic tax invoices.
+
+
+Can TallyPrime handle eTIMS for a multi-branch or inventory-heavy business?
+
+Absolutely. TallyPrime's eTIMS integration covers ledgers, stock items, stock positions, and transactions across all your branches, with bulk or individual upload options depending on your transaction volume.
+
+
+What if I'm not currently on TallyPrime — can I still get compliant before June 30?
+
+Yes, but the runway is short. The fastest path is a focused eTIMS readiness review of your current setup, followed by either a targeted integration fix or a clean migration plan that doesn't disrupt your filing.
+
+
+## Book a Free eTIMS Compliance Review
+
+Not sure where your business stands? We offer a free, no-obligation eTIMS compliance review — we'll assess your current setup, identify any gaps, and give you a clear action plan before the June 30 deadline.
+
+Optimum Prime Solutions is a certified TallyPrime partner based in Nairobi. We help Kenyan businesses with TallyPrime licensing, eTIMS compliance, payroll, and cloud hosting. We know this system inside out — and we're here to make sure your business is protected before the deadline.
+
+[Book Your Free Compliance Review Today](/contact)`,
     },
   ],
   leads: [],
