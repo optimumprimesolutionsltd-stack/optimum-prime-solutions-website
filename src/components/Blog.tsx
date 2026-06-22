@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Calendar, Clock, ArrowRight, Play } from 'lucide-react';
+import { Calendar, Clock, ArrowRight, Play, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { useSite } from '../context/SiteContext';
 import BlogDetail from './BlogDetail';
@@ -8,13 +8,20 @@ const categoryStyles: Record<string, { badge: string; shadow: string }> = {
   Insights: { badge: 'from-red-500 to-orange-400 text-white', shadow: 'shadow-red-500/20' },
   Tutorial: { badge: 'from-emerald-500 to-teal-400 text-white', shadow: 'shadow-emerald-500/20' },
   Comparison: { badge: 'from-sky-600 to-indigo-500 text-white', shadow: 'shadow-sky-500/20' },
+  'Product Update': { badge: 'from-violet-600 to-purple-500 text-white', shadow: 'shadow-violet-500/20' },
+  EOS: { badge: 'from-amber-500 to-yellow-400 text-white', shadow: 'shadow-amber-500/20' },
+  Cloud: { badge: 'from-cyan-500 to-teal-400 text-white', shadow: 'shadow-cyan-500/20' },
+  Compliance: { badge: 'from-rose-600 to-red-500 text-white', shadow: 'shadow-rose-500/20' },
 };
 
 export default function Blog() {
   const { data } = useSite();
   const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
+  const [showAll, setShowAll] = useState(false);
 
   if (!data.blogs.length) return null;
+
+  const visibleBlogs = showAll ? data.blogs : data.blogs.slice(0, 3);
 
   return (
     <>
@@ -28,13 +35,13 @@ export default function Blog() {
           </motion.div>
           
           <div className="mt-16 grid md:grid-cols-3 gap-8">
-            {data.blogs.slice(0,3).map((b,i)=>(
+            {visibleBlogs.map((b,i)=>(
               <motion.article 
                 key={b.id} 
                 initial={{opacity:0,y:30}} 
                 whileInView={{opacity:1,y:0}} 
                 viewport={{once:true}} 
-                transition={{delay:i*0.1}}
+                transition={{delay:(i % 3)*0.1}}
                 onClick={() => setSelectedBlogId(b.id)}
                 className="group rounded-[2rem] border border-white/10 bg-slate-800 shadow-xl overflow-hidden hover:-translate-y-1 hover:shadow-2xl hover:border-red-500/30 transition-all cursor-pointer"
               >
@@ -88,9 +95,15 @@ export default function Blog() {
               viewport={{ once: true }}
               className="mt-12 text-center"
             >
-              <button className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-3 text-sm font-semibold text-white shadow-sm shadow-red-900/10 hover:bg-red-700 transition">
-                View All Articles
-                <ArrowRight className="h-4 w-4" />
+              <button
+                onClick={() => setShowAll(prev => !prev)}
+                className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-3 text-sm font-semibold text-white shadow-sm shadow-red-900/10 hover:bg-red-700 transition"
+              >
+                {showAll ? (
+                  <>Show Less <ChevronUp className="h-4 w-4" /></>
+                ) : (
+                  <>View All Articles <ArrowRight className="h-4 w-4" /></>
+                )}
               </button>
             </motion.div>
           )}
