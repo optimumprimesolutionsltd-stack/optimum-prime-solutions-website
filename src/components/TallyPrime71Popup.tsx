@@ -82,10 +82,20 @@ export default function TallyPrime71Popup() {
             {/* Close button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 z-10 p-1.5 rounded-lg transition-colors"
-              style={{ color: 'rgba(148, 163, 184, 0.8)' }}
-              onMouseEnter={e => (e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)')}
-              onMouseLeave={e => (e.currentTarget.style.backgroundColor = 'transparent')}
+              className="absolute top-3 right-3 z-10 flex items-center justify-center w-9 h-9 rounded-full transition-all duration-200"
+              style={{
+                background: 'rgba(255,255,255,0.12)',
+                border: '1px solid rgba(255,255,255,0.2)',
+                color: '#ffffff',
+              }}
+              onMouseEnter={e => {
+                e.currentTarget.style.background = 'rgba(220,38,38,0.7)';
+                e.currentTarget.style.borderColor = 'rgba(220,38,38,0.8)';
+              }}
+              onMouseLeave={e => {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.12)';
+                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)';
+              }}
               aria-label="Close"
             >
               <X className="h-5 w-5" />
@@ -189,18 +199,27 @@ export default function TallyPrime71Popup() {
                 </button>
               </motion.div>
 
-              {/* Dismiss link */}
-              <p className="mt-4 text-center text-xs" style={{ color: '#475569' }}>
-                <button
-                  onClick={handleClose}
-                  className="hover:underline transition-colors"
-                  style={{ color: '#475569' }}
-                  onMouseEnter={e => (e.currentTarget.style.color = '#94a3b8')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
-                >
-                  Maybe later — close this
-                </button>
-              </p>
+              {/* Dismiss button */}
+              <button
+                onClick={handleClose}
+                className="mt-3 w-full flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-medium transition-all duration-200"
+                style={{
+                  background: 'rgba(255,255,255,0.06)',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  color: '#94a3b8',
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.11)';
+                  e.currentTarget.style.color = '#e2e8f0';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.06)';
+                  e.currentTarget.style.color = '#94a3b8';
+                }}
+              >
+                <X className="h-4 w-4" />
+                No thanks, close this
+              </button>
             </div>
           </motion.div>
         </motion.div>
