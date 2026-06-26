@@ -450,7 +450,7 @@ Getting Started
 Our cloud hosting packages start from KES 3,000 per month. Setup takes 1-2 days and includes migration of your existing TallyPrime data to the cloud, user access configuration, and training on remote access.
 
 Contact us today to get your TallyPrime on the cloud.`},
-    {id:'6',title:'TallyPrime 7.1 Is Here: What\'s New and What It Means for Your Business',excerpt:'Tally Solutions has released TallyPrime 7.1 Beta with major upgrades to invoicing, banking, compliance, and reporting. Here\'s everything you need to know as a Kenyan business owner.',date:'2026-06-01',category:'Product Update',readTime:'6 min',content:`Tally Solutions has officially released TallyPrime 7.1 as an early access Beta — and it is packed with features that will make a real difference for Kenyan businesses.
+    {id:'6',title:'TallyPrime 7.1 is Now Live: What\'s New and What It Means for Your Business',excerpt:'TallyPrime 7.1 is officially released — no longer in Beta. Here are all the major upgrades to invoicing, banking, compliance, and reporting that Kenyan businesses can experience today.',date:'2026-06-26',category:'Product Update',readTime:'6 min',content:`TallyPrime 7.1 is officially released and available now — and it is packed with features that will make a real difference for Kenyan businesses.
 
 As Kenya\'s certified TallyPrime partner, we have reviewed all the new features and here is what you need to know.
 
@@ -477,13 +477,13 @@ Long vendor names, descriptions, and notes now wrap automatically across reports
 7. Flexible Discounts & Voucher Enhancements
 Apply discounts as a percentage, an amount, or both in purchase and sales transactions. Reuse deleted voucher numbers to maintain clean numbering sequences.
 
-When Will TallyPrime 7.1 Be Fully Released?
+TallyPrime 7.1 is Now Officially Live!
 
-TallyPrime 7.1 is currently in Beta (early access). The full release is expected soon. As your certified TallyPrime partner, we will handle your upgrade seamlessly — including data migration, staff training, and post-upgrade support.
+TallyPrime 7.1 is fully released — no longer in Beta. As your certified TallyPrime partner, we will handle your upgrade seamlessly — including data migration, staff training, and post-upgrade support.
 
 How to Get TallyPrime 7.1
 
-You can download the Beta directly from the official Tally Solutions website at: https://tallysolutions.com/download-tallyprime-7-1-beta/
+You can download TallyPrime 7.1 directly from the official Tally Solutions website at: https://tallysolutions.com/tallyprime/
 
 Or contact us to book an upgrade consultation. We will assess your current setup, plan the upgrade, and ensure zero disruption to your business operations.
 

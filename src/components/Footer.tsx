@@ -144,37 +144,37 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* TallyPrime 7.1 Coming Soon Banner */}
-        <div className="rounded-4xl border border-amber-200 bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 p-6 shadow-lg">
+        {/* TallyPrime 7.1 Now Live Banner */}
+        <div className="rounded-4xl border border-green-200 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 p-6 shadow-lg">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl bg-amber-400 text-white shadow-md">
+              <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl bg-green-500 text-white shadow-md">
                 <Sparkles className="h-6 w-6" />
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-white">Coming Soon</span>
-                  <span className="text-xs text-amber-700 font-semibold">Early Access Beta Available Now</span>
+                  <span className="inline-block rounded-full bg-green-500 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-white">Now Live</span>
+                  <span className="text-xs text-green-700 font-semibold">TallyPrime 7.1 is officially released — upgrade today!</span>
                 </div>
-                <h4 className="text-base font-bold text-white">TallyPrime 7.1 — The Next Generation of Business Management</h4>
+                <h4 className="text-base font-bold text-slate-900">TallyPrime 7.1 is Here — Experience the Next Generation of Business Management</h4>
                 <p className="mt-1 text-sm text-slate-600 max-w-2xl">
-                  TallyPrime 7.1 is here with features built for Kenyan businesses: <strong>8 professional invoice templates</strong> including eTIMS-ready formats, <strong>enhanced KRA & eTIMS compliance</strong> with faster e-filing, <strong>M-Pesa & local bank reconciliation upgrades</strong>, <strong>improved multi-currency support</strong> for USD/EUR transactions, <strong>faster payroll processing</strong> with updated PAYE, NHIF, NSSF & Housing Levy rates, and <strong>auto-wrap text</strong> for cleaner reports. As your certified TallyPrime partner, we will upgrade and support your transition seamlessly.
+                  TallyPrime 7.1 is now officially available with features built for Kenyan businesses: <strong>8 professional invoice templates</strong> including eTIMS-ready formats, <strong>enhanced KRA &amp; eTIMS compliance</strong> with faster e-filing, <strong>M-Pesa &amp; local bank reconciliation upgrades</strong>, <strong>improved multi-currency support</strong> for USD/EUR transactions, <strong>faster payroll processing</strong> with updated PAYE, NHIF, NSSF &amp; Housing Levy rates, and <strong>auto-wrap text</strong> for cleaner reports. As your certified TallyPrime partner, we will upgrade and support your transition seamlessly.
                 </p>
               </div>
             </div>
             <div className="flex flex-col gap-2 shrink-0">
               <a
-                href="https://tallysolutions.com/download-tallyprime-7-1-beta/"
+                href="https://tallysolutions.com/tallyprime/"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-full bg-amber-400 hover:bg-amber-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition"
+                className="inline-flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition"
               >
-                Explore 7.1 Features
+                Experience 7.1 Now
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>
               <a
                 href="/contact"
-                className="inline-flex items-center justify-center rounded-full border border-amber-400 bg-amber-500/10 hover:bg-amber-500/20 px-6 py-3 text-sm font-semibold text-amber-400 transition"
+                className="inline-flex items-center justify-center rounded-full border border-green-500 bg-green-500/10 hover:bg-green-500/20 px-6 py-3 text-sm font-semibold text-green-600 transition"
               >
                 Book an Upgrade Consultation
               </a>
