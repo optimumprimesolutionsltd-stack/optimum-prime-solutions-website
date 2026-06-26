@@ -489,6 +489,78 @@ Or contact us to book an upgrade consultation. We will assess your current setup
 
 Ready to upgrade? Get in touch with our team today.`},
     {
+      id: '8',
+      title: 'TallyPrime 7.1 Released: How the New Features Help Kenyan Businesses Navigate eTIMS 2026',
+      excerpt: 'TallyPrime 7.1 is officially here. From professional invoice templates to auto-wrap text, discover how the latest features are specifically designed to help Kenyan businesses streamline operations and stay compliant with KRA\'s 2026 eTIMS mandates.',
+      date: '2026-06-26',
+      category: 'Product Update',
+      readTime: '5 min',
+      content: `The wait is over. Tally Solutions has officially released **TallyPrime 7.1**, bringing a suite of powerful new features designed to simplify daily business operations. 
+
+For Kenyan businesses, this release comes at a critical time. With the Kenya Revenue Authority (KRA) enforcing strict eTIMS validation rules in 2026—where expenses without eTIMS-compliant invoices are automatically disallowed—having an accounting system that seamlessly integrates compliance with daily workflows is no longer optional.
+
+As Kenya's certified TallyPrime partner, we have deployed and tested the new release. Here is a deep dive into the top features of TallyPrime 7.1 and exactly how they benefit your business in the Kenyan context.
+
+## 1. Professional, Customisable Invoice Templates
+
+First impressions matter. In the past, customizing invoice layouts required technical tweaks. TallyPrime 7.1 changes this by introducing **eight ready-to-use, professional invoice templates**.
+
+**What this means for you:**
+- **Brand Identity:** You can now easily add your company logo, a background watermark, header/footer images, and brand colours directly to your invoices.
+- **Clear Terms:** Add specific terms and conditions seamlessly.
+- **eTIMS Ready:** These templates are designed to clearly display mandatory KRA eTIMS QR codes and control numbers without cluttering the design.
+- **Flexibility:** Set your preferred template as the default for different voucher types (e.g., a specific look for export invoices vs. local retail sales).
+
+## 2. Flexible Discount Handling
+
+Negotiating deals in Kenya often involves a mix of percentage discounts and flat cash reductions. Previously, handling complex discount structures required workarounds.
+
+**What this means for you:**
+TallyPrime 7.1 introduces highly flexible discount application. You can now apply discounts as a **percentage, a fixed amount, or both** within the same purchase or sales transaction. This reflects real-world trading scenarios in Nairobi's fast-paced wholesale and retail markets, ensuring your invoices match your actual agreements perfectly.
+
+## 3. Auto-Wrap Text for Better Readability
+
+It sounds like a small detail, but it's a massive quality-of-life improvement. 
+
+**What this means for you:**
+Long vendor names, detailed item descriptions, and extensive transaction notes now **wrap automatically** across your reports and printouts. No more truncated text or awkward line breaks. When you share an invoice or a ledger statement with a client or auditor, all details are clearly legible at a glance.
+
+## 4. Reusable Voucher Numbers
+
+Mistakes happen. A voucher gets deleted, and suddenly your numbering sequence is broken—a red flag for auditors.
+
+**What this means for you:**
+TallyPrime 7.1 allows you to quickly access and **reuse deleted voucher numbers** in any voucher type. This ensures you maintain a clean, unbroken numbering sequence, which is crucial for KRA audits and internal controls.
+
+## 5. Connected Banking and Easier Reconciliation
+
+While some banking features are currently rolling out region by region, the core banking engine in TallyPrime 7.1 has been significantly upgraded.
+
+**What this means for you:**
+- **Potential Matches Summary:** A new summary view shows the count of book vs. bank transactions, helping you reconcile faster.
+- **Bill-wise Details:** You can now add bill-wise details while creating multiple vouchers directly from bank statements.
+- **Faster Workflows:** Import your bank statements and complete payment/receipt accounting with a single click. For businesses dealing with high volumes of M-Pesa paybill and bank transfers, this drastically reduces manual data entry.
+
+## 6. Enhanced Compliance and Edit Log Controls
+
+With KRA's 2026 mandate requiring strict validation of income and expenses, internal controls are paramount.
+
+**What this means for you:**
+TallyPrime 7.1 gives you flexibility over the **Edit Log**. You can choose to keep it permanently activated to ensure a tamper-proof audit trail—ideal for larger enterprises or those preparing for external audits. Alternatively, it can be disabled by default based on your specific operational needs.
+
+## The Verdict: Why Upgrade Now?
+
+TallyPrime 7.1 isn't just a cosmetic update; it's a practical response to the everyday friction points businesses face. From making your invoices look world-class to ensuring your numbering sequences stay compliant for KRA, every feature is built to save time.
+
+Most importantly, as the June 30th eTIMS deadline approaches, running the latest, most compliant version of TallyPrime ensures your business isn't caught off guard by KRA's automated expense validation engine.
+
+### Ready to Experience TallyPrime 7.1?
+
+As your certified partner, Optimum Prime Solutions handles the entire upgrade process. We ensure zero data loss, provide staff training on the new features, and guarantee your eTIMS integration remains flawless.
+
+[Contact us today](/contact) to schedule your seamless upgrade to TallyPrime 7.1.`
+    },
+    {
       id: '7',
       title: 'eTIMS Deadline 2026: What Every Kenyan Business Must Do Before June 30',
       excerpt: 'KRA\'s eTIMS validation engine is now checking every return automatically. Here\'s what changes before June 30, 2026, and how to get compliant fast with TallyPrime.',
