@@ -17,6 +17,7 @@ import TestimonialsPage from './pages/TestimonialsPage';
 import BlogPage from './pages/BlogPage';
 import FAQPage from './pages/FAQPage';
 import ContactPage from './pages/ContactPage';
+import TallyPrime71Popup from './components/TallyPrime71Popup';
 import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth } from './firebase/config';
 import type { User } from 'firebase/auth';
 import { signInAnonymously } from 'firebase/auth';
@@ -41,6 +42,7 @@ function SiteRoutes() {
       </main>
       <Footer />
       <Chatbot />
+      <TallyPrime71Popup />
     </div>
   );
 }
