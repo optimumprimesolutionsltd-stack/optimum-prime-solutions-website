@@ -85,14 +85,19 @@ export default function Testimonials() {
                 </motion.div>
               </div>
 
-              {/* Video Info Overlay */}
-              <div className="absolute top-6 left-6 bg-black/60 backdrop-blur-md rounded-full px-4 py-2 text-xs font-bold text-white flex items-center gap-2 border border-white/10">
+              {/* Video Info Overlay — hidden on mobile to avoid covering the subject's face */}
+              <div className="hidden md:flex absolute top-6 left-6 bg-black/60 backdrop-blur-md rounded-full px-4 py-2 text-xs font-bold text-white items-center gap-2 border border-white/10">
                 <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
                 Success Story: Ujenzi Distributors Ltd
               </div>
 
               <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
                 <div className="text-white">
+                  {/* On mobile, show the badge here at the bottom instead */}
+                  <div className="flex md:hidden items-center gap-2 bg-black/60 backdrop-blur-md rounded-full px-3 py-1 text-xs font-bold text-white border border-white/10 mb-2 w-fit">
+                    <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
+                    Success Story: Ujenzi Distributors Ltd
+                  </div>
                   <p className="text-sm font-bold">Watch Frederick Chege's Story</p>
                   <p className="text-xs text-slate-300">Opens in Facebook</p>
                 </div>
