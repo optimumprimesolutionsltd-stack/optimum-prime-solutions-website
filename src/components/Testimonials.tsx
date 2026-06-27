@@ -47,14 +47,11 @@ export default function Testimonials() {
           viewport={{ once: true }}
           className="text-center max-w-3xl mx-auto mb-20"
         >
-          <span className="inline-block rounded-full bg-red-600/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-red-400 border border-red-500/20">
-            Success Story
-          </span>
           <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-white leading-tight">
             Trusted by <span className="bg-gradient-to-r from-[#0070c0] to-[#2e3192] bg-clip-text text-transparent">Ujenzi Distributors Ltd</span>
           </h2>
-          <p className="mt-6 text-lg text-slate-300">
-            See how Frederick Chege transformed his business operations with Optimum Prime Solutions.
+          <p className="mt-4 text-base text-slate-400">
+            Frederick Chege, Ujenzi Distributors Ltd
           </p>
         </motion.div>
 
@@ -85,21 +82,9 @@ export default function Testimonials() {
                 </motion.div>
               </div>
 
-              {/* Video Info Overlay — hidden on mobile to avoid covering the subject's face */}
-              <div className="hidden md:flex absolute top-6 left-6 bg-black/60 backdrop-blur-md rounded-full px-4 py-2 text-xs font-bold text-white items-center gap-2 border border-white/10">
-                <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-                Success Story: Ujenzi Distributors Ltd
-              </div>
-
               <div className="absolute bottom-6 left-6 right-6 flex justify-between items-end">
                 <div className="text-white">
-                  {/* On mobile, show the badge here at the bottom instead */}
-                  <div className="flex md:hidden items-center gap-2 bg-black/60 backdrop-blur-md rounded-full px-3 py-1 text-xs font-bold text-white border border-white/10 mb-2 w-fit">
-                    <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse" />
-                    Success Story: Ujenzi Distributors Ltd
-                  </div>
                   <p className="text-sm font-bold">Watch Frederick Chege's Story</p>
-                  <p className="text-xs text-slate-300">Opens in Facebook</p>
                 </div>
                 <div className="flex gap-2">
                   <a 
