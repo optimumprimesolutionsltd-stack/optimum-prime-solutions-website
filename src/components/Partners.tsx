@@ -14,8 +14,8 @@ const partners = [
   {
     name: 'EOS Worldwide',
     logo: '/partner-eos.png',
-    description: 'We are certified EOS® Implementers helping leadership teams run their businesses on the Entrepreneurial Operating System by Gino Wickman. EOS strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction.',
-    badge: 'Certified Implementer',
+    description: 'We apply EOS® (Entrepreneurial Operating System) principles to help leadership teams get aligned, gain traction, and achieve their vision. EOS® strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. EOS® is a registered trademark of EOS Worldwide, LLC.',
+    badge: 'EOS-Inspired Consulting',
     badgeColor: 'bg-orange-100 text-orange-700',
     url: 'https://www.eosworldwide.com',
     logoClass: 'h-10 object-contain',
@@ -23,8 +23,8 @@ const partners = [
   {
     name: 'HubSpot',
     logo: '/partner-hubspot.png',
-    description: 'We integrate HubSpot CRM with TallyPrime to give your business a complete view of sales, collections, and customer relationships. HubSpot powers your pipeline, follow-ups, and marketing — while TallyPrime handles the financials.',
-    badge: 'Integration Partner',
+    description: 'We integrate HubSpot CRM with TallyPrime to give your business a complete view of sales, collections, and customer relationships. HubSpot powers your pipeline, follow-ups, and marketing — while TallyPrime handles the financials. HubSpot® is a registered trademark of HubSpot, Inc.',
+    badge: 'CRM Integration',
     badgeColor: 'bg-orange-100 text-orange-700',
     url: 'https://www.hubspot.com',
     logoClass: 'h-8 object-contain',

@@ -206,7 +206,18 @@ export default function Footer() {
           </div>
         </div>
 
-      <div className="flex flex-col gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+      {/* Trademark Disclaimer */}
+      <div className="border-t border-slate-800 pt-6 pb-2">
+        <p className="text-xs text-slate-600 leading-relaxed max-w-4xl">
+          TallyPrime® is a registered trademark of Tally Solutions Pvt. Ltd. TSplus® is a registered trademark of Terminal Service Plus SAS.
+          EOS® and Entrepreneurial Operating System® are registered trademarks of EOS Worldwide, LLC.
+          HubSpot® is a registered trademark of HubSpot, Inc.
+          Optimum Prime Solutions Ltd is an authorised TallyPrime reseller and TSplus deployment partner.
+          References to EOS® and HubSpot® are for descriptive purposes only. Optimum Prime Solutions Ltd is not affiliated with, endorsed by, or an official partner of EOS Worldwide, LLC or HubSpot, Inc.
+        </p>
+      </div>
+
+      <div className="flex flex-col gap-4 border-t border-slate-800 pt-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} {data.company.name}. All rights reserved.</p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
