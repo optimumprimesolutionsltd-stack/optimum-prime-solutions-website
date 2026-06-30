@@ -18,23 +18,23 @@ export interface SiteData {
 
 export const defaultData: SiteData = {
   company: {
-    name:'Optimum Prime Solutions',
-    tagline:'Certified TallyPrime Partner · Cloud Hosting · Business Systems Consulting',
+    name:'Optimum Prime Solutions Ltd',
+    tagline:'Certified TallyPrime Partner · Business Management Consultant · Cloud Hosting · Business Systems Consulting',
     mission:'To empower Kenyan businesses with world-class TallyPrime solutions, secure cloud infrastructure, and proven business operating frameworks — helping leadership teams get aligned, gain traction, and achieve sustainable growth.',
     vision:'To be the leading TallyPrime partner and business systems consultancy in East Africa, transforming how businesses manage their finances, operations, and leadership systems.',
     about:[
-      'Optimum Prime Solutions is Kenya\'s certified TallyPrime partner, delivering end-to-end business automation and cloud solutions. With over 15 years of combined experience, our certified team has helped 500+ businesses across East Africa transform their operations using TallyPrime Silver, Gold, and Enterprise editions.',
+      'Optimum Prime Solutions Ltd is a certified TallyPrime partner and business management consultant based in Ruiru, Kenya. We help small and medium businesses streamline accounting, inventory, payroll, and KRA/eTIMS tax compliance through TallyPrime implementation, training, and support. We also offer cloud hosting and ongoing business systems consulting to help growing Kenyan businesses operate more efficiently.',
       'Beyond accounting software, we apply proven business operating frameworks — drawing on EOS® (Entrepreneurial Operating System) principles by Gino Wickman — to help leadership teams get aligned, gain traction, and achieve their vision. EOS® strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. We combine TallyPrime\'s financial power with structured operational discipline to give your business both the numbers and the systems to grow. EOS® is a registered trademark of EOS Worldwide, LLC.'
     ],
     stats:[{label:'Clients Served',value:'500+'},{label:'Years Experience',value:'15+'},{label:'Uptime Guarantee',value:'99.9%'},{label:'Support Response',value:'< 1hr'}],
   },
   contact: {
-    location:'Ruiru, Kenya',
+    location:'Gacheru House, Ruiru Town, Ruiru, Kenya',
     phones:['+254 116 246 074','+254 727 209 720'],
     emails:['optimumprimesolutionsltd@gmail.com','Info@optimumprimesolutionsltd.co.ke'],
     workingHours:['Mon – Fri: 8:00 AM – 6:00 PM','Sat: 9:00 AM – 1:00 PM'],
     whatsapp:'254116246074',
-    mapUrl:'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.37!2d36.96!3d-1.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRuiru!5e0!3m2!1sen!2ske!4v1',
+    mapUrl:'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8!2d36.9614!3d-1.1453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f3f6c!2sGacheru+House+Ruiru+Town!5e0!3m2!1sen!2ske!4v1',
   },
   heroImages: {
     // About: African business team in a modern office setting

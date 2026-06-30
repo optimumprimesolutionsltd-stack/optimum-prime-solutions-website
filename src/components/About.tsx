@@ -18,10 +18,10 @@ export default function About() {
               custom={0}
               className="inline-block rounded-full bg-gradient-to-r from-sky-500 to-cyan-400 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white shadow-lg shadow-cyan-200/30"
             >
-              About Optimum Prime Solutions
+              About Optimum Prime Solutions Ltd
             </motion.span>
             <motion.h2 variants={fade} custom={1} className="mt-4 text-3xl sm:text-4xl font-bold text-white">Systems That Help Businesses Grow</motion.h2>
-            <motion.p variants={fade} custom={2} className="mt-4 text-slate-300 leading-relaxed">Optimum Prime Solutions is Kenya's certified TallyPrime partner — selling, implementing, and supporting TallyPrime Silver, Gold, and Enterprise editions across East Africa. We also provide secure cloud hosting so your team can access TallyPrime from anywhere, and we are licensed EOS® implementers helping leadership teams run their businesses on the Entrepreneurial Operating System by Gino Wickman.</motion.p>
+            <motion.p variants={fade} custom={2} className="mt-4 text-slate-300 leading-relaxed">Optimum Prime Solutions Ltd is a certified TallyPrime partner and business management consultant based in Ruiru, Kenya. We help small and medium businesses streamline accounting, inventory, payroll, and KRA/eTIMS tax compliance through TallyPrime implementation, training, and support. We also offer cloud hosting and ongoing business systems consulting to help growing Kenyan businesses operate more efficiently.</motion.p>
             <motion.p variants={fade} custom={3} className="mt-4 text-slate-400 leading-relaxed">EOS® strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. Combined with TallyPrime's financial intelligence, our clients gain both the numbers and the management system to grow with confidence and accountability.</motion.p>
             <motion.div variants={fade} custom={4} className="mt-8 grid grid-cols-2 gap-5">
               {c.stats.map((s:{label:string;value:string},i:number)=>{const I=icons[i%icons.length];return(

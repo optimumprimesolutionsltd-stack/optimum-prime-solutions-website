@@ -5,7 +5,7 @@ export interface ChatMessage {
 
 // Mock AI responses database - conversational, inquisitive, and broad
 const mockResponses: Record<string, (history: ChatMessage[], leadProfile?: Record<string, string | undefined>) => string> = {
-  greeting: () => `Hey there! 👋 Welcome to Optimum Prime Solutions — Kenya's certified TallyPrime partner. I'm **Zawadi**, your business solutions guide.
+  greeting: () => `Hey there! 👋 Welcome to Optimum Prime Solutions Ltd — certified TallyPrime partner and business management consultant in Ruiru, Kenya. I'm **Zawadi**, your business solutions guide.
 
 I'm here to help you find the right accounting software, cloud hosting, or business consulting solution for your needs. What brings you here today?`,
 
@@ -90,7 +90,7 @@ Which of these sounds most relevant to your current situation?`;
   contact: () => `You can reach us anytime:
 📞 **Phone:** +254 116 246 074 | +254 727 209 720
 📧 **Email:** optimumprimesolutionsltd@gmail.com
-📍 **Location:** Ruiru, Kenya
+📍 **Location:** Gacheru House, Ruiru Town, Ruiru, Kenya
 💬 **WhatsApp:** +254 116 246 074
 
 Or I can help you book a free consultation right now. What works best for you?`,
