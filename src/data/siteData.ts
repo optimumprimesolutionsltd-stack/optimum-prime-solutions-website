@@ -32,7 +32,7 @@ export const defaultData: SiteData = {
     location:'Gacheru House, Ruiru Town, Ruiru, Kenya',
     phones:['+254 116 246 074','+254 727 209 720'],
     emails:['optimumprimesolutionsltd@gmail.com','Info@optimumprimesolutionsltd.co.ke'],
-    workingHours:['Mon – Fri: 8:00 AM – 6:00 PM','Sat: 9:00 AM – 1:00 PM'],
+    workingHours:['Mon – Fri: 8:00 AM – 5:00 PM','Sat: 8:00 AM – 3:00 PM','Sun: Closed | Online support available 24/7'],
     whatsapp:'254116246074',
     mapUrl:'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8!2d36.9614!3d-1.1453!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f3f6c!2sGacheru+House+Ruiru+Town!5e0!3m2!1sen!2ske!4v1',
   },

@@ -48,6 +48,8 @@
         },
         "areaServed": [
           { "@type": "Country", "name": "KE" },
+          { "@type": "City", "name": "Nairobi" },
+          { "@type": "AdministrativeArea", "name": "Kiambu County" },
           { "@type": "Country", "name": "UG" },
           { "@type": "Country", "name": "TZ" }
         ],
@@ -66,15 +68,19 @@
             "@type": "OpeningHoursSpecification",
             "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
             "opens": "08:00",
-            "closes": "18:00"
+            "closes": "17:00"
           },
           {
             "@type": "OpeningHoursSpecification",
             "dayOfWeek": "Saturday",
-            "opens": "09:00",
-            "closes": "13:00"
+            "opens": "08:00",
+            "closes": "15:00"
           }
         ],
+        "specialOpeningHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "description": "Online support available 24/7"
+        },
         "knowsAbout": [
           "TallyPrime",
           "Accounting Software",
