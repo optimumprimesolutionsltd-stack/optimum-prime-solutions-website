@@ -180,7 +180,7 @@ export default function Testimonials() {
           {/* Right: CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 flex-shrink-0">
             <motion.a
-              href="https://search.google.com/local/writereview?placeid=ChIJ0dQxJo9HGRsRubrYTcALqyU"
+              href="https://search.google.com/local/writereview?placeid=ChIJHdQxJo9HGRsR-bqwTcALqyU"
               target="_blank"
               rel="noreferrer"
               whileHover={{ scale: 1.04 }}
