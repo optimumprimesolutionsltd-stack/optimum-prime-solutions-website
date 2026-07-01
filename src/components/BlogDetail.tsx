@@ -238,7 +238,7 @@ export default function BlogDetail({ blogId, onClose }: Props) {
               <div>
                 <p className="font-semibold text-navy-900 dark:text-white">Optimum Prime Solutions</p>
                 <p className="text-sm text-navy-600 dark:text-navy-400">
-                  Your trusted Tally Prime implementation partner in East Africa.
+                  Your trusted TallyPrime implementation partner in East Africa.
                 </p>
               </div>
             </div>

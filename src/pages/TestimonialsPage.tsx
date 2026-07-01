@@ -13,7 +13,7 @@ export default function TestimonialsPage() {
       />
       <AfricanLaptopShowcase
         tag="Client stories"
-        title="A happy business owner sharing their Tally Prime journey"
+        title="A happy business owner sharing their TallyPrime journey"
         description="Every testimonial is grounded in a single-person experience, showing how our local team helps one owner gain control of finances and inventory."
         features={['Real Kenyan success stories', 'Personal support and follow-up', 'Proof of smoother compliance', 'Strong ROI for small teams']}
         theme="testimonials"

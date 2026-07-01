@@ -10,7 +10,7 @@ export default function Industries() {
         <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} className="text-center max-w-3xl mx-auto">
           <span className="inline-block rounded-full bg-yellow-400/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-yellow-600">Industries</span>
           <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-navy-900 dark:text-white">Solutions for Every Industry</h2>
-          <p className="mt-4 text-navy-600 dark:text-navy-300">We've tailored Tally Prime for the unique needs of Kenyan businesses across all sectors.</p>
+          <p className="mt-4 text-navy-600 dark:text-navy-300">We've tailored TallyPrime for the unique needs of Kenyan businesses across all sectors.</p>
         </motion.div>
         <div className="mt-16 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {data.industries.map((ind,i)=>{const Ic=iconMap[ind.icon]||ShoppingBag;return(

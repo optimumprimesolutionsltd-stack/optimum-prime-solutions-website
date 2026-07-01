@@ -35,7 +35,7 @@ export default function ProductsEditor({ data, onSave }: P) {
   const addProduct = () => {
     const newProduct: ProductItem = {
       id: Date.now().toString(),
-      name: 'Tally Prime',
+      name: 'TallyPrime',
       edition: 'New Edition',
       price: 'KES 0',
       period: 'one-time',
@@ -71,7 +71,7 @@ export default function ProductsEditor({ data, onSave }: P) {
   const addPresetProduct = (type: 'silver' | 'gold' | 'custom') => {
     const presets: Record<string, Partial<ProductItem>> = {
       silver: {
-        name: 'Tally Prime',
+        name: 'TallyPrime',
         edition: 'Silver',
         price: 'KES 54,000',
         period: 'one-time',
@@ -89,7 +89,7 @@ export default function ProductsEditor({ data, onSave }: P) {
         cta: 'Get Silver'
       },
       gold: {
-        name: 'Tally Prime',
+        name: 'TallyPrime',
         edition: 'Gold',
         price: 'KES 162,000',
         period: 'one-time',
@@ -107,7 +107,7 @@ export default function ProductsEditor({ data, onSave }: P) {
         cta: 'Get Gold'
       },
       custom: {
-        name: 'Tally Prime',
+        name: 'TallyPrime',
         edition: 'Enterprise',
         price: 'Custom Quote',
         period: 'per project',
@@ -159,7 +159,7 @@ export default function ProductsEditor({ data, onSave }: P) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-sm text-navy-500">{items.length} products/licenses</p>
-          <p className="text-xs text-navy-400">Manage your Tally Prime pricing tiers</p>
+          <p className="text-xs text-navy-400">Manage your TallyPrime pricing tiers</p>
         </div>
         <div className="flex items-center gap-2">
           <button 
@@ -292,7 +292,7 @@ export default function ProductsEditor({ data, onSave }: P) {
                       value={product.name} 
                       onChange={e => updateProduct(product.id, { name: e.target.value })}
                       className="w-full rounded-lg border border-navy-200 px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/10"
-                      placeholder="Tally Prime"
+                      placeholder="TallyPrime"
                     />
                   </div>
                   <div>
@@ -431,7 +431,7 @@ export default function ProductsEditor({ data, onSave }: P) {
         <div className="rounded-2xl border border-navy-200 bg-navy-50/50 py-16 text-center">
           <Package className="mx-auto h-12 w-12 text-navy-300" />
           <p className="mt-4 text-sm font-medium text-navy-600">No products yet</p>
-          <p className="mt-1 text-xs text-navy-400">Add your first Tally Prime license using the buttons above</p>
+          <p className="mt-1 text-xs text-navy-400">Add your first TallyPrime license using the buttons above</p>
           <button 
             onClick={() => setShowPresetModal(true)}
             className="mt-4 inline-flex items-center gap-2 rounded-lg bg-navy-900 px-5 py-2.5 text-sm font-medium text-white"

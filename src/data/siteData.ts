@@ -19,11 +19,11 @@ export interface SiteData {
 export const defaultData: SiteData = {
   company: {
     name:'Optimum Prime Solutions Ltd',
-    tagline:'Certified TallyPrime Partner · Business Management Consultant · Cloud Hosting · Business Systems Consulting',
+    tagline:'Certified TallyPrime Partner · Business Automation · Cloud Hosting · Business Systems Consulting',
     mission:'To empower Kenyan businesses with world-class TallyPrime solutions, secure cloud infrastructure, and proven business operating frameworks — helping leadership teams get aligned, gain traction, and achieve sustainable growth.',
     vision:'To be the leading TallyPrime partner and business systems consultancy in East Africa, transforming how businesses manage their finances, operations, and leadership systems.',
     about:[
-      'Optimum Prime Solutions Ltd is a certified TallyPrime partner and business management consultant based in Ruiru, Kenya. We help small and medium businesses streamline accounting, inventory, payroll, and KRA/eTIMS tax compliance through TallyPrime implementation, training, and support. We also offer cloud hosting and ongoing business systems consulting to help growing Kenyan businesses operate more efficiently.',
+      'Optimum Prime Solutions Ltd is a certified TallyPrime partner and business automation consultancy based in Ruiru, Kenya. We help small and medium businesses streamline accounting, inventory, payroll, and KRA/eTIMS tax compliance through TallyPrime implementation, training, and support. We also offer cloud hosting and ongoing business systems consulting to help growing Kenyan businesses operate more efficiently.',
       'Beyond accounting software, we apply proven business operating frameworks — drawing on EOS® (Entrepreneurial Operating System) principles by Gino Wickman — to help leadership teams get aligned, gain traction, and achieve their vision. EOS® strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. We combine TallyPrime\'s financial power with structured operational discipline to give your business both the numbers and the systems to grow. EOS® is a registered trademark of EOS Worldwide, LLC.'
     ],
     stats:[{label:'Clients Served',value:'500+'},{label:'Years Experience',value:'15+'},{label:'Uptime Guarantee',value:'99.9%'},{label:'Support Response',value:'< 1hr'}],
@@ -53,12 +53,12 @@ export const defaultData: SiteData = {
     contact: '/images/contact-office-setup.webp',
   },
   services: [
-    {id:'1',title:'Tally Prime Installation & Setup',desc:'Complete installation, configuration, and data migration for Tally Prime Silver & Gold editions. Get up and running in 24 hours.',icon:'Download',features:['License activation','Data migration','Multi-user setup','Initial training'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
-    {id:'2',title:'Inventory Management',desc:'Real-time stock tracking, batch management, reorder alerts, and multi-location inventory control powered by Tally Prime.',icon:'Package',features:['Real-time tracking','Batch & expiry management','Reorder alerts','Multi-location support'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
+    {id:'1',title:'TallyPrime Installation & Setup',desc:'Complete installation, configuration, and data migration for TallyPrime Silver & Gold editions. Get up and running in 24 hours.',icon:'Download',features:['License activation','Data migration','Multi-user setup','Initial training'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
+    {id:'2',title:'Inventory Management',desc:'Real-time stock tracking, batch management, reorder alerts, and multi-location inventory control powered by TallyPrime.',icon:'Package',features:['Real-time tracking','Batch & expiry management','Reorder alerts','Multi-location support'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
     {id:'3',title:'Payroll Systems',desc:'Automated payroll processing fully configured for Kenyan statutory requirements — PAYE, NHIF, NSSF, Housing Levy.',icon:'Wallet',features:['Auto salary processing','PAYE/NHIF/NSSF','Payslip generation','Leave management'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
     {id:'4',title:'Manufacturing Solutions',desc:'Streamline production with Bill of Materials, production orders, work-in-progress tracking, and cost analysis.',icon:'Factory',features:['BOM management','Production orders','Cost tracking','Quality control'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
     {id:'5',title:'KRA Compliance',desc:'Stay 100% compliant with KRA. Automated VAT, income tax, PAYE calculations, and e-filing integration.',icon:'FileCheck',features:['VAT management','e-Filing integration','Tax reports','Audit trail'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
-    {id:'6',title:'TDL Customization',desc:'Custom Tally Definition Language development to tailor Tally Prime to your exact business workflows.',icon:'Code',features:['Custom reports','Workflow automation','Integration APIs','Module extensions'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
+    {id:'6',title:'TDL Customization',desc:'Custom Tally Definition Language development to tailor TallyPrime to your exact business workflows.',icon:'Code',features:['Custom reports','Workflow automation','Integration APIs','Module extensions'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
     {id:'7',title:'Remote & On-site Support',desc:'24/7 remote assistance plus scheduled on-site visits. Average response time under 1 hour.',icon:'Headphones',features:['24/7 remote support','On-site visits','Software updates','Troubleshooting'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
     {id:'8',title:'Business Operating System Consulting',desc:'We apply EOS®-inspired frameworks to help your leadership team get aligned, gain traction, and achieve your vision using the Entrepreneurial Operating System by Gino Wickman.',icon:'BarChart3',features:['Vision & traction planning','Vision/Traction Organizer (V/TO)','Rocks & accountability meetings','L10 meeting cadence','People Analyser & RPRS','Quarterly & annual planning'],link:'/contact'},
     {id:'9',title:'TallyPrime Cloud Hosting',desc:'Access your TallyPrime data securely from anywhere. We set up and manage cloud infrastructure so your team can work remotely without compromising data security.',icon:'Cloud',features:['Cloud server setup','Remote access configuration','Automated daily backups','99.9% uptime SLA','Multi-user concurrent access','Disaster recovery planning'],link:'/contact'},
@@ -84,21 +84,21 @@ export const defaultData: SiteData = {
     }
   ],
   faqs: [
-    {id:'1',q:'What is Tally Prime?',a:'Tally Prime is a complete business management software for accounting, inventory, payroll, manufacturing, taxation, and more. It\'s used by millions of businesses worldwide and is the leading ERP solution in East Africa.',cat:'General'},
-    {id:'2',q:'How much does Tally Prime cost?',a:'Tally Prime Silver (single user) costs KES 54,000 and Tally Prime Gold (multi-user) costs KES 162,000. Both are one-time purchases with 1 year of free updates. Contact us for volume discounts.',cat:'Pricing'},
-    {id:'3',q:'Do you provide training?',a:'Yes! We provide comprehensive training covering all Tally Prime modules — accounting, inventory, payroll, manufacturing, and KRA compliance. Training can be on-site or remote.',cat:'Services'},
-    {id:'4',q:'How does Tally handle KRA compliance?',a:'Tally Prime is fully configured for KRA including VAT computation, PAYE calculations, income tax reports, and supports e-filing integration for iTax returns.',cat:'KRA & Tax'},
-    {id:'5',q:'Can I access Tally Prime remotely?',a:'Yes! Tally Prime Gold supports remote access. With our cloud setup, you can access your data from anywhere — perfect for teams working across multiple locations.',cat:'General'},
+    {id:'1',q:'What is TallyPrime?',a:'TallyPrime is a complete business management software for accounting, inventory, payroll, manufacturing, taxation, and more. It\'s used by millions of businesses worldwide and is the leading ERP solution in East Africa.',cat:'General'},
+    {id:'2',q:'How much does TallyPrime cost?',a:'TallyPrime Silver (single user) costs KES 54,000 and TallyPrime Gold (multi-user) costs KES 162,000. Both are one-time purchases with 1 year of free updates. Contact us for volume discounts.',cat:'Pricing'},
+    {id:'3',q:'Do you provide training?',a:'Yes! We provide comprehensive training covering all TallyPrime modules — accounting, inventory, payroll, manufacturing, and KRA compliance. Training can be on-site or remote.',cat:'Services'},
+    {id:'4',q:'How does Tally handle KRA compliance?',a:'TallyPrime is fully configured for KRA including VAT computation, PAYE calculations, income tax reports, and supports e-filing integration for iTax returns.',cat:'KRA & Tax'},
+    {id:'5',q:'Can I access TallyPrime remotely?',a:'Yes! TallyPrime Gold supports remote access. With our cloud setup, you can access your data from anywhere — perfect for teams working across multiple locations.',cat:'General'},
     {id:'6',q:'How long does implementation take?',a:'Basic setup takes 1-2 days. Full enterprise implementation with data migration and training typically takes 1-2 weeks, depending on complexity.',cat:'Services'},
     {id:'7',q:'Do you offer after-sales support?',a:'Absolutely. We provide 24/7 remote support with average response under 1 hour, plus scheduled on-site visits. Support plans start from KES 5,000/month.',cat:'Support'},
     {id:'8',q:'Can I migrate from Excel or other software?',a:'Yes, we handle full data migration from Excel, spreadsheets, and other systems. All historical data is accurately transferred with zero downtime, ensuring no loss of critical information.',cat:'Services'},
-    {id:'9',q:'Is my data secure?',a:'Tally Prime provides enterprise-grade security with role-based access, audit trails, encrypted storage, and automated backups. We also set up disaster recovery plans.',cat:'Security'},
+    {id:'9',q:'Is my data secure?',a:'TallyPrime provides enterprise-grade security with role-based access, audit trails, encrypted storage, and automated backups. We also set up disaster recovery plans.',cat:'Security'},
     {id:'10',q:'Do you serve businesses outside Nairobi?',a:'Yes! We serve clients across Kenya and East Africa. Remote support is available nationwide, and we schedule on-site visits for implementation anywhere in the region.',cat:'General'},
-    {id:'11',q:'Which Tally Prime edition is best for my business?',a:'We recommend Tally Prime Silver for single-user small businesses and Tally Prime Gold for multi-user teams with remote access needs. For branch operations or advanced reporting, we often advise Plus or Enterprise deployments.',cat:'Products'},
-    {id:'12',q:'Can Tally Prime integrate with our POS or bank systems?',a:'Yes. We build Tally Prime integrations using custom TDL and available APIs so your POS, banking, or payment systems sync with accounting and inventory data automatically.',cat:'Integration'},
-    {id:'13',q:'How do you train our staff on Tally Prime?',a:'We provide tailored training sessions for accountants, managers, and operations teams. Training is available on-site or remote and includes real-world workflows, compliance reports, and support best practices.',cat:'Training'},
+    {id:'11',q:'Which TallyPrime edition is best for my business?',a:'We recommend TallyPrime Silver for single-user small businesses and TallyPrime Gold for multi-user teams with remote access needs. For branch operations or advanced reporting, we often advise Plus or Enterprise deployments.',cat:'Products'},
+    {id:'12',q:'Can TallyPrime integrate with our POS or bank systems?',a:'Yes. We build TallyPrime integrations using custom TDL and available APIs so your POS, banking, or payment systems sync with accounting and inventory data automatically.',cat:'Integration'},
+    {id:'13',q:'How do you train our staff on TallyPrime?',a:'We provide tailored training sessions for accountants, managers, and operations teams. Training is available on-site or remote and includes real-world workflows, compliance reports, and support best practices.',cat:'Training'},
     {id:'14',q:'What support options do you offer after implementation?',a:'We offer support plans covering remote assistance, regular health checks, software updates, and on-site visits. Our support response is typically under 1 hour for urgent issues.',cat:'Support'},
-    {id:'15',q:'How can I access Tally Prime remotely?',a:'Tally Prime Gold supports remote access. We can also set up secure cloud hosting so your team accesses Tally Prime from multiple locations while keeping your data centralized and backed up.',cat:'Remote Access'},
+    {id:'15',q:'How can I access TallyPrime remotely?',a:'TallyPrime Gold supports remote access. We can also set up secure cloud hosting so your team accesses TallyPrime from multiple locations while keeping your data centralized and backed up.',cat:'Remote Access'},
     {id:'16',q:'What is EOS® and how can it help my business?',a:'EOS® (Entrepreneurial Operating System) is a complete business operating system developed by Gino Wickman and detailed in his book \"Traction\". It strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. We apply EOS00ae-inspired principles to help your leadership team get aligned on where the business is going, who is doing what, and how you will get there — through proven tools like the Vision/Traction Organizer (V/TO), Rocks, L10 meetings, and the People Analyser.',cat:'EOS'},
     {id:'17',q:'How does EOS® work with TallyPrime?',a:'EOS® provides the operating system for your leadership team — clarity on vision, accountability, and meeting rhythms. TallyPrime provides the financial and operational data that feeds into your EOS scorecards and dashboards. Together, they give your business both the management discipline and the real-time numbers to make better decisions faster.',cat:'EOS'},
     {id:'18',q:'What is the EOS® implementation process?',a:'Our EOS® implementation typically runs over 12–24 months. We start with a 90-minute meeting to introduce the tools, then a Focus Day to align the leadership team, followed by quarterly and annual planning sessions. Between sessions, we coach your team on running L10 meetings, setting 90-day Rocks, and using the People Analyser. The result is a business that runs on a consistent, proven rhythm.',cat:'EOS'},
@@ -116,15 +116,15 @@ export const defaultData: SiteData = {
     {id:'8',name:'Education & NGOs',icon:'GraduationCap',desc:'Fee management, donor tracking, and grant accounting.'},
   ],
   blogs: [
-    {id:'1',title:'Why Every Kenyan Business Needs Tally Prime in 2025',excerpt:'Discover how Tally Prime is transforming business operations across Kenya with automated accounting, KRA compliance, and real-time reporting.',date:'2025-01-15',category:'Insights',readTime:'5 min',content:`Tally Prime has become the backbone of business operations across Kenya. Whether you're a small retail shop, a manufacturing facility, or a growing services company, the need for accurate financial management and KRA compliance is non-negotiable.
+    {id:'1',title:'Why Every Kenyan Business Needs TallyPrime in 2025',excerpt:'Discover how TallyPrime is transforming business operations across Kenya with automated accounting, KRA compliance, and real-time reporting.',date:'2025-01-15',category:'Insights',readTime:'5 min',content:`TallyPrime has become the backbone of business operations across Kenya. Whether you're a small retail shop, a manufacturing facility, or a growing services company, the need for accurate financial management and KRA compliance is non-negotiable.
 
-Why should your business invest in Tally Prime in 2025?
+Why should your business invest in TallyPrime in 2025?
 
 1. KRA Compliance Made Easy
-Kenya's tax environment demands precision. Tally Prime simplifies VAT calculations, PAYE processing, and e-filing integration. The eTIMS module ensures real-time invoice tracking, and automated compliance reports keep your business audit-ready. No more manual calculations or missed deadlines.
+Kenya's tax environment demands precision. TallyPrime simplifies VAT calculations, PAYE processing, and e-filing integration. The eTIMS module ensures real-time invoice tracking, and automated compliance reports keep your business audit-ready. No more manual calculations or missed deadlines.
 
 2. Real-Time Business Insights
-Stop relying on spreadsheets. Tally Prime provides instant access to your:
+Stop relying on spreadsheets. TallyPrime provides instant access to your:
 - Daily sales and expense reports
 - Inventory levels across multiple locations
 - Cash flow projections
@@ -134,10 +134,10 @@ Stop relying on spreadsheets. Tally Prime provides instant access to your:
 Decision-making becomes data-driven, not guesswork-based.
 
 3. Inventory Management at Scale
-Whether you have 1 warehouse or 10 branches, Tally Prime tracks inventory in real-time. Automated reorder points prevent stockouts, batch management prevents expired stock, and multi-location visibility ensures optimal stock distribution.
+Whether you have 1 warehouse or 10 branches, TallyPrime tracks inventory in real-time. Automated reorder points prevent stockouts, batch management prevents expired stock, and multi-location visibility ensures optimal stock distribution.
 
 4. Automated Payroll Processing
-Calculating payroll manually is error-prone and time-consuming. Tally Prime automates:
+Calculating payroll manually is error-prone and time-consuming. TallyPrime automates:
 - Salary calculations
 - PAYE, NHIF, NSSF, and Housing Levy deductions
 - Statutory compliance
@@ -147,28 +147,34 @@ Calculating payroll manually is error-prone and time-consuming. Tally Prime auto
 Your HR team gains 3+ hours daily that can be redirected to strategic work.
 
 5. Cost Reduction & Efficiency
-Implementing Tally Prime typically reduces operational costs by 15-25% through:
+Implementing TallyPrime typically reduces operational costs by 15-25% through:
 - Reduced data entry errors (95% fewer manual entries)
 - Faster month-end closing (from 5 days to 1 day)
 - Minimized accounting staff requirements
 - Fewer compliance penalties and fines
 
 6. Scalability Built-In
-As your business grows, Tally Prime grows with you. Multi-user access, role-based controls, and unlimited transaction capacity ensure you're never outgrowing your system.
+As your business grows, TallyPrime grows with you. Multi-user access, role-based controls, and unlimited transaction capacity ensure you're never outgrowing your system.
 
 The Bottom Line
-In 2025, manual accounting is not just inefficient—it's risky. Tally Prime eliminates operational friction, ensures compliance, and gives you the visibility needed to scale confidently.
+In 2025, manual accounting is not just inefficient—it's risky. TallyPrime eliminates operational friction, ensures compliance, and gives you the visibility needed to scale confidently.
 
-Ready to transform your business? The businesses that embrace Tally Prime this year will be the ones leading their industries next year.`},
-    {id:'2',title:'Complete Guide to KRA e-Filing with Tally Prime',excerpt:'Step-by-step guide to setting up and filing your KRA returns directly from Tally Prime. Save time and avoid penalties.',date:'2025-02-01',category:'Tutorial',readTime:'8 min',content:`KRA compliance can be intimidating, but with Tally Prime, it's surprisingly straightforward. This guide walks you through the entire e-filing process.
+Ready to transform your business? The businesses that embrace TallyPrime this year will be the ones leading their industries next year.
+
+---
+
+**Ready to get TallyPrime working for your business?** Optimum Prime Solutions is Kenya's certified TallyPrime partner — licensing, implementation, training, and support all under one roof.
+
+[Visit our TallyPrime Kenya services page →](/tally-prime-kenya)`},
+    {id:'2',title:'Complete Guide to KRA e-Filing with TallyPrime',excerpt:'Step-by-step guide to setting up and filing your KRA returns directly from TallyPrime. Save time and avoid penalties.',date:'2025-02-01',category:'Tutorial',readTime:'8 min',content:`KRA compliance can be intimidating, but with TallyPrime, it's surprisingly straightforward. This guide walks you through the entire e-filing process.
 
 What You Need Before Starting
 ✓ Active KRA PIN
 ✓ Valid iTax login credentials
-✓ Tally Prime configured with your business details
-✓ Up-to-date transaction records (should already be in Tally Prime)
+✓ TallyPrime configured with your business details
+✓ Up-to-date transaction records (should already be in TallyPrime)
 
-Step 1: Enable eTIMS in Tally Prime
+Step 1: Enable eTIMS in TallyPrime
 Navigate to F11 (Features) and ensure eTIMS is activated. This enables invoice-level tracking required by KRA.
 
 Step 2: Configure Your Invoice Format
@@ -179,7 +185,7 @@ All invoices must include:
 - Total amount and tax amount
 - Invoice date
 
-Tally Prime automatically formats this correctly when eTIMS is enabled.
+TallyPrime automatically formats this correctly when eTIMS is enabled.
 
 Step 3: Generate VAT Reports
 From the Gateway of Tally, go to:
@@ -190,18 +196,18 @@ Review your:
 - Output VAT (VAT collected on sales)
 - Net VAT payable
 
-Tally Prime calculates this automatically based on your invoices.
+TallyPrime calculates this automatically based on your invoices.
 
 Step 4: Export Data for iTax
-Tally Prime integrates with KRA's iTax system. The process is automatic:
+TallyPrime integrates with KRA's iTax system. The process is automatic:
 1. Period selection (monthly or quarterly)
 2. One-click export to iTax format
-3. Upload directly from Tally Prime to KRA portal
+3. Upload directly from TallyPrime to KRA portal
 
 Step 5: File Your Returns
 Through iTax:
 1. Log in with your credentials
-2. Import the exported Tally Prime data
+2. Import the exported TallyPrime data
 3. Review calculations
 4. File returns
 5. Keep acknowledgment receipt
@@ -240,10 +246,16 @@ Keep records of:
 - Reconciliation reports
 - Monthly bank statements
 
-The entire process, once set up correctly, takes just 2-3 hours per month. Tally Prime handles the heavy lifting—you just need to ensure accurate data entry daily.
+The entire process, once set up correctly, takes just 2-3 hours per month. TallyPrime handles the heavy lifting—you just need to ensure accurate data entry daily.
 
-Need help with your first filing? Our team can guide you through every step.`},
-    {id:'3',title:'Tally Prime Silver vs Gold: Which Edition Is Right for You?',excerpt:'A detailed comparison of Tally Prime Silver and Gold editions to help you choose the perfect solution for your business size.',date:'2025-02-15',category:'Comparison',readTime:'6 min',content:`Choosing between Tally Prime Silver and Gold is one of the first decisions you'll make. This comprehensive comparison helps you pick the right fit for your business.
+Need help with your first filing? Our team can guide you through every step.
+
+---
+
+**Want TallyPrime configured for seamless KRA eTIMS and e-filing?** As Kenya's certified TallyPrime partner, we set up your system correctly from day one — so every invoice, VAT report, and return is automatically compliant.
+
+[Visit our TallyPrime Kenya services page →](/tally-prime-kenya)`},
+    {id:'3',title:'TallyPrime Silver vs Gold: Which Edition Is Right for You?',excerpt:'A detailed comparison of TallyPrime Silver and Gold editions to help you choose the perfect solution for your business size.',date:'2025-02-15',category:'Comparison',readTime:'6 min',content:`Choosing between TallyPrime Silver and Gold is one of the first decisions you'll make. This comprehensive comparison helps you pick the right fit for your business.
 
 Quick Comparison Table:
 
@@ -257,7 +269,7 @@ Remote Access           | Not Built-in      | Yes (with setup)
 Backup Options          | Local Backup      | Cloud Ready
 Support Tier            | Email/Chat        | Priority Support
 
-Tally Prime Silver: Best For
+TallyPrime Silver: Best For
 
 ✓ Small businesses with 1-3 employees handling finances
 ✓ Sole traders and freelancers
@@ -269,7 +281,7 @@ Tally Prime Silver: Best For
 Real-World Silver User Profile:
 Meet Sarah, a retail shop owner. She has one checkout counter, manages inventory herself, and needs basic accounting for tax filing. Silver handles everything: sales tracking, inventory, payroll (if needed), and KRA compliance. Cost savings matter, and she'll upgrade later if the business scales.
 
-Tally Prime Gold: Best For
+TallyPrime Gold: Best For
 
 ✓ Multi-location businesses (2+ branches)
 ✓ Growing companies with 5+ employees
@@ -371,7 +383,13 @@ The Bottom Line
 
 Don't overthink it. Both Silver and Gold are excellent investments. Silver gets you started affordably. Gold is when you've outgrown single-user limitations. Many successful businesses started with Silver and upgraded—that's perfectly normal.
 
-Ready to get started? Our team can help you choose and implement the right edition for your situation.`},
+Ready to get started? Our team can help you choose and implement the right edition for your situation.
+
+---
+
+**Not sure which edition fits your business?** Our team will assess your setup and recommend the right TallyPrime edition — then handle the full implementation for you.
+
+[Visit our TallyPrime Kenya services page →](/tally-prime-kenya)`},
     {id:'4',title:'What is EOS® and Why Kenyan Businesses Are Adopting It',excerpt:'The Entrepreneurial Operating System (EOS®) by Gino Wickman is transforming how leadership teams in Kenya run their businesses. Here\'s what it is and how to get started.',date:'2025-03-01',category:'EOS',readTime:'7 min',content:`The Entrepreneurial Operating System (EOS®) is a complete, practical system for running a business. Developed by Gino Wickman and detailed in his bestselling book \"Traction\", EOS is used by over 280,000 companies worldwide to get more of what they want from their businesses.
 
 What Problem Does EOS Solve?
@@ -410,7 +428,13 @@ Optimum Prime Solutions can guide your leadership team through the full EOS jour
 
 The result: a business where everyone is aligned, accountable, and moving in the same direction.
 
-Ready to gain traction? Contact us to book your first EOS session.`},
+Ready to gain traction? Contact us to book your first EOS session.
+
+---
+
+**Looking for a TallyPrime partner who also helps you build the business system behind the software?** That is exactly what we do at Optimum Prime Solutions.
+
+[Visit our TallyPrime Kenya services page →](/tally-prime-kenya)`},
     {id:'5',title:'TallyPrime Cloud Hosting: Access Your Business Data From Anywhere',excerpt:'Learn how cloud-hosted TallyPrime gives your team secure, real-time access to accounting and inventory data from any location in Kenya and beyond.',date:'2025-03-15',category:'Cloud',readTime:'5 min',content:`One of the most common challenges for growing Kenyan businesses is data access. Your accountant is at the office, your sales manager is in the field, and you\'re at a client meeting — but the TallyPrime data is locked on one computer.
 
 Cloud hosting solves this completely.
@@ -449,7 +473,13 @@ Getting Started
 
 Our cloud hosting packages start from KES 3,000 per month. Setup takes 1-2 days and includes migration of your existing TallyPrime data to the cloud, user access configuration, and training on remote access.
 
-Contact us today to get your TallyPrime on the cloud.`},
+Contact us today to get your TallyPrime on the cloud.
+
+---
+
+**Want TallyPrime on the cloud, set up and managed by Kenya's certified partner?** We handle the full migration, configuration, and ongoing support.
+
+[Visit our TallyPrime Kenya services page →](/tally-prime-kenya)`},
     {id:'6',title:'TallyPrime 7.1 is Now Live: What\'s New and What It Means for Your Business',excerpt:'TallyPrime 7.1 is officially released — no longer in Beta. Here are all the major upgrades to invoicing, banking, compliance, and reporting that Kenyan businesses can experience today.',date:'2026-06-26',category:'Product Update',readTime:'6 min',content:`TallyPrime 7.1 is officially released and available now — and it is packed with features that will make a real difference for Kenyan businesses.
 
 As Kenya\'s certified TallyPrime partner, we have reviewed all the new features and here is what you need to know.
@@ -487,7 +517,13 @@ You can download TallyPrime 7.1 directly from the official Tally Solutions websi
 
 Or contact us to book an upgrade consultation. We will assess your current setup, plan the upgrade, and ensure zero disruption to your business operations.
 
-Ready to upgrade? Get in touch with our team today.`},
+Ready to upgrade? Get in touch with our team today.
+
+---
+
+**Ready to upgrade to TallyPrime 7.1?** As Kenya's certified TallyPrime partner, we handle the full upgrade — data migration, staff training, and post-upgrade support included.
+
+[Visit our TallyPrime Kenya services page →](/tally-prime-kenya)`},
     {
       id: '8',
       title: 'TallyPrime 7.1 Released: How the New Features Help Kenyan Businesses Navigate eTIMS 2026',
@@ -558,7 +594,13 @@ Most importantly, as the June 30th eTIMS deadline approaches, running the latest
 
 As your certified partner, Optimum Prime Solutions handles the entire upgrade process. We ensure zero data loss, provide staff training on the new features, and guarantee your eTIMS integration remains flawless.
 
-[Contact us today](/contact) to schedule your seamless upgrade to TallyPrime 7.1.`
+[Contact us today](/contact) to schedule your seamless upgrade to TallyPrime 7.1.
+
+---
+
+**Looking for a certified TallyPrime partner to handle your upgrade and eTIMS compliance?** Optimum Prime Solutions manages the entire process — from upgrade to full KRA eTIMS integration.
+
+[Visit our TallyPrime Kenya services page →](/tally-prime-kenya)`
     },
     {
       id: '7',
@@ -667,7 +709,13 @@ Not sure where your business stands? We offer a free, no-obligation eTIMS compli
 
 Optimum Prime Solutions is a certified TallyPrime partner based in Nairobi. We help Kenyan businesses with TallyPrime licensing, eTIMS compliance, payroll, and cloud hosting. We know this system inside out — and we're here to make sure your business is protected before the deadline.
 
-[Book Your Free Compliance Review Today](/contact)`,
+[Book Your Free Compliance Review Today](/contact)
+
+---
+
+**Need a certified TallyPrime partner to get your business eTIMS-ready before the deadline?** Optimum Prime Solutions handles licensing, eTIMS setup, and compliance training for Kenyan businesses.
+
+[Visit our TallyPrime Kenya services page →](/tally-prime-kenya)`,
     },
     {
       id: '9',
@@ -790,7 +838,13 @@ Business systems give you control.
 
 At Optimum Prime Solutions, we bring both together to help SMEs move from reactive operations to disciplined, scalable growth.
 
-[Talk to us today — let's build the system behind your software.](/contact)`,
+[Talk to us today — let's build the system behind your software.](/contact)
+
+---
+
+**Ready to implement TallyPrime with the business systems to make it actually work?** Optimum Prime Solutions is Kenya's certified TallyPrime partner — software and structure, together.
+
+[Visit our TallyPrime Kenya services page →](/tally-prime-kenya)`,
     },
     {
       id: '10',
@@ -839,6 +893,12 @@ If your business is still manually reconciling PAYE, SHIF, NSSF, and Housing Lev
 **Talk to Optimum Prime Solutions today** for a free consultation on TallyPrime Kenya licensing, payroll implementation, and training tailored to your business.
 
 [Book Your Free Consultation →](/contact)
+
+---
+
+**Ready to bring payroll in-house with TallyPrime?** Optimum Prime Solutions is Kenya's certified TallyPrime partner — we handle implementation, statutory configuration, and training so your team runs payroll confidently.
+
+[Visit our TallyPrime Kenya services page →](/tally-prime-kenya)
 
 *This article is for general guidance only and reflects statutory rates believed accurate at the time of writing. Always confirm current rates and thresholds with KRA, NSSF, and SHA, or consult a qualified tax professional for your specific circumstances.*`,
     },

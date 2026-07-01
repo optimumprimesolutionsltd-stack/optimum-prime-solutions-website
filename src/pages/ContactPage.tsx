@@ -13,9 +13,9 @@ export default function ContactPage() {
       />
       <AfricanLaptopShowcase
         tag="Get in touch"
-        title="Contact one expert who guides your Tally Prime setup"
+        title="Contact one expert who guides your TallyPrime setup"
         description="Reach out with a direct question and get a one-on-one answer that helps you move forward with confidence."
-        features={['Fast demo scheduling', 'Personal support invite', 'Tally Prime implementation help', 'WhatsApp-friendly contact']}
+        features={['Fast demo scheduling', 'Personal support invite', 'TallyPrime implementation help', 'WhatsApp-friendly contact']}
         theme="contact"
       />
       <Contact />

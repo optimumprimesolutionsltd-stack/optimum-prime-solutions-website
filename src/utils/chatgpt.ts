@@ -5,7 +5,7 @@ export interface ChatMessage {
 
 // Mock AI responses database - conversational, inquisitive, and broad
 const mockResponses: Record<string, (history: ChatMessage[], leadProfile?: Record<string, string | undefined>) => string> = {
-  greeting: () => `Hey there! 👋 Welcome to Optimum Prime Solutions Ltd — certified TallyPrime partner and business management consultant in Ruiru, Kenya. I'm **Zawadi**, your business solutions guide.
+  greeting: () => `Hey there! 👋 Welcome to Optimum Prime Solutions Ltd — certified TallyPrime partner and business automation consultancy in Ruiru, Kenya. I'm **Zawadi**, your business solutions guide.
 
 I'm here to help you find the right accounting software, cloud hosting, or business consulting solution for your needs. What brings you here today?`,
 

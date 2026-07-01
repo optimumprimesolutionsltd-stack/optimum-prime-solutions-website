@@ -40,7 +40,7 @@ export default function DemoRequestModal({ isOpen, onClose, companyPhone, compan
     localStorage.setItem('ops_leads', JSON.stringify(leads));
 
     // Open WhatsApp
-    const waText = `Hi Optimum Prime Solutions,\n\nI'm ${formData.name} from ${formData.company || 'my company'}.\n\nI'd like to request a demo for Tally Prime.\n\nPhone: ${formData.phone}\nEmail: ${formData.email}\nPreferred Date: ${formData.demoDate || 'Any time'}\n\n${formData.message ? `Details: ${formData.message}` : ''}`;
+    const waText = `Hi Optimum Prime Solutions,\n\nI'm ${formData.name} from ${formData.company || 'my company'}.\n\nI'd like to request a demo for TallyPrime.\n\nPhone: ${formData.phone}\nEmail: ${formData.email}\nPreferred Date: ${formData.demoDate || 'Any time'}\n\n${formData.message ? `Details: ${formData.message}` : ''}`;
     
     const waLink = `https://wa.me/${companyWhatsapp}?text=${encodeURIComponent(waText)}`;
     setTimeout(() => window.open(waLink, '_blank'), 500);

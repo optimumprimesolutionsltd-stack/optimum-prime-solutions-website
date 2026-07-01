@@ -67,7 +67,7 @@ export default function FaqEditor({ data, onSave }: P) {
           {exp === f.id && (
             <div className="border-t border-navy-100 p-5 space-y-4">
               <div><label className="block text-sm font-bold text-navy-900 mb-2">Question</label>
-                <input value={f.q} onChange={e => upd(f.id, { q: e.target.value })} placeholder="e.g. How much does Tally Prime cost?"
+                <input value={f.q} onChange={e => upd(f.id, { q: e.target.value })} placeholder="e.g. How much does TallyPrime cost?"
                   className="w-full rounded-lg border border-navy-200 px-4 py-3 text-base text-navy-900 placeholder-navy-400 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20" /></div>
               <div><label className="block text-sm font-bold text-navy-900 mb-2">Answer</label>
                 <textarea value={f.a} onChange={e => upd(f.id, { a: e.target.value })} rows={5} placeholder="Provide a detailed answer..."

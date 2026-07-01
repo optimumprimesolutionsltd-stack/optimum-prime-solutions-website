@@ -30,7 +30,7 @@ export default function Blog() {
         <motion.div initial={{opacity:0,y:20}} whileInView={{opacity:1,y:0}} viewport={{once:true}} className="text-center max-w-3xl mx-auto">
           <span className="inline-block rounded-full bg-gradient-to-r from-red-500 to-orange-400 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-white shadow-lg shadow-red-500/10">Blog & Insights</span>
           <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-white">Latest From Our Blog</h2>
-          <p className="mt-4 text-sm text-slate-400">Read practical guidance, compliance tips, and Tally Prime success stories designed to help your business grow faster.</p>
+          <p className="mt-4 text-sm text-slate-400">Read practical guidance, compliance tips, and TallyPrime success stories designed to help your business grow faster.</p>
         </motion.div>
         
         <div className="mt-16 grid md:grid-cols-3 gap-8">

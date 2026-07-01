@@ -22,7 +22,7 @@ export default function TallyPrimeIcon({ className = 'h-8 w-8', showText = true,
       whileTap={{ scale: 0.95 }}
       transition={{ duration: 0.2 }}
     >
-      <svg viewBox="0 0 100 100" className="w-full h-full min-w-[1rem]" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tally Prime logo">
+      <svg viewBox="0 0 100 100" className="w-full h-full min-w-[1rem]" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="TallyPrime logo">
         <defs>
           <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
             <feDropShadow dx="0" dy="1" stdDeviation="1" floodColor="#000" floodOpacity={isDark ? 0.28 : 0.12} />
@@ -47,7 +47,7 @@ export default function TallyPrimeIcon({ className = 'h-8 w-8', showText = true,
       </svg>
       {showText && (
         <span className={`text-xs font-semibold tracking-wide ${isDark ? 'text-white' : 'text-[#05345D]'}`}>
-          Tally Prime
+          TallyPrime
         </span>
       )}
     </motion.span>

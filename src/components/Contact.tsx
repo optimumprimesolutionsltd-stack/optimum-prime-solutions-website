@@ -102,7 +102,7 @@ export default function Contact() {
           html: `
             <h2>Thank you for your demo request!</h2>
             <p>Hi ${formData.name},</p>
-            <p>We've received your request for a Tally Prime demo. Our team will contact you within 24 hours.</p>
+            <p>We've received your request for a TallyPrime demo. Our team will contact you within 24 hours.</p>
             <ul>
               <li>Company: ${formData.company || 'Not provided'}</li>
               <li>Phone: ${formData.phone}</li>
