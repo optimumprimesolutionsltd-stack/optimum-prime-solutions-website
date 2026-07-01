@@ -792,6 +792,56 @@ At Optimum Prime Solutions, we bring both together to help SMEs move from reacti
 
 [Talk to us today — let's build the system behind your software.](/contact)`,
     },
+    {
+      id: '10',
+      title: 'Payroll Compliance in Kenya: How TallyPrime Kenya Keeps You In-House and Audit-Ready',
+      excerpt: 'Struggling with PAYE, SHIF, NSSF & Housing Levy compliance? See how TallyPrime Kenya, implemented by Optimum Prime Solutions, keeps payroll in-house and error-free.',
+      date: '2026-07-01',
+      category: 'Payroll & Compliance',
+      readTime: '6 min',
+      content: `If you run a business in Kenya, you already know payroll is no longer a simple "calculate salary, pay salary" exercise. Every payslip today has to account for PAYE, SHIF (formerly NHIF), NSSF Tier I and Tier II, the Affordable Housing Levy, and — depending on your sector — NITA. Miss a rate, misapply a band, or file late, and you're not just looking at an unhappy employee. You're looking at penalties from KRA and NSSF that can add up fast. This is exactly the kind of complexity that **TallyPrime Kenya**, properly implemented, is built to handle.
+
+For many SMEs, the "solution" has been to outsource payroll entirely to a bureau or consultant. It works, but it comes with real trade-offs: your sensitive salary and employee data leaves your business, you're at the mercy of someone else's turnaround time, and every correction means another phone call or email exchange. There's a better way — and it doesn't require you to become a tax expert overnight.
+
+## What Kenyan Payroll Compliance Actually Involves in 2026
+
+Here's the current statutory picture employers need to get right every month:
+
+**PAYE** uses a five-band progressive system. The first KES 24,000 of monthly taxable income is taxed at 10%, the next KES 8,333 at 25%, income from KES 32,334 up to KES 500,000 at 30%, the next band up to KES 800,000 at 32.5%, and anything above that at 35%. Every resident employee is entitled to a personal relief of KES 2,400 a month, deducted directly from the tax calculated — not from income. PAYE is due to KRA by the 9th of the following month, and late remittance carries a 25% penalty on the tax involved (or KES 10,000, whichever is higher), plus monthly interest.
+
+**NSSF** contributions are calculated before PAYE, since they reduce taxable pay. As of the current contribution schedule, employees contribute 6% of pensionable earnings, with a maximum employee contribution capped at KES 6,480 a month for those earning at or above the upper limit. Employers match this contribution.
+
+**SHIF** (which replaced NHIF) is charged at 2.75% of gross pay, also deductible before PAYE is calculated.
+
+**The Affordable Housing Levy** adds a further 1.5% of gross pay.
+
+Get the order of these deductions wrong — for example, applying PAYE before subtracting NSSF and SHIF — and you'll over-deduct tax from every single employee, every single month. Multiply that error across a full team and a full year, and it's a serious problem to unwind.
+
+## Why "Outsource It All" Isn't the Only Option for TallyPrime Kenya Users
+
+Outsourcing payroll solves the complexity problem, but it creates a dependency problem. Your business's most sensitive data — salaries, bank details, statutory numbers — sits with a third party. If that provider is slow, unavailable, or makes an error, you often can't self-correct; you wait.
+
+**Optimum Prime Solutions** takes a different approach as a certified **TallyPrime Kenya** partner based in Nairobi. Rather than doing your payroll for you indefinitely, Optimum Prime Solutions sets your business up to run it confidently in-house:
+
+- **Training** — Your own finance or HR team learns to navigate PAYE, SHIF, NSSF, NITA, and Housing Levy calculations directly inside TallyPrime, so you're never dependent on external support for routine payroll runs.
+- **Implementation** — Optimum Prime Solutions configures TallyPrime specifically for Kenyan statutory requirements from day one, so the system reflects current rates and bands rather than generic defaults.
+- **Data control** — Your payroll and employee records stay on infrastructure you control, whether that's on-premise or in a cloud environment Optimum Prime Solutions helps you set up. No third-party bureau holding your books.
+- **Custom add-ons** — Every business runs payroll a little differently — different allowances, benefits-in-kind, loan deductions, or reporting needs. TallyPrime's add-on ecosystem lets Optimum Prime Solutions tailor the system to how your business actually operates, instead of forcing your processes to fit rigid software.
+
+## The Bigger Picture: Staying Compliant With TallyPrime Kenya, Year After Year
+
+Payroll compliance isn't a one-time setup — statutory rates and bands change with each Finance Act, NSSF contribution schedules, and SHA/SHIF adjustments. A system that's configured once and never revisited quickly becomes a liability. That's why implementation and training go hand in hand: your team needs both the right tool and the confidence to keep it current.
+
+If your business is still manually reconciling PAYE, SHIF, NSSF, and Housing Levy every month — or handing your payroll data to an outside bureau out of necessity rather than choice — it's worth having a conversation about what an in-house, TallyPrime Kenya-powered setup could look like for you.
+
+## Ready to Bring Payroll In-House?
+
+**Talk to Optimum Prime Solutions today** for a free consultation on TallyPrime Kenya licensing, payroll implementation, and training tailored to your business.
+
+[Book Your Free Consultation →](/contact)
+
+*This article is for general guidance only and reflects statutory rates believed accurate at the time of writing. Always confirm current rates and thresholds with KRA, NSSF, and SHA, or consult a qualified tax professional for your specific circumstances.*`,
+    },
   ],
   leads: [],
 };
