@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@formspree/react": "^3.0.0",
+    "@tailwindcss/typography": "^0.5.20",
     "clsx": "2.1.1",
     "firebase": "^12.13.0",
     "framer-motion": "^12.38.0",

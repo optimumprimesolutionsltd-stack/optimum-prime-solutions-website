@@ -1,69 +1,107 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Main Pages -->
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/about</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/features</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/products</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.95</priority>
   </url>
   <url>
+    <loc>https://www.optimumprimesolutions.co.ke/testimonials</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://www.optimumprimesolutions.co.ke/blog</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/faq</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/contact</loc>
-    <lastmod>2026-06-30</lastmod>
+    <lastmod>2026-07-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- eTIMS Deadline 2026 Blog Post -->
+  <!-- Blog Posts -->
   <url>
-    <loc>https://www.optimumprimesolutions.co.ke/blog/etims-income-tax-deadline-june-30-2026</loc>
-    <lastmod>2026-06-30</lastmod>
+    <loc>https://www.optimumprimesolutions.co.ke/blog/why-every-kenyan-business-needs-tally-prime-in-2025</loc>
+    <lastmod>2025-01-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/blog/complete-guide-to-kra-e-filing-with-tally-prime</loc>
+    <lastmod>2025-02-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-
-  <!-- TallyPrime 7.1 Released — Kenya eTIMS 2026 Blog Post -->
   <url>
-    <loc>https://www.optimumprimesolutions.co.ke/blog/tallyprime-7-1-released-kenya-etims-2026</loc>
-    <lastmod>2026-06-30</lastmod>
+    <loc>https://www.optimumprimesolutions.co.ke/blog/tally-prime-silver-vs-gold-which-edition-is-right-for-you</loc>
+    <lastmod>2025-02-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/blog/what-is-eos-and-why-kenyan-businesses-are-adopting-it</loc>
+    <lastmod>2025-03-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/blog/tallyprime-cloud-hosting-access-your-business-data-from-anywhere</loc>
+    <lastmod>2025-03-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/blog/tallyprime-71-is-now-live-whats-new-and-what-it-means-for-your-business</loc>
+    <lastmod>2026-06-26</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
   </url>
-
-  <!-- TallyPrime 7.1 Now Live — What's New Blog Post -->
   <url>
-    <loc>https://www.optimumprimesolutions.co.ke/blog/tallyprime-7-1-now-live-whats-new</loc>
-    <lastmod>2026-06-30</lastmod>
+    <loc>https://www.optimumprimesolutions.co.ke/blog/etims-deadline-2026-what-every-kenyan-business-must-do-before-june-30</loc>
+    <lastmod>2026-06-22</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/blog/tallyprime-71-released-how-the-new-features-help-kenyan-businesses-navigate-etims-2026</loc>
+    <lastmod>2026-06-26</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/blog/why-tallyprime-alone-isnt-enough-for-growing-kenyan-businesses</loc>
+    <lastmod>2026-06-27</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

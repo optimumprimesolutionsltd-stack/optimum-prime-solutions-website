@@ -1,9 +1,16 @@
+import SEO from '../components/SEO';
 import Testimonials from '../components/Testimonials';
 import AfricanLaptopShowcase from '../components/AfricanLaptopShowcase';
 
 export default function TestimonialsPage() {
   return (
     <div className="min-h-screen">
+      <SEO
+        title="Client Reviews & Testimonials | Optimum Prime Solutions"
+        description="Read what Kenyan business owners say about Optimum Prime Solutions. Real testimonials from TallyPrime, cloud hosting, and EOS® consulting clients across Kenya."
+        canonical="/testimonials"
+        keywords="TallyPrime reviews Kenya, Optimum Prime Solutions testimonials, TallyPrime client stories, accounting software reviews Kenya"
+      />
       <AfricanLaptopShowcase
         tag="Client stories"
         title="A happy business owner sharing their Tally Prime journey"

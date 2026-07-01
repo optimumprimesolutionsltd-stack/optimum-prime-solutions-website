@@ -17,6 +17,7 @@ import TestimonialsPage from './pages/TestimonialsPage';
 import BlogPage from './pages/BlogPage';
 import FAQPage from './pages/FAQPage';
 import ContactPage from './pages/ContactPage';
+import BlogPostPage from './pages/BlogPostPage';
 import TallyPrime71Popup from './components/TallyPrime71Popup';
 import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth } from './firebase/config';
 import type { User } from 'firebase/auth';
@@ -35,6 +36,7 @@ function SiteRoutes() {
           <Route path="/products" element={<ProductsPage />} />
           <Route path="/testimonials" element={<TestimonialsPage />} />
           <Route path="/blog" element={<BlogPage />} />
+          <Route path="/blog/:slug" element={<BlogPostPage />} />
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="*" element={<Navigate to="/" replace />} />
