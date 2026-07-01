@@ -49,6 +49,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/tally-prime-kenya</loc>
+    <lastmod>2026-07-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.95</priority>
+  </url>
   <!-- Blog Posts -->
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/blog/why-every-kenyan-business-needs-tally-prime-in-2025</loc>

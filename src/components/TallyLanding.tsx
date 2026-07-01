@@ -1,32 +1,30 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { CheckCircle, Award, Cloud, BookOpen, Wrench } from 'lucide-react';
 
 export default function TallyLanding() {
   const confettiRoot = useRef<HTMLDivElement | null>(null);
   const logoRef = useRef<HTMLDivElement | null>(null);
   const navigate = useNavigate();
-  const benefits = [
-    'Certified TallyPrime partner — Silver, Gold & Enterprise',
-    'Secure cloud hosting & remote access setup',
-    'KRA & eTIMS compliant accounting out of the box',
-    'EOS® business operating system implementation',
-    'Scalable systems for growing Kenyan businesses',
+
+  const services = [
+    { icon: Award, label: 'Official Tally Partner Kenya', desc: 'Certified by Tally Solutions Africa — authorised to sell, implement and support TallyPrime across Kenya.' },
+    { icon: Wrench, label: 'TallyPrime Implementation Kenya', desc: 'End-to-end setup, data migration, customisation and go-live support for Silver, Gold & Enterprise editions.' },
+    { icon: BookOpen, label: 'TallyPrime Training Kenya', desc: 'Hands-on user training, admin workshops and ongoing coaching for your team — on-site or remote.' },
+    { icon: Cloud, label: 'TallyPrime Cloud Hosting', desc: 'Secure, always-on cloud access to your TallyPrime data from any device, anywhere in Kenya.' },
+    { icon: CheckCircle, label: 'Buy TallyPrime Kenya', desc: 'Genuine licences at competitive prices — Silver, Gold and Enterprise editions with full local support.' },
   ];
 
   useEffect(() => {
-    // Simple DOM confetti: create colorful flakes and animate then remove
     const root = confettiRoot.current;
     if (!root) return;
-    // Disable confetti on small screens or when user prefers reduced motion
     if (typeof window !== 'undefined') {
       const prefersReduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
       if (prefersReduced || window.innerWidth < 640) return;
     }
-
     const colors = ['#F59E0B', '#06B6D4', '#0EA5E9', '#F97316', '#60A5FA', '#34D399'];
     const flakes: HTMLDivElement[] = [];
-
     for (let i = 0; i < 36; i++) {
       const f = document.createElement('div');
       f.className = 'confetti-flake';
@@ -37,64 +35,44 @@ export default function TallyLanding() {
       root.appendChild(f);
       flakes.push(f);
     }
-
-    const cleanup = () => {
-      flakes.forEach((el) => el.remove());
-    };
-
-    const t = setTimeout(cleanup, 5000);
-    return () => {
-      clearTimeout(t);
-      cleanup();
-    };
+    const t = setTimeout(() => flakes.forEach((el) => el.remove()), 5000);
+    return () => { clearTimeout(t); flakes.forEach((el) => el.remove()); };
   }, []);
 
-  // Simple parallax / tilt for logo
   useEffect(() => {
     const el = logoRef.current;
     if (!el) return;
     const node = el as HTMLDivElement;
-
     function onMove(e: MouseEvent) {
       const rect = node.getBoundingClientRect();
       const x = e.clientX - rect.left - rect.width / 2;
       const y = e.clientY - rect.top - rect.height / 2;
-      const rx = (-y / rect.height) * 6; // tilt intensity
-      const ry = (x / rect.width) * 6;
-      node.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg) translateZ(6px)`;
+      node.style.transform = `perspective(800px) rotateX(${(-y / rect.height) * 6}deg) rotateY(${(x / rect.width) * 6}deg) translateZ(6px)`;
     }
-
-    function onLeave() {
-      node.style.transform = 'none';
-    }
-
+    function onLeave() { node.style.transform = 'none'; }
     node.addEventListener('mousemove', onMove);
     node.addEventListener('mouseleave', onLeave);
-    return () => {
-      node.removeEventListener('mousemove', onMove);
-      node.removeEventListener('mouseleave', onLeave);
-    };
+    return () => { node.removeEventListener('mousemove', onMove); node.removeEventListener('mouseleave', onLeave); };
   }, []);
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden bg-black">
-      {/* Stock photo — swap for real company photo when available. */}
-      <div 
+      {/* Background image */}
+      <div
         className="absolute inset-0 bg-cover bg-center animate-videoZoom opacity-60"
         style={{ backgroundImage: "url('/images/hero-erp-dashboard.webp')" }}
       />
       <div className="absolute inset-0 z-10 bg-slate-950/80 pointer-events-none" />
-
       <div className="absolute inset-x-0 bottom-0 h-48 z-30 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent pointer-events-none" />
 
-      {/* Subtle particle layer using SVG shapes and CSS animation */}
+      {/* Particle layer */}
       <svg className="pointer-events-none absolute inset-0 -z-20 h-full w-full" preserveAspectRatio="none">
         <defs>
-            <linearGradient id="p" x1="0" x2="1">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
-              <stop offset="100%" stopColor="#ffffff" stopOpacity="0.02" />
-            </linearGradient>
-          </defs>
+          <linearGradient id="p" x1="0" x2="1">
+            <stop offset="0%" stopColor="#ffffff" stopOpacity="0.08" />
+            <stop offset="100%" stopColor="#ffffff" stopOpacity="0.02" />
+          </linearGradient>
+        </defs>
         <g className="animate-particles" fill="url(#p)">
           <circle cx="10%" cy="20%" r="2" />
           <circle cx="30%" cy="10%" r="1.5" />
@@ -104,85 +82,89 @@ export default function TallyLanding() {
         </g>
       </svg>
 
-      <div ref={confettiRoot} className="relative z-40 mx-auto flex h-full max-w-7xl items-center justify-center px-4 text-center sm:px-6 lg:px-8">
+      <div ref={confettiRoot} className="relative z-40 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6 lg:px-8">
         <motion.div
           ref={logoRef}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9 }}
-          className="space-y-6"
+          className="w-full space-y-8"
         >
-          <div className="mx-auto max-w-3xl rounded-full border border-white/20 bg-slate-800/10 px-4 py-2 text-xs uppercase tracking-[0.3em] text-slate-100/80 shadow-sm shadow-black/10">
-            Kenya's Certified TallyPrime Partner · Cloud Support · EOS® Consulting
+          {/* Badge */}
+          <div className="mx-auto inline-block rounded-full border border-white/20 bg-slate-800/10 px-5 py-2 text-xs uppercase tracking-[0.3em] text-slate-100/80 shadow-sm backdrop-blur-sm">
+            Kenya's Official TallyPrime Partner · Ruiru &amp; Nationwide
           </div>
 
+          {/* H1 — primary keyword target */}
           <h1 className="mx-auto max-w-4xl text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl drop-shadow-lg">
-            Gain Complete Control of Your Accounting, Inventory & Business Operations
+            Buy TallyPrime in Kenya —{' '}
+            <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
+              Official Partner, Implementation &amp; Training
+            </span>
           </h1>
 
-          <p className="mx-auto max-w-2xl text-lg text-slate-200/90 leading-relaxed">
-            As Kenya's Certified TallyPrime Partner, we help businesses streamline accounting, inventory management, reporting, and compliance through expert implementation, training, support, and secure cloud hosting.
+          {/* Sub-headline */}
+          <p className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-200/90">
+            Optimum Prime Solutions is Kenya's certified TallyPrime partner — authorised to sell genuine TallyPrime licences, deliver professional implementation, provide hands-on training, and host your data securely in the cloud. Serving businesses across Ruiru, Nairobi and all of Kenya.
           </p>
 
-          <div className="mx-auto mt-8 grid max-w-2xl gap-3 grid-cols-1 sm:grid-cols-2">
-            {benefits.map((benefit) => (
-              <div key={benefit} className="flex items-start gap-3 rounded-3xl border border-white/15 bg-slate-800/10 px-4 py-3 text-left backdrop-blur-sm text-sm text-white/90 shadow-sm shadow-black/10">
-                <span className="mt-1 inline-flex h-8 w-8 items-center justify-center rounded-full bg-slate-800/15 text-xs font-bold text-emerald-200">✓</span>
-                <span>{benefit}</span>
-              </div>
-            ))}
+          {/* CTA buttons */}
+          <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
+            <button
+              type="button"
+              onClick={() => { navigate('/contact'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
+              className="w-full rounded-full bg-red-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-red-600/20 transition-all hover:scale-105 hover:bg-red-500 hover:shadow-red-600/40 active:scale-95 sm:w-auto"
+            >
+              Get a Free Quote
+            </button>
+            <Link
+              to="/tally-prime-kenya"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
+              className="w-full rounded-full border border-white/30 bg-white/5 px-8 py-4 text-sm font-bold text-white backdrop-blur-md transition-all hover:scale-105 hover:border-white/70 hover:bg-white/10 active:scale-95 sm:w-auto"
+            >
+              Explore TallyPrime Kenya
+            </Link>
           </div>
 
-          <div className="mt-8 flex flex-col sm:flex-row justify-center gap-3 sm:gap-4 px-4">
-            <button 
-              type="button" 
-              onClick={() => { navigate('/contact'); window.scrollTo({ top: 0, behavior: 'instant' }); }} 
-              className="rounded-full bg-red-600 px-8 py-4 text-sm sm:text-base font-bold text-white shadow-lg shadow-red-600/20 hover:bg-red-500 hover:shadow-red-600/40 hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto"
-            >
-              Book a Free Consultation
-            </button>
-            <button 
-              type="button" 
-              onClick={() => { navigate('/products'); window.scrollTo({ top: 0, behavior: 'instant' }); }} 
-              className="rounded-full border border-white/30 bg-white/5 backdrop-blur-md px-8 py-4 text-sm sm:text-base font-bold text-white hover:bg-white/10 hover:border-white/70 hover:scale-105 transition-all text-center inline-flex items-center justify-center cursor-pointer active:scale-95 w-full sm:w-auto"
-            >
-              Explore TallyPrime Solutions
-            </button>
+          {/* Service keyword cards */}
+          <div className="mx-auto mt-4 grid max-w-5xl gap-3 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {services.map((s) => (
+              <div
+                key={s.label}
+                className="flex items-start gap-3 rounded-2xl border border-white/10 bg-slate-800/20 px-4 py-4 text-left backdrop-blur-sm transition-colors hover:border-red-500/30"
+              >
+                <s.icon className="mt-0.5 h-5 w-5 shrink-0 text-red-400" />
+                <div>
+                  <p className="text-sm font-semibold text-white">{s.label}</p>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-400">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+            {/* Trust badge card */}
+            <div className="flex items-start gap-3 rounded-2xl border border-amber-500/20 bg-amber-500/5 px-4 py-4 text-left backdrop-blur-sm">
+              <Award className="mt-0.5 h-5 w-5 shrink-0 text-amber-400" />
+              <div>
+                <p className="text-sm font-semibold text-white">KRA &amp; eTIMS Compliant</p>
+                <p className="mt-1 text-xs leading-relaxed text-slate-400">TallyPrime is a KRA-approved eTIMS solution — fully compliant with Kenya's 2026 e-invoicing mandate.</p>
+              </div>
+            </div>
           </div>
         </motion.div>
       </div>
 
       <style>{`
-        @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        .animate-[gradientShift_14s_linear_infinite] { background-size: 200% 200%; }
-
         @keyframes videoZoom {
           0% { transform: scale(1); }
           50% { transform: scale(1.06); }
           100% { transform: scale(1); }
         }
         .animate-videoZoom { animation: videoZoom 18s ease-in-out infinite; }
-
         @keyframes particleFloat {
           0% { transform: translateY(0px) translateX(0px); }
           50% { transform: translateY(-18px) translateX(6px); }
           100% { transform: translateY(0px) translateX(0px); }
         }
         .animate-particles { animation: particleFloat 12s ease-in-out infinite; }
-
-        /* Vibrant extras */
-        .filter-bright { filter: brightness(1.08) contrast(1.08) saturate(1.12); }
-
-        @keyframes bob1 { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-18px) } }
-        @keyframes bob2 { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-8px) } }
-        @keyframes bob3 { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-28px) } }
-        .animate-bob-1 { animation: bob1 7s ease-in-out infinite; }
-        .animate-bob-2 { animation: bob2 9s ease-in-out infinite; }
-        .animate-bob-3 { animation: bob3 11s ease-in-out infinite; }
         .confetti-flake {
           position: absolute;
           top: -6vh;

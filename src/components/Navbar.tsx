@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Phone, Zap, Cloud, Users, BookOpen, HelpCircle, Mail, BarChart3, Cpu, Shield, Briefcase } from 'lucide-react';
+import { Menu, X, Phone, Zap, Cloud, Users, BookOpen, HelpCircle, Mail, BarChart3, Cpu, Shield, Briefcase, Award } from 'lucide-react';
 import Logo from './Logo';
 
 const navItems = [
@@ -38,6 +38,12 @@ const navItems = [
       { label: 'Cloud Hosting', desc: 'From KES 3,000/month', icon: Cloud, href: '/products' },
       { label: 'EOS® Consulting', desc: 'Business operating system', icon: Briefcase, href: '/products' },
     ],
+  },
+  {
+    label: 'TallyPrime Kenya',
+    href: '/tally-prime-kenya',
+    icon: Award,
+    submenu: null,
   },
   {
     label: 'Blog',
