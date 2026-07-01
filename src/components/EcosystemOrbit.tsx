@@ -3,12 +3,12 @@ import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
 const partners = [
-  { name: 'TallyPrime',  logo: '/tally-solutions-new-logo.png', angle: 0,   color: '#dc2626' },
-  { name: 'EOS®',        logo: '/partner-eos.png',        angle: 60,  color: '#0ea5e9' },
-  { name: 'Biz Analyst', logo: '/partner-biz-analyst.png', angle: 120, color: '#34d399' },
-  { name: 'HubSpot',     logo: '/partner-hubspot.png',    angle: 180, color: '#f97316' },
-  { name: 'TSplus',      logo: '/partner-tsplus.png',     angle: 240, color: '#8b5cf6' },
-  { name: 'KRA eTIMS',   logo: '/kra-logo-official.png', angle: 300, color: '#16a34a' },
+  { name: 'TallyPrime',  logo: '/tally-solutions-new-logo.png', angle: 0,   color: '#dc2626', invertOnDark: false },
+  { name: 'EOS®',        logo: '/partner-eos.png',        angle: 60,  color: '#0ea5e9', invertOnDark: false },
+  { name: 'Biz Analyst', logo: '/partner-biz-analyst.png', angle: 120, color: '#34d399', invertOnDark: false },
+  { name: 'HubSpot',     logo: '/partner-hubspot.png',    angle: 180, color: '#f97316', invertOnDark: false },
+  { name: 'TSplus',      logo: '/partner-tsplus.png',     angle: 240, color: '#8b5cf6', invertOnDark: false },
+  { name: 'KRA eTIMS',   logo: '/kra-logo-official.png', angle: 300, color: '#16a34a', invertOnDark: true },
 ];
 
 const cards = [
@@ -67,7 +67,7 @@ function OrbitIcon({ partner, radius, duration, delay }: {
             src={partner.logo}
             alt={partner.name}
             className="w-full h-full object-contain relative z-10 filter drop-shadow-md"
-            style={{ imageRendering: 'auto' }}
+            style={{ imageRendering: 'auto', ...(partner.invertOnDark ? { filter: 'brightness(0) invert(1)' } : {}) }}
             onError={(e) => {
               const el = e.target as HTMLImageElement;
               el.style.display = 'none';

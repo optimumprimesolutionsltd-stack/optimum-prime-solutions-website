@@ -5,7 +5,7 @@ export default function KraLogo({ className = 'h-6 w-6 object-contain' }: { clas
       className={className}
       alt="iTax / KRA logo"
       aria-label="iTax logo"
-      style={{ display: 'inline-block' }}
+      style={{ display: 'inline-block', filter: 'brightness(0) invert(1)' }}
     />
   );
 }
