@@ -4,14 +4,25 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 import Logo from './Logo';
 
-const links = [
+const quickLinks = [
   { l: 'Home', h: '/' },
   { l: 'About', h: '/about' },
-  { l: 'Services', h: '/features' },
-  { l: 'Products', h: '/products' },
+  { l: 'TallyPrime Solutions', h: '/tallyprime' },
+  { l: 'Industries', h: '/industries' },
+  { l: 'Knowledge Hub', h: '/knowledge-hub' },
+  { l: 'Pricing', h: '/pricing' },
   { l: 'Blog', h: '/blog' },
   { l: 'FAQ', h: '/faq' },
   { l: 'Contact', h: '/contact' },
+];
+
+const tallyPrimeLinks = [
+  { l: 'Implementation', h: '/tallyprime/implementation' },
+  { l: 'Licensing', h: '/tallyprime/licensing' },
+  { l: 'Cloud Hosting', h: '/tallyprime/cloud-hosting' },
+  { l: 'Training', h: '/tallyprime/training' },
+  { l: 'Support', h: '/tallyprime/support' },
+  { l: 'Customization (TDL)', h: '/tallyprime/customization' },
 ];
 
 export default function Footer() {
@@ -37,12 +48,20 @@ export default function Footer() {
   };
 
   return (
-    <footer className="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+    <footer className="bg-gradient-to-br from-slate-50 via-sky-50 to-white text-slate-900">
       <div className="mx-auto max-w-7xl space-y-12 px-4 py-16 sm:px-6 lg:px-8">
-        <div className="rounded-4xl bg-slate-800/60 p-8 grid gap-8 lg:grid-cols-[1.4fr_0.9fr_0.9fr_1fr] shadow-2xl shadow-black/40 ring-1 ring-white/10">
+        <div className="rounded-4xl bg-white/90 p-8 grid gap-8 lg:grid-cols-[1.4fr_0.9fr_0.9fr_1fr] shadow-2xl shadow-slate-200/20 ring-1 ring-slate-200/70">
+          {/* Brand Column */}
           <div className="space-y-5">
             <div className="flex flex-col items-start gap-4">
-              <Logo className="h-16 w-auto bg-transparent" />
+              <div className="w-full max-w-[160px]">
+                <img
+                  src="/tally-solutions-new-logo.png"
+                  alt="Tally Solutions logo"
+                  className="h-auto w-full max-h-14 object-contain object-left"
+                />
+              </div>
+              <Logo className="h-12 w-auto" />
             </div>
             <p className="max-w-md text-sm leading-relaxed text-slate-500">
               {data.company.tagline}. Kenya's certified TallyPrime reseller, cloud hosting provider & EOS® implementer.
@@ -70,7 +89,7 @@ export default function Footer() {
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
               </a>
               <a
-                href="https://www.facebook.com/profile.php?id=100041376170510"
+                href="https://www.facebook.com/optimumprimesolutionsltd"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Follow us on Facebook"
@@ -82,15 +101,16 @@ export default function Footer() {
             </div>
           </div>
 
-          <div className="rounded-3xl bg-slate-800/50 p-8">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-white mb-5">Quick Links</h4>
-            <ul className="space-y-3 text-sm text-slate-700">
-              {links.map((link) => (
+          {/* Quick Links */}
+          <div className="rounded-3xl bg-slate-50 p-8">
+            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Quick Links</h4>
+            <ul className="space-y-2 text-sm text-slate-700">
+              {quickLinks.map((link) => (
                 <li key={link.h}>
                   <Link
                     to={link.h}
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="block rounded-2xl px-3 py-2 text-slate-300 transition hover:bg-slate-700 hover:text-red-400"
+                    className="block rounded-2xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-red-600"
                   >
                     {link.l}
                   </Link>
@@ -99,26 +119,27 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="rounded-3xl bg-slate-800/50 p-8">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-white mb-5">Services</h4>
-            <ul className="space-y-3 text-sm text-slate-700">
-              {data.services.slice(0, 6).map((service) => (
-                <li key={service.id}>
+          {/* TallyPrime Services */}
+          <div className="rounded-3xl bg-slate-50 p-8">
+            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">TallyPrime Services</h4>
+            <ul className="space-y-2 text-sm text-slate-700">
+              {tallyPrimeLinks.map((link) => (
+                <li key={link.h}>
                   <Link
-                    to={`/features#service-${service.id}`}
+                    to={link.h}
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                    className="block rounded-2xl px-3 py-2 text-slate-300 transition hover:bg-slate-700 hover:text-red-400"
+                    className="block rounded-2xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-red-600"
                   >
-                    <div className="font-semibold">{service.title}</div>
-                    <div className="text-xs text-slate-500 mt-1 line-clamp-2">{service.desc}</div>
+                    {link.l}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div className="rounded-3xl bg-slate-800/50 p-8">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-white mb-5">Stay updated</h4>
+          {/* Newsletter */}
+          <div className="rounded-3xl bg-slate-50 p-8">
+            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Stay updated</h4>
             <p className="text-sm text-slate-700 mb-4">Receive TallyPrime tips, cloud hosting guides, and EOS® business insights.</p>
             {submitted ? (
               <div className="rounded-2xl bg-green-50 border border-green-200 px-4 py-4 text-sm text-green-700 font-medium text-center">
@@ -131,7 +152,7 @@ export default function Footer() {
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder="Your email"
-                  className="rounded-2xl border border-white/10 bg-slate-700 px-4 py-3 text-sm text-white outline-none transition focus:border-sky-500 placeholder:text-slate-400"
+                  className="rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 placeholder:text-slate-500"
                 />
                 <button
                   type="submit"
@@ -144,51 +165,52 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* TallyPrime 7.1 Now Live Banner */}
-        <div className="rounded-4xl border border-green-200 bg-gradient-to-r from-green-50 via-emerald-50 to-teal-50 p-6 shadow-lg">
+        {/* TallyPrime 7.1 Banner */}
+        <div className="rounded-4xl border border-amber-200 bg-gradient-to-r from-amber-50 via-yellow-50 to-orange-50 p-6 shadow-lg">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl bg-green-500 text-white shadow-md">
+              <div className="flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-2xl bg-amber-400 text-white shadow-md">
                 <Sparkles className="h-6 w-6" />
               </div>
               <div>
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="inline-block rounded-full bg-green-500 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-white">Now Live</span>
-                  <span className="text-xs text-green-700 font-semibold">TallyPrime 7.1 is officially released — upgrade today!</span>
+                  <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-white">Coming Soon</span>
+                  <span className="text-xs text-amber-700 font-semibold">Early Access Beta Available Now</span>
                 </div>
-                <h4 className="text-base font-bold text-slate-900">TallyPrime 7.1 is Here — Experience the Next Generation of Business Management</h4>
+                <h4 className="text-base font-bold text-slate-900">TallyPrime 7.1 — The Next Generation of Business Management</h4>
                 <p className="mt-1 text-sm text-slate-600 max-w-2xl">
-                  TallyPrime 7.1 is now officially available with features built for Kenyan businesses: <strong>8 professional invoice templates</strong> including eTIMS-ready formats, <strong>enhanced KRA &amp; eTIMS compliance</strong> with faster e-filing, <strong>M-Pesa &amp; local bank reconciliation upgrades</strong>, <strong>improved multi-currency support</strong> for USD/EUR transactions, <strong>faster payroll processing</strong> with updated PAYE, NHIF, NSSF &amp; Housing Levy rates, and <strong>auto-wrap text</strong> for cleaner reports. As your certified TallyPrime partner, we will upgrade and support your transition seamlessly.
+                  Tally Solutions has released TallyPrime 7.1 Beta with powerful new features: <strong>8 professional invoice templates</strong>, <strong>connected banking</strong>, <strong>HSN/SAC online validation</strong>, <strong>Schedule III financial statements</strong>, and more. As your certified TallyPrime partner, we will upgrade and support your transition seamlessly.
                 </p>
               </div>
             </div>
             <div className="flex flex-col gap-2 shrink-0">
               <a
-                href="https://tallysolutions.com/tallyprime/"
+                href="https://tallysolutions.com/download-tallyprime-7-1-beta/"
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center justify-center rounded-full bg-green-500 hover:bg-green-600 px-6 py-3 text-sm font-semibold text-white shadow-md transition"
+                className="inline-flex items-center justify-center rounded-full bg-amber-400 hover:bg-amber-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition"
               >
-                Experience 7.1 Now
+                Explore 7.1 Features
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>
-              <a
-                href="/contact"
-                className="inline-flex items-center justify-center rounded-full border border-green-500 bg-green-500/10 hover:bg-green-500/20 px-6 py-3 text-sm font-semibold text-green-600 transition"
+              <Link
+                to="/contact"
+                className="inline-flex items-center justify-center rounded-full border border-amber-300 bg-white hover:bg-amber-50 px-6 py-3 text-sm font-semibold text-amber-700 transition"
               >
                 Book an Upgrade Consultation
-              </a>
+              </Link>
             </div>
           </div>
         </div>
 
+        {/* Download Banner */}
         <div className="rounded-4xl bg-slate-900 p-8 text-white shadow-2xl shadow-slate-900/10">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <img
                 src="/tally-solutions-new-logo.png"
                 alt="Tally Solutions logo"
-                className="h-12 w-auto max-w-[160px] object-contain rounded-2xl bg-white/10 p-2 shadow-lg shadow-black/10"
+                className="h-16 w-auto rounded-2xl bg-white/10 p-2 shadow-lg shadow-black/10"
               />
               <span className="max-w-xl text-sm font-semibold leading-6 text-white">
                 Try TallyPrime free — Education Mode. Or contact us for official Silver, Gold & Enterprise licensing.
@@ -198,7 +220,7 @@ export default function Footer() {
               href="https://tallysolutions.com/ssa/download/"
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center justify-center rounded-full bg-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-sky-900/30 transition hover:bg-sky-700"
+              className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/10 transition hover:bg-slate-100"
             >
               Download Now
               <ArrowRight className="ml-2 h-4 w-4" />
@@ -206,18 +228,8 @@ export default function Footer() {
           </div>
         </div>
 
-      {/* Trademark Disclaimer */}
-      <div className="border-t border-slate-800 pt-6 pb-2">
-        <p className="text-xs text-slate-600 leading-relaxed max-w-4xl">
-          TallyPrime® is a registered trademark of Tally Solutions Pvt. Ltd. TSplus® is a registered trademark of Terminal Service Plus SAS.
-          EOS® and Entrepreneurial Operating System® are registered trademarks of EOS Worldwide, LLC.
-          HubSpot® is a registered trademark of HubSpot, Inc.
-          Optimum Prime Solutions Ltd is an authorised TallyPrime reseller and TSplus deployment partner.
-          References to EOS® and HubSpot® are for descriptive purposes only. Optimum Prime Solutions Ltd is not affiliated with, endorsed by, or an official partner of EOS Worldwide, LLC or HubSpot, Inc.
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-4 border-t border-slate-800 pt-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        {/* Bottom Bar */}
+        <div className="flex flex-col gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} {data.company.name}. All rights reserved.</p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}

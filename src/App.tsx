@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { SiteProvider } from './context/SiteContext';
-import ScrollToTop from './components/ScrollToTop';
 import ErrorBoundary from './components/ErrorBoundary';
 import { OfflineBanner } from './components/OfflineBanner';
 import Navbar from './components/Navbar';
@@ -9,17 +8,25 @@ import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
 import AdminLogin from './admin/AdminLogin';
 import AdminLayout from './admin/AdminLayout';
+
+// Existing pages
 import HomePage from './pages/HomePage';
 import AboutPage from './pages/AboutPage';
 import FeaturesPage from './pages/FeaturesPage';
 import ProductsPage from './pages/ProductsPage';
 import TestimonialsPage from './pages/TestimonialsPage';
 import BlogPage from './pages/BlogPage';
+import BlogPostPage from './pages/BlogPostPage';
 import FAQPage from './pages/FAQPage';
 import ContactPage from './pages/ContactPage';
-import BlogPostPage from './pages/BlogPostPage';
-import TallyPrimeKenyaPage from './pages/TallyPrimeKenyaPage';
-import TallyPrime71Popup from './components/TallyPrime71Popup';
+
+// Phase 0 — New parent landing pages
+import TallyPrimePage from './pages/TallyPrimePage';
+import IndustriesPage from './pages/IndustriesPage';
+import KnowledgeHubPage from './pages/KnowledgeHubPage';
+import PricingPage from './pages/PricingPage';
+import ComingSoonPage from './pages/ComingSoonPage';
+
 import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth } from './firebase/config';
 import type { User } from 'firebase/auth';
 import { signInAnonymously } from 'firebase/auth';
@@ -27,26 +34,64 @@ import { signInAnonymously } from 'firebase/auth';
 function SiteRoutes() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950 flex flex-col">
-      <ScrollToTop />
       <Navbar />
       <main className="flex-grow pt-[72px]">
         <Routes>
+          {/* ── Core pages (preserved) ── */}
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/features" element={<FeaturesPage />} />
-          <Route path="/products" element={<ProductsPage />} />
           <Route path="/testimonials" element={<TestimonialsPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogPostPage />} />
-          <Route path="/tally-prime-kenya" element={<TallyPrimeKenyaPage />} />
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/contact" element={<ContactPage />} />
+
+          {/* ── Legacy URLs preserved (no broken links) ── */}
+          <Route path="/features" element={<FeaturesPage />} />
+          <Route path="/products" element={<ProductsPage />} />
+
+          {/* ── Phase 0: TallyPrime Solutions ── */}
+          <Route path="/tallyprime" element={<TallyPrimePage />} />
+          <Route path="/tallyprime/implementation" element={<ComingSoonPage />} />
+          <Route path="/tallyprime/licensing" element={<ComingSoonPage />} />
+          <Route path="/tallyprime/cloud-hosting" element={<ComingSoonPage />} />
+          <Route path="/tallyprime/training" element={<ComingSoonPage />} />
+          <Route path="/tallyprime/support" element={<ComingSoonPage />} />
+          <Route path="/tallyprime/customization" element={<ComingSoonPage />} />
+          <Route path="/tallyprime/data-migration" element={<ComingSoonPage />} />
+
+          {/* ── Phase 0: Industries ── */}
+          <Route path="/industries" element={<IndustriesPage />} />
+          <Route path="/industries/retail" element={<ComingSoonPage />} />
+          <Route path="/industries/distribution" element={<ComingSoonPage />} />
+          <Route path="/industries/manufacturing" element={<ComingSoonPage />} />
+          <Route path="/industries/construction" element={<ComingSoonPage />} />
+          <Route path="/industries/hardware" element={<ComingSoonPage />} />
+          <Route path="/industries/ngos" element={<ComingSoonPage />} />
+          <Route path="/industries/schools" element={<ComingSoonPage />} />
+          <Route path="/industries/saccos" element={<ComingSoonPage />} />
+
+          {/* ── Phase 0: Knowledge Hub ── */}
+          <Route path="/knowledge-hub" element={<KnowledgeHubPage />} />
+          <Route path="/knowledge-hub/guides" element={<ComingSoonPage />} />
+          <Route path="/knowledge-hub/downloads" element={<ComingSoonPage />} />
+          <Route path="/knowledge-hub/case-studies" element={<ComingSoonPage />} />
+          <Route path="/knowledge-hub/videos" element={<ComingSoonPage />} />
+          <Route path="/knowledge-hub/webinars" element={<ComingSoonPage />} />
+          <Route path="/knowledge-hub/templates" element={<ComingSoonPage />} />
+
+          {/* ── Phase 0: Pricing ── */}
+          <Route path="/pricing" element={<PricingPage />} />
+
+          {/* ── Phase 0: Why Choose Us (future) ── */}
+          <Route path="/why-choose-us" element={<ComingSoonPage />} />
+
+          {/* ── Catch-all ── */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </main>
       <Footer />
       <Chatbot />
-      <TallyPrime71Popup />
     </div>
   );
 }
@@ -57,11 +102,9 @@ function App() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Timeout fallback: if Firebase auth takes too long or is unavailable, proceed anyway
-    // Use a very short timeout so regular visitors never see a loading screen
     const timeout = setTimeout(() => {
       setAuthReady(true);
-    }, 200);
+    }, 2000);
 
     let unsubscribe: (() => void) | null = null;
     try {
@@ -70,7 +113,6 @@ function App() {
         setUser(currentUser);
         setAuthReady(true);
       });
-      // If fbOnAuthStateChanged returned a no-op (Firebase not ready), set ready immediately
       if (!unsubscribe || unsubscribe.toString() === '() => {}') {
         clearTimeout(timeout);
         setAuthReady(true);
@@ -90,9 +132,7 @@ function App() {
     if (user === null) {
       try {
         const authInstance = fbAuth();
-        signInAnonymously(authInstance).catch(() => {
-          // If anon sign-in fails, site may still work with public DB access.
-        });
+        signInAnonymously(authInstance).catch(() => {});
       } catch {
         // Firebase auth not available, continue without it
       }
@@ -115,9 +155,11 @@ function App() {
   };
 
   if (!authReady) {
-    // Show a blank screen instead of "Checking admin access" so visitors
-    // never see an admin-related message while Firebase initialises.
-    return <div className="min-h-screen bg-slate-50" />;
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-950">
+        <p className="text-sm text-slate-600">Checking admin access…</p>
+      </div>
+    );
   }
 
   return (

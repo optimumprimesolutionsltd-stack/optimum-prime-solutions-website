@@ -1,75 +1,77 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Phone, Zap, Cloud, Users, BookOpen, HelpCircle, Mail, BarChart3, Cpu, Shield, Briefcase, Award } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
 import Logo from './Logo';
 
-const navItems = [
+interface NavChild {
+  label: string;
+  href: string;
+  desc?: string;
+}
+
+interface NavLink {
+  label: string;
+  href: string;
+  children?: NavChild[];
+}
+
+const links: NavLink[] = [
+  { label: 'Home', href: '/' },
+  { label: 'About', href: '/about' },
   {
-    label: 'Home',
-    href: '/',
-    icon: null,
-    submenu: null,
-  },
-  {
-    label: 'About',
-    href: '/about',
-    icon: Briefcase,
-    submenu: null,
-  },
-  {
-    label: 'Services',
-    href: '/features',
-    icon: Zap,
-    submenu: [
-      { label: 'TallyPrime Setup', desc: 'Complete installation & configuration', icon: BarChart3, href: '/features#service-1' },
-      { label: 'Cloud Hosting', desc: 'Secure remote access & backups', icon: Cloud, href: '/features#service-9' },
-      { label: 'Payroll Systems', desc: 'KRA-compliant payroll automation', icon: Users, href: '/features#service-3' },
-      { label: 'KRA Compliance', desc: 'VAT & eTIMS integration', icon: Shield, href: '/features#service-5' },
+    label: 'TallyPrime Solutions',
+    href: '/tallyprime',
+    children: [
+      { label: 'TallyPrime Overview', href: '/tallyprime', desc: 'All TallyPrime services in one place' },
+      { label: 'Implementation', href: '/tallyprime/implementation', desc: 'End-to-end setup & go-live' },
+      { label: 'Licensing', href: '/tallyprime/licensing', desc: 'Silver, Gold & Enterprise editions' },
+      { label: 'Cloud Hosting', href: '/tallyprime/cloud-hosting', desc: 'Secure remote access from anywhere' },
+      { label: 'Training', href: '/tallyprime/training', desc: 'Hands-on user & admin training' },
+      { label: 'Support', href: '/tallyprime/support', desc: '24/7 remote & on-site support' },
+      { label: 'Customization', href: '/tallyprime/customization', desc: 'TDL & workflow customization' },
+      { label: 'Data Migration', href: '/tallyprime/data-migration', desc: 'Migrate from any system' },
     ],
   },
   {
-    label: 'Products',
-    href: '/products',
-    icon: Cpu,
-    submenu: [
-      { label: 'TallyPrime Silver', desc: 'Single-user accounting solution', icon: Zap, href: '/products' },
-      { label: 'TallyPrime Gold', desc: 'Multi-user with advanced features', icon: BarChart3, href: '/products' },
-      { label: 'Cloud Hosting', desc: 'From KES 3,000/month', icon: Cloud, href: '/products' },
-      { label: 'EOS® Consulting', desc: 'Business operating system', icon: Briefcase, href: '/products' },
+    label: 'Industries',
+    href: '/industries',
+    children: [
+      { label: 'All Industries', href: '/industries', desc: 'Solutions for every sector' },
+      { label: 'Retail', href: '/industries/retail', desc: 'POS, stock & billing' },
+      { label: 'Distribution', href: '/industries/distribution', desc: 'Multi-location & route sales' },
+      { label: 'Manufacturing', href: '/industries/manufacturing', desc: 'BOM, production & costing' },
+      { label: 'Construction', href: '/industries/construction', desc: 'Project costing & contracts' },
+      { label: 'Hardware & Wholesale', href: '/industries/hardware', desc: 'Inventory & trade management' },
+      { label: 'NGOs', href: '/industries/ngos', desc: 'Fund accounting & donor reports' },
+      { label: 'Schools', href: '/industries/schools', desc: 'Fee management & payroll' },
     ],
   },
   {
-    label: 'TallyPrime Kenya',
-    href: '/tally-prime-kenya',
-    icon: Award,
-    submenu: null,
+    label: 'Knowledge Hub',
+    href: '/knowledge-hub',
+    children: [
+      { label: 'Knowledge Hub', href: '/knowledge-hub', desc: 'Your TallyPrime learning centre' },
+      { label: 'Blog', href: '/blog', desc: 'Tips, guides & news' },
+      { label: 'Guides', href: '/knowledge-hub/guides', desc: 'Step-by-step implementation guides' },
+      { label: 'Downloads', href: '/knowledge-hub/downloads', desc: 'Templates & resources' },
+      { label: 'FAQs', href: '/faq', desc: 'Common questions answered' },
+      { label: 'Case Studies', href: '/knowledge-hub/case-studies', desc: 'Real client success stories' },
+      { label: 'Videos', href: '/knowledge-hub/videos', desc: 'Tutorials & demos' },
+    ],
   },
-  {
-    label: 'Blog',
-    href: '/blog',
-    icon: BookOpen,
-    submenu: null,
-  },
-  {
-    label: 'FAQ',
-    href: '/faq',
-    icon: HelpCircle,
-    submenu: null,
-  },
-  {
-    label: 'Contact',
-    href: '/contact',
-    icon: Mail,
-    submenu: null,
-  },
+  { label: 'Pricing', href: '/pricing' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [activeMenu, setActiveMenu] = useState<string | null>(null);
+  const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+  const [mobileExpanded, setMobileExpanded] = useState<string | null>(null);
   const location = useLocation();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -78,73 +80,115 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close dropdown on route change
+  useEffect(() => {
+    setActiveDropdown(null);
+    setOpen(false);
+  }, [location.pathname]);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setActiveDropdown(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const handleMouseEnter = (label: string) => {
+    if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    setActiveDropdown(label);
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => setActiveDropdown(null), 150);
+  };
+
+  const isActive = (link: NavLink) => {
+    if (link.href === '/') return location.pathname === '/';
+    return location.pathname.startsWith(link.href);
+  };
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 backdrop-blur-sm bg-gradient-to-b from-slate-950/95 via-slate-900/90 to-slate-900/80 border-b border-white/10 ${scrolled ? 'shadow-[0_20px_80px_-40px_rgba(15,23,42,0.16)] border-slate-200/20' : 'shadow-none'}`}
+      className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 backdrop-blur-sm bg-gradient-to-b from-slate-100/95 via-slate-50/80 to-transparent border-b border-slate-200/10 ${scrolled ? 'shadow-[0_20px_80px_-40px_rgba(15,23,42,0.16)] border-slate-200/20' : 'shadow-none'}`}
     >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="h-[72px] flex items-center justify-between gap-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" ref={dropdownRef}>
+        <div className="h-[72px] flex items-center justify-between gap-4">
           {/* Logo */}
-          <Link to="/" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="flex items-center gap-3 flex-shrink-0">
-            <Logo className="h-10 sm:h-12 w-auto" variant="full" />
+          <Link
+            to="/"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="flex items-center gap-3 shrink-0"
+          >
+            <Logo className="h-10 w-auto text-slate-950" variant="full" />
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden lg:flex items-center gap-1">
-            {navItems.map((item) => (
+            {links.map((link) => (
               <div
-                key={item.label}
-                className="relative group"
-                onMouseEnter={() => setActiveMenu(item.label)}
-                onMouseLeave={() => setActiveMenu(null)}
+                key={link.href}
+                className="relative"
+                onMouseEnter={() => link.children && handleMouseEnter(link.label)}
+                onMouseLeave={handleMouseLeave}
               >
                 <Link
-                  to={item.href}
+                  to={link.href}
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2 ${
-                    location.pathname === item.href
-                      ? 'text-red-400 bg-red-600/10 border border-red-500/20'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/50'
+                  className={`flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 ${
+                    isActive(link)
+                      ? 'bg-slate-100 text-slate-950'
+                      : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950'
                   }`}
                 >
-                  {item.icon && <item.icon className="h-4 w-4" />}
-                  {item.label}
-                  {item.submenu && <span className="text-xs ml-1">▼</span>}
+                  {link.label}
+                  {link.children && (
+                    <ChevronDown
+                      className={`h-3.5 w-3.5 transition-transform duration-200 ${activeDropdown === link.label ? 'rotate-180' : ''}`}
+                    />
+                  )}
                 </Link>
 
-                {/* Mega Menu Dropdown */}
-                {item.submenu && (
+                {/* Dropdown */}
+                {link.children && (
                   <AnimatePresence>
-                    {activeMenu === item.label && (
+                    {activeDropdown === link.label && (
                       <motion.div
-                        initial={{ opacity: 0, y: -10 }}
+                        initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
-                        transition={{ duration: 0.2 }}
-                        className="absolute top-full left-0 mt-2 w-80 rounded-xl border border-white/10 bg-gradient-to-br from-slate-800 via-slate-850 to-slate-900 shadow-2xl shadow-black/50 p-4 space-y-2"
-                        onMouseEnter={() => setActiveMenu(item.label)}
-                        onMouseLeave={() => setActiveMenu(null)}
+                        exit={{ opacity: 0, y: 8 }}
+                        transition={{ duration: 0.15 }}
+                        className="absolute top-full left-0 mt-1 w-64 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-sm shadow-xl shadow-slate-200/40 overflow-hidden"
+                        onMouseEnter={() => handleMouseEnter(link.label)}
+                        onMouseLeave={handleMouseLeave}
                       >
-                        {item.submenu.map((subitem, idx) => (
-                          <Link
-                            key={subitem.label}
-                            to={subitem.href || item.href}
-                            onClick={() => { setActiveMenu(null); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                            className="block p-3 rounded-lg hover:bg-slate-700/50 transition-all cursor-pointer group/item"
-                          >
-                            <div className="flex items-start gap-3">
-                              <div className="mt-1 p-2 rounded-lg bg-slate-700/50 group-hover/item:bg-red-600/20 transition-all">
-                                <subitem.icon className="h-4 w-4 text-slate-300 group-hover/item:text-red-400" />
-                              </div>
-                              <div className="flex-1">
-                                <p className="text-sm font-semibold text-white group-hover/item:text-red-400 transition-all">{subitem.label}</p>
-                                <p className="text-xs text-slate-400 mt-0.5">{subitem.desc}</p>
-                              </div>
-                            </div>
-                          </Link>
-                        ))}
+                        <div className="p-2">
+                          {link.children.map((child) => (
+                            <Link
+                              key={child.href}
+                              to={child.href}
+                              onClick={() => {
+                                setActiveDropdown(null);
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className={`block rounded-xl px-3 py-2.5 transition-colors ${
+                                location.pathname === child.href
+                                  ? 'bg-slate-100 text-slate-950'
+                                  : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
+                              }`}
+                            >
+                              <div className="text-sm font-medium">{child.label}</div>
+                              {child.desc && (
+                                <div className="text-xs text-slate-500 mt-0.5">{child.desc}</div>
+                              )}
+                            </Link>
+                          ))}
+                        </div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -153,24 +197,14 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* CTA + Mobile Menu Button */}
-          <div className="flex items-center gap-3 ml-auto">
-            <a
-              href="tel:+254116246074"
-              className="hidden sm:flex items-center gap-2 px-4 py-2 rounded-lg bg-red-600/10 text-red-400 hover:bg-red-600/20 transition text-sm font-medium border border-red-500/20"
-            >
-              <Phone className="h-4 w-4" />
-              <span className="hidden md:inline">+254 116 246 074</span>
-            </a>
-
-            <button
-              onClick={() => setOpen((prev) => !prev)}
-              className="lg:hidden p-2 text-white transition hover:text-sky-400"
-              aria-label={open ? 'Close menu' : 'Open menu'}
-            >
-              {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </button>
-          </div>
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setOpen((prev) => !prev)}
+            className="lg:hidden p-2 text-slate-900 transition hover:text-slate-700"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+          >
+            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
         </div>
       </div>
 
@@ -181,47 +215,85 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="lg:hidden border-t border-white/10 bg-gradient-to-b from-slate-900/98 via-slate-900/95 to-slate-900/90"
+            className="lg:hidden border-t border-slate-200 bg-gradient-to-b from-slate-50/95 via-slate-50/80 to-slate-50/70"
           >
             <div className="px-4 py-4">
               <div className="mb-3 flex items-center justify-between">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Menu</p>
+                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-600">Navigation</p>
+                <button
+                  onClick={() => setOpen(false)}
+                  className="rounded-full p-2 text-slate-700 transition hover:bg-slate-100"
+                  aria-label="Close menu"
+                >
+                  <X className="h-5 w-5" />
+                </button>
               </div>
-              <div className="max-h-[60vh] overflow-y-auto rounded-3xl border border-white/10 bg-slate-800/90 p-3 space-y-2">
-                {navItems.map((item) => {
-                  const isActive = location.pathname === item.href;
-                  return (
-                    <div key={item.label}>
+              <div className="max-h-[60vh] overflow-y-auto rounded-3xl border border-slate-200 bg-white/90 p-3 shadow-sm">
+                {links.map((link) => (
+                  <div key={link.href}>
+                    {link.children ? (
+                      <>
+                        <button
+                          onClick={() =>
+                            setMobileExpanded(mobileExpanded === link.label ? null : link.label)
+                          }
+                          className={`w-full flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-medium transition ${
+                            isActive(link) ? 'bg-slate-100 text-slate-950' : 'text-slate-700 hover:bg-slate-50'
+                          }`}
+                        >
+                          <span>{link.label}</span>
+                          <ChevronDown
+                            className={`h-4 w-4 transition-transform duration-200 ${
+                              mobileExpanded === link.label ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </button>
+                        <AnimatePresence>
+                          {mobileExpanded === link.label && (
+                            <motion.div
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              exit={{ opacity: 0, height: 0 }}
+                              className="ml-3 border-l-2 border-slate-100 pl-3 mb-1"
+                            >
+                              {link.children.map((child) => (
+                                <Link
+                                  key={child.href}
+                                  to={child.href}
+                                  onClick={() => {
+                                    setOpen(false);
+                                    setMobileExpanded(null);
+                                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                                  }}
+                                  className={`block rounded-xl px-3 py-2 text-sm transition ${
+                                    location.pathname === child.href
+                                      ? 'bg-slate-100 text-slate-950 font-medium'
+                                      : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                                  }`}
+                                >
+                                  {child.label}
+                                </Link>
+                              ))}
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </>
+                    ) : (
                       <Link
-                        to={item.href}
-                        onClick={() => { setOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                        className={`flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-medium transition ${
-                          isActive ? 'bg-red-600/20 text-red-400 border border-red-500/20' : 'text-slate-300 hover:bg-slate-700 hover:text-white'
+                        to={link.href}
+                        onClick={() => {
+                          setOpen(false);
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className={`block rounded-2xl px-4 py-3 text-sm font-medium transition ${
+                          isActive(link) ? 'bg-slate-100 text-slate-950' : 'text-slate-700 hover:bg-slate-50'
                         }`}
                       >
-                        {item.icon && <item.icon className="h-4 w-4" />}
-                        {item.label}
+                        {link.label}
                       </Link>
-
-                      {/* Mobile Submenu */}
-                      {item.submenu && (
-                        <div className="ml-4 mt-2 space-y-1 border-l border-slate-700 pl-3">
-                          {item.submenu.map((subitem) => (
-                            <Link
-                              key={subitem.label}
-                              to={subitem.href || item.href}
-                              onClick={() => { setOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                              className="block p-2 rounded-lg bg-slate-700/30 text-xs text-slate-300 hover:bg-slate-700 transition"
-                            >
-                              <p className="font-medium text-slate-200">{subitem.label}</p>
-                              <p className="text-slate-400 mt-0.5">{subitem.desc}</p>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </motion.div>
