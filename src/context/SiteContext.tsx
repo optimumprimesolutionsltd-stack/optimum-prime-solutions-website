@@ -4,14 +4,16 @@ import { fbGet, fbSet, fbSubscribe } from '../firebase/config';
 import { signInAnonymously, getAuth } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 
+// New Firebase project: optimum-prime-website (migrated July 2026)
 const firebaseConfig = {
-  apiKey: "AIzaSyA2T8PddUwaJHiaMNJ3XvwMDBFJ4CaohHE",
-  authDomain: "optimum-website-1a60b.firebaseapp.com",
-  databaseURL: "https://optimum-website-1a60b-default-rtdb.firebaseio.com",
-  projectId: "optimum-website-1a60b",
-  storageBucket: "optimum-website-1a60b.appspot.com",
-  messagingSenderId: "472845820373",
-  appId: "1:472845820373:web:a1b2c3d4e5f6g7h8i9j0"
+  apiKey: "AIzaSyAY8O5LRWxcJgkYhNn1SstAylc-q959vv0",
+  authDomain: "optimum-prime-website.firebaseapp.com",
+  databaseURL: "https://optimum-prime-website-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "optimum-prime-website",
+  storageBucket: "optimum-prime-website.firebasestorage.app",
+  messagingSenderId: "784083256897",
+  appId: "1:784083256897:web:3edc73fa438f5faa2f68c0",
+  measurementId: "G-H1Y0KTGKG6"
 };
 
 try {
