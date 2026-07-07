@@ -179,7 +179,7 @@ export default function Footer() {
                 </div>
                 <h4 className="text-base font-bold text-slate-900">TallyPrime 7.1 — The Next Generation of Business Management</h4>
                 <p className="mt-1 text-sm text-slate-600 max-w-2xl">
-                  Tally Solutions has released TallyPrime 7.1 Beta with powerful new features: <strong>8 professional invoice templates</strong>, <strong>connected banking</strong>, <strong>HSN/SAC online validation</strong>, <strong>Schedule III financial statements</strong>, and more. As your certified TallyPrime partner, we will upgrade and support your transition seamlessly.
+                  Tally Solutions has released TallyPrime 7.1 Beta with powerful new features: <strong>8 professional invoice print templates</strong>, <strong>auto wrap text</strong>, <strong>scheduled auto backup</strong>, <strong>eTIMS-ready compliance</strong>, and more. As your certified TallyPrime partner in Kenya, we will upgrade and support your transition seamlessly.
                 </p>
               </div>
             </div>
