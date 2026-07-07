@@ -23,6 +23,7 @@ export default function Contact() {
     email: '',
     businessType: '',
     demoDate: '',
+    demoTime: '',
     currentSoftware: '',
     message: '',
   });
@@ -78,6 +79,7 @@ export default function Contact() {
         email: '',
         businessType: '',
         demoDate: '',
+        demoTime: '',
         currentSoftware: '',
         message: '',
       });
@@ -215,14 +217,11 @@ export default function Contact() {
               ) : (
                 <form onSubmit={submit} className="mt-8 grid gap-4">
                   <div className="grid gap-4 sm:grid-cols-2">
-                    {[
-                      { k: 'name', l: 'Full name *', t: 'text', p: 'John Doe' },
-                      { k: 'company', l: 'Company name', t: 'text', p: 'Your company' },
+                    {/* Full name */}
+                    {[{ k: 'name', l: 'Full name *', t: 'text', p: 'John Doe' },
+                      { k: 'company', l: 'Company name *', t: 'text', p: 'Your company' },
                       { k: 'phone', l: 'Phone *', t: 'tel', p: '+254 700 000000' },
                       { k: 'email', l: 'Email *', t: 'email', p: 'john@company.ke' },
-                      { k: 'businessType', l: 'Business type', t: 'text', p: 'Retail / Manufacturing' },
-                      { k: 'demoDate', l: 'Preferred date', t: 'date', p: '' },
-                      { k: 'currentSoftware', l: 'Current software', t: 'text', p: 'QuickBooks, Excel' },
                     ].map((field) => {
                       const error = getFieldError(errors, field.k);
                       return (
@@ -233,7 +232,7 @@ export default function Contact() {
                             value={(form as Record<string, string>)[field.k]}
                             onChange={(e) => set(field.k, e.target.value)}
                             placeholder={field.p}
-                            required={field.l.includes('*')}
+                            required
                             className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition ${
                               error ? 'border-red-500/70 bg-slate-900 text-white placeholder:text-red-400' : 'border-white/10 bg-slate-900 text-white placeholder:text-slate-400'
                             }`}
@@ -242,6 +241,99 @@ export default function Contact() {
                         </label>
                       );
                     })}
+
+                    {/* Business type dropdown */}
+                    <label className="block text-sm text-slate-200">
+                      <span className="block mb-2 font-semibold text-slate-100">Business type *</span>
+                      <select
+                        value={form.businessType}
+                        onChange={(e) => set('businessType', e.target.value)}
+                        required
+                        className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition appearance-none ${
+                          getFieldError(errors, 'businessType') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
+                        } ${!form.businessType ? 'text-slate-400' : 'text-white'}`}
+                      >
+                        <option value="" disabled>Select business type</option>
+                        <option value="Retail">Retail</option>
+                        <option value="Wholesale / Distribution">Wholesale / Distribution</option>
+                        <option value="Manufacturing">Manufacturing</option>
+                        <option value="Construction">Construction</option>
+                        <option value="Hardware">Hardware</option>
+                        <option value="School / Education">School / Education</option>
+                        <option value="NGO / Non-profit">NGO / Non-profit</option>
+                        <option value="SACCO / Microfinance">SACCO / Microfinance</option>
+                        <option value="Professional Services">Professional Services</option>
+                        <option value="Hospitality">Hospitality</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      {getFieldError(errors, 'businessType') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'businessType')}</p>}
+                    </label>
+
+                    {/* Current software dropdown */}
+                    <label className="block text-sm text-slate-200">
+                      <span className="block mb-2 font-semibold text-slate-100">Current software *</span>
+                      <select
+                        value={form.currentSoftware}
+                        onChange={(e) => set('currentSoftware', e.target.value)}
+                        required
+                        className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition appearance-none ${
+                          getFieldError(errors, 'currentSoftware') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
+                        } ${!form.currentSoftware ? 'text-slate-400' : 'text-white'}`}
+                      >
+                        <option value="" disabled>Select current software</option>
+                        <option value="QuickBooks">QuickBooks</option>
+                        <option value="Sage">Sage</option>
+                        <option value="Pastel">Pastel</option>
+                        <option value="Excel / Manual">Excel / Manual</option>
+                        <option value="TallyPrime (older version)">TallyPrime (older version)</option>
+                        <option value="Tally ERP 9">Tally ERP 9</option>
+                        <option value="Odoo">Odoo</option>
+                        <option value="SAP">SAP</option>
+                        <option value="None">None — starting fresh</option>
+                        <option value="Other">Other</option>
+                      </select>
+                      {getFieldError(errors, 'currentSoftware') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'currentSoftware')}</p>}
+                    </label>
+
+                    {/* Preferred date */}
+                    <label className="block text-sm text-slate-200">
+                      <span className="block mb-2 font-semibold text-slate-100">Preferred date *</span>
+                      <input
+                        type="date"
+                        value={form.demoDate}
+                        onChange={(e) => set('demoDate', e.target.value)}
+                        required
+                        min={new Date().toISOString().split('T')[0]}
+                        className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition ${
+                          getFieldError(errors, 'demoDate') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
+                        }`}
+                      />
+                      {getFieldError(errors, 'demoDate') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'demoDate')}</p>}
+                    </label>
+
+                    {/* Preferred time */}
+                    <label className="block text-sm text-slate-200">
+                      <span className="block mb-2 font-semibold text-slate-100">Preferred time *</span>
+                      <select
+                        value={form.demoTime}
+                        onChange={(e) => set('demoTime', e.target.value)}
+                        required
+                        className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition appearance-none ${
+                          getFieldError(errors, 'demoTime') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
+                        } ${!form.demoTime ? 'text-slate-400' : 'text-white'}`}
+                      >
+                        <option value="" disabled>Select preferred time</option>
+                        <option value="8:00 AM – 9:00 AM">8:00 AM – 9:00 AM</option>
+                        <option value="9:00 AM – 10:00 AM">9:00 AM – 10:00 AM</option>
+                        <option value="10:00 AM – 11:00 AM">10:00 AM – 11:00 AM</option>
+                        <option value="11:00 AM – 12:00 PM">11:00 AM – 12:00 PM</option>
+                        <option value="12:00 PM – 1:00 PM">12:00 PM – 1:00 PM</option>
+                        <option value="2:00 PM – 3:00 PM">2:00 PM – 3:00 PM</option>
+                        <option value="3:00 PM – 4:00 PM">3:00 PM – 4:00 PM</option>
+                        <option value="4:00 PM – 5:00 PM">4:00 PM – 5:00 PM</option>
+                      </select>
+                      {getFieldError(errors, 'demoTime') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'demoTime')}</p>}
+                    </label>
                   </div>
 
                   <label className="block text-sm text-slate-200">

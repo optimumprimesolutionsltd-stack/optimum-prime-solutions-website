@@ -30,6 +30,7 @@ export interface FormData {
   email: string;
   businessType: string;
   demoDate: string;
+  demoTime: string;
   currentSoftware: string;
   message: string;
 }
@@ -42,6 +43,13 @@ export const validateForm = (data: FormData): FormValidation => {
     errors.push({ field: 'name', message: 'Full name is required' });
   } else if (data.name.trim().length < 2) {
     errors.push({ field: 'name', message: 'Name must be at least 2 characters' });
+  }
+
+  // Company validation — now required
+  if (!data.company.trim()) {
+    errors.push({ field: 'company', message: 'Company name is required' });
+  } else if (data.company.trim().length < 2) {
+    errors.push({ field: 'company', message: 'Company name must be at least 2 characters' });
   }
 
   // Email validation
@@ -58,14 +66,24 @@ export const validateForm = (data: FormData): FormValidation => {
     errors.push({ field: 'phone', message: 'Please enter a valid Kenyan phone number (e.g., +254 7XX XXX XXX)' });
   }
 
-  // Company is optional but if provided, must be valid
-  if (data.company.trim() && data.company.trim().length < 2) {
-    errors.push({ field: 'company', message: 'Company name must be at least 2 characters' });
+  // Business type — now required
+  if (!data.businessType.trim()) {
+    errors.push({ field: 'businessType', message: 'Please select your business type' });
   }
 
-  // Business type is optional
-  if (data.businessType.trim() && data.businessType.trim().length < 2) {
-    errors.push({ field: 'businessType', message: 'Please specify a valid business type' });
+  // Current software — now required
+  if (!data.currentSoftware.trim()) {
+    errors.push({ field: 'currentSoftware', message: 'Please select your current software' });
+  }
+
+  // Preferred date — now required
+  if (!data.demoDate.trim()) {
+    errors.push({ field: 'demoDate', message: 'Please select a preferred demo date' });
+  }
+
+  // Preferred time — now required
+  if (!data.demoTime?.trim()) {
+    errors.push({ field: 'demoTime', message: 'Please select a preferred time slot' });
   }
 
   // Message is optional but if provided, must be at least 10 chars
