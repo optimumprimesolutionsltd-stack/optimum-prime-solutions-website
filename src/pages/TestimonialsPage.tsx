@@ -1,9 +1,29 @@
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import SEO from '../components/SEO';
 import Testimonials from '../components/Testimonials';
 import AfricanLaptopShowcase from '../components/AfricanLaptopShowcase';
 import ReviewForm from '../components/ReviewForm';
 
+const NAVBAR_HEIGHT = 88; // px — accounts for sticky navbar + a little breathing room
+
 export default function TestimonialsPage() {
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (hash === '#review-form') {
+      // Wait for page to fully render before scrolling
+      const timer = setTimeout(() => {
+        const el = document.getElementById('review-form');
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - NAVBAR_HEIGHT;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [hash]);
+
   return (
     <div className="min-h-screen">
       <SEO
