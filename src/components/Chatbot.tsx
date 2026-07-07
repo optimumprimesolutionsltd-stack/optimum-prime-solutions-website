@@ -6,8 +6,7 @@ import { useSite } from '../context/SiteContext';
 import { fbSet, fbGet } from '../firebase/config';
 import { motion, AnimatePresence } from 'framer-motion';
 import DemoRequestModal from './DemoRequestModal';
-import { getChatGPTReply, type ChatMessage } from '../utils/chatgpt';
-import type { SiteData } from '../data/siteData';
+import { getChatResponse, type ChatMessage } from '../utils/chatgpt';
 
 interface Msg {
   id: string;
@@ -130,7 +129,7 @@ export default function Chatbot() {
     };
     setMsgs((prev) => [...prev, userMsg]);
 
-    // Prepare history for AI, excluding the initial greeting and any quick replies
+    // Prepare history for AI, excluding the initial greeting
     const aiHistory: ChatMessage[] = msgs
       .filter(msg => msg.text !== botGreeting)
       .map((msg) => ({
@@ -142,14 +141,30 @@ export default function Chatbot() {
     aiHistory.push({ role: 'user', content: trimmedText });
 
     try {
-      const aiReplyContent = await getChatGPTReply(trimmedText, data, aiHistory, lead as Record<string, string | undefined>);
+      const chatResult = await getChatResponse(trimmedText, aiHistory);
 
-      // Attempt to extract lead info from AI's response if it provides it implicitly
-      const updatedLead = { ...lead };
-      const nameMatch = aiReplyContent.match(/(?:my name is|i(?:’m| am)|call me)\s+([A-Za-z]+)/i);
-      if (nameMatch && !updatedLead.name) updatedLead.name = nameMatch[1];
-      // More sophisticated lead info extraction could be added here if needed
-      setLead(updatedLead);
+      // Handle smart handoff
+      if (chatResult.handoff && chatResult.name && chatResult.phone) {
+        const handoffMsg: Msg = {
+          id: Date.now().toString(),
+          role: 'bot',
+          text: `Great news, ${chatResult.name}! 🎉 Our team has been notified and will reach out to you on **${chatResult.phone}** shortly.\n\nYou can also start a WhatsApp chat with us right now — tap the button below! 👇`,
+          time: getTime(),
+          action: 'whatsapp',
+        };
+        setTimeout(() => {
+          setMsgs((p) => [...p, handoffMsg]);
+          setShowTypingIndicator(false);
+          setTyping(false);
+          // Auto-open WhatsApp after a short delay
+          if (chatResult.whatsapp_url) {
+            setTimeout(() => window.open(chatResult.whatsapp_url, '_blank'), 1500);
+          }
+        }, 900);
+        return;
+      }
+
+      const aiReplyContent = chatResult.reply || "I'm sorry, I didn't get a response. Please try again.";
 
       const botMsg: Msg = {
         id: Date.now().toString(),
@@ -169,14 +184,14 @@ export default function Chatbot() {
       const errorMsg: Msg = {
         id: Date.now().toString(),
         role: 'bot',
-        text: "Oops! I'm having a little trouble connecting right now. Please try again in a moment, or you can reach us directly on WhatsApp.",
+        text: "Oops! I'm having a little trouble connecting right now. Please try again in a moment, or you can reach us directly on WhatsApp at +254 116 246 074.",
         time: getTime(),
       };
       setMsgs((p) => [...p, errorMsg]);
       setShowTypingIndicator(false);
       setTyping(false);
     }
-  }, [msgs, lead, data, botGreeting]);
+  }, [msgs, lead, botGreeting]);
 
   const handleClear = () => {
     if (confirm('Start a fresh conversation?')) {

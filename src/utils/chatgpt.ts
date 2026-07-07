@@ -9,14 +9,21 @@ export interface ChatMessage {
   content: string;
 }
 
+export interface ChatResponse {
+  reply?: string;
+  handoff?: boolean;
+  name?: string;
+  phone?: string;
+  interest?: string;
+  whatsapp_url?: string;
+}
+
 const CHAT_API_URL = 'https://optimum-prime-lead-notifier.onrender.com/chat';
 
-export async function getChatGPTReply(
+export async function getChatResponse(
   userText: string,
-  _siteData: unknown,
-  history: ChatMessage[] = [],
-  _leadProfile?: Record<string, string | undefined>
-): Promise<string> {
+  history: ChatMessage[] = []
+): Promise<ChatResponse> {
   // Build message history — include full conversation for context
   const messages: ChatMessage[] = [
     ...history.filter(m => m.content && m.content.trim()),
@@ -39,15 +46,23 @@ export async function getChatGPTReply(
       throw new Error(`Chat API error: ${response.status}`);
     }
 
-    const data = await response.json();
-    return (
-      data.reply ||
-      "I'm sorry, I didn't get a response. Please try again or reach us on WhatsApp at +254 116 246 074."
-    );
+    return await response.json();
   } catch (error) {
     console.error('Zawadi chat error:', error);
-    return (
-      "I'm having a little trouble connecting right now. You can reach us directly on WhatsApp at **+254 116 246 074** or visit **www.optimumprimesolutions.co.ke** 😊"
-    );
+    return {
+      reply: "I'm having a little trouble connecting right now. You can reach us directly on WhatsApp at **+254 116 246 074** or visit **www.optimumprimesolutions.co.ke** 😊",
+      handoff: false,
+    };
   }
+}
+
+// Legacy wrapper for backward compatibility
+export async function getChatGPTReply(
+  userText: string,
+  _siteData: unknown,
+  history: ChatMessage[] = [],
+  _leadProfile?: Record<string, string | undefined>
+): Promise<string> {
+  const result = await getChatResponse(userText, history);
+  return result.reply || "I'm sorry, I didn't get a response. Please try again or reach us on WhatsApp at +254 116 246 074.";
 }
