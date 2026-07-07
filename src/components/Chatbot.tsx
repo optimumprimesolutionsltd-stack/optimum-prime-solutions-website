@@ -314,6 +314,22 @@ export default function Chatbot() {
                             ))}
                           </div>
                         )}
+
+                        {/* WhatsApp handoff button */}
+                        {msg.role === 'bot' && msg.action === 'whatsapp' && (
+                          <motion.a
+                            href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20speak%20to%20an%20expert%20about%20TallyPrime"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            initial={{ opacity: 0, scale: 0.9 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            transition={{ delay: 0.3 }}
+                            className="flex items-center justify-center gap-2 px-5 py-3 bg-[#25D366] hover:bg-[#1ebe5d] text-white font-semibold text-sm rounded-2xl shadow-lg shadow-[#25D366]/30 transition-all hover:scale-105 active:scale-95 mt-1"
+                          >
+                            <WhatsAppIcon className="h-5 w-5 text-white" />
+                            Chat on WhatsApp
+                          </motion.a>
+                        )}
                       </div>
 
                       {msg.role === 'user' && (
