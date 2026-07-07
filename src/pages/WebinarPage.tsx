@@ -4,6 +4,7 @@ import { fbSet } from '../firebase/config';
 
 const WEBINAR_DATE = 'Wednesday, 15th July 2026';
 const WEBINAR_TIME = '3:00 PM – 4:00 PM (EAT)';
+const WEBINAR_MEET_LINK = 'https://meet.google.com/ded-fdcf-aac';
 const NOTIFIER_URL = 'https://optimum-prime-lead-notifier.onrender.com/new-lead';
 
 interface FormState {
@@ -47,7 +48,9 @@ export default function WebinarPage() {
         `✅ Scheduled Auto Backup\n` +
         `✅ Reuse Deleted Voucher Numbers\n` +
         `✅ Live Q&A\n\n` +
-        `We'll send the Google Meet join link closer to the date.\n\n` +
+        `📹 *Google Meet Join Link:*\n` +
+        `${WEBINAR_MEET_LINK}\n` +
+        `_(Click to join at 3:00 PM EAT on 15th July)_\n\n` +
         `📞 *+254 116 246 074*\n` +
         `🌐 *www.optimumprimesolutions.co.ke*\n\n` +
         `_Optimum Prime Solutions — TallyPrime · Cloud · EOS® · HubSpot CRM · Biz Analyst_`;
