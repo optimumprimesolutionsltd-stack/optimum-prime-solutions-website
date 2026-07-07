@@ -215,13 +215,23 @@ export default function ReviewForm() {
                   <label className="block text-xs font-semibold text-slate-300 mb-1.5">
                     Your Role (optional)
                   </label>
-                  <input
-                    type="text"
+                  <select
                     value={form.role}
                     onChange={(e) => setForm((f) => ({ ...f, role: e.target.value }))}
-                    placeholder="e.g. Director, Accountant, Owner"
-                    className="w-full rounded-xl border border-white/10 bg-slate-700/50 text-white placeholder-slate-500 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 transition"
-                  />
+                    className="w-full rounded-xl border border-white/10 bg-slate-700/50 text-white px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 transition appearance-none cursor-pointer"
+                  >
+                    <option value="" className="bg-slate-800">Select your role...</option>
+                    <option value="CEO / Managing Director" className="bg-slate-800">CEO / Managing Director</option>
+                    <option value="Director" className="bg-slate-800">Director</option>
+                    <option value="Business Owner" className="bg-slate-800">Business Owner</option>
+                    <option value="Finance Manager" className="bg-slate-800">Finance Manager</option>
+                    <option value="Accountant" className="bg-slate-800">Accountant</option>
+                    <option value="Operations Manager" className="bg-slate-800">Operations Manager</option>
+                    <option value="HR Manager" className="bg-slate-800">HR Manager</option>
+                    <option value="IT Manager" className="bg-slate-800">IT Manager</option>
+                    <option value="Procurement Manager" className="bg-slate-800">Procurement Manager</option>
+                    <option value="Other" className="bg-slate-800">Other</option>
+                  </select>
                 </div>
 
                 {/* Review text */}
