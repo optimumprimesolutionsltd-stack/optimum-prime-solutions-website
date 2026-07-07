@@ -1,8 +1,22 @@
+import { useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import Contact from '../components/Contact';
 import AfricanLaptopShowcase from '../components/AfricanLaptopShowcase';
 import SEO from '../components/SEO';
 
 export default function ContactPage() {
+  const { hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const id = hash.replace('#', '');
+      const el = document.getElementById(id);
+      if (el) {
+        setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
+      }
+    }
+  }, [hash]);
+
   return (
     <div className="min-h-screen bg-slate-900">
       <SEO
