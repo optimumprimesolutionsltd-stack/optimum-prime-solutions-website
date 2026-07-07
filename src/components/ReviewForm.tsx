@@ -46,11 +46,11 @@ export default function ReviewForm() {
       setErrorMsg('Please fill in your name, a review, and select a star rating.');
       return;
     }
-    setStatus('submitting');
+      setStatus('submitting');
     setErrorMsg('');
     try {
       const id = `review_${Date.now()}`;
-      await fbSet(`pending_reviews/${id}`, {
+      const reviewData = {
         id,
         name: form.name.trim(),
         company: form.company.trim(),
@@ -59,7 +59,14 @@ export default function ReviewForm() {
         text: form.text.trim(),
         submittedAt: new Date().toISOString(),
         status: 'pending',
-      });
+      };
+      await fbSet(`pending_reviews/${id}`, reviewData);
+      // Notify team via WhatsApp (fire-and-forget — don't block on this)
+      fetch('https://optimum-prime-lead-notifier.onrender.com/new-review', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(reviewData),
+      }).catch(() => {}); // silently ignore if backend is sleeping
       setStatus('success');
     } catch (err) {
       console.error('Review submission error:', err);
