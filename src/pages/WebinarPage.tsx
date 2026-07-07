@@ -35,9 +35,8 @@ export default function WebinarPage() {
     setSubmitting(true);
     try {
       const id = `reg_${Date.now()}`;
-      const firstName = form.name.split(' ')[0];
       const confirmationMessage =
-        `Hello ${firstName}! 🎉\n\n` +
+        `Hello ${form.name}! 🎉\n\n` +
         `You're registered for our free TallyPrime 7.1 webinar!\n\n` +
         `📅 *Date:* ${WEBINAR_DATE}\n` +
         `🕒 *Time:* ${WEBINAR_TIME}\n` +
