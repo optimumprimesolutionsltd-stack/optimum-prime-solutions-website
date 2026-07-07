@@ -27,6 +27,7 @@ import KnowledgeHubPage from './pages/KnowledgeHubPage';
 import PricingPage from './pages/PricingPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 
+import WebinarPage from './pages/WebinarPage';
 import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth } from './firebase/config';
 import type { User } from 'firebase/auth';
 import { signInAnonymously } from 'firebase/auth';
@@ -77,6 +78,7 @@ function SiteRoutes() {
           <Route path="/knowledge-hub/downloads" element={<ComingSoonPage />} />
           <Route path="/knowledge-hub/case-studies" element={<ComingSoonPage />} />
           <Route path="/knowledge-hub/videos" element={<ComingSoonPage />} />
+          <Route path="/webinar" element={<WebinarPage />} />
           <Route path="/knowledge-hub/webinars" element={<ComingSoonPage />} />
           <Route path="/knowledge-hub/templates" element={<ComingSoonPage />} />
 
