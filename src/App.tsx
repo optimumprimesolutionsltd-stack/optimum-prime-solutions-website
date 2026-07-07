@@ -20,14 +20,34 @@ import BlogPostPage from './pages/BlogPostPage';
 import FAQPage from './pages/FAQPage';
 import ContactPage from './pages/ContactPage';
 
-// Phase 0 — New parent landing pages
+// Phase 0 — Parent landing pages
 import TallyPrimePage from './pages/TallyPrimePage';
 import IndustriesPage from './pages/IndustriesPage';
 import KnowledgeHubPage from './pages/KnowledgeHubPage';
 import PricingPage from './pages/PricingPage';
 import ComingSoonPage from './pages/ComingSoonPage';
-
 import WebinarPage from './pages/WebinarPage';
+
+// Phase 2 — Service pages
+import ImplementationPage from './pages/services/ImplementationPage';
+import LicensingPage from './pages/services/LicensingPage';
+import CloudHostingPage from './pages/services/CloudHostingPage';
+import TrainingPage from './pages/services/TrainingPage';
+import SupportPage from './pages/services/SupportPage';
+import CustomizationPage from './pages/services/CustomizationPage';
+import DataMigrationPage from './pages/services/DataMigrationPage';
+import ConsultingPage from './pages/services/ConsultingPage';
+
+// Phase 2 — Industry pages
+import ManufacturingPage from './pages/industries/ManufacturingPage';
+import DistributionPage from './pages/industries/DistributionPage';
+import RetailPage from './pages/industries/RetailPage';
+import ConstructionPage from './pages/industries/ConstructionPage';
+import HardwarePage from './pages/industries/HardwarePage';
+import NGOPage from './pages/industries/NGOPage';
+import SchoolsPage from './pages/industries/SchoolsPage';
+import SACCOPage from './pages/industries/SACCOPage';
+
 import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth } from './firebase/config';
 import type { User } from 'firebase/auth';
 import { signInAnonymously } from 'firebase/auth';
@@ -38,7 +58,7 @@ function SiteRoutes() {
       <Navbar />
       <main className="flex-grow pt-[72px]">
         <Routes>
-          {/* ── Core pages (preserved) ── */}
+          {/* ── Core pages ── */}
           <Route path="/" element={<HomePage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/testimonials" element={<TestimonialsPage />} />
@@ -47,32 +67,35 @@ function SiteRoutes() {
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/contact" element={<ContactPage />} />
 
-          {/* ── Legacy URLs preserved (no broken links) ── */}
+          {/* ── Legacy URLs preserved ── */}
           <Route path="/features" element={<FeaturesPage />} />
           <Route path="/products" element={<ProductsPage />} />
 
-          {/* ── Phase 0: TallyPrime Solutions ── */}
+          {/* ── TallyPrime Solutions ── */}
           <Route path="/tallyprime" element={<TallyPrimePage />} />
-          <Route path="/tallyprime/implementation" element={<ComingSoonPage />} />
-          <Route path="/tallyprime/licensing" element={<ComingSoonPage />} />
-          <Route path="/tallyprime/cloud-hosting" element={<ComingSoonPage />} />
-          <Route path="/tallyprime/training" element={<ComingSoonPage />} />
-          <Route path="/tallyprime/support" element={<ComingSoonPage />} />
-          <Route path="/tallyprime/customization" element={<ComingSoonPage />} />
-          <Route path="/tallyprime/data-migration" element={<ComingSoonPage />} />
+          <Route path="/tallyprime/implementation" element={<ImplementationPage />} />
+          <Route path="/tallyprime/licensing" element={<LicensingPage />} />
+          <Route path="/tallyprime/cloud-hosting" element={<CloudHostingPage />} />
+          <Route path="/tallyprime/training" element={<TrainingPage />} />
+          <Route path="/tallyprime/support" element={<SupportPage />} />
+          <Route path="/tallyprime/customization" element={<CustomizationPage />} />
+          <Route path="/tallyprime/data-migration" element={<DataMigrationPage />} />
+          <Route path="/tallyprime/consulting" element={<ConsultingPage />} />
 
-          {/* ── Phase 0: Industries ── */}
+          {/* ── Industries ── */}
           <Route path="/industries" element={<IndustriesPage />} />
-          <Route path="/industries/retail" element={<ComingSoonPage />} />
-          <Route path="/industries/distribution" element={<ComingSoonPage />} />
-          <Route path="/industries/manufacturing" element={<ComingSoonPage />} />
-          <Route path="/industries/construction" element={<ComingSoonPage />} />
-          <Route path="/industries/hardware" element={<ComingSoonPage />} />
-          <Route path="/industries/ngos" element={<ComingSoonPage />} />
-          <Route path="/industries/schools" element={<ComingSoonPage />} />
-          <Route path="/industries/saccos" element={<ComingSoonPage />} />
+          <Route path="/industries/manufacturing" element={<ManufacturingPage />} />
+          <Route path="/industries/distribution" element={<DistributionPage />} />
+          <Route path="/industries/retail" element={<RetailPage />} />
+          <Route path="/industries/construction" element={<ConstructionPage />} />
+          <Route path="/industries/hardware" element={<HardwarePage />} />
+          <Route path="/industries/ngo" element={<NGOPage />} />
+          <Route path="/industries/ngos" element={<NGOPage />} />
+          <Route path="/industries/schools" element={<SchoolsPage />} />
+          <Route path="/industries/sacco" element={<SACCOPage />} />
+          <Route path="/industries/saccos" element={<SACCOPage />} />
 
-          {/* ── Phase 0: Knowledge Hub ── */}
+          {/* ── Knowledge Hub ── */}
           <Route path="/knowledge-hub" element={<KnowledgeHubPage />} />
           <Route path="/knowledge-hub/guides" element={<ComingSoonPage />} />
           <Route path="/knowledge-hub/downloads" element={<ComingSoonPage />} />
@@ -82,10 +105,10 @@ function SiteRoutes() {
           <Route path="/knowledge-hub/webinars" element={<ComingSoonPage />} />
           <Route path="/knowledge-hub/templates" element={<ComingSoonPage />} />
 
-          {/* ── Phase 0: Pricing ── */}
+          {/* ── Pricing ── */}
           <Route path="/pricing" element={<PricingPage />} />
 
-          {/* ── Phase 0: Why Choose Us (future) ── */}
+          {/* ── Why Choose Us ── */}
           <Route path="/why-choose-us" element={<ComingSoonPage />} />
 
           {/* ── Catch-all ── */}
