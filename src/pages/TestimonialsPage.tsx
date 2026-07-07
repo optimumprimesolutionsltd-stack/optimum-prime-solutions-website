@@ -1,6 +1,7 @@
 import SEO from '../components/SEO';
 import Testimonials from '../components/Testimonials';
 import AfricanLaptopShowcase from '../components/AfricanLaptopShowcase';
+import ReviewForm from '../components/ReviewForm';
 
 export default function TestimonialsPage() {
   return (
@@ -19,6 +20,7 @@ export default function TestimonialsPage() {
         theme="testimonials"
       />
       <Testimonials />
+      <ReviewForm />
     </div>
   );
 }
