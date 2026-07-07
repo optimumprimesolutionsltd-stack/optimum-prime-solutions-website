@@ -191,14 +191,13 @@ export default function Contact() {
 
           <div id="demo-form" className="lg:col-span-3">
             <div className="rounded-[2rem] border border-white/10 bg-slate-800 p-8 shadow-xl text-white">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-400">Demo request</p>
-                  <h3 className="mt-3 text-2xl font-bold text-white">Let's build your next TallyPrime solution.</h3>
+              <div className="mb-6 rounded-2xl bg-sky-600/20 border border-sky-500/30 px-6 py-5">
+                <div className="flex items-center gap-3 mb-2">
+                  <span className="flex h-3 w-3 rounded-full bg-sky-400 animate-pulse" />
+                  <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-400">Step 1 — Fill in your details below</p>
                 </div>
-                <div className="rounded-full border border-white/10 bg-slate-900 px-4 py-2 text-sm font-semibold text-slate-300">
-                  {isOnline ? 'Online' : 'Offline'}
-                </div>
+                <h3 className="text-xl font-bold text-white">Book your free TallyPrime demo</h3>
+                <p className="mt-1 text-sm text-slate-300">Complete the form and our team will confirm your demo within 24 hours.</p>
               </div>
 
               {serverError && (
