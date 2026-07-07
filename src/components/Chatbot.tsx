@@ -51,6 +51,16 @@ export default function Chatbot() {
   const { data } = useSite();
   const endRef = useRef<HTMLDivElement>(null);
 
+  // Listen for external 'zawadi:open' event (fired by Talk to an Expert buttons)
+  useEffect(() => {
+    const handleOpen = () => {
+      setOpen(true);
+      setMin(false);
+    };
+    window.addEventListener('zawadi:open', handleOpen);
+    return () => window.removeEventListener('zawadi:open', handleOpen);
+  }, []);
+
   const botGreeting = `Hey there! 👋 Welcome to **Optimum Prime Solutions** — Kenya's certified TallyPrime partner.\n\nI'm **Zawadi**, your business solutions guide. I'm here to help you find the right tools to grow your business.\n\nWhat's your name? I'd love to make this feel a bit more personal! 😊`;
 
   useEffect(() => {

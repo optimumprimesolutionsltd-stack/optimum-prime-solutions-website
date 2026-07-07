@@ -236,14 +236,13 @@ export default function EcosystemOrbit() {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <Link
-                to="/contact#demo-form"
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              <button
+                onClick={() => window.dispatchEvent(new CustomEvent('zawadi:open'))}
                 className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-red-500"
               >
                 Talk to an Expert
                 <ArrowRight className="h-4 w-4" />
-              </Link>
+              </button>
             </motion.div>
           </motion.div>
         </div>
