@@ -68,7 +68,7 @@ export default function ReviewForm() {
       <div className="absolute top-10 left-1/4 w-64 h-64 bg-red-600/5 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-10 right-1/4 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
 
-      <div className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+      <div id="review-form" className="relative mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
