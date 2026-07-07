@@ -10,10 +10,16 @@ export default function ContactPage() {
   useEffect(() => {
     if (hash) {
       const id = hash.replace('#', '');
-      const el = document.getElementById(id);
-      if (el) {
-        setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
-      }
+      const scroll = () => {
+        const el = document.getElementById(id);
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY - 80;
+          window.scrollTo({ top, behavior: 'smooth' });
+        }
+      };
+      // Try immediately, then retry after animations settle
+      setTimeout(scroll, 200);
+      setTimeout(scroll, 600);
     }
   }, [hash]);
 
