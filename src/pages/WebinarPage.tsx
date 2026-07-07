@@ -35,11 +35,29 @@ export default function WebinarPage() {
     setSubmitting(true);
     try {
       const id = `reg_${Date.now()}`;
+      const firstName = form.name.split(' ')[0];
+      const confirmationMessage =
+        `Hello ${firstName}! 🎉\n\n` +
+        `You're registered for our free TallyPrime 7.1 webinar!\n\n` +
+        `📅 *Date:* ${WEBINAR_DATE}\n` +
+        `🕒 *Time:* ${WEBINAR_TIME}\n` +
+        `📍 *Venue:* Online via Google Meet\n\n` +
+        `*What We'll Cover:*\n` +
+        `✅ Auto Wrap Text\n` +
+        `✅ Professional Invoice Print Templates\n` +
+        `✅ Scheduled Auto Backup\n` +
+        `✅ Reuse Deleted Voucher Numbers\n` +
+        `✅ Live Q&A\n\n` +
+        `We'll send the Google Meet join link closer to the date.\n\n` +
+        `📞 *+254 116 246 074*\n` +
+        `🌐 *www.optimumprimesolutions.co.ke*\n\n` +
+        `_Optimum Prime Solutions — TallyPrime · Cloud · EOS® · HubSpot CRM · Biz Analyst_`;
       const payload = {
         ...form,
         interest: 'Webinar Registration — TallyPrime 7.1',
         source: 'Webinar Registration Page',
         message: `Registered for webinar on ${WEBINAR_DATE} at ${WEBINAR_TIME}`,
+        confirmation_message: confirmationMessage,
         createdAt: new Date().toISOString(),
         status: 'registered',
       };
