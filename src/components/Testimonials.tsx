@@ -143,7 +143,7 @@ export default function Testimonials() {
           </div>
         )}
         {/* Google Reviews CTA */}
-        <div id="review-form" className="scroll-mt-24" />
+        <div id="review-form" style={{ marginTop: '-120px', paddingTop: '120px', pointerEvents: 'none' }} />
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
