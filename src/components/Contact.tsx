@@ -95,31 +95,29 @@ export default function Contact() {
 
   const sendEmailNotification = async (formData: FormData) => {
     try {
-      const response = await fetch('/api/send-email', {
+      const response = await fetch('https://optimum-prime-lead-notifier.onrender.com/new-lead', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: formData.email,
-          subject: 'Demo Request Received - Optimum Prime Solutions',
-          html: `
-            <h2>Thank you for your demo request!</h2>
-            <p>Hi ${formData.name},</p>
-            <p>We've received your request for a TallyPrime demo. Our team will contact you within 24 hours.</p>
-            <ul>
-              <li>Company: ${formData.company || 'Not provided'}</li>
-              <li>Phone: ${formData.phone}</li>
-              <li>Preferred Date: ${formData.demoDate || 'Not specified'}</li>
-            </ul>
-            <p>Best regards,<br/>Optimum Prime Solutions Team</p>
-          `,
+          name: formData.name,
+          company: formData.company,
+          phone: formData.phone,
+          email: formData.email,
+          businessType: formData.businessType,
+          currentSoftware: formData.currentSoftware,
+          demoDate: formData.demoDate,
+          demoTime: formData.demoTime,
+          message: formData.message,
+          interest: 'TallyPrime Demo',
+          source: 'Website — Contact Form',
         }),
       });
 
       if (!response.ok) {
-        console.warn('Email notification failed - form was saved to database');
+        console.warn('WhatsApp notification failed — lead was saved to database');
       }
     } catch (error) {
-      console.warn('Could not send email notification:', error);
+      console.warn('Could not send WhatsApp notification:', error);
     }
   };
 
