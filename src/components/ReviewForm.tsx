@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Star, Send, CheckCircle, AlertCircle } from 'lucide-react';
-import { fbSet } from '../firebase/config';
+import { fbSet, fbGet } from '../firebase/config';
 
 interface ReviewFormData {
   name: string;
@@ -47,22 +47,29 @@ export default function ReviewForm() {
     setErrorMsg('');
     try {
       const id = `review_${Date.now()}`;
-      const reviewData = {
+      const newTestimonial = {
         id,
         name: form.name.trim(),
-        company: form.company.trim(),
-        role: form.role.trim(),
-        rating: form.rating,
+        role: form.role.trim() || 'Customer',
+        company: form.company.trim() || '',
         text: form.text.trim(),
-        submittedAt: new Date().toISOString(),
-        status: 'pending',
+        rating: form.rating,
       };
-      await fbSet(`pending_reviews/${id}`, reviewData);
+
+      // Load existing siteData and append the new testimonial
+      const siteData = await fbGet('siteData');
+      const existing: any[] = siteData?.testimonials || [];
+      const updated = [newTestimonial, ...existing];
+      await fbSet('siteData/testimonials', updated);
+
+      // Also save a copy to pending_reviews for your records
+      await fbSet(`pending_reviews/${id}`, { ...newTestimonial, submittedAt: new Date().toISOString(), status: 'live' });
+
       // Notify team via WhatsApp (fire-and-forget)
       fetch('https://optimum-prime-lead-notifier.onrender.com/new-review', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(reviewData),
+        body: JSON.stringify(newTestimonial),
       }).catch(() => {});
       setStatus('success');
     } catch (err) {
