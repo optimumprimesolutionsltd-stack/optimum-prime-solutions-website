@@ -30,6 +30,64 @@ export default function Contact() {
 
   const set = (k: string, v: string) => setForm({ ...form, [k]: v });
 
+  // Kenya public holidays (YYYY-MM-DD)
+  const KENYA_HOLIDAYS = new Set([
+    // 2026
+    '2026-01-01', // New Year's Day
+    '2026-04-03', // Good Friday
+    '2026-04-06', // Easter Monday
+    '2026-05-01', // Labour Day
+    '2026-06-01', // Madaraka Day
+    '2026-10-10', // Huduma Day
+    '2026-10-20', // Mashujaa Day
+    '2026-12-12', // Jamhuri Day
+    '2026-12-25', // Christmas Day
+    '2026-12-26', // Boxing Day
+    // 2027
+    '2027-01-01',
+    '2027-03-26', // Good Friday
+    '2027-03-29', // Easter Monday
+    '2027-05-01',
+    '2027-06-01',
+    '2027-10-10',
+    '2027-10-20',
+    '2027-12-12',
+    '2027-12-25',
+    '2027-12-26',
+  ]);
+
+  const isBlockedDate = (dateStr: string): boolean => {
+    if (!dateStr) return false;
+    const d = new Date(dateStr + 'T00:00:00');
+    const day = d.getDay(); // 0=Sun, 6=Sat
+    if (day === 0) return true; // Block all Sundays
+    if (KENYA_HOLIDAYS.has(dateStr)) return true; // Block holidays
+    return false;
+  };
+
+  const isSaturday = (dateStr: string): boolean => {
+    if (!dateStr) return false;
+    return new Date(dateStr + 'T00:00:00').getDay() === 6;
+  };
+
+  // Time slots — full week vs Saturday (2PM onwards only)
+  const ALL_TIME_SLOTS = [
+    '8:00 AM – 9:00 AM',
+    '9:00 AM – 10:00 AM',
+    '10:00 AM – 11:00 AM',
+    '11:00 AM – 12:00 PM',
+    '12:00 PM – 1:00 PM',
+    '2:00 PM – 3:00 PM',
+    '3:00 PM – 4:00 PM',
+    '4:00 PM – 5:00 PM',
+  ];
+  const SATURDAY_TIME_SLOTS = [
+    '2:00 PM – 3:00 PM',
+    '3:00 PM – 4:00 PM',
+    '4:00 PM – 5:00 PM',
+  ];
+  const availableTimeSlots = isSaturday(form.demoDate) ? SATURDAY_TIME_SLOTS : ALL_TIME_SLOTS;
+
   const submit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErrors([]);
@@ -299,7 +357,24 @@ export default function Contact() {
                       <input
                         type="date"
                         value={form.demoDate}
-                        onChange={(e) => set('demoDate', e.target.value)}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          if (isBlockedDate(val)) {
+                            setErrors((prev) => [
+                              ...prev.filter((err) => err.field !== 'demoDate'),
+                              { field: 'demoDate', message: 'We are closed on Sundays and public holidays. Please choose another date.' },
+                            ]);
+                            set('demoDate', val);
+                          } else {
+                            setErrors((prev) => prev.filter((err) => err.field !== 'demoDate'));
+                            // Reset time if switching to/from Saturday
+                            if (isSaturday(val) && form.demoTime && !SATURDAY_TIME_SLOTS.includes(form.demoTime)) {
+                              setForm((prev) => ({ ...prev, demoDate: val, demoTime: '' }));
+                            } else {
+                              set('demoDate', val);
+                            }
+                          }
+                        }}
                         required
                         min={new Date().toISOString().split('T')[0]}
                         className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition ${
@@ -307,6 +382,9 @@ export default function Contact() {
                         }`}
                       />
                       {getFieldError(errors, 'demoDate') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'demoDate')}</p>}
+                      {form.demoDate && isSaturday(form.demoDate) && !isBlockedDate(form.demoDate) && (
+                        <p className="mt-1 text-xs text-amber-400">Saturday — demo slots available from 2:00 PM only.</p>
+                      )}
                     </label>
 
                     {/* Preferred time */}
@@ -320,15 +398,12 @@ export default function Contact() {
                           getFieldError(errors, 'demoTime') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
                         } ${!form.demoTime ? 'text-slate-400' : 'text-white'}`}
                       >
-                        <option value="" disabled>Select preferred time</option>
-                        <option value="8:00 AM – 9:00 AM">8:00 AM – 9:00 AM</option>
-                        <option value="9:00 AM – 10:00 AM">9:00 AM – 10:00 AM</option>
-                        <option value="10:00 AM – 11:00 AM">10:00 AM – 11:00 AM</option>
-                        <option value="11:00 AM – 12:00 PM">11:00 AM – 12:00 PM</option>
-                        <option value="12:00 PM – 1:00 PM">12:00 PM – 1:00 PM</option>
-                        <option value="2:00 PM – 3:00 PM">2:00 PM – 3:00 PM</option>
-                        <option value="3:00 PM – 4:00 PM">3:00 PM – 4:00 PM</option>
-                        <option value="4:00 PM – 5:00 PM">4:00 PM – 5:00 PM</option>
+                        <option value="" disabled>
+                          {form.demoDate ? 'Select preferred time' : 'Select a date first'}
+                        </option>
+                        {availableTimeSlots.map((slot) => (
+                          <option key={slot} value={slot}>{slot}</option>
+                        ))}
                       </select>
                       {getFieldError(errors, 'demoTime') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'demoTime')}</p>}
                     </label>
