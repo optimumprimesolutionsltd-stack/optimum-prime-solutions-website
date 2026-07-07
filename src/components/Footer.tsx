@@ -194,7 +194,7 @@ export default function Footer() {
                 <ArrowRight className="ml-2 h-4 w-4" />
               </a>
               <Link
-                to="/contact"
+                to="/contact#demo-form"
                 className="inline-flex items-center justify-center rounded-full border border-amber-300 bg-white hover:bg-amber-50 px-6 py-3 text-sm font-semibold text-amber-700 transition"
               >
                 Book an Upgrade Consultation

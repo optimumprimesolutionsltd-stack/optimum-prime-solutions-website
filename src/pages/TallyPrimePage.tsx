@@ -105,7 +105,7 @@ export default function TallyPrimePage() {
                 View Pricing <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                to="/contact"
+                to="/contact#demo-form"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"
               >
                 Book a Free Consultation
@@ -180,7 +180,7 @@ export default function TallyPrimePage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              to="/contact"
+              to="/contact#demo-form"
               className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-8 py-3 text-sm font-semibold text-white shadow-lg transition"
             >
               Book a Free Consultation <ArrowRight className="h-4 w-4" />

@@ -237,7 +237,7 @@ export default function EcosystemOrbit() {
               whileTap={{ scale: 0.98 }}
             >
               <Link
-                to="/contact"
+                to="/contact#demo-form"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-red-500"
               >

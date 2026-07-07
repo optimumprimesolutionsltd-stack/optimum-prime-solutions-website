@@ -150,7 +150,7 @@ export default function VideoSection() {
             <div className="flex flex-col sm:flex-row gap-3 mt-2">
               <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }}>
                 <Link
-                  to="/contact"
+                  to="/contact#demo-form"
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                   className="inline-flex items-center justify-center gap-2 rounded-xl bg-red-600 px-6 py-3 text-sm font-bold text-white hover:bg-red-500 shadow-lg shadow-red-600/30 transition-colors w-full sm:w-auto"
                 >

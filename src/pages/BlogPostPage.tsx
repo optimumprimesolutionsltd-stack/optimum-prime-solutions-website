@@ -110,7 +110,7 @@ export default function BlogPostPage() {
             </p>
             <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
               <Link
-                to="/contact"
+                to="/contact#demo-form"
                 className="rounded-xl bg-red-600 px-6 py-3 text-sm font-bold text-white hover:bg-red-700 transition-colors"
               >
                 Book a Free Demo

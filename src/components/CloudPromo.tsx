@@ -82,7 +82,7 @@ export default function CloudPromo() {
             {/* CTA buttons */}
             <div className="mt-10 flex flex-wrap gap-4">
               <Link
-                to="/contact"
+                to="/contact#demo-form"
                 className="group inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 px-7 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-600/30 transition-all hover:shadow-blue-600/50 hover:scale-105"
               >
                 Start Cloud Hosting

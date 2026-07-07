@@ -117,7 +117,7 @@ export default function ProcessFlow() {
         >
           <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="inline-block">
             <Link
-              to="/contact"
+              to="/contact#demo-form"
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-8 py-4 text-sm font-bold text-white hover:bg-red-500 shadow-xl shadow-red-600/30 transition-colors"
             >

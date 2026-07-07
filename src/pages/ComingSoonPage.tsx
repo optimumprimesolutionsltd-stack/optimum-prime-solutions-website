@@ -62,7 +62,7 @@ export default function ComingSoonPage() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
-                to="/contact"
+                to="/contact#demo-form"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition"
               >

@@ -152,7 +152,7 @@ export default function Products() {
                       className="mt-8"
                     >
                       <Link
-                        to="/contact"
+                        to="/contact#demo-form"
                         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                         className="block text-center rounded-xl py-3 text-sm font-bold transition bg-gradient-to-r from-sky-500 to-cyan-500 text-white hover:from-sky-400 hover:to-cyan-400 shadow-lg shadow-sky-500/30"
                       >
@@ -281,7 +281,7 @@ export default function Products() {
                   className="mt-8"
                 >
                   <Link
-                    to="/contact"
+                    to="/contact#demo-form"
                     onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                     className={`block text-center rounded-xl py-3 text-sm font-semibold transition relative z-10 ${
                       p.popular

@@ -156,14 +156,6 @@ function App() {
     navigate('/');
   };
 
-  if (!authReady) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-950">
-        <p className="text-sm text-slate-600">Checking admin access…</p>
-      </div>
-    );
-  }
-
   return (
     <ErrorBoundary>
       <SiteProvider>

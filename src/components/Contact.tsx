@@ -189,7 +189,7 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="lg:col-span-3">
+          <div id="demo-form" className="lg:col-span-3">
             <div className="rounded-[2rem] border border-white/10 bg-slate-800 p-8 shadow-xl text-white">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>

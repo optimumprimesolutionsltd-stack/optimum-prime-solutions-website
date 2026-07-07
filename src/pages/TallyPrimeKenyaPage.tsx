@@ -150,7 +150,7 @@ export default function TallyPrimeKenyaPage() {
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link
-                to="/contact"
+                to="/contact#demo-form"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-red-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-red-900/40 transition-all hover:scale-105 hover:bg-red-500 active:scale-95"
               >
@@ -206,7 +206,7 @@ export default function TallyPrimeKenyaPage() {
                 <h3 className="mt-4 text-base font-bold text-slate-900">{s.title}</h3>
                 <p className="mt-2 text-sm leading-6 text-slate-500">{s.description}</p>
                 <Link
-                  to="/contact"
+                  to="/contact#demo-form"
                   onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
                   className="mt-4 inline-flex items-center gap-1 text-sm font-semibold text-red-600 transition-colors hover:text-red-700"
                 >
@@ -334,7 +334,7 @@ export default function TallyPrimeKenyaPage() {
                   ))}
                 </ul>
                 <Link
-                  to="/contact"
+                  to="/contact#demo-form"
                   onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
                   className={`mt-8 inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-all hover:scale-105 active:scale-95 ${
                     ed.highlight
@@ -390,7 +390,7 @@ export default function TallyPrimeKenyaPage() {
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
               <Link
-                to="/contact"
+                to="/contact#demo-form"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
                 className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 text-sm font-bold text-red-600 shadow-lg transition-all hover:scale-105 hover:bg-red-50 active:scale-95"
               >

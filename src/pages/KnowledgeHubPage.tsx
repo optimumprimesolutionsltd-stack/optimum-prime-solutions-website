@@ -230,7 +230,7 @@ export default function KnowledgeHubPage() {
                   Browse FAQs <ArrowRight className="h-4 w-4" />
                 </Link>
                 <Link
-                  to="/contact"
+                  to="/contact#demo-form"
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                   className="flex items-center justify-between rounded-2xl bg-white border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 hover:border-red-200 hover:text-red-600 transition"
                 >
@@ -259,7 +259,7 @@ export default function KnowledgeHubPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              to="/contact"
+              to="/contact#demo-form"
               className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-8 py-3 text-sm font-semibold text-white shadow-lg transition"
             >
               Book a Free Consultation <ArrowRight className="h-4 w-4" />

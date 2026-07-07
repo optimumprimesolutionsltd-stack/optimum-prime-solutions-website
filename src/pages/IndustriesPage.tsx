@@ -98,7 +98,7 @@ export default function IndustriesPage() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
-                to="/contact"
+                to="/contact#demo-form"
                 className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition"
               >
                 Talk to an Industry Specialist <ArrowRight className="h-4 w-4" />
@@ -210,7 +210,7 @@ export default function IndustriesPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
-              to="/contact"
+              to="/contact#demo-form"
               className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-8 py-3 text-sm font-semibold text-white shadow-lg transition"
             >
               Book a Free Consultation <ArrowRight className="h-4 w-4" />
