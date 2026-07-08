@@ -112,11 +112,15 @@ const emptyBooking: BookingForm = {
   notifyClient: true,
 };
 
+// ── Team member entry ───────────────────────────────────────────────────────
+interface TeamMember { name: string; phone: string; }
+
 // ── Schedule panel state ─────────────────────────────────────────────────────
 interface ScheduleForm {
   scheduledDate: string; scheduledTime: string;
   demoType: 'online' | 'physical'; demoLocation: string;
   teamMemberName: string; teamMemberPhone: string;
+  extraTeam: TeamMember[];
   demoNotes: string;
 }
 
@@ -136,15 +140,33 @@ export default function LeadsManager({ data, onSave }: P) {
   const [schedulingId, setSchedulingId] = useState<string | null>(null);
   const [schedForm, setSchedForm]       = useState<ScheduleForm>({
     scheduledDate: '', scheduledTime: '', demoType: 'online',
-    demoLocation: '', teamMemberName: '', teamMemberPhone: '', demoNotes: '',
+    demoLocation: '', teamMemberName: '', teamMemberPhone: '',
+    extraTeam: [], demoNotes: '',
   });
   const [schedSubmitting, setSchedSubmitting] = useState(false);
   const [schedError, setSchedError]           = useState('');
+
+  // Edit mode for already-scheduled leads
+  const [editingId, setEditingId]   = useState<string | null>(null);
+  const [editSubmitting, setEditSubmitting] = useState(false);
+  const [editError, setEditError]   = useState('');
+  const [editSuccess, setEditSuccess] = useState<string | null>(null);
 
   const setB = (f: keyof BookingForm, v: string | boolean) =>
     setBooking(prev => ({ ...prev, [f]: v }));
   const setS = (f: keyof ScheduleForm, v: string) =>
     setSchedForm(prev => ({ ...prev, [f]: v }));
+
+  // ── Extra team members helpers ───────────────────────────────────────────
+  const addExtraTeam = () =>
+    setSchedForm(prev => ({ ...prev, extraTeam: [...prev.extraTeam, { name: '', phone: '' }] }));
+  const removeExtraTeam = (i: number) =>
+    setSchedForm(prev => ({ ...prev, extraTeam: prev.extraTeam.filter((_, idx) => idx !== i) }));
+  const setExtraTeam = (i: number, field: keyof TeamMember, val: string) =>
+    setSchedForm(prev => ({
+      ...prev,
+      extraTeam: prev.extraTeam.map((m, idx) => idx === i ? { ...m, [field]: val } : m),
+    }));
 
   // ── Booked slots (for conflict detection) ───────────────────────────────
   const bookedSlots = useMemo(() =>
@@ -180,6 +202,7 @@ export default function LeadsManager({ data, onSave }: P) {
         demoLocation: lead?.demoLocation || '',
         teamMemberName: lead?.teamMemberName || '',
         teamMemberPhone: lead?.teamMemberPhone || '',
+        extraTeam: (lead as any)?.extraTeam || [],
         demoNotes: lead?.demoNotes || '',
       });
       setSchedError('');
@@ -323,8 +346,15 @@ export default function LeadsManager({ data, onSave }: P) {
         teamMemberPhone: schedForm.teamMemberPhone,
         demoNotes: schedForm.demoNotes,
         meetSent: true,
-      };
+        ...(schedForm.extraTeam.length > 0 ? { extraTeam: schedForm.extraTeam } : {}),
+      } as Lead;
       onSave({ ...data, leads: data.leads.map(l => l.id === lead.id ? updated : l) });
+
+      // Build extra team list for backend
+      const allTeam = [
+        { name: schedForm.teamMemberName, phone: schedForm.teamMemberPhone },
+        ...schedForm.extraTeam.filter(m => m.name.trim()),
+      ];
 
       // Send Meet link + confirmation via backend
       await fetch(`${BACKEND_URL}/book-demo`, {
@@ -341,8 +371,12 @@ export default function LeadsManager({ data, onSave }: P) {
           demoType: schedForm.demoType,
           demoLocation: schedForm.demoLocation,
           demoNotes: schedForm.demoNotes,
-          teamMemberName: schedForm.teamMemberName,
-          teamMemberPhone: schedForm.teamMemberPhone,
+          teamMemberName: allTeam[0]?.name || '',
+          teamMemberPhone: allTeam[0]?.phone || '',
+          teamMember2Name: allTeam[1]?.name || '',
+          teamMember2Phone: allTeam[1]?.phone || '',
+          teamMember3Name: allTeam[2]?.name || '',
+          teamMember3Phone: allTeam[2]?.phone || '',
           notifyClient: true,
           source: 'scheduled',
         }),
@@ -357,6 +391,88 @@ export default function LeadsManager({ data, onSave }: P) {
   };
 
   const newCount = data.leads.filter(l => l.status === 'New').length;
+
+  // ── Edit an already-scheduled demo ────────────────────────────────────────
+  const openEdit = (lead: Lead) => {
+    setEditingId(lead.id);
+    setEditError('');
+    setEditSuccess(null);
+    setSchedForm({
+      scheduledDate: lead.scheduledDate || '',
+      scheduledTime: lead.scheduledTime || '',
+      demoType: lead.demoType || 'online',
+      demoLocation: lead.demoLocation || '',
+      teamMemberName: lead.teamMemberName || '',
+      teamMemberPhone: lead.teamMemberPhone || '',
+      extraTeam: (lead as any).extraTeam || [],
+      demoNotes: lead.demoNotes || '',
+    });
+  };
+
+  const handleEditSubmit = async (lead: Lead, resendToClient: boolean) => {
+    if (!schedForm.scheduledDate) { setEditError('Please select a date'); return; }
+    if (!schedForm.scheduledTime) { setEditError('Please select a time'); return; }
+    if (isDateBlocked(schedForm.scheduledDate)) { setEditError('This date is a Sunday or public holiday'); return; }
+    if (schedForm.demoType === 'physical' && !schedForm.demoLocation.trim()) { setEditError('Location is required for physical demos'); return; }
+    if (!schedForm.teamMemberName.trim()) { setEditError('Assign at least one team member'); return; }
+    setEditError('');
+    setEditSubmitting(true);
+    try {
+      const allTeam = [
+        { name: schedForm.teamMemberName, phone: schedForm.teamMemberPhone },
+        ...schedForm.extraTeam.filter(m => m.name.trim()),
+      ];
+      const updated: Lead = {
+        ...lead,
+        scheduledDate: schedForm.scheduledDate,
+        scheduledTime: schedForm.scheduledTime,
+        demoType: schedForm.demoType,
+        demoLocation: schedForm.demoLocation,
+        teamMemberName: schedForm.teamMemberName,
+        teamMemberPhone: schedForm.teamMemberPhone,
+        demoNotes: schedForm.demoNotes,
+        meetSent: true,
+        ...(schedForm.extraTeam.length > 0 ? { extraTeam: schedForm.extraTeam } : { extraTeam: [] }),
+      } as Lead;
+      onSave({ ...data, leads: data.leads.map(l => l.id === lead.id ? updated : l) });
+
+      if (resendToClient) {
+        await fetch(`${BACKEND_URL}/book-demo`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientName: lead.name,
+            clientPhone: lead.phone,
+            clientEmail: lead.email,
+            clientCompany: lead.company,
+            clientIndustry: lead.industry || lead.businessType,
+            demoDate: schedForm.scheduledDate,
+            demoTime: schedForm.scheduledTime,
+            demoType: schedForm.demoType,
+            demoLocation: schedForm.demoLocation,
+            demoNotes: schedForm.demoNotes,
+            teamMemberName: allTeam[0]?.name || '',
+            teamMemberPhone: allTeam[0]?.phone || '',
+            teamMember2Name: allTeam[1]?.name || '',
+            teamMember2Phone: allTeam[1]?.phone || '',
+            teamMember3Name: allTeam[2]?.name || '',
+            teamMember3Phone: allTeam[2]?.phone || '',
+            notifyClient: true,
+            source: 'reschedule',
+          }),
+        });
+        setEditSuccess('Demo updated and new confirmation sent to client.');
+      } else {
+        setEditSuccess('Demo details updated. No message sent to client.');
+      }
+      setEditingId(null);
+      setTimeout(() => setEditSuccess(null), 5000);
+    } catch {
+      setEditError('Failed to save changes. Please try again.');
+    } finally {
+      setEditSubmitting(false);
+    }
+  };
 
   // ── Booking form time slots ──────────────────────────────────────────────
   const bookingSlots = useMemo(() => {
@@ -375,6 +491,9 @@ export default function LeadsManager({ data, onSave }: P) {
       blocked: bookedSlots.has(`${schedForm.scheduledDate}|${s.value}`),
     }));
   }, [schedForm.scheduledDate, bookedSlots]);
+
+  // Edit form uses the same schedForm state — slots computed from schedForm.scheduledDate
+  // (editSlots reuse schedSlots since they share the same form state)
 
   return (
     <div className="mx-auto max-w-4xl space-y-5">
@@ -402,6 +521,14 @@ export default function LeadsManager({ data, onSave }: P) {
             <p className="text-sm font-semibold text-green-800">Demo booked and lead added!</p>
             <p className="text-xs text-green-600 mt-0.5">WhatsApp notifications sent to the office, team member, and client.</p>
           </div>
+        </div>
+      )}
+
+      {/* ── Edit success banner ── */}
+      {editSuccess && (
+        <div className="flex items-center gap-3 rounded-2xl bg-blue-50 border border-blue-200 px-5 py-4">
+          <CheckCircle2 className="h-5 w-5 text-blue-600 shrink-0" />
+          <p className="text-sm font-semibold text-blue-800">{editSuccess}</p>
         </div>
       )}
 
@@ -661,23 +788,30 @@ export default function LeadsManager({ data, onSave }: P) {
                   )}
 
                   {/* Scheduled demo info (if already scheduled) */}
-                  {l.status === 'Demo Scheduled' && l.scheduledDate && l.meetSent && (
-                    <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 space-y-1">
-                      <p className="text-xs font-bold text-amber-700 mb-2">📅 Demo Scheduled</p>
+                  {l.status === 'Demo Scheduled' && l.scheduledDate && l.meetSent && editingId !== l.id && (
+                    <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-bold text-amber-700">📅 Demo Scheduled</p>
+                        <button
+                          onClick={() => openEdit(l)}
+                          className="flex items-center gap-1 rounded-lg bg-amber-100 hover:bg-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-800 transition">
+                          ✏️ Edit Demo
+                        </button>
+                      </div>
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-amber-800">
                         <div><span className="font-semibold">Date:</span> {new Date(l.scheduledDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>
                         <div><span className="font-semibold">Time:</span> {l.scheduledTime} EAT</div>
                         <div><span className="font-semibold">Type:</span> {l.demoType === 'online' ? '💻 Online' : '📍 Physical'}</div>
-                        {l.teamMemberName && <div><span className="font-semibold">Team:</span> {l.teamMemberName}</div>}
+                        {l.teamMemberName && <div><span className="font-semibold">Team:</span> {l.teamMemberName}{(l as any).extraTeam?.length > 0 ? ` +${(l as any).extraTeam.length}` : ''}</div>}
                       </div>
                       {l.demoType === 'physical' && l.demoLocation && (
-                        <div className="text-xs text-amber-800 flex items-center gap-1 mt-1">
+                        <div className="text-xs text-amber-800 flex items-center gap-1">
                           <MapPin className="h-3 w-3" />{l.demoLocation}
                         </div>
                       )}
                       {l.meetLink && (
                         <a href={l.meetLink} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1">
+                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
                           📹 {l.meetLink}
                         </a>
                       )}
@@ -710,6 +844,161 @@ export default function LeadsManager({ data, onSave }: P) {
                       </button>
                     </div>
                   </div>
+
+                  {/* ── Edit Panel (shown when editing an already-scheduled demo) ── */}
+                  {editingId === l.id && (
+                    <div className="rounded-2xl border border-blue-300 bg-blue-50 p-5 space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays className="h-5 w-5 text-blue-600" />
+                          <p className="font-bold text-blue-800">Edit Demo Details</p>
+                        </div>
+                        <button onClick={() => setEditingId(null)}
+                          className="rounded-lg p-1.5 hover:bg-blue-200 transition">
+                          <X className="h-4 w-4 text-blue-600" />
+                        </button>
+                      </div>
+                      <p className="text-xs text-blue-700">Update the demo details. You can choose whether to re-send the updated confirmation to the client.</p>
+
+                      {editError && (
+                        <div className="flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                          <AlertCircle className="h-4 w-4 shrink-0" />{editError}
+                        </div>
+                      )}
+
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        {/* Demo type */}
+                        <div className="sm:col-span-2">
+                          <div className="flex rounded-xl overflow-hidden border border-blue-300">
+                            <button type="button" onClick={() => setS('demoType', 'online')}
+                              className={`flex-1 py-2.5 text-sm font-semibold transition ${schedForm.demoType === 'online' ? 'bg-blue-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                              💻 Online (Google Meet)
+                            </button>
+                            <button type="button" onClick={() => setS('demoType', 'physical')}
+                              className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-blue-300 ${schedForm.demoType === 'physical' ? 'bg-green-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                              📍 Physical / On-site
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Date */}
+                        <div>
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Date *</label>
+                          <input type="date" value={schedForm.scheduledDate}
+                            min={new Date().toISOString().split('T')[0]}
+                            onChange={e => { setS('scheduledDate', e.target.value); setS('scheduledTime', ''); }}
+                            className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 ${schedForm.scheduledDate && isDateBlocked(schedForm.scheduledDate) ? 'border-red-400 bg-red-50' : 'border-navy-200'}`} />
+                          {schedForm.scheduledDate && isDateBlocked(schedForm.scheduledDate) && (
+                            <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(schedForm.scheduledDate) === 0 ? 'Sundays not available' : 'Public holiday'} — choose another date.</p>
+                          )}
+                          {schedForm.scheduledDate && getDayOfWeek(schedForm.scheduledDate) === 6 && !isDateBlocked(schedForm.scheduledDate) && (
+                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–12:00 PM only.</p>
+                          )}
+                        </div>
+
+                        {/* Time slots */}
+                        <div>
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Time *</label>
+                          {schedForm.scheduledDate && !isDateBlocked(schedForm.scheduledDate) && schedSlots.length > 0 ? (
+                            <div className="grid grid-cols-3 gap-1.5 max-h-32 overflow-y-auto pr-1">
+                              {schedSlots.map(s => (
+                                <button key={s.value} type="button"
+                                  disabled={s.blocked}
+                                  onClick={() => setS('scheduledTime', s.value)}
+                                  title={s.blocked ? 'Already booked' : ''}
+                                  className={`rounded-lg py-1.5 text-xs font-medium transition border ${
+                                    s.blocked
+                                      ? 'border-navy-100 bg-navy-100 text-navy-300 cursor-not-allowed line-through'
+                                      : schedForm.scheduledTime === s.value
+                                        ? 'border-blue-500 bg-blue-500 text-white'
+                                        : 'border-navy-200 bg-white text-navy-700 hover:border-blue-400 hover:bg-blue-50'
+                                  }`}>
+                                  {s.label}
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-navy-400 italic">Select a date first</p>
+                          )}
+                        </div>
+
+                        {/* Location (physical only) */}
+                        {schedForm.demoType === 'physical' && (
+                          <div className="sm:col-span-2">
+                            <label className="block text-xs font-semibold text-navy-600 mb-1.5">Location / Address *</label>
+                            <input value={schedForm.demoLocation} onChange={e => setS('demoLocation', e.target.value)}
+                              placeholder="e.g. Client's office — Moi Avenue, Nairobi"
+                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
+                          </div>
+                        )}
+
+                        {/* Team members */}
+                        <div className="sm:col-span-2 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <label className="text-xs font-bold text-navy-600 uppercase tracking-wider">
+                              <User className="h-3 w-3 inline mr-1" />Team Members *
+                            </label>
+                            {schedForm.extraTeam.length < 2 && (
+                              <button type="button" onClick={addExtraTeam}
+                                className="text-xs text-blue-600 font-semibold hover:underline flex items-center gap-1">
+                                <Plus className="h-3 w-3" /> Add member
+                              </button>
+                            )}
+                          </div>
+                          <div className="grid grid-cols-2 gap-2">
+                            <input value={schedForm.teamMemberName} onChange={e => setS('teamMemberName', e.target.value)}
+                              placeholder="Name *"
+                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
+                            <input value={schedForm.teamMemberPhone} onChange={e => setS('teamMemberPhone', e.target.value)}
+                              placeholder="+254 7XX XXX XXX"
+                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
+                          </div>
+                          {schedForm.extraTeam.map((m, i) => (
+                            <div key={i} className="grid grid-cols-2 gap-2 items-center">
+                              <input value={m.name} onChange={e => setExtraTeam(i, 'name', e.target.value)}
+                                placeholder={`Member ${i + 2} name`}
+                                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
+                              <div className="flex gap-1">
+                                <input value={m.phone} onChange={e => setExtraTeam(i, 'phone', e.target.value)}
+                                  placeholder="+254 7XX XXX XXX"
+                                  className="flex-1 rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
+                                <button type="button" onClick={() => removeExtraTeam(i)}
+                                  className="rounded-lg p-2 text-red-400 hover:bg-red-50 transition shrink-0">
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+
+                        {/* Notes */}
+                        <div className="sm:col-span-2">
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Notes (optional)</label>
+                          <textarea value={schedForm.demoNotes} onChange={e => setS('demoNotes', e.target.value)}
+                            placeholder="e.g. Focus on manufacturing module, client uses QuickBooks currently"
+                            rows={2} className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 resize-none" />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 flex-wrap">
+                        <button onClick={() => handleEditSubmit(l, true)} disabled={editSubmitting}
+                          className="flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white disabled:opacity-60 transition"
+                          style={{ backgroundColor: '#2563eb' }}>
+                          {editSubmitting
+                            ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving...</>
+                            : <><Send className="h-4 w-4" /> Save & Re-send to Client</>}
+                        </button>
+                        <button onClick={() => handleEditSubmit(l, false)} disabled={editSubmitting}
+                          className="flex items-center justify-center gap-2 rounded-xl border border-navy-300 px-4 py-3 text-sm font-semibold text-navy-700 hover:bg-navy-50 disabled:opacity-60 transition">
+                          Save Only (no message)
+                        </button>
+                        <button onClick={() => setEditingId(null)}
+                          className="rounded-xl border border-navy-200 px-4 py-3 text-sm font-medium text-navy-500 hover:bg-navy-50 transition">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
 
                   {/* ── Schedule Panel (shown when status = Demo Scheduled and not yet sent) ── */}
                   {schedulingId === l.id && !l.meetSent && (
@@ -795,22 +1084,45 @@ export default function LeadsManager({ data, onSave }: P) {
                           </div>
                         )}
 
-                        {/* Team member */}
-                        <div>
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">
-                            <User className="h-3 w-3 inline mr-1" />Team Member *
-                          </label>
-                          <input value={schedForm.teamMemberName} onChange={e => setS('teamMemberName', e.target.value)}
-                            placeholder="Name"
-                            className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
-                        </div>
-                        <div>
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">
-                            <Phone className="h-3 w-3 inline mr-1" />Team Member Phone *
-                          </label>
-                          <input value={schedForm.teamMemberPhone} onChange={e => setS('teamMemberPhone', e.target.value)}
-                            placeholder="+254 7XX XXX XXX"
-                            className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                        {/* Team members */}
+                        <div className="sm:col-span-2 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <label className="text-xs font-bold text-navy-600 uppercase tracking-wider">
+                              <User className="h-3 w-3 inline mr-1" />Team Members *
+                            </label>
+                            {schedForm.extraTeam.length < 2 && (
+                              <button type="button" onClick={addExtraTeam}
+                                className="text-xs text-accent font-semibold hover:underline flex items-center gap-1">
+                                <Plus className="h-3 w-3" /> Add member
+                              </button>
+                            )}
+                          </div>
+                          {/* Primary team member */}
+                          <div className="grid grid-cols-2 gap-2">
+                            <input value={schedForm.teamMemberName} onChange={e => setS('teamMemberName', e.target.value)}
+                              placeholder="Name *"
+                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                            <input value={schedForm.teamMemberPhone} onChange={e => setS('teamMemberPhone', e.target.value)}
+                              placeholder="+254 7XX XXX XXX"
+                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                          </div>
+                          {/* Extra team members */}
+                          {schedForm.extraTeam.map((m, i) => (
+                            <div key={i} className="grid grid-cols-2 gap-2 items-center">
+                              <input value={m.name} onChange={e => setExtraTeam(i, 'name', e.target.value)}
+                                placeholder={`Member ${i + 2} name`}
+                                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                              <div className="flex gap-1">
+                                <input value={m.phone} onChange={e => setExtraTeam(i, 'phone', e.target.value)}
+                                  placeholder="+254 7XX XXX XXX"
+                                  className="flex-1 rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                                <button type="button" onClick={() => removeExtraTeam(i)}
+                                  className="rounded-lg p-2 text-red-400 hover:bg-red-50 transition shrink-0">
+                                  <X className="h-4 w-4" />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
                         </div>
 
                         {/* Notes */}
