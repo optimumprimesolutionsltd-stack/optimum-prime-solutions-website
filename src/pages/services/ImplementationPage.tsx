@@ -68,9 +68,9 @@ export default function ImplementationPage() {
       <SEO
         title="TallyPrime Implementation Kenya — Setup, Configuration & Go-Live Support"
         description="Professional TallyPrime implementation in Kenya. End-to-end setup, KRA eTIMS integration, data migration, staff training, and go-live support. Serving Nairobi, Ruiru, Kiambu and all of Kenya."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Implementation solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/implementation"
-        keywords="TallyPrime implementation Kenya, TallyPrime setup Kenya, TallyPrime configuration Nairobi, TallyPrime go-live support Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
           { name: 'Implementation', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/implementation/' },

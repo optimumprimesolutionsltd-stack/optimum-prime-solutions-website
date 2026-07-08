@@ -25,9 +25,9 @@ export default function RetailPage() {
       <SEO
         title="TallyPrime for Retail Businesses Kenya — POS, Inventory & KRA eTIMS Compliance"
         description="TallyPrime retail solution in Kenya. POS integration, stock management, multiple price lists, and KRA eTIMS compliance for retail shops and supermarkets across Kenya."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Retail solutions for your business in Ruiru and beyond."
         canonical="/industries/retail"
-        keywords="TallyPrime retail Kenya, retail accounting software Kenya, POS TallyPrime Kenya, shop management software Nairobi, retail inventory Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
           { name: 'Retail', item: 'https://www.optimumprimesolutions.co.ke/industries/retail/' },

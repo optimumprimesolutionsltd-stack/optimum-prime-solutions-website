@@ -25,9 +25,9 @@ export default function SchoolsPage() {
       <SEO
         title="TallyPrime for Schools & Educational Institutions Kenya — Fee Management & Payroll"
         description="TallyPrime school accounting solution in Kenya. Student fee management, staff payroll, budget tracking, and financial reporting for private schools and educational institutions."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Schools solutions for your business in Ruiru and beyond."
         canonical="/industries/schools"
-        keywords="TallyPrime schools Kenya, school accounting software Kenya, fee management software Kenya, school payroll Kenya, educational institution accounting Nairobi"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
           { name: 'Schools', item: 'https://www.optimumprimesolutions.co.ke/industries/schools/' },

@@ -182,7 +182,7 @@ export default function EcosystemOrbit() {
                 >
                   <img
                     src="/logo.png"
-                    alt="Optimum Prime Solutions"
+                    alt="Optimum Prime Solutions logo — certified TallyPrime partner and business consultant in Ruiru, Kenya"
                     className="w-16 h-16 object-contain filter drop-shadow-lg"
                     width={64}
                     height={64}

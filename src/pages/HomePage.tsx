@@ -12,10 +12,10 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       <SEO
-        title="Optimum Prime Solutions | Official TallyPrime Partner in Kenya | Implementation, Training & Cloud Hosting"
-        description="Optimum Prime Solutions is Kenya's official TallyPrime partner. Buy genuine TallyPrime licences, get expert implementation, hands-on training, KRA eTIMS compliance setup, and secure cloud hosting. Serving Ruiru, Nairobi and all of Kenya."
+        title="Official TallyPrime Partner Kenya | Optimum Prime Solutions Ruiru"
+        description="Official TallyPrime partner in Kenya. Get KRA eTIMS compliance, cloud hosting, and expert training for your business in Nairobi, Ruiru, and beyond."
+        socialDescription="Empower your business with Kenya's trusted TallyPrime experts. From KRA eTIMS compliance to cloud hosting, we help you grow with confidence."
         canonical="/"
-        keywords="TallyPrime Kenya, buy TallyPrime Kenya, official Tally partner Kenya, TallyPrime implementation Kenya, TallyPrime training Kenya, TallyPrime reseller Kenya, KRA eTIMS compliance Kenya, TallyPrime cloud hosting Kenya, accounting software Kenya, TallyPrime Ruiru, TallyPrime Nairobi, EOS consulting Kenya"
         breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
         ]}

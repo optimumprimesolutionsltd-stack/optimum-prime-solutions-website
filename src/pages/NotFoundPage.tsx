@@ -30,6 +30,7 @@ export default function NotFoundPage() {
       <SEO
         title="Page Not Found — 404 | Optimum Prime Solutions"
         description="The page you are looking for does not exist. Return to the Optimum Prime Solutions homepage or contact us for help."
+        socialDescription="The page you're looking for doesn't exist. Return to Optimum Prime Solutions — Kenya's TallyPrime partner."
         canonical={location.pathname}
         noIndex={true}
         breadcrumbs={[

@@ -8,9 +8,9 @@ export default function BlogPage() {
       <SEO
         title="Blog | TallyPrime, KRA Compliance & Business Tips for Kenya"
         description="Practical guides, case studies, and expert insights on TallyPrime implementation, KRA compliance, eTIMS, cloud hosting, payroll, and EOS® — tailored for Kenyan business owners."
+        socialDescription="Stay informed with the latest insights on TallyPrime, KRA eTIMS compliance, and business automation in Kenya."
         canonical="/blog"
-        keywords="TallyPrime blog Kenya, KRA compliance tips, eTIMS guide Kenya, accounting tips Kenya, TallyPrime tutorial, EOS business tips Kenya, payroll Kenya guide"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Blog', item: 'https://www.optimumprimesolutions.co.ke/blog/' },
         ]}
@@ -19,6 +19,7 @@ export default function BlogPage() {
         tag="Insights & Articles"
         title="TallyPrime, Cloud Hosting & EOS® Insights for Kenyan Businesses"
         description="Practical guides, case studies, and expert insights on TallyPrime implementation, KRA compliance, cloud hosting, and the Entrepreneurial Operating System (EOS®) — all tailored for Kenyan business owners."
+        socialDescription="Stay informed with the latest insights on TallyPrime, KRA eTIMS compliance, and business automation in Kenya."
         features={['TallyPrime tips & tutorials', 'EOS® business operating system guides', 'Cloud hosting & remote access advice', 'KRA compliance & eTIMS updates']}
         theme="blog"
       />

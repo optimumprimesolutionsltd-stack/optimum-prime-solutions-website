@@ -93,9 +93,9 @@ export default function KnowledgeHubPage() {
       <SEO
         title="Knowledge Hub — TallyPrime Guides, Blog, FAQs & Resources Kenya"
         description="Your central TallyPrime learning resource. Access blog articles, implementation guides, video tutorials, FAQs, case studies, and downloadable templates from Kenya's certified TallyPrime partner."
+        socialDescription="Access guides, templates, case studies, and resources for TallyPrime and business management in Kenya."
         canonical="/knowledge-hub"
-        keywords="TallyPrime guides Kenya, TallyPrime tutorials Kenya, TallyPrime FAQ Kenya, TallyPrime blog Kenya, TallyPrime resources Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Knowledge Hub', item: 'https://www.optimumprimesolutions.co.ke/knowledge-hub/' },
         ]}

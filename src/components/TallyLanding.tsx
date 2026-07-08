@@ -97,9 +97,9 @@ export default function TallyLanding() {
 
           {/* H1 — primary keyword target */}
           <h1 className="mx-auto max-w-4xl text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl drop-shadow-lg">
-            Buy TallyPrime in Kenya —{' '}
+            Official TallyPrime Partner in Kenya —{' '}
             <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
-              Official Partner, Implementation &amp; Training
+              Ruiru Tally Support &amp; Implementation
             </span>
           </h1>
 

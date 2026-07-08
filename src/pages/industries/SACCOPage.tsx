@@ -25,9 +25,9 @@ export default function SACCOPage() {
       <SEO
         title="TallyPrime for SACCOs Kenya — Member Accounting, Loans & SASRA Compliance"
         description="TallyPrime SACCO accounting solution in Kenya. Member savings tracking, loan management, SASRA compliance reports, and financial statements for SACCOs across Kenya."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. SACCO solutions for your business in Ruiru and beyond."
         canonical="/industries/sacco"
-        keywords="TallyPrime SACCO Kenya, SACCO accounting software Kenya, SACCO management software Nairobi, SASRA compliance Kenya, cooperative accounting Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
           { name: 'SACCO', item: 'https://www.optimumprimesolutions.co.ke/industries/sacco/' },

@@ -6,7 +6,10 @@ import { HelmetProvider } from "react-helmet-async";
 import "./index.css";
 import App from "./App";
 
-createRoot(document.getElementById("root")!).render(
+const rootElement = document.getElementById("root")!;
+const root = createRoot(rootElement);
+
+root.render(
   <StrictMode>
     <HelmetProvider>
       <BrowserRouter>
@@ -15,3 +18,9 @@ createRoot(document.getElementById("root")!).render(
     </HelmetProvider>
   </StrictMode>
 );
+
+// Dispatch custom event to trigger prerendering after a short delay
+// to ensure dynamic content is loaded
+setTimeout(() => {
+  document.dispatchEvent(new Event("custom-render-trigger"));
+}, 1000);

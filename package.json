@@ -29,9 +29,14 @@
     "@types/react": "19.2.7",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "5.1.1",
+    "lighthouse": "^13.4.0",
+    "puppeteer-core": "^25.3.0",
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
     "vite": "7.3.2",
     "vite-plugin-singlefile": "2.3.0"
+  },
+  "optionalDependencies": {
+    "puppeteer": "^25.3.0"
   }
 }

@@ -25,9 +25,9 @@ export default function NGOPage() {
       <SEO
         title="TallyPrime for NGOs & Non-Profits Kenya — Fund Accounting, Donor Reports & Compliance"
         description="TallyPrime NGO accounting solution in Kenya. Multi-donor fund accounting, budget tracking, donor report generation, and KRA compliance for NGOs and non-profit organisations."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. NGO solutions for your business in Ruiru and beyond."
         canonical="/industries/ngo"
-        keywords="TallyPrime NGO Kenya, NGO accounting software Kenya, fund accounting Kenya, donor reporting software Kenya, non-profit accounting Nairobi"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
           { name: 'NGO', item: 'https://www.optimumprimesolutions.co.ke/industries/ngo/' },

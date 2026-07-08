@@ -8,9 +8,9 @@ export default function FAQPage() {
       <SEO
         title="FAQ | TallyPrime Kenya — Pricing, Licensing & KRA Compliance Questions"
         description="Answers to the most common questions about TallyPrime Kenya pricing, licensing, KRA & eTIMS compliance, cloud hosting, remote access, payroll setup, and EOS® consulting."
+        socialDescription="Got questions about TallyPrime in Kenya? Find answers to the most common questions about implementation, pricing, and KRA compliance."
         canonical="/faq"
-        keywords="TallyPrime FAQ Kenya, TallyPrime price Kenya, TallyPrime licence questions, KRA compliance FAQ, eTIMS questions Kenya, cloud hosting FAQ Kenya, EOS FAQ Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'FAQ', item: 'https://www.optimumprimesolutions.co.ke/faq/' },
         ]}
@@ -19,6 +19,7 @@ export default function FAQPage() {
         tag="Frequently Asked Questions"
         title="TallyPrime, Cloud Hosting & EOS® — Your Questions Answered"
         description="Find answers to common questions about TallyPrime licensing, KRA compliance, cloud hosting, remote access, and the Entrepreneurial Operating System (EOS®) by Gino Wickman."
+        socialDescription="Got questions about TallyPrime in Kenya? Find answers to the most common questions about implementation, pricing, and KRA compliance."
         features={['TallyPrime editions & pricing', 'Cloud hosting & remote access', 'EOS® implementation process', 'KRA compliance & eTIMS setup']}
         theme="faq"
       />

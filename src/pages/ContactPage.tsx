@@ -28,9 +28,9 @@ export default function ContactPage() {
       <SEO
         title="Contact Us | Optimum Prime Solutions — TallyPrime Kenya"
         description="Get in touch with Optimum Prime Solutions. Book a TallyPrime demo, request a quote, or ask about cloud hosting, KRA compliance, or EOS® consulting. Based in Ruiru, Kenya. Call +254 116 246 074."
+        socialDescription="Ready to modernize your business? Contact Optimum Prime Solutions — Kenya's certified TallyPrime partner in Ruiru."
         canonical="/contact"
-        keywords="contact TallyPrime Kenya, book TallyPrime demo Kenya, TallyPrime quote Kenya, Optimum Prime Solutions contact, TallyPrime Ruiru Kenya, accounting software support Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Contact', item: 'https://www.optimumprimesolutions.co.ke/contact/' },
         ]}
@@ -39,6 +39,7 @@ export default function ContactPage() {
         tag="Get in touch"
         title="Contact one expert who guides your TallyPrime setup"
         description="Reach out with a direct question and get a one-on-one answer that helps you move forward with confidence."
+        socialDescription="Ready to modernize your business? Contact Optimum Prime Solutions — Kenya's certified TallyPrime partner in Ruiru."
         features={['Fast demo scheduling', 'Personal support invite', 'TallyPrime implementation help', 'WhatsApp-friendly contact']}
         theme="contact"
       />

@@ -28,7 +28,7 @@ export default function StickyDownloadBar() {
                 <div className="flex-shrink-0 h-12 w-28 rounded-xl bg-white/90 p-2 shadow-[0_10px_28px_rgba(0,0,0,0.16)] flex items-center justify-center">
                   <img
                     src="/tally-solutions-new-logo.png"
-                    alt="Tally Solutions logo"
+                    alt="TallyPrime accounting software logo — official partner Optimum Prime Solutions Kenya"
                     className="h-full w-full object-contain"
                     width={112}
                     height={48}

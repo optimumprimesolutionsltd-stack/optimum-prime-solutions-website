@@ -25,7 +25,11 @@ const cachingHeaders = {
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss(), viteSingleFile()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    viteSingleFile(),
+  ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "src"),

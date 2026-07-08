@@ -3,7 +3,7 @@ export default function KraLogo({ className = 'h-6 w-6 object-contain' }: { clas
     <img
       src="/itax-logo.png"
       className={className}
-      alt="iTax / KRA logo"
+      alt="KRA eTIMS compliance logo — Kenya Revenue Authority digital tax reporting"
       aria-label="iTax logo"
       width={24}
       height={24}

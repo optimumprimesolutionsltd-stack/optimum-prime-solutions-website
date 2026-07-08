@@ -7,9 +7,9 @@ export default function ProductsPage() {
       <SEO
         title="TallyPrime Products & Pricing Kenya | Silver, Gold & Enterprise"
         description="Buy TallyPrime Silver, Gold or Enterprise in Kenya. Official pricing, cloud hosting packages from KES 3,000/month, and EOS consulting. Kenya's certified TallyPrime reseller."
+        socialDescription="Discover our full range of business solutions — TallyPrime, cloud hosting, EOS consulting, and business automation."
         canonical="/products"
-        keywords="TallyPrime price Kenya, TallyPrime Silver Kenya, TallyPrime Gold Kenya, TallyPrime Enterprise Kenya, buy TallyPrime Nairobi, TallyPrime licence Kenya, cloud hosting Kenya price"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Products', item: 'https://www.optimumprimesolutions.co.ke/products/' },
         ]}

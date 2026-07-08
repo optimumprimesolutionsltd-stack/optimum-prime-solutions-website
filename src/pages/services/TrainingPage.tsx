@@ -110,9 +110,9 @@ export default function TrainingPage() {
       <SEO
         title="TallyPrime Training Kenya — On-Site, Remote & Classroom | Optimum Prime Solutions"
         description="Professional TallyPrime training in Kenya. Foundation, advanced, KRA compliance and administrator courses. On-site training in Nairobi, Ruiru and Kiambu. Remote training available nationwide."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Training solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/training"
-        keywords="TallyPrime training Kenya, Tally training Nairobi, TallyPrime course Kenya, Tally Prime classes Kenya, TallyPrime KRA compliance training"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
           { name: 'Training', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/training/' },

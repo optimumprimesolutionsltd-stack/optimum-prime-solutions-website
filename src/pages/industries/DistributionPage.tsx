@@ -65,9 +65,9 @@ export default function DistributionPage() {
       <SEO
         title="TallyPrime for Distributors & Wholesalers Kenya — Multi-Branch, Credit Control & eTIMS"
         description="TallyPrime distribution solution in Kenya. Multi-branch inventory, credit control, sales order management, and KRA eTIMS compliance for wholesale distributors across Kenya."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Distribution solutions for your business in Ruiru and beyond."
         canonical="/industries/distribution"
-        keywords="TallyPrime distribution Kenya, wholesale accounting software Kenya, distributor software Nairobi, multi-branch inventory Kenya, TallyPrime wholesale Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
           { name: 'Distribution', item: 'https://www.optimumprimesolutions.co.ke/industries/distribution/' },

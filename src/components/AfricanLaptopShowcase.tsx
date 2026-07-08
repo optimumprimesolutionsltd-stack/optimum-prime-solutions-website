@@ -7,6 +7,7 @@ type AfricanLaptopShowcaseProps = {
   tag: string;
   title: string;
   description: string;
+  socialDescription?: string;
   features: string[];
   theme: ShowcaseTheme;
 };

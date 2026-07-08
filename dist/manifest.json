@@ -1,0 +1,21 @@
+{
+  "name": "Optimum Prime Solutions Ltd",
+  "short_name": "Optimum Prime",
+  "description": "Official TallyPrime Partner in Kenya — Implementation, Licensing, Cloud Hosting, Training & Support",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f8fafc",
+  "theme_color": "#dc2626",
+  "icons": [
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

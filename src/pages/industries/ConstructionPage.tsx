@@ -25,9 +25,9 @@ export default function ConstructionPage() {
       <SEO
         title="TallyPrime for Construction Companies Kenya — Project Costing, BOQ & Compliance"
         description="TallyPrime construction solution in Kenya. Project cost accounting, BOQ tracking, subcontractor management, withholding tax, and KRA eTIMS compliance for construction companies."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Construction solutions for your business in Ruiru and beyond."
         canonical="/industries/construction"
-        keywords="TallyPrime construction Kenya, construction accounting software Kenya, project costing software Nairobi, contractor accounting Kenya, BOQ tracking Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
           { name: 'Construction', item: 'https://www.optimumprimesolutions.co.ke/industries/construction/' },

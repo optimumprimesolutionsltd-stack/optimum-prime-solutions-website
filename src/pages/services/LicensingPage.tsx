@@ -89,9 +89,9 @@ export default function LicensingPage() {
       <SEO
         title="Buy TallyPrime Licence Kenya — Silver, Gold & Edit Log | Optimum Prime Solutions"
         description="Buy genuine TallyPrime Silver, Gold and Edit Log licences in Kenya. Authorised Tally partner in Nairobi and Ruiru. Competitive prices, full local support, and TSS included."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Licensing solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/licensing"
-        keywords="buy TallyPrime Kenya, TallyPrime licence Kenya, TallyPrime Silver Kenya, TallyPrime Gold Kenya, TallyPrime price Kenya, Tally reseller Nairobi"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
           { name: 'Licensing', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/licensing/' },

@@ -84,9 +84,9 @@ export default function WebinarPage() {
       <SEO
         title="Free Webinar — What's New in TallyPrime 7.1 | Optimum Prime Solutions"
         description="Join our free webinar on Wednesday 15th July 2026 and discover the powerful new features in TallyPrime 7.1 — Auto Wrap Text, Invoice Templates, Scheduled Backup & more."
+        socialDescription="Join our free webinars on TallyPrime best practices, KRA compliance, and business growth in Kenya."
         canonical="/webinar"
-        keywords="TallyPrime 7.1 webinar Kenya, TallyPrime new features 2026, free TallyPrime webinar, Optimum Prime Solutions webinar"
-      />
+/>
 
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 py-20 px-4">

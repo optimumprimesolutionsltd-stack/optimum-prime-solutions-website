@@ -25,9 +25,9 @@ export default function HardwarePage() {
       <SEO
         title="TallyPrime for Hardware Shops Kenya — Inventory, Credit Control & KRA Compliance"
         description="TallyPrime hardware shop solution in Kenya. Manage thousands of SKUs, contractor credit, bulk pricing, and KRA eTIMS compliance for hardware and building materials businesses."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Hardware solutions for your business in Ruiru and beyond."
         canonical="/industries/hardware"
-        keywords="TallyPrime hardware shop Kenya, hardware accounting software Kenya, building materials software Nairobi, hardware inventory Kenya, contractor credit management Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
           { name: 'Hardware', item: 'https://www.optimumprimesolutions.co.ke/industries/hardware/' },

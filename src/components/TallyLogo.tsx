@@ -38,7 +38,7 @@ export default function TallyLogo({
       {(variant === 'image' || variant === 'both') && (
         <img
           src="/tally-solutions-new-logo.png"
-          alt="Tally Solutions logo"
+          alt="TallyPrime accounting software logo — official partner Optimum Prime Solutions Kenya"
           className={imageClass}
           width={220}
           height={40}

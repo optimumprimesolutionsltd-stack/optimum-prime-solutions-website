@@ -72,9 +72,9 @@ export default function ManufacturingPage() {
       <SEO
         title="TallyPrime for Manufacturing Companies Kenya — BOM, Production Costing & Inventory"
         description="TallyPrime manufacturing solution in Kenya. Bill of Materials, production costing, batch tracking, multi-godown inventory, and KRA eTIMS compliance. Serving manufacturers in Nairobi, Ruiru, Kiambu and across Kenya."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Manufacturing solutions for your business in Ruiru and beyond."
         canonical="/industries/manufacturing"
-        keywords="TallyPrime manufacturing Kenya, Tally BOM Kenya, production costing software Kenya, manufacturing accounting software Nairobi, TallyPrime factory Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
           { name: 'Manufacturing', item: 'https://www.optimumprimesolutions.co.ke/industries/manufacturing/' },

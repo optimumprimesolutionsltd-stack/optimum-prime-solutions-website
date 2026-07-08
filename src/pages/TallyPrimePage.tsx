@@ -76,9 +76,9 @@ export default function TallyPrimePage() {
       <SEO
         title="TallyPrime Solutions Kenya — Implementation, Licensing, Cloud, Training & Support"
         description="Kenya's certified TallyPrime partner. We offer TallyPrime implementation, licensing, cloud hosting, training, support, customization, and data migration. Serving businesses across Nairobi, Ruiru and all of Kenya."
+        socialDescription="Transform your business with Kenya's leading TallyPrime partner. Get expert implementation, KRA eTIMS compliance, and reliable cloud hosting today."
         canonical="/tallyprime"
-        keywords="TallyPrime Kenya, TallyPrime implementation Kenya, TallyPrime licensing Kenya, TallyPrime cloud hosting Kenya, TallyPrime training Kenya, TallyPrime support Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
         ]}

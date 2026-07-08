@@ -113,9 +113,9 @@ export default function TallyPrimeKenyaPage() {
       <SEO
         title="TallyPrime Kenya | Buy, Implement & Train — Official Tally Partner"
         description="Buy genuine TallyPrime in Kenya from the official certified partner. Expert TallyPrime implementation, training, KRA eTIMS compliance setup, and cloud hosting. Serving Ruiru, Nairobi and all of Kenya. Call +254 116 246 074."
+        socialDescription="Transform your business with Kenya's leading TallyPrime partner. Get expert implementation, KRA eTIMS compliance, and reliable cloud hosting today."
         canonical="/tally-prime-kenya"
-        keywords="TallyPrime Kenya, buy TallyPrime Kenya, official Tally partner Kenya, TallyPrime implementation Kenya, TallyPrime training Kenya, TallyPrime price Kenya, TallyPrime reseller Nairobi, KRA eTIMS TallyPrime, TallyPrime cloud hosting Kenya, TallyPrime Silver Gold Kenya, TallyPrime Ruiru"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'TallyPrime Kenya', item: 'https://www.optimumprimesolutions.co.ke/tally-prime-kenya/' },
         ]}

@@ -41,8 +41,7 @@ export default function BlogPostPage() {
         canonical={`/blog/${slugify(post.title)}`}
         ogType="article"
         ogImage={`${BASE_URL}/og-image.png`}
-        keywords={`${post.category}, TallyPrime Kenya, KRA compliance, ${post.title}`}
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Blog', item: 'https://www.optimumprimesolutions.co.ke/blog/' },
           { name: post.title, item: `${BASE_URL}/blog/${slugify(post.title)}/` },

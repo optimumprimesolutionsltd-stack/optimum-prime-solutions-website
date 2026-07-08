@@ -29,9 +29,9 @@ export default function TestimonialsPage() {
       <SEO
         title="Client Reviews & Testimonials | Optimum Prime Solutions"
         description="Read what Kenyan business owners say about Optimum Prime Solutions. Real testimonials from TallyPrime, cloud hosting, and EOS consulting clients across Kenya."
+        socialDescription="See what Kenyan businesses say about working with Optimum Prime Solutions — your trusted TallyPrime partner."
         canonical="/testimonials"
-        keywords="TallyPrime reviews Kenya, Optimum Prime Solutions testimonials, TallyPrime client stories, accounting software reviews Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Testimonials', item: 'https://www.optimumprimesolutions.co.ke/testimonials/' },
         ]}
@@ -40,6 +40,7 @@ export default function TestimonialsPage() {
         tag="Client stories"
         title="A happy business owner sharing their TallyPrime journey"
         description="Every testimonial is grounded in a single-person experience, showing how our local team helps one owner gain control of finances and inventory."
+        socialDescription="See what Kenyan businesses say about working with Optimum Prime Solutions — your trusted TallyPrime partner."
         features={['Real Kenyan success stories', 'Personal support and follow-up', 'Proof of smoother compliance', 'Strong ROI for small teams']}
         theme="testimonials"
       />

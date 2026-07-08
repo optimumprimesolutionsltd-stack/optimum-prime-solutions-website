@@ -71,9 +71,9 @@ export default function SupportPage() {
       <SEO
         title="TallyPrime Support & Maintenance Kenya — AMC, Remote & On-Site Support"
         description="Reliable TallyPrime support and maintenance in Kenya. Annual Maintenance Contracts, remote desktop support, WhatsApp helpdesk, and on-site visits in Nairobi, Ruiru and Kiambu."
+        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Support solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/support"
-        keywords="TallyPrime support Kenya, Tally maintenance Kenya, TallyPrime AMC Kenya, Tally helpdesk Nairobi, TallyPrime technical support Kenya"
-        breadcrumbs={[
+breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
           { name: 'Support', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/support/' },
