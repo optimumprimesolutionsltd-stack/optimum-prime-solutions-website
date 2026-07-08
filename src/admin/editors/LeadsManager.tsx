@@ -86,12 +86,20 @@ function generateTimeSlots(dateStr: string): { value: string; label: string; blo
 
 // ── Status config ────────────────────────────────────────────────────────────
 const statusColors: Record<string, string> = {
-  'New':            'bg-accent/10 text-accent',
-  'Contacted':      'bg-blue-50 text-blue-600',
-  'Qualified':      'bg-purple-50 text-purple-600',
-  'Demo Scheduled': 'bg-amber-50 text-amber-600',
-  'Closed Won':     'bg-green-50 text-green-700',
-  'Closed Lost':    'bg-red-50 text-red-600',
+  'New':            '',
+  'Contacted':      '',
+  'Qualified':      '',
+  'Demo Scheduled': '',
+  'Closed Won':     '',
+  'Closed Lost':    '',
+};
+const statusBadgeStyle: Record<string, React.CSSProperties> = {
+  'New':            { backgroundColor: '#ef4444', color: '#fff' },
+  'Contacted':      { backgroundColor: '#3b82f6', color: '#fff' },
+  'Qualified':      { backgroundColor: '#8b5cf6', color: '#fff' },
+  'Demo Scheduled': { backgroundColor: '#f59e0b', color: '#fff' },
+  'Closed Won':     { backgroundColor: '#16a34a', color: '#fff' },
+  'Closed Lost':    { backgroundColor: '#64748b', color: '#fff' },
 };
 const statuses = Object.keys(statusColors);
 
@@ -840,7 +848,10 @@ export default function LeadsManager({ data, onSave }: P) {
                   </div>
                   <p className="text-xs text-navy-500 truncate">{l.phone} · {l.company || 'No company'}</p>
                 </div>
-                <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold whitespace-nowrap ${statusColors[l.status] || 'bg-navy-100 text-navy-600'}`}>
+                <span
+                  className="rounded-full px-2.5 py-1 text-[10px] font-semibold whitespace-nowrap"
+                  style={statusBadgeStyle[l.status] || { backgroundColor: '#e2e8f0', color: '#475569' }}
+                >
                   {l.status}
                 </span>
                 {l.scheduledDate && (
