@@ -191,7 +191,7 @@ export default function ReviewForm() {
                       type="text"
                       value={form.name}
                       onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                      placeholder="e.g. James Mwangi"
+                      placeholder="e.g. Frederick Chege"
                       className="w-full rounded-xl border border-white/10 bg-slate-700/50 text-white placeholder-slate-500 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 transition"
                       required
                     />
@@ -204,7 +204,7 @@ export default function ReviewForm() {
                       type="text"
                       value={form.company}
                       onChange={(e) => setForm((f) => ({ ...f, company: e.target.value }))}
-                      placeholder="e.g. Mwangi Traders Ltd"
+                      placeholder="e.g. Ujenzi Distributors Ltd"
                       className="w-full rounded-xl border border-white/10 bg-slate-700/50 text-white placeholder-slate-500 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/50 transition"
                     />
                   </div>
