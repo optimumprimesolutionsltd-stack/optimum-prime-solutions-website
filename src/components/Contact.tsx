@@ -355,33 +355,37 @@ export default function Contact() {
                     {/* Preferred date */}
                     <label className="block text-sm text-slate-200">
                       <span className="block mb-2 font-semibold text-slate-100">Preferred date *</span>
-                      <input
-                        type="date"
-                        value={form.demoDate}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          if (isBlockedDate(val)) {
-                            setErrors((prev) => [
-                              ...prev.filter((err) => err.field !== 'demoDate'),
-                              { field: 'demoDate', message: 'We are closed on Sundays and public holidays. Please choose another date.' },
-                            ]);
-                            set('demoDate', val);
-                          } else {
-                            setErrors((prev) => prev.filter((err) => err.field !== 'demoDate'));
-                            // Reset time if switching to/from Saturday
-                            if (isSaturday(val) && form.demoTime && !SATURDAY_TIME_SLOTS.includes(form.demoTime)) {
-                              setForm((prev) => ({ ...prev, demoDate: val, demoTime: '' }));
-                            } else {
+                      <div className="relative">
+                        <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-accent">
+                          📅
+                        </span>
+                        <input
+                          type="date"
+                          value={form.demoDate}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (isBlockedDate(val)) {
+                              setErrors((prev) => [
+                                ...prev.filter((err) => err.field !== 'demoDate'),
+                                { field: 'demoDate', message: 'We are closed on Sundays and public holidays. Please choose another date.' },
+                              ]);
                               set('demoDate', val);
+                            } else {
+                              setErrors((prev) => prev.filter((err) => err.field !== 'demoDate'));
+                              if (isSaturday(val) && form.demoTime && !SATURDAY_TIME_SLOTS.includes(form.demoTime)) {
+                                setForm((prev) => ({ ...prev, demoDate: val, demoTime: '' }));
+                              } else {
+                                set('demoDate', val);
+                              }
                             }
-                          }
-                        }}
-                        required
-                        min={new Date().toISOString().split('T')[0]}
-                        className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition ${
-                          getFieldError(errors, 'demoDate') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
-                        }`}
-                      />
+                          }}
+                          required
+                          min={new Date().toISOString().split('T')[0]}
+                          className={`w-full rounded-3xl border pl-10 pr-4 py-3 text-sm outline-none transition ${
+                            getFieldError(errors, 'demoDate') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
+                          }`}
+                        />
+                      </div>
                       {getFieldError(errors, 'demoDate') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'demoDate')}</p>}
                       {form.demoDate && isSaturday(form.demoDate) && !isBlockedDate(form.demoDate) && (
                         <p className="mt-1 text-xs text-amber-400">Saturday — demo slots available from 2:00 PM only.</p>
@@ -391,21 +395,26 @@ export default function Contact() {
                     {/* Preferred time */}
                     <label className="block text-sm text-slate-200">
                       <span className="block mb-2 font-semibold text-slate-100">Preferred time *</span>
-                      <select
-                        value={form.demoTime}
-                        onChange={(e) => set('demoTime', e.target.value)}
-                        required
-                        className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition appearance-none ${
-                          getFieldError(errors, 'demoTime') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
-                        } ${!form.demoTime ? 'text-slate-400' : 'text-white'}`}
-                      >
-                        <option value="" disabled>
-                          {form.demoDate ? 'Select preferred time' : 'Select a date first'}
-                        </option>
-                        {availableTimeSlots.map((slot) => (
-                          <option key={slot} value={slot}>{slot}</option>
-                        ))}
-                      </select>
+                      <div className="relative">
+                        <span className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-accent">
+                          ⏰
+                        </span>
+                        <select
+                          value={form.demoTime}
+                          onChange={(e) => set('demoTime', e.target.value)}
+                          required
+                          className={`w-full rounded-3xl border pl-10 pr-4 py-3 text-sm outline-none transition appearance-none ${
+                            getFieldError(errors, 'demoTime') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
+                          } ${!form.demoTime ? 'text-slate-400' : 'text-white'}`}
+                        >
+                          <option value="" disabled>
+                            {form.demoDate ? 'Select preferred time' : 'Select a date first'}
+                          </option>
+                          {availableTimeSlots.map((slot) => (
+                            <option key={slot} value={slot}>{slot}</option>
+                          ))}
+                        </select>
+                      </div>
                       {getFieldError(errors, 'demoTime') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'demoTime')}</p>}
                     </label>
                   </div>
