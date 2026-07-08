@@ -1,7 +1,11 @@
 {
   "version": 2,
-  "buildCommand": "echo done",
-  "outputDirectory": "dist",
+  "builds": [
+    {
+      "src": "dist/index.html",
+      "use": "@vercel/static"
+    }
+  ],
   "routes": [
     { "src": "^/(.*\\..+)$", "dest": "/$1" },
     { "src": "^/tallyprime/implementation(/.*)?$", "dest": "/tallyprime/implementation/index.html" },
