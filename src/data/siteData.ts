@@ -15,7 +15,7 @@ export interface Lead {
   meetLink?: string; meetSent?: boolean;
   source?: 'website' | 'manual'; // where the lead came from
   industry?: string; demoNotes?: string;
-  requestType?: 'demo' | 'consultation'; // demo or consultation request
+  requestType?: 'demo' | 'consultation' | 'bizanalyst'; // demo, consultation, or biz analyst enquiry
 }
 export interface ContactInfo { location:string; phones:string[]; emails:string[]; workingHours:string[]; whatsapp:string; mapUrl:string }
 export interface CompanyInfo { name:string; tagline:string; mission:string; vision:string; about:string[]; stats:{label:string;value:string}[] }

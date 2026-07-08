@@ -857,11 +857,15 @@ export default function LeadsManager({ data, onSave }: P) {
                 {l.requestType && (
                   <span
                     className="rounded-full px-2 py-0.5 text-[9px] font-semibold whitespace-nowrap hidden sm:inline"
-                    style={l.requestType === 'consultation'
-                      ? { backgroundColor: '#8b5cf6', color: '#fff' }
-                      : { backgroundColor: '#0ea5e9', color: '#fff' }}
+                    style={
+                      l.requestType === 'consultation'
+                        ? { backgroundColor: '#8b5cf6', color: '#fff' }
+                        : l.requestType === 'bizanalyst'
+                        ? { backgroundColor: '#0ea5e9', color: '#fff' }
+                        : { backgroundColor: '#3b82f6', color: '#fff' }
+                    }
                   >
-                    {l.requestType === 'consultation' ? '🤝 Consultation' : '📊 Demo'}
+                    {l.requestType === 'consultation' ? '🤝 Consultation' : l.requestType === 'bizanalyst' ? '📱 Biz Analyst' : '📊 Demo'}
                   </span>
                 )}
                 {l.scheduledDate && (

@@ -18,14 +18,16 @@ export default function Contact() {
   const [serverError, setServerError] = useState<string | null>(null);
   const [errors, setErrors] = useState<ValidationError[]>([]);
   const [searchParams] = useSearchParams();
-  const [requestType, setRequestType] = useState<'demo' | 'consultation'>(
-    searchParams.get('type') === 'consultation' ? 'consultation' : 'demo'
+  const initType = searchParams.get('type');
+  const [requestType, setRequestType] = useState<'demo' | 'consultation' | 'bizanalyst'>(
+    initType === 'consultation' ? 'consultation' : initType === 'bizanalyst' ? 'bizanalyst' : 'demo'
   );
 
   useEffect(() => {
-    if (searchParams.get('type') === 'consultation') {
-      setRequestType('consultation');
-    }
+    const t = searchParams.get('type');
+    if (t === 'consultation') setRequestType('consultation');
+    else if (t === 'bizanalyst') setRequestType('bizanalyst');
+    else setRequestType('demo');
   }, [searchParams]);
   const [form, setForm] = useState<FormData>({
     name: '',
@@ -180,7 +182,7 @@ export default function Contact() {
           demoDate: formData.demoDate,
           demoTime: formData.demoTime,
           message: formData.message,
-          interest: reqType === 'consultation' ? 'EOS® Business Consultation' : 'TallyPrime Demo',
+          interest: reqType === 'consultation' ? 'EOS® Business Consultation' : reqType === 'bizanalyst' ? 'Biz Analyst Enquiry' : 'TallyPrime Demo',
           requestType: reqType,
           source: 'Website — Contact Form',
         }),
@@ -269,7 +271,7 @@ export default function Contact() {
                 <button
                   type="button"
                   onClick={() => setRequestType('demo')}
-                  className="flex-1 rounded-xl py-3 text-sm font-semibold transition"
+                  className="flex-1 rounded-xl py-2.5 text-xs font-semibold transition"
                   style={requestType === 'demo' ? { backgroundColor: '#e53e3e', color: '#fff' } : { backgroundColor: 'transparent', color: '#94a3b8' }}
                 >
                   📊 Book a Demo
@@ -277,10 +279,18 @@ export default function Contact() {
                 <button
                   type="button"
                   onClick={() => setRequestType('consultation')}
-                  className="flex-1 rounded-xl py-3 text-sm font-semibold transition"
+                  className="flex-1 rounded-xl py-2.5 text-xs font-semibold transition"
                   style={requestType === 'consultation' ? { backgroundColor: '#8b5cf6', color: '#fff' } : { backgroundColor: 'transparent', color: '#94a3b8' }}
                 >
-                  🤝 Book a Consultation
+                  🤝 Consultation
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRequestType('bizanalyst')}
+                  className="flex-1 rounded-xl py-2.5 text-xs font-semibold transition"
+                  style={requestType === 'bizanalyst' ? { backgroundColor: '#0ea5e9', color: '#fff' } : { backgroundColor: 'transparent', color: '#94a3b8' }}
+                >
+                  📱 Biz Analyst
                 </button>
               </div>
 
@@ -290,11 +300,17 @@ export default function Contact() {
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-400">Step 1 — Fill in your details below</p>
                 </div>
                 <h3 className="text-xl font-bold text-white">
-                  {requestType === 'consultation' ? 'Book a free EOS® Business Consultation' : 'Book your free TallyPrime demo'}
+                  {requestType === 'consultation'
+                    ? 'Book a free EOS® Business Consultation'
+                    : requestType === 'bizanalyst'
+                    ? 'Enquire about Biz Analyst'
+                    : 'Book your free TallyPrime demo'}
                 </h3>
                 <p className="mt-1 text-sm text-slate-300">
                   {requestType === 'consultation'
                     ? 'Complete the form and our EOS® consultant will confirm your session within 24 hours.'
+                    : requestType === 'bizanalyst'
+                    ? 'Tell us about your business and we will show you how Biz Analyst works with TallyPrime.'
                     : 'Complete the form and our team will confirm your demo within 24 hours.'}
                 </p>
               </div>
