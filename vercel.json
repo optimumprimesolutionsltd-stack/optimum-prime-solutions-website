@@ -15,6 +15,7 @@
     { "src": "^/tallyprime/support(/.*)?$", "dest": "/dist/tallyprime/support/index.html" },
     { "src": "^/tallyprime/customization(/.*)?$", "dest": "/dist/tallyprime/customization/index.html" },
     { "src": "^/tallyprime/data-migration(/.*)?$", "dest": "/dist/tallyprime/data-migration/index.html" },
+    { "src": "^/tallyprime/consulting(/.*)?$", "dest": "/dist/tallyprime/consulting/index.html" },
     { "src": "^/tallyprime(/.*)?$", "dest": "/dist/tallyprime/index.html" },
     { "src": "^/industries/manufacturing(/.*)?$", "dest": "/dist/industries/manufacturing/index.html" },
     { "src": "^/industries/distribution(/.*)?$", "dest": "/dist/industries/distribution/index.html" },
@@ -25,12 +26,14 @@
     { "src": "^/industries/schools(/.*)?$", "dest": "/dist/industries/schools/index.html" },
     { "src": "^/industries/saccos(/.*)?$", "dest": "/dist/industries/saccos/index.html" },
     { "src": "^/industries(/.*)?$", "dest": "/dist/industries/index.html" },
+    { "src": "^/biz-analyst(/.*)?$", "dest": "/dist/biz-analyst/index.html" },
     { "src": "^/about(/.*)?$", "dest": "/dist/about/index.html" },
     { "src": "^/blog(/.*)?$", "dest": "/dist/blog/index.html" },
     { "src": "^/contact(/.*)?$", "dest": "/dist/contact/index.html" },
     { "src": "^/faq(/.*)?$", "dest": "/dist/faq/index.html" },
     { "src": "^/pricing(/.*)?$", "dest": "/dist/pricing/index.html" },
     { "src": "^/knowledge-hub(/.*)?$", "dest": "/dist/knowledge-hub/index.html" },
+    { "src": "^/admin(/.*)?$", "dest": "/dist/admin/index.html" },
     { "src": "^/(.*)$", "dest": "/dist/index.html" }
   ]
 }
