@@ -574,22 +574,44 @@ export default function LeadsManager({ data, onSave }: P) {
       </div>
 
       {/* ── Toolbar ── */}
-      <div className="flex flex-wrap items-center gap-3">
-        <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-400" />
-          <input value={search} onChange={e => setSearch(e.target.value)}
-            placeholder="Search by name, email, phone, company..."
-            className="w-full rounded-lg border border-navy-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
+      <div className="space-y-3">
+        {/* Search + Export row */}
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative flex-1 min-w-[200px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-400" />
+            <input value={search} onChange={e => setSearch(e.target.value)}
+              placeholder="Search by name, email, phone, company..."
+              className="w-full rounded-lg border border-navy-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
+          </div>
+          <button onClick={exportCSV} disabled={data.leads.length === 0}
+            className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
+            <Download className="h-4 w-4" /> Export CSV
+          </button>
         </div>
-        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-          className="rounded-lg border border-navy-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-accent">
-          <option value="All">All Status</option>
-          {statuses.map(s => <option key={s} value={s}>{s}</option>)}
-        </select>
-        <button onClick={exportCSV} disabled={data.leads.length === 0}
-          className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
-          <Download className="h-4 w-4" /> Export CSV
-        </button>
+        {/* Status filter tabs */}
+        <div className="flex flex-wrap gap-2">
+          {(['All', ...statuses] as string[]).map(s => {
+            const tabStyles: Record<string, string> = {
+              'All':            filterStatus === 'All'            ? 'bg-navy-800 text-white border-navy-800'            : 'bg-white text-navy-600 border-navy-300 hover:bg-navy-50',
+              'New':            filterStatus === 'New'            ? 'bg-red-500 text-white border-red-500'              : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100',
+              'Contacted':      filterStatus === 'Contacted'      ? 'bg-blue-500 text-white border-blue-500'            : 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100',
+              'Qualified':      filterStatus === 'Qualified'      ? 'bg-purple-500 text-white border-purple-500'        : 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100',
+              'Demo Scheduled': filterStatus === 'Demo Scheduled' ? 'bg-amber-500 text-white border-amber-500'          : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
+              'Closed Won':     filterStatus === 'Closed Won'     ? 'bg-green-600 text-white border-green-600'          : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100',
+              'Closed Lost':    filterStatus === 'Closed Lost'    ? 'bg-slate-500 text-white border-slate-500'          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100',
+            };
+            const count = s === 'All' ? data.leads.length : data.leads.filter(l => l.status === s).length;
+            return (
+              <button key={s} onClick={() => setFilterStatus(s)}
+                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap flex items-center gap-1.5 ${tabStyles[s] || 'bg-white text-navy-600 border-navy-300 hover:bg-navy-50'}`}>
+                {s}
+                <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
+                  filterStatus === s ? 'bg-white/25 text-white' : 'bg-navy-100 text-navy-600'
+                }`}>{count}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* ── Manual Booking Panel (slide-in) ── */}
