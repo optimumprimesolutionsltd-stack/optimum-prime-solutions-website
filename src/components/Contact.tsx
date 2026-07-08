@@ -167,7 +167,7 @@ export default function Contact() {
     }
   };
 
-  const sendEmailNotification = async (formData: FormData, reqType: 'demo' | 'consultation' = 'demo') => {
+  const sendEmailNotification = async (formData: FormData, reqType: 'demo' | 'consultation' | 'bizanalyst' = 'demo') => {
     try {
       const response = await fetch('https://optimum-prime-lead-notifier.onrender.com/new-lead', {
         method: 'POST',
