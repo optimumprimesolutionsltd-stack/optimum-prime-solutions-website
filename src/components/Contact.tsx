@@ -121,6 +121,7 @@ export default function Contact() {
         company: form.company,
         businessType: form.businessType,
         demoDate: form.demoDate,
+        demoTime: form.demoTime,
         currentSoftware: form.currentSoftware,
         message: form.message,
         createdAt: lead.createdAt,

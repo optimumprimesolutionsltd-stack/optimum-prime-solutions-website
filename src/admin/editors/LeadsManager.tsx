@@ -196,14 +196,16 @@ export default function LeadsManager({ data, onSave }: P) {
       setSchedulingId(id);
       const lead = data.leads.find(l => l.id === id);
       setSchedForm({
-        scheduledDate: lead?.scheduledDate || '',
-        scheduledTime: lead?.scheduledTime || '',
-        demoType: lead?.demoType || 'online',
+        // Pre-fill with already-saved schedule details first,
+        // then fall back to the client's requested preferences
+        scheduledDate: lead?.scheduledDate || lead?.demoDate || '',
+        scheduledTime: lead?.scheduledTime || lead?.demoTime || '',
+        demoType: lead?.demoType || (lead?.demoMode as 'online' | 'physical') || 'online',
         demoLocation: lead?.demoLocation || '',
         teamMemberName: lead?.teamMemberName || '',
         teamMemberPhone: lead?.teamMemberPhone || '',
         extraTeam: (lead as any)?.extraTeam || [],
-        demoNotes: lead?.demoNotes || '',
+        demoNotes: lead?.demoNotes || lead?.message || '',
       });
       setSchedError('');
     } else {
@@ -771,7 +773,14 @@ export default function LeadsManager({ data, onSave }: P) {
                     </div>
                     <div className="flex items-start gap-2">
                       <Calendar className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
-                      <div><p className="text-[10px] text-navy-500 font-medium">Requested Date</p><p className="text-sm text-navy-900">{l.demoDate || 'Flexible'}</p></div>
+                      <div>
+                        <p className="text-[10px] text-navy-500 font-medium">Requested Slot</p>
+                        <p className="text-sm text-navy-900">
+                          {l.demoDate
+                            ? `${new Date(l.demoDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}${l.demoTime ? ` · ${l.demoTime}` : ''}`
+                            : 'Flexible'}
+                        </p>
+                      </div>
                     </div>
                   </div>
 

@@ -6,7 +6,7 @@ export interface IndustryItem { id:string; name:string; icon:string; desc:string
 export interface BlogPost { id:string; title:string; excerpt:string; date:string; category:string; readTime:string; content:string; youtubeUrl?:string }
 export interface Lead {
   id:string; name:string; company:string; phone:string; email:string;
-  businessType:string; demoDate:string; currentSoftware:string; message:string;
+  businessType:string; demoDate:string; demoTime?:string; currentSoftware:string; message:string;
   createdAt:string; status:string;
   // Scheduling fields (set when status → Demo Scheduled)
   scheduledDate?: string; scheduledTime?: string;
