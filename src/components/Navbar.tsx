@@ -31,6 +31,7 @@ const links: NavLink[] = [
       { label: 'Support', href: '/tallyprime/support', desc: '24/7 remote & on-site support' },
       { label: 'Customization', href: '/tallyprime/customization', desc: 'TDL & workflow customization' },
       { label: 'Data Migration', href: '/tallyprime/data-migration', desc: 'Migrate from any system' },
+      { label: 'Business Consulting', href: '/tallyprime/consulting', desc: 'EOS® for business growth' },
     ],
   },
   {
@@ -43,8 +44,9 @@ const links: NavLink[] = [
       { label: 'Manufacturing', href: '/industries/manufacturing', desc: 'BOM, production & costing' },
       { label: 'Construction', href: '/industries/construction', desc: 'Project costing & contracts' },
       { label: 'Hardware & Wholesale', href: '/industries/hardware', desc: 'Inventory & trade management' },
-      { label: 'NGOs', href: '/industries/ngos', desc: 'Fund accounting & donor reports' },
+      { label: 'NGOs', href: '/industries/ngo', desc: 'Fund accounting & donor reports' },
       { label: 'Schools', href: '/industries/schools', desc: 'Fee management & payroll' },
+      { label: 'SACCOs', href: '/industries/sacco', desc: 'Member accounts & SASRA compliance' },
     ],
   },
   {
