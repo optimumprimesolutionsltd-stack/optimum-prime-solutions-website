@@ -7,33 +7,141 @@
     }
   ],
   "routes": [
-    { "src": "^/(.*\\..+)$", "dest": "/dist/$1" },
-    { "src": "^/tallyprime/implementation(/.*)?$", "dest": "/dist/tallyprime/implementation/index.html" },
-    { "src": "^/tallyprime/licensing(/.*)?$", "dest": "/dist/tallyprime/licensing/index.html" },
-    { "src": "^/tallyprime/cloud-hosting(/.*)?$", "dest": "/dist/tallyprime/cloud-hosting/index.html" },
-    { "src": "^/tallyprime/training(/.*)?$", "dest": "/dist/tallyprime/training/index.html" },
-    { "src": "^/tallyprime/support(/.*)?$", "dest": "/dist/tallyprime/support/index.html" },
-    { "src": "^/tallyprime/customization(/.*)?$", "dest": "/dist/tallyprime/customization/index.html" },
-    { "src": "^/tallyprime/data-migration(/.*)?$", "dest": "/dist/tallyprime/data-migration/index.html" },
-    { "src": "^/tallyprime/consulting(/.*)?$", "dest": "/dist/tallyprime/consulting/index.html" },
-    { "src": "^/tallyprime(/.*)?$", "dest": "/dist/tallyprime/index.html" },
-    { "src": "^/industries/manufacturing(/.*)?$", "dest": "/dist/industries/manufacturing/index.html" },
-    { "src": "^/industries/distribution(/.*)?$", "dest": "/dist/industries/distribution/index.html" },
-    { "src": "^/industries/retail(/.*)?$", "dest": "/dist/industries/retail/index.html" },
-    { "src": "^/industries/construction(/.*)?$", "dest": "/dist/industries/construction/index.html" },
-    { "src": "^/industries/hardware(/.*)?$", "dest": "/dist/industries/hardware/index.html" },
-    { "src": "^/industries/ngos(/.*)?$", "dest": "/dist/industries/ngos/index.html" },
-    { "src": "^/industries/schools(/.*)?$", "dest": "/dist/industries/schools/index.html" },
-    { "src": "^/industries/saccos(/.*)?$", "dest": "/dist/industries/saccos/index.html" },
-    { "src": "^/industries(/.*)?$", "dest": "/dist/industries/index.html" },
-    { "src": "^/biz-analyst(/.*)?$", "dest": "/dist/biz-analyst/index.html" },
-    { "src": "^/about(/.*)?$", "dest": "/dist/about/index.html" },
-    { "src": "^/blog(/.*)?$", "dest": "/dist/blog/index.html" },
-    { "src": "^/contact(/.*)?$", "dest": "/dist/contact/index.html" },
-    { "src": "^/faq(/.*)?$", "dest": "/dist/faq/index.html" },
-    { "src": "^/pricing(/.*)?$", "dest": "/dist/pricing/index.html" },
-    { "src": "^/knowledge-hub(/.*)?$", "dest": "/dist/knowledge-hub/index.html" },
-    { "src": "^/admin(/.*)?$", "dest": "/dist/admin/index.html" },
-    { "src": "^/(.*)$", "dest": "/dist/index.html" }
+    {
+      "src": "^/(.*\\..+)$",
+      "dest": "/dist/$1"
+    },
+    {
+      "src": "^/tallyprime/implementation(/.*)?$",
+      "dest": "/dist/tallyprime/implementation/index.html"
+    },
+    {
+      "src": "^/tallyprime/licensing(/.*)?$",
+      "dest": "/dist/tallyprime/licensing/index.html"
+    },
+    {
+      "src": "^/tallyprime/cloud-hosting(/.*)?$",
+      "dest": "/dist/tallyprime/cloud-hosting/index.html"
+    },
+    {
+      "src": "^/tallyprime/training(/.*)?$",
+      "dest": "/dist/tallyprime/training/index.html"
+    },
+    {
+      "src": "^/tallyprime/support(/.*)?$",
+      "dest": "/dist/tallyprime/support/index.html"
+    },
+    {
+      "src": "^/tallyprime/customization(/.*)?$",
+      "dest": "/dist/tallyprime/customization/index.html"
+    },
+    {
+      "src": "^/tallyprime/data-migration(/.*)?$",
+      "dest": "/dist/tallyprime/data-migration/index.html"
+    },
+    {
+      "src": "^/tallyprime/consulting(/.*)?$",
+      "dest": "/dist/tallyprime/consulting/index.html"
+    },
+    {
+      "src": "^/tallyprime(/.*)?$",
+      "dest": "/dist/tallyprime/index.html"
+    },
+    {
+      "src": "^/industries/manufacturing(/.*)?$",
+      "dest": "/dist/industries/manufacturing/index.html"
+    },
+    {
+      "src": "^/industries/distribution(/.*)?$",
+      "dest": "/dist/industries/distribution/index.html"
+    },
+    {
+      "src": "^/industries/retail(/.*)?$",
+      "dest": "/dist/industries/retail/index.html"
+    },
+    {
+      "src": "^/industries/construction(/.*)?$",
+      "dest": "/dist/industries/construction/index.html"
+    },
+    {
+      "src": "^/industries/hardware(/.*)?$",
+      "dest": "/dist/industries/hardware/index.html"
+    },
+    {
+      "src": "^/industries/ngos(/.*)?$",
+      "dest": "/dist/industries/ngos/index.html"
+    },
+    {
+      "src": "^/industries/schools(/.*)?$",
+      "dest": "/dist/industries/schools/index.html"
+    },
+    {
+      "src": "^/industries/saccos(/.*)?$",
+      "dest": "/dist/industries/saccos/index.html"
+    },
+    {
+      "src": "^/industries(/.*)?$",
+      "dest": "/dist/industries/index.html"
+    },
+    {
+      "src": "^/biz-analyst(/.*)?$",
+      "dest": "/dist/biz-analyst/index.html"
+    },
+    {
+      "src": "^/about(/.*)?$",
+      "dest": "/dist/about/index.html"
+    },
+    {
+      "src": "^/contact(/.*)?$",
+      "dest": "/dist/contact/index.html"
+    },
+    {
+      "src": "^/faq(/.*)?$",
+      "dest": "/dist/faq/index.html"
+    },
+    {
+      "src": "^/pricing(/.*)?$",
+      "dest": "/dist/pricing/index.html"
+    },
+    {
+      "src": "^/knowledge-hub(/.*)?$",
+      "dest": "/dist/knowledge-hub/index.html"
+    },
+    {
+      "src": "^/admin(/.*)?$",
+      "dest": "/dist/admin/index.html"
+    },
+    {
+      "src": "^/blog/why\\-every\\-kenyan\\-business\\-needs\\-tally\\-prime\\-in\\-2025(/)?$",
+      "dest": "/dist/blog/why-every-kenyan-business-needs-tally-prime-in-2025/index.html"
+    },
+    {
+      "src": "^/blog/complete\\-guide\\-to\\-kra\\-e\\-filing\\-with\\-tally\\-prime(/)?$",
+      "dest": "/dist/blog/complete-guide-to-kra-e-filing-with-tally-prime/index.html"
+    },
+    {
+      "src": "^/blog/tally\\-prime\\-silver\\-vs\\-gold\\-which\\-edition\\-is\\-right\\-for\\-you(/)?$",
+      "dest": "/dist/blog/tally-prime-silver-vs-gold-which-edition-is-right-for-you/index.html"
+    },
+    {
+      "src": "^/blog/what\\-is\\-eos\\-and\\-why\\-kenyan\\-businesses\\-are\\-adopting\\-it(/)?$",
+      "dest": "/dist/blog/what-is-eos-and-why-kenyan-businesses-are-adopting-it/index.html"
+    },
+    {
+      "src": "^/blog/tallyprime\\-cloud\\-hosting\\-access\\-your\\-business\\-data\\-from\\-anywhere(/)?$",
+      "dest": "/dist/blog/tallyprime-cloud-hosting-access-your-business-data-from-anywhere/index.html"
+    },
+    {
+      "src": "^/blog/tallyprime\\-71\\-is\\-here\\-whats\\-new\\-and\\-what\\-it\\-means\\-for\\-your\\-business(/)?$",
+      "dest": "/dist/blog/tallyprime-71-is-here-whats-new-and-what-it-means-for-your-business/index.html"
+    },
+    {
+      "src": "^/blog(/)?$",
+      "dest": "/dist/blog/index.html"
+    },
+    {
+      "src": "^/(.*)$",
+      "dest": "/dist/index.html"
+    }
   ]
 }
