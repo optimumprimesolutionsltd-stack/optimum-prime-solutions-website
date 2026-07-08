@@ -81,7 +81,31 @@ export default function BizAnalystPage() {
               <p className="text-lg text-slate-300 mb-8">
                 Monitor your business in real-time — sales, expenses, inventory, KRA compliance, and financial reports — all from your smartphone. No computer needed.
               </p>
-              <div className="flex flex-wrap gap-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <a
+                  href="https://play.google.com/store/apps/details?id=in.bizanalyst"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex"
+                >
+                  <img
+                    src="/badge-google-play.png"
+                    alt="Get it on Google Play"
+                    className="h-12 w-auto hover:opacity-90 transition"
+                  />
+                </a>
+                <a
+                  href="https://apps.apple.com/in/app/biz-analyst-app-for-tally-user/id1164789740"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex"
+                >
+                  <img
+                    src="/badge-app-store.png"
+                    alt="Download on the App Store"
+                    className="h-12 w-auto hover:opacity-90 transition"
+                  />
+                </a>
                 <Link
                   to="/contact?type=bizanalyst"
                   className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-semibold transition"
@@ -89,14 +113,6 @@ export default function BizAnalystPage() {
                   Get Started
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-                <a
-                  href="https://www.bizanalyst.co"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-600 text-slate-300 hover:border-emerald-500 hover:text-emerald-400 transition"
-                >
-                  Download App
-                </a>
               </div>
             </div>
             <div className="relative">
