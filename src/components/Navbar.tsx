@@ -62,6 +62,13 @@ const links: NavLink[] = [
       { label: 'Videos', href: '/knowledge-hub/videos', desc: 'Tutorials & demos' },
     ],
   },
+  {
+    label: 'Biz Analyst',
+    href: '/biz-analyst',
+    children: [
+      { label: 'Biz Analyst App', href: '/biz-analyst', desc: 'Real-time TallyPrime data on your phone' },
+    ],
+  },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Contact', href: '/contact' },
 ];

@@ -1,330 +1,329 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
-        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+<?xml version='1.0' encoding='utf-8'?>
+<ns0:urlset xmlns:ns0="http://www.sitemaps.org/schemas/sitemap/0.9">
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- CORE PAGES                                              -->
-  <!-- ═══════════════════════════════════════════════════════ -->
+  
+  
+  
 
-  <!-- Homepage -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>weekly</ns0:changefreq>
+    <ns0:priority>1.0</ns0:priority>
+  </ns0:url>
 
-  <!-- About -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/about</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/about</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.7</ns0:priority>
+  </ns0:url>
 
-  <!-- Contact -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/contact</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/contact</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- FAQ -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/faq</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/faq</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.7</ns0:priority>
+  </ns0:url>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- TALLYPRIME SOLUTIONS (Phase 0)                          -->
-  <!-- ═══════════════════════════════════════════════════════ -->
+  
+  
+  
 
-  <!-- TallyPrime Solutions — Parent Landing Page -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/tallyprime</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/tallyprime</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>weekly</ns0:changefreq>
+    <ns0:priority>1.0</ns0:priority>
+  </ns0:url>
 
-  <!-- TallyPrime Implementation -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/tallyprime/implementation</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/tallyprime/implementation</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.9</ns0:priority>
+  </ns0:url>
 
-  <!-- TallyPrime Licensing -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/tallyprime/licensing</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/tallyprime/licensing</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.9</ns0:priority>
+  </ns0:url>
 
-  <!-- TallyPrime Cloud Hosting -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/tallyprime/cloud-hosting</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/tallyprime/cloud-hosting</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.9</ns0:priority>
+  </ns0:url>
 
-  <!-- TallyPrime Training -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/tallyprime/training</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/tallyprime/training</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- TallyPrime Support -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/tallyprime/support</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/tallyprime/support</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- TallyPrime Customization -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/tallyprime/customization</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/tallyprime/customization</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- TallyPrime Data Migration -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/tallyprime/data-migration</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/tallyprime/data-migration</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- INDUSTRIES (Phase 0)                                    -->
-  <!-- ═══════════════════════════════════════════════════════ -->
+  
+  
+  
 
-  <!-- Industries — Parent Landing Page -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/industries</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.9</ns0:priority>
+  </ns0:url>
 
-  <!-- Retail -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries/retail</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/industries/retail</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- Distribution -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries/distribution</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/industries/distribution</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- Manufacturing -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries/manufacturing</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/industries/manufacturing</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- Construction -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries/construction</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/industries/construction</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- Hardware & Wholesale -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries/hardware</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/industries/hardware</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- NGOs -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries/ngos</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/industries/ngos</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- Schools -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries/schools</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/industries/schools</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- SACCOs -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries/saccos</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/industries/saccos</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- KNOWLEDGE HUB (Phase 0)                                 -->
-  <!-- ═══════════════════════════════════════════════════════ -->
+  
+  
+  
 
-  <!-- Knowledge Hub — Parent Landing Page -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/knowledge-hub</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>weekly</ns0:changefreq>
+    <ns0:priority>0.9</ns0:priority>
+  </ns0:url>
 
-  <!-- Blog -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/blog</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/blog</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>weekly</ns0:changefreq>
+    <ns0:priority>0.8</ns0:priority>
+  </ns0:url>
 
-  <!-- Guides -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/guides</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/guides</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.7</ns0:priority>
+  </ns0:url>
 
-  <!-- Downloads -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/downloads</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/downloads</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.7</ns0:priority>
+  </ns0:url>
 
-  <!-- Case Studies -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/case-studies</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/case-studies</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.7</ns0:priority>
+  </ns0:url>
 
-  <!-- Videos -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/videos</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/videos</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.7</ns0:priority>
+  </ns0:url>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- PRICING (Phase 0)                                       -->
-  <!-- ═══════════════════════════════════════════════════════ -->
+  
+  
+  
 
-  <!-- Pricing -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/pricing</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.95</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/pricing</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>weekly</ns0:changefreq>
+    <ns0:priority>0.95</ns0:priority>
+  </ns0:url>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- LEGACY URLS (preserved for backward compatibility)      -->
-  <!-- ═══════════════════════════════════════════════════════ -->
+  
+  
+  
 
-  <!-- Legacy: /features (preserved, not removed) -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/features</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/features</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.6</ns0:priority>
+  </ns0:url>
 
-  <!-- Legacy: /products (preserved, not removed) -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/products</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/products</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.6</ns0:priority>
+  </ns0:url>
 
-  <!-- Testimonials -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/testimonials</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
-  </url>
+  
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/testimonials</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.6</ns0:priority>
+  </ns0:url>
 
-  <!-- ═══════════════════════════════════════════════════════ -->
-  <!-- BLOG POSTS                                              -->
-  <!-- ═══════════════════════════════════════════════════════ -->
+  
+  
+  
 
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/blog/why-every-kenyan-business-needs-tally-prime-in-2025</loc>
-    <lastmod>2025-01-15</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/blog/why-every-kenyan-business-needs-tally-prime-in-2025</ns0:loc>
+    <ns0:lastmod>2025-01-15</ns0:lastmod>
+    <ns0:changefreq>yearly</ns0:changefreq>
+    <ns0:priority>0.7</ns0:priority>
+  </ns0:url>
 
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/blog/complete-guide-to-kra-e-filing-with-tally-prime</loc>
-    <lastmod>2025-02-01</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/blog/complete-guide-to-kra-e-filing-with-tally-prime</ns0:loc>
+    <ns0:lastmod>2025-02-01</ns0:lastmod>
+    <ns0:changefreq>yearly</ns0:changefreq>
+    <ns0:priority>0.7</ns0:priority>
+  </ns0:url>
 
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/blog/tally-prime-silver-vs-gold-which-edition-is-right-for-you</loc>
-    <lastmod>2025-02-15</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/blog/tally-prime-silver-vs-gold-which-edition-is-right-for-you</ns0:loc>
+    <ns0:lastmod>2025-02-15</ns0:lastmod>
+    <ns0:changefreq>yearly</ns0:changefreq>
+    <ns0:priority>0.7</ns0:priority>
+  </ns0:url>
 
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/blog/what-is-eos-and-why-kenyan-businesses-are-adopting-it</loc>
-    <lastmod>2025-03-01</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/blog/what-is-eos-and-why-kenyan-businesses-are-adopting-it</ns0:loc>
+    <ns0:lastmod>2025-03-01</ns0:lastmod>
+    <ns0:changefreq>yearly</ns0:changefreq>
+    <ns0:priority>0.7</ns0:priority>
+  </ns0:url>
 
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/blog/tallyprime-cloud-hosting-access-your-business-data-from-anywhere</loc>
-    <lastmod>2025-03-15</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.7</priority>
-  </url>
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/blog/tallyprime-cloud-hosting-access-your-business-data-from-anywhere</ns0:loc>
+    <ns0:lastmod>2025-03-15</ns0:lastmod>
+    <ns0:changefreq>yearly</ns0:changefreq>
+    <ns0:priority>0.7</ns0:priority>
+  </ns0:url>
 
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/blog/tallyprime-7-1-is-here-what-s-new-and-what-it-means-for-your-business</loc>
-    <lastmod>2026-06-01</lastmod>
-    <changefreq>yearly</changefreq>
-    <priority>0.75</priority>
-  </url>
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/blog/tallyprime-7-1-is-here-what-s-new-and-what-it-means-for-your-business</ns0:loc>
+    <ns0:lastmod>2026-06-01</ns0:lastmod>
+    <ns0:changefreq>yearly</ns0:changefreq>
+    <ns0:priority>0.75</ns0:priority>
+  </ns0:url>
 
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/blog/etims-deadline-2026-what-every-kenyan-business-must-do-before-june-30</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.85</priority>
-  </url>
+  <ns0:url>
+    <ns0:loc>https://www.optimumprimesolutions.co.ke/blog/etims-deadline-2026-what-every-kenyan-business-must-do-before-june-30</ns0:loc>
+    <ns0:lastmod>2026-07-08</ns0:lastmod>
+    <ns0:changefreq>monthly</ns0:changefreq>
+    <ns0:priority>0.85</ns0:priority>
+  </ns0:url>
 
-</urlset>
+<ns0:url><ns0:loc>https://www.optimumprimesolutions.co.ke/biz-analyst</ns0:loc><ns0:lastmod>2026-07-08</ns0:lastmod></ns0:url></ns0:urlset>

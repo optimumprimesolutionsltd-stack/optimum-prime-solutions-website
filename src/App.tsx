@@ -28,6 +28,7 @@ import PricingPage from './pages/PricingPage';
 import ComingSoonPage from './pages/ComingSoonPage';
 import NotFoundPage from './pages/NotFoundPage';
 import WebinarPage from './pages/WebinarPage';
+import BizAnalystPage from './pages/BizAnalystPage';
 
 // Phase 2 — Service pages
 import ImplementationPage from './pages/services/ImplementationPage';
@@ -105,6 +106,9 @@ function SiteRoutes() {
           <Route path="/webinar" element={<WebinarPage />} />
           <Route path="/knowledge-hub/webinars" element={<ComingSoonPage />} />
           <Route path="/knowledge-hub/templates" element={<ComingSoonPage />} />
+
+          {/* ── Biz Analyst ── */}
+          <Route path="/biz-analyst" element={<BizAnalystPage />} />
 
           {/* ── Pricing ── */}
           <Route path="/pricing" element={<PricingPage />} />
