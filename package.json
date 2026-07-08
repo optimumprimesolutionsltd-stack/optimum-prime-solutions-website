@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node prerender.mjs",
+    "prerender": "node prerender.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -33,6 +34,7 @@
     "puppeteer-core": "^25.3.0",
     "tailwindcss": "4.1.17",
     "typescript": "5.9.3",
+    "vercel": "^54.21.1",
     "vite": "7.3.2",
     "vite-plugin-singlefile": "2.3.0"
   },
