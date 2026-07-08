@@ -169,6 +169,7 @@ export default function BookDemoManager() {
       )}
 
       {view === 'book' && (
+        <div className="space-y-6">
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Client Details */}
           <div className="rounded-2xl border border-navy-200 bg-white p-6 space-y-4">
@@ -435,19 +436,21 @@ export default function BookDemoManager() {
               </div>
             </div>
 
-            {/* Submit button — full width, always visible */}
-            <button
-              onClick={handleSubmit}
-              disabled={submitting}
-              className="w-full flex items-center justify-center gap-2 rounded-2xl bg-accent hover:bg-accent/90 disabled:opacity-60 px-8 py-4 text-base font-bold text-white shadow-lg shadow-accent/20 transition"
-            >
-              {submitting ? (
-                <><Loader2 className="h-5 w-5 animate-spin" /> Sending notifications...</>
-              ) : (
-                <><Send className="h-5 w-5" /> Book Demo &amp; Notify All</>
-              )}
-            </button>
           </div>
+        </div>
+
+        {/* Submit button — outside grid, full width */}
+        <button
+          onClick={handleSubmit}
+          disabled={submitting}
+          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-accent hover:bg-accent/90 disabled:opacity-60 px-8 py-4 text-base font-bold text-white shadow-lg shadow-accent/20 transition"
+        >
+          {submitting ? (
+            <><Loader2 className="h-5 w-5 animate-spin" /> Sending notifications...</>
+          ) : (
+            <><Send className="h-5 w-5" /> Book Demo &amp; Notify All</>
+          )}
+        </button>
         </div>
       )}
 
