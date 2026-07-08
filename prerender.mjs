@@ -33,6 +33,7 @@ const routes = [
   '/industries/ngos',
   '/industries/schools',
   '/industries/saccos',
+  '/biz-analyst',
 ];
 
 const MIME_TYPES = {
@@ -137,6 +138,7 @@ async function prerender() {
       '/industries/manufacturing', '/industries/distribution', '/industries/retail',
       '/industries/construction', '/industries/hardware', '/industries/ngos',
       '/industries/schools', '/industries/saccos',
+      '/biz-analyst',
     ];
     for (const route of routes) {
       if (route !== '/') {
