@@ -1,0 +1,23 @@
+# Robots.txt for Optimum Prime Solutions
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /*.json$
+Disallow: /*?*sort=
+Disallow: /*?*filter=
+Disallow: /api/
+Disallow: /.well-known/
+
+# Sitemaps
+Sitemap: https://www.optimumprimesolutions.co.ke/sitemap.xml
+
+# Google
+User-agent: Googlebot
+Allow: /
+
+# Bing
+User-agent: Bingbot
+Allow: /
+
+# Crawl delay to prevent overloading server
+Crawl-delay: 1

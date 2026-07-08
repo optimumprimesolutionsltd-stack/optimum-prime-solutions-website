@@ -1,0 +1,32 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Tally 7.0 logo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f5f8ff" />
+      <stop offset="100%" stop-color="#dbeefe" />
+    </linearGradient>
+    <linearGradient id="darkBlue" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0c4c7a" />
+      <stop offset="100%" stop-color="#0a3f68" />
+    </linearGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f6bf2d" />
+      <stop offset="100%" stop-color="#d79f10" />
+    </linearGradient>
+    <linearGradient id="teal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#51b3d5" />
+      <stop offset="100%" stop-color="#2d89b5" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1200" height="360" rx="32" fill="url(#bg)" />
+  <g transform="translate(280,50)">
+    <rect width="640" height="260" rx="32" fill="#ffffff" opacity="0.95" />
+    <rect x="48" y="32" width="220" height="118" rx="24" fill="url(#darkBlue)" />
+    <rect x="48" y="158" width="108" height="104" rx="18" fill="url(#gold)" />
+    <rect x="160" y="158" width="108" height="104" rx="18" fill="url(#teal)" />
+    <path d="M 64 48 H 248" stroke="#ffffff" stroke-width="6" opacity="0.18" />
+    <text x="360" y="96" font-family="Inter, system-ui, sans-serif" font-size="78" font-weight="800" fill="#0c4c7a">Tally</text>
+    <text x="360" y="168" font-family="Inter, system-ui, sans-serif" font-size="78" font-weight="800" fill="#0c4c7a">7.0</text>
+    <text x="360" y="232" font-family="Inter, system-ui, sans-serif" font-size="28" font-weight="700" fill="#0a3f68">Cloud-ready TallyPrime experience</text>
+  </g>
+</svg>
