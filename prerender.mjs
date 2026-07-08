@@ -163,15 +163,17 @@ async function prerender() {
         }
         
         // KEY FIX: Inject the rendered body into the original SPA shell
-        // This preserves the original <head> with SEO meta tags (no duplicates)
-        const headMatch = spaShell.match(/<head>[\s\S]*?<\/head>/);
-        const headHtml = headMatch ? headMatch[0] : '';
+        // Preserve DOCTYPE + <head> from original, replace <body> with prerendered content
+        const doctypeMatch = spaShell.match(/<!DOCTYPE[^>]*>/i);
+        const doctype = doctypeMatch ? doctypeMatch[0] : '<!DOCTYPE html>';
         
         const bodyMatch = html.match(/<body[^>]*>[\s\S]*?<\/body>/);
         const bodyHtml = bodyMatch ? bodyMatch[0] : '';
         
-        // Reconstruct the HTML with original head + prerendered body
-        const finalHtml = spaShell.replace(
+        // Reconstruct: DOCTYPE + original shell with replaced body
+        const finalHtml = doctype + '\n' + spaShell.replace(
+          /<!DOCTYPE[^>]*>\s*\n?/i, ''
+        ).replace(
           /<body[^>]*>[\s\S]*?<\/body>/,
           bodyHtml
         );
