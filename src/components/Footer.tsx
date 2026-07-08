@@ -25,6 +25,10 @@ const tallyPrimeLinks = [
   { l: 'Customization (TDL)', h: '/tallyprime/customization' },
 ];
 
+const upcomingEvents = [
+  { l: 'Free TallyPrime 7.1 Webinar', h: '/webinar', badge: 'Live — Wed 15 July' },
+];
+
 export default function Footer() {
   const { data } = useSite();
   const [newsletterEmail, setNewsletterEmail] = useState('');
@@ -50,7 +54,7 @@ export default function Footer() {
   return (
     <footer className="bg-gradient-to-br from-slate-50 via-sky-50 to-white text-slate-900">
       <div className="mx-auto max-w-7xl space-y-12 px-4 py-16 sm:px-6 lg:px-8">
-        <div className="rounded-4xl bg-white/90 p-8 grid gap-8 lg:grid-cols-[1.4fr_0.9fr_0.9fr_1fr] shadow-2xl shadow-slate-200/20 ring-1 ring-slate-200/70">
+        <div className="rounded-4xl bg-white/90 p-8 grid gap-8 lg:grid-cols-[1.4fr_0.8fr_0.8fr_0.8fr_0.9fr] shadow-2xl shadow-slate-200/20 ring-1 ring-slate-200/70">
           {/* Brand Column */}
           <div className="space-y-5">
             <div className="flex flex-col items-start gap-4">
@@ -137,6 +141,39 @@ export default function Footer() {
                   </Link>
                 </li>
               ))}
+            </ul>
+          </div>
+
+          {/* Upcoming Events */}
+          <div className="rounded-3xl bg-slate-50 p-8">
+            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Upcoming Events</h3>
+            <ul className="space-y-2 text-sm">
+              {upcomingEvents.map((event) => (
+                <li key={event.h}>
+                  <Link
+                    to={event.h}
+                    onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                    className="block rounded-2xl px-3 py-2 text-slate-700 transition hover:bg-slate-100 hover:text-red-600"
+                  >
+                    <div className="flex items-center justify-between gap-2">
+                      <span>{event.l}</span>
+                      <span className="inline-flex items-center gap-1 rounded-full bg-red-600/10 px-2 py-0.5 text-[11px] font-semibold text-red-600 border border-red-500/20">
+                        <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-pulse" />
+                        {event.badge}
+                      </span>
+                    </div>
+                  </Link>
+                </li>
+              ))}
+              <li className="pt-2">
+                <Link
+                  to="/knowledge-hub"
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="block rounded-2xl px-3 py-2 text-slate-500 text-xs transition hover:bg-slate-100 hover:text-red-600"
+                >
+                  View all events & webinars →
+                </Link>
+              </li>
             </ul>
           </div>
 

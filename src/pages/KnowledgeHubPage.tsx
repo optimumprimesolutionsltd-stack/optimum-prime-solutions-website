@@ -62,10 +62,10 @@ const resources = [
     icon: BookMarked,
     title: 'Webinars',
     desc: 'Live and recorded webinars on TallyPrime features, KRA compliance deadlines, and business management.',
-    href: '/knowledge-hub/webinars',
+    href: '/webinar',
     cta: 'View Webinars',
     color: 'bg-teal-50 text-teal-600',
-    badge: 'Coming Soon',
+    badge: 'Live — 15 July',
   },
   {
     icon: Layout,
@@ -162,7 +162,7 @@ breadcrumbs={[
                       <Icon className="h-6 w-6" />
                     </div>
                     <span className={`text-xs font-semibold rounded-full px-2.5 py-0.5 ${
-                      resource.badge === 'Live' || resource.badge === 'Latest Articles'
+                      resource.badge === 'Live' || resource.badge === 'Latest Articles' || resource.badge.startsWith('Live')
                         ? 'bg-green-100 text-green-700'
                         : 'bg-slate-100 text-slate-500'
                     }`}>
