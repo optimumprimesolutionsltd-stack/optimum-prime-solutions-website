@@ -723,7 +723,13 @@ export default function LeadsManager({ data, onSave }: P) {
       ) : (
         <div className="space-y-3">
           {filtered.map(l => (
-            <div key={l.id} className={`rounded-2xl border bg-white overflow-hidden transition ${expandedId === l.id ? 'border-accent/30 shadow-md' : 'border-navy-200'}`}>
+            <div key={l.id} className={`rounded-2xl border overflow-hidden transition ${
+                l.status === 'New'
+                  ? 'border-accent bg-red-50/30 shadow-sm shadow-accent/10'
+                  : expandedId === l.id
+                  ? 'border-accent/30 bg-white shadow-md'
+                  : 'border-navy-200 bg-white'
+              }`}>
               {/* Lead row */}
               <div className="flex items-center gap-4 p-4 cursor-pointer" onClick={() => setExpandedId(expandedId === l.id ? null : l.id)}>
                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-navy-700 to-navy-900 flex items-center justify-center text-xs font-bold text-white shrink-0">
@@ -757,23 +763,32 @@ export default function LeadsManager({ data, onSave }: P) {
               {/* Expanded detail */}
               {expandedId === l.id && (
                 <div className="border-t border-navy-100 p-5 space-y-4">
-                  {/* Info grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="flex items-start gap-2">
+                  {/* Info grid — 2 cols on mobile, 3 cols on sm+ to prevent overlap */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+                    <div className="flex items-start gap-2 min-w-0">
                       <Mail className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
-                      <div><p className="text-[10px] text-navy-500 font-medium">Email</p><p className="text-sm text-navy-900">{l.email || '—'}</p></div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-navy-500 font-medium">Email</p>
+                        <p className="text-sm text-navy-900 break-all">{l.email || '—'}</p>
+                      </div>
                     </div>
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-2 min-w-0">
                       <Phone className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
-                      <div><p className="text-[10px] text-navy-500 font-medium">Phone</p><p className="text-sm text-navy-900">{l.phone}</p></div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-navy-500 font-medium">Phone</p>
+                        <p className="text-sm text-navy-900">{l.phone}</p>
+                      </div>
                     </div>
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-2 min-w-0">
                       <Building2 className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
-                      <div><p className="text-[10px] text-navy-500 font-medium">Company</p><p className="text-sm text-navy-900">{l.company || '—'}</p></div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] text-navy-500 font-medium">Company</p>
+                        <p className="text-sm text-navy-900 truncate">{l.company || '—'}</p>
+                      </div>
                     </div>
-                    <div className="flex items-start gap-2">
+                    <div className="flex items-start gap-2 min-w-0">
                       <Calendar className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
-                      <div>
+                      <div className="min-w-0">
                         <p className="text-[10px] text-navy-500 font-medium">Requested Slot</p>
                         <p className="text-sm text-navy-900">
                           {l.demoDate
@@ -782,11 +797,14 @@ export default function LeadsManager({ data, onSave }: P) {
                         </p>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-3">
-                    <div><p className="text-[10px] text-navy-500 font-medium mb-0.5">Industry</p><p className="text-sm text-navy-900">{l.industry || l.businessType || '—'}</p></div>
-                    <div><p className="text-[10px] text-navy-500 font-medium mb-0.5">Current Software</p><p className="text-sm text-navy-900">{l.currentSoftware || '—'}</p></div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-navy-500 font-medium mb-0.5">Industry</p>
+                      <p className="text-sm text-navy-900 truncate">{l.industry || l.businessType || '—'}</p>
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] text-navy-500 font-medium mb-0.5">Current Software</p>
+                      <p className="text-sm text-navy-900 truncate">{l.currentSoftware || '—'}</p>
+                    </div>
                   </div>
 
                   {l.message && (
