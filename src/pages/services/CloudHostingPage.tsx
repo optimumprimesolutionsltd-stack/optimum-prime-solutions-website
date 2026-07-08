@@ -168,7 +168,7 @@ breadcrumbs={[
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-14">
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Cloud Hosting Plans</h2>
-            <p className="text-slate-600 max-w-xl mx-auto">Contact us for current pricing — plans are tailored to your number of users and storage requirements.</p>
+            <p className="text-slate-600 max-w-xl mx-auto">Cloud hosting <span className="font-bold text-sky-600">from as low as KES 3,000 per month</span>. Plans are tailored to your number of users and storage requirements.</p>
           </div>
           <div className="grid gap-6 sm:grid-cols-3">
             {plans.map((plan, i) => (
