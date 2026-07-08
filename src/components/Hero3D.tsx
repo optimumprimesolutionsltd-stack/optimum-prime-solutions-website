@@ -54,6 +54,7 @@ export default function Hero3D() {
               {[
                 { title: 'Certified Tally Partner', description: 'Official TallyPrime reseller & implementation expert.' },
                 { title: 'Cloud & Remote Access', description: 'Secure cloud hosting with anywhere access.' },
+                { title: 'Biz Analyst Mobile App', description: 'Real-time TallyPrime data on your mobile phone — anytime, anywhere.' },
                 { title: 'EOS® Consulting', description: 'Run your business on the Entrepreneurial Operating System.' },
                 { title: 'HubSpot CRM Integration', description: 'Connect your sales pipeline to TallyPrime for a 360° business view.' },
               ].map((item) => (
@@ -81,6 +82,7 @@ export default function Hero3D() {
               <div className="space-y-3 px-4 pb-4 sm:px-6 sm:pb-6">
                 {[
                   { title: 'TallyPrime Sales & Licensing', description: 'Official Silver, Gold & Enterprise editions at best prices.' },
+                  { title: 'Biz Analyst Mobile App', description: 'Access real-time accounting data on your phone — monitor sales, expenses & KRA compliance on the go.' },
                   { title: 'Cloud Hosting & Remote Access', description: 'Access your TallyPrime data securely from anywhere.' },
                   { title: 'EOS® Business Operating System', description: 'Strengthen Vision, People, Data, Process & Traction in your business.' },
                 ].map((item) => (

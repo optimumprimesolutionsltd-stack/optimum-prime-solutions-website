@@ -30,6 +30,15 @@ const partners = [
     logoClass: 'h-8 object-contain',
   },
   {
+    name: 'Biz Analyst',
+    logo: '/partner-biz-analyst.png',
+    description: 'Biz Analyst is the official TallyPrime mobile app that brings your accounting data to your fingertips. Monitor sales, expenses, inventory, and KRA compliance in real-time from your phone — no computer needed.',
+    badge: 'Mobile App Partner',
+    badgeColor: 'bg-emerald-100 text-emerald-700',
+    url: 'https://www.bizanalyst.co',
+    logoClass: 'h-10 object-contain',
+  },
+  {
     name: 'TSplus',
     logo: '/partner-tsplus.png',
     description: 'TSplus enables secure remote desktop access to TallyPrime from any device, anywhere. We deploy and manage TSplus infrastructure so your team can access business data remotely without complex VPN setups or expensive Citrix licensing.',
@@ -114,7 +123,7 @@ export default function Partners() {
             ))}
           </div>
           <p className="text-sm text-slate-400">
-            <span className="font-semibold text-white">Certified across 4 platforms.</span>{' '}
+            <span className="font-semibold text-white">Certified across 5 platforms.</span>{' '}
             One trusted partner to implement, integrate, and support them all for your business.
           </p>
         </div>

@@ -380,7 +380,7 @@ export default function Chatbot() {
                 <button
                   onClick={() => handleSend(input)}
                   disabled={!input.trim() || typing}
-                  className="p-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 disabled:opacity-50 transition-colors"
+                  className="p-2.5 bg-[#25D366] text-white rounded-xl hover:bg-[#1ebe5d] disabled:opacity-50 transition-colors"
                   aria-label="Send message"
                 >
                   <Send className="h-4 w-4" />

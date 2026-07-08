@@ -83,7 +83,7 @@ export const defaultData: SiteData = {
     {id:'4',name:'EOS®',edition:'Implementation',price:'Contact for Quote',period:'per engagement',features:['Full EOS® implementation program','Vision/Traction Organizer (V/TO)','Rocks & 90-day priority setting','L10 weekly leadership meetings','People Analyser & accountability','Quarterly & annual planning days','Certified EOS Implementer® led'],cta:'Book EOS Session'},
   ],
   testimonials: [
-    {id:'1',name:'James Mwangi',role:'CEO',company:'Mwangi Enterprises Ltd',text:'Optimum Prime Solutions transformed our accounting. The KRA compliance module alone has saved us countless hours. Their team is professional and responsive.',rating:5},
+    {id:'1',name:'Frederick Chege',role:'CEO',company:'Ujenzi Distributors Ltd',text:'Optimum Prime Solutions transformed our accounting. The KRA compliance module alone has saved us countless hours. Their team is professional and responsive.',rating:5},
     {id:'2',name:'Grace Wanjiku',role:'Finance Director',company:'Wanjiku Manufacturing',text:'The manufacturing module is a game-changer. Real-time production cost tracking and BOM management have improved our margins by 18%.',rating:5},
     {id:'3',name:'Peter Ochieng',role:'Managing Director',company:'Ochieng Trading Co.',text:'Complete visibility of stock across 5 locations. Inventory discrepancies dropped by 95% after implementing their solution.',rating:5},
     {id:'4',name:'Mary Njeri',role:'HR Manager',company:'Njeri Group',text:'Payroll processing that used to take 3 days now takes 2 hours. The PAYE, NHIF, and NSSF calculations are always accurate.',rating:5},
