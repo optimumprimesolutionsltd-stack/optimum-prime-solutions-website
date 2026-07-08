@@ -169,7 +169,7 @@ export default function BookDemoManager() {
       )}
 
       {view === 'book' && (
-        <div className="space-y-6">
+        <div className="space-y-6 pb-10">
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Client Details */}
           <div className="rounded-2xl border border-navy-200 bg-white p-6 space-y-4">
