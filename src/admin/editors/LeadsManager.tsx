@@ -591,23 +591,48 @@ export default function LeadsManager({ data, onSave }: P) {
         {/* Status filter tabs */}
         <div className="flex flex-wrap gap-2">
           {(['All', ...statuses] as string[]).map(s => {
-            const tabStyles: Record<string, string> = {
-              'All':            filterStatus === 'All'            ? 'bg-navy-800 text-white border-navy-800'            : 'bg-white text-navy-600 border-navy-300 hover:bg-navy-50',
-              'New':            filterStatus === 'New'            ? 'bg-red-500 text-white border-red-500'              : 'bg-red-50 text-red-600 border-red-200 hover:bg-red-100',
-              'Contacted':      filterStatus === 'Contacted'      ? 'bg-blue-500 text-white border-blue-500'            : 'bg-blue-50 text-blue-600 border-blue-200 hover:bg-blue-100',
-              'Qualified':      filterStatus === 'Qualified'      ? 'bg-purple-500 text-white border-purple-500'        : 'bg-purple-50 text-purple-600 border-purple-200 hover:bg-purple-100',
-              'Demo Scheduled': filterStatus === 'Demo Scheduled' ? 'bg-amber-500 text-white border-amber-500'          : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100',
-              'Closed Won':     filterStatus === 'Closed Won'     ? 'bg-green-600 text-white border-green-600'          : 'bg-green-50 text-green-700 border-green-200 hover:bg-green-100',
-              'Closed Lost':    filterStatus === 'Closed Lost'    ? 'bg-slate-500 text-white border-slate-500'          : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100',
+            // Inline styles bypass Tailwind purge for dynamic colours
+            type TabPalette = { bg: string; text: string; border: string; badgeBg: string; badgeText: string };
+            const palette: Record<string, TabPalette> = {
+              'All':            { bg: '#1e3a5f', text: '#fff',    border: '#1e3a5f', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
+              'New':            { bg: '#ef4444', text: '#fff',    border: '#ef4444', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
+              'Contacted':      { bg: '#3b82f6', text: '#fff',    border: '#3b82f6', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
+              'Qualified':      { bg: '#8b5cf6', text: '#fff',    border: '#8b5cf6', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
+              'Demo Scheduled': { bg: '#f59e0b', text: '#fff',    border: '#f59e0b', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
+              'Closed Won':     { bg: '#16a34a', text: '#fff',    border: '#16a34a', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
+              'Closed Lost':    { bg: '#64748b', text: '#fff',    border: '#64748b', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
             };
+            const inactiveBg: Record<string, string> = {
+              'All': '#f1f5f9', 'New': '#fef2f2', 'Contacted': '#eff6ff',
+              'Qualified': '#f5f3ff', 'Demo Scheduled': '#fffbeb',
+              'Closed Won': '#f0fdf4', 'Closed Lost': '#f8fafc',
+            };
+            const inactiveText: Record<string, string> = {
+              'All': '#475569', 'New': '#dc2626', 'Contacted': '#2563eb',
+              'Qualified': '#7c3aed', 'Demo Scheduled': '#b45309',
+              'Closed Won': '#15803d', 'Closed Lost': '#475569',
+            };
+            const isActive = filterStatus === s;
+            const p = palette[s];
             const count = s === 'All' ? data.leads.length : data.leads.filter(l => l.status === s).length;
             return (
-              <button key={s} onClick={() => setFilterStatus(s)}
-                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap flex items-center gap-1.5 ${tabStyles[s] || 'bg-white text-navy-600 border-navy-300 hover:bg-navy-50'}`}>
+              <button
+                key={s}
+                onClick={() => setFilterStatus(s)}
+                className="rounded-full border px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap flex items-center gap-1.5"
+                style={isActive && p
+                  ? { backgroundColor: p.bg, color: p.text, borderColor: p.border }
+                  : { backgroundColor: inactiveBg[s] || '#f8fafc', color: inactiveText[s] || '#475569', borderColor: 'transparent' }
+                }
+              >
                 {s}
-                <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
-                  filterStatus === s ? 'bg-white/25 text-white' : 'bg-navy-100 text-navy-600'
-                }`}>{count}</span>
+                <span
+                  className="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+                  style={isActive && p
+                    ? { backgroundColor: p.badgeBg, color: p.badgeText }
+                    : { backgroundColor: '#e2e8f0', color: '#475569' }
+                  }
+                >{count}</span>
               </button>
             );
           })}
@@ -833,8 +858,15 @@ export default function LeadsManager({ data, onSave }: P) {
               {/* Expanded detail */}
               {expandedId === l.id && (
                 <div className="border-t border-navy-100 p-5 space-y-4">
-                  {/* Info grid — 2 cols on mobile, 3 cols on sm+ to prevent overlap */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
+                  {/* Info grid — always 1 col on mobile, 2 cols on sm, 3 cols on lg */}
+                  <div style={{ display: 'grid', gap: '12px 24px', gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}
+                    className="sm:grid-cols-2-override lg:grid-cols-3-override"
+                    ref={el => {
+                      if (!el) return;
+                      const w = window.innerWidth;
+                      el.style.gridTemplateColumns = w >= 1024 ? 'repeat(3,minmax(0,1fr))' : w >= 640 ? 'repeat(2,minmax(0,1fr))' : 'repeat(1,minmax(0,1fr))';
+                    }}
+                  >
                     <div className="flex items-start gap-2 min-w-0">
                       <Mail className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
                       <div className="min-w-0">
