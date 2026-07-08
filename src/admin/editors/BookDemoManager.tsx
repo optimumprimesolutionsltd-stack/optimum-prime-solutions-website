@@ -435,7 +435,9 @@ export default function BookDemoManager() {
               </div>
             </div>
 
-            <div className="mt-6 flex justify-end">
+            {/* Sticky submit bar */}
+            <div className="sticky bottom-0 left-0 right-0 z-20 bg-white border-t border-navy-200 px-6 py-4 flex items-center justify-between shadow-lg">
+              <p className="text-xs text-navy-500">All required fields must be filled before submitting.</p>
               <button
                 onClick={handleSubmit}
                 disabled={submitting}
@@ -444,7 +446,7 @@ export default function BookDemoManager() {
                 {submitting ? (
                   <><Loader2 className="h-4 w-4 animate-spin" /> Sending notifications...</>
                 ) : (
-                  <><Send className="h-4 w-4" /> Book Demo & Notify All</>
+                  <><Send className="h-4 w-4" /> Book Demo &amp; Notify All</>
                 )}
               </button>
             </div>
