@@ -105,5 +105,10 @@
       "src": "^/(.*)$",
       "dest": "/index.html"
     }
-  ]
+  ],
+  "build": {
+    "env": {
+      "PUPPETEER_SKIP_DOWNLOAD": "true"
+    }
+  }
 }

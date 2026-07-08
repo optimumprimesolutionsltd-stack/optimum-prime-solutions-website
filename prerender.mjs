@@ -88,9 +88,13 @@ function createStaticServer(distDir, port) {
 }
 
 async function prerender() {
+  const isVercel = process.env.VERCEL === '1';
+  const isCI = process.env.CI === 'true';
+  
   console.log('='.repeat(60));
   console.log('OPTIMUM PRIME SOLUTIONS - PRE-RENDER PIPELINE');
   console.log('='.repeat(60));
+  console.log(`Environment: ${isVercel ? 'Vercel CI' : 'Local'} (CI=${isCI})`);
   
   // Save the SPA shell BEFORE prerendering (it has the SEO head)
   const spaShell = readFileSync(join(__dirname, 'dist', 'index.html'), 'utf-8');
@@ -107,7 +111,75 @@ async function prerender() {
     }
   }
   
-  // Prerender with Puppeteer
+  // Skip Puppeteer on Vercel - use pre-built dist/ committed to git
+  if (isVercel) {
+    console.log('\nPhase 2: Running on Vercel CI - skipping Puppeteer prerender.');
+    console.log('  Using pre-built SSG dist/ from git.');
+    
+    // Copy public assets
+    console.log('\nPhase 3: Copying public assets to dist...');
+    const publicFiles = ['sitemap.xml', 'robots.txt', '3fd67103052cd75b3b1146cf0670b20e.txt', 'manifest.json'];
+    for (const file of publicFiles) {
+      const src = join(__dirname, 'public', file);
+      const dst = join(__dirname, 'dist', file);
+      if (existsSync(src)) {
+        copyFileSync(src, dst);
+        console.log(`  Copied: ${file}`);
+      }
+    }
+    
+    // Create route directories from SPA shell for any missing routes
+    const routes = [
+      '/', '/about', '/tallyprime', '/industries', '/pricing', '/contact',
+      '/faq', '/blog', '/knowledge-hub',
+      '/tallyprime/implementation', '/tallyprime/licensing', '/tallyprime/cloud-hosting',
+      '/tallyprime/training', '/tallyprime/support', '/tallyprime/customization', '/tallyprime/data-migration',
+      '/industries/manufacturing', '/industries/distribution', '/industries/retail',
+      '/industries/construction', '/industries/hardware', '/industries/ngos',
+      '/industries/schools', '/industries/saccos',
+    ];
+    for (const route of routes) {
+      if (route !== '/') {
+        const outputPath = join(__dirname, 'dist', route, 'index.html');
+        if (!existsSync(outputPath)) {
+          if (!existsSync(dirname(outputPath))) {
+            mkdirSync(dirname(outputPath), { recursive: true });
+          }
+          writeFileSync(outputPath, spaShell);
+          console.log(`  Created fallback: ${route}`);
+        }
+      }
+    }
+    
+    console.log('\nPhase 4: Verifying prerendered output...');
+    const finalHtml = readFileSync(join(__dirname, 'dist', 'index.html'), 'utf-8');
+    const checks = {
+      hasHeadSEO: finalHtml.includes('<title>') && finalHtml.includes('name="description"'),
+      hasNoDuplicateHead: (finalHtml.match(/<title>/g) || []).length === 1,
+      hasBodyContent: finalHtml.includes('<h1') || finalHtml.includes('<h2'),
+      hasSemanticMain: finalHtml.includes('<main'),
+      hasSchema: finalHtml.includes('application/ld+json'),
+      hasCanonical: finalHtml.includes('rel="canonical"'),
+      hasSkipNav: finalHtml.includes('skip-nav'),
+    };
+    const passed = Object.entries(checks).filter(([, v]) => v).length;
+    const total = Object.keys(checks).length;
+    console.log(`  Verification: ${passed}/${total} checks passed`);
+    
+    const { execSync } = await import('child_process');
+    try {
+      const count = execSync(`find ${join(__dirname, 'dist')} -name "index.html" | wc -l`, { encoding: 'utf-8' }).trim();
+      const totalSize = execSync(`du -sh ${join(__dirname, 'dist')} | cut -f1`, { encoding: 'utf-8' }).trim();
+      console.log(`\nFinal: ${count} HTML files, ${totalSize} total`);
+    } catch {}
+    
+    console.log('\n' + '='.repeat(60));
+    console.log('PRE-RENDER PIPELINE COMPLETE (Vercel mode)');
+    console.log('='.repeat(60));
+    return;
+  }
+  
+  // Prerender with Puppeteer (local only)
   console.log('\nPhase 2: SSG prerendering with Puppeteer...');
   
   try {
