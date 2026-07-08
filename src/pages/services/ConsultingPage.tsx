@@ -81,8 +81,8 @@ export default function ConsultingPage() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
-                to="/contact#demo-form"
-                className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition"
+                to="/contact?type=consultation#demo-form"
+                className="inline-flex items-center gap-2 rounded-full bg-purple-600 hover:bg-purple-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition"
               >
                 Book a Free Introductory Session <ArrowRight className="h-4 w-4" />
               </Link>
@@ -180,7 +180,7 @@ export default function ConsultingPage() {
               </p>
               <div className="space-y-3">
                 <Link
-                  to="/contact#demo-form"
+                  to="/contact?type=consultation#demo-form"
                   className="flex items-center justify-center gap-2 rounded-full bg-white text-emerald-700 hover:bg-emerald-50 font-semibold px-6 py-3 text-sm transition w-full"
                 >
                   Book Your Free Session <ArrowRight className="h-4 w-4" />

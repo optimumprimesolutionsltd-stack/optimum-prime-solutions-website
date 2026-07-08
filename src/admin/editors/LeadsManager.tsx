@@ -854,6 +854,16 @@ export default function LeadsManager({ data, onSave }: P) {
                 >
                   {l.status}
                 </span>
+                {l.requestType && (
+                  <span
+                    className="rounded-full px-2 py-0.5 text-[9px] font-semibold whitespace-nowrap hidden sm:inline"
+                    style={l.requestType === 'consultation'
+                      ? { backgroundColor: '#8b5cf6', color: '#fff' }
+                      : { backgroundColor: '#0ea5e9', color: '#fff' }}
+                  >
+                    {l.requestType === 'consultation' ? '🤝 Consultation' : '📊 Demo'}
+                  </span>
+                )}
                 {l.scheduledDate && (
                   <span className="text-[10px] text-navy-400 hidden sm:block whitespace-nowrap">
                     📅 {new Date(l.scheduledDate + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}

@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Loader } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
@@ -16,6 +17,16 @@ export default function Contact() {
   const [loading, setLoading] = useState(false);
   const [serverError, setServerError] = useState<string | null>(null);
   const [errors, setErrors] = useState<ValidationError[]>([]);
+  const [searchParams] = useSearchParams();
+  const [requestType, setRequestType] = useState<'demo' | 'consultation'>(
+    searchParams.get('type') === 'consultation' ? 'consultation' : 'demo'
+  );
+
+  useEffect(() => {
+    if (searchParams.get('type') === 'consultation') {
+      setRequestType('consultation');
+    }
+  }, [searchParams]);
   const [form, setForm] = useState<FormData>({
     name: '',
     company: '',
@@ -126,11 +137,13 @@ export default function Contact() {
         message: form.message,
         createdAt: lead.createdAt,
         status: 'New',
+        requestType,
       });
 
       update({ ...data, leads: [...data.leads, lead] });
-      await sendEmailNotification(form);
+      await sendEmailNotification(form, requestType);
       setOk(true);
+      setRequestType('demo');
       setForm({
         name: '',
         company: '',
@@ -152,7 +165,7 @@ export default function Contact() {
     }
   };
 
-  const sendEmailNotification = async (formData: FormData) => {
+  const sendEmailNotification = async (formData: FormData, reqType: 'demo' | 'consultation' = 'demo') => {
     try {
       const response = await fetch('https://optimum-prime-lead-notifier.onrender.com/new-lead', {
         method: 'POST',
@@ -167,7 +180,8 @@ export default function Contact() {
           demoDate: formData.demoDate,
           demoTime: formData.demoTime,
           message: formData.message,
-          interest: 'TallyPrime Demo',
+          interest: reqType === 'consultation' ? 'EOS® Business Consultation' : 'TallyPrime Demo',
+          requestType: reqType,
           source: 'Website — Contact Form',
         }),
       });
@@ -250,13 +264,39 @@ export default function Contact() {
 
           <div id="demo-form" className="lg:col-span-3">
             <div className="rounded-[2rem] border border-white/10 bg-slate-800 p-8 shadow-xl text-white">
+              {/* Request type toggle */}
+              <div className="mb-6 flex rounded-2xl border border-white/10 bg-slate-900 p-1 gap-1">
+                <button
+                  type="button"
+                  onClick={() => setRequestType('demo')}
+                  className="flex-1 rounded-xl py-3 text-sm font-semibold transition"
+                  style={requestType === 'demo' ? { backgroundColor: '#e53e3e', color: '#fff' } : { backgroundColor: 'transparent', color: '#94a3b8' }}
+                >
+                  📊 Book a Demo
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRequestType('consultation')}
+                  className="flex-1 rounded-xl py-3 text-sm font-semibold transition"
+                  style={requestType === 'consultation' ? { backgroundColor: '#8b5cf6', color: '#fff' } : { backgroundColor: 'transparent', color: '#94a3b8' }}
+                >
+                  🤝 Book a Consultation
+                </button>
+              </div>
+
               <div className="mb-6 rounded-2xl bg-sky-600/20 border border-sky-500/30 px-6 py-5">
                 <div className="flex items-center gap-3 mb-2">
                   <span className="flex h-3 w-3 rounded-full bg-sky-400 animate-pulse" />
                   <p className="text-xs font-bold uppercase tracking-[0.2em] text-sky-400">Step 1 — Fill in your details below</p>
                 </div>
-                <h3 className="text-xl font-bold text-white">Book your free TallyPrime demo</h3>
-                <p className="mt-1 text-sm text-slate-300">Complete the form and our team will confirm your demo within 24 hours.</p>
+                <h3 className="text-xl font-bold text-white">
+                  {requestType === 'consultation' ? 'Book a free EOS® Business Consultation' : 'Book your free TallyPrime demo'}
+                </h3>
+                <p className="mt-1 text-sm text-slate-300">
+                  {requestType === 'consultation'
+                    ? 'Complete the form and our EOS® consultant will confirm your session within 24 hours.'
+                    : 'Complete the form and our team will confirm your demo within 24 hours.'}
+                </p>
               </div>
 
               {serverError && (
