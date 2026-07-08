@@ -4,7 +4,18 @@ export interface TestimonialItem { id:string; name:string; role:string; company:
 export interface FaqItem { id:string; q:string; a:string; cat:string }
 export interface IndustryItem { id:string; name:string; icon:string; desc:string }
 export interface BlogPost { id:string; title:string; excerpt:string; date:string; category:string; readTime:string; content:string; youtubeUrl?:string }
-export interface Lead { id:string; name:string; company:string; phone:string; email:string; businessType:string; demoDate:string; currentSoftware:string; message:string; createdAt:string; status:string }
+export interface Lead {
+  id:string; name:string; company:string; phone:string; email:string;
+  businessType:string; demoDate:string; currentSoftware:string; message:string;
+  createdAt:string; status:string;
+  // Scheduling fields (set when status → Demo Scheduled)
+  scheduledDate?: string; scheduledTime?: string;
+  demoType?: 'online' | 'physical'; demoLocation?: string;
+  teamMemberName?: string; teamMemberPhone?: string;
+  meetLink?: string; meetSent?: boolean;
+  source?: 'website' | 'manual'; // where the lead came from
+  industry?: string; demoNotes?: string;
+}
 export interface ContactInfo { location:string; phones:string[]; emails:string[]; workingHours:string[]; whatsapp:string; mapUrl:string }
 export interface CompanyInfo { name:string; tagline:string; mission:string; vision:string; about:string[]; stats:{label:string;value:string}[] }
 

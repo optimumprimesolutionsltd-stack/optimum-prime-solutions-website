@@ -1,35 +1,191 @@
-import { useState } from 'react';
-import { Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown, Download } from 'lucide-react';
-import type { SiteData } from '../../data/siteData';
+import { useState, useMemo } from 'react';
+import {
+  Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown,
+  Download, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
+  User, Send, AlertCircle,
+} from 'lucide-react';
+import type { SiteData, Lead } from '../../data/siteData';
 
 interface P { data: SiteData; onSave: (d: SiteData) => void }
 
+const BACKEND_URL = 'https://optimum-prime-lead-notifier.onrender.com';
+
+const INDUSTRIES = [
+  'Manufacturing', 'Distribution & Wholesale', 'Retail', 'Construction',
+  'Hardware & Building Materials', 'NGO / Non-Profit', 'School / Education',
+  'SACCO / Cooperative', 'Professional Services', 'Other',
+];
+
+// ── Kenya Public Holidays (recurring annual dates as MM-DD) ──────────────────
+const KE_HOLIDAYS_RECURRING = new Set([
+  '01-01', // New Year's Day
+  '05-01', // Labour Day
+  '06-01', // Madaraka Day
+  '10-10', // Huduma Day
+  '10-20', // Mashujaa Day
+  '12-12', // Jamhuri Day
+  '12-25', // Christmas Day
+  '12-26', // Boxing Day
+]);
+// One-off holidays (YYYY-MM-DD) — add upcoming ones as needed
+const KE_HOLIDAYS_ONEOFF = new Set([
+  '2026-04-03', // Good Friday 2026
+  '2026-04-06', // Easter Monday 2026
+  '2027-03-26', // Good Friday 2027
+  '2027-03-29', // Easter Monday 2027
+]);
+
+function isKenyaHoliday(dateStr: string): boolean {
+  if (!dateStr) return false;
+  const mmdd = dateStr.slice(5); // "MM-DD"
+  return KE_HOLIDAYS_RECURRING.has(mmdd) || KE_HOLIDAYS_ONEOFF.has(dateStr);
+}
+
+function getDayOfWeek(dateStr: string): number {
+  // Returns 0=Sun, 1=Mon ... 6=Sat
+  if (!dateStr) return -1;
+  return new Date(dateStr + 'T12:00:00').getDay();
+}
+
+function isDateBlocked(dateStr: string): boolean {
+  if (!dateStr) return false;
+  const dow = getDayOfWeek(dateStr);
+  if (dow === 0) return true; // Sunday
+  if (isKenyaHoliday(dateStr)) return true;
+  return false;
+}
+
+// ── Working hours per day ────────────────────────────────────────────────────
+// Weekday: 8:00–17:00, Saturday: 8:00–12:00
+function getAvailableHours(dateStr: string): { start: number; end: number } | null {
+  if (!dateStr) return null;
+  if (isDateBlocked(dateStr)) return null;
+  const dow = getDayOfWeek(dateStr);
+  if (dow === 6) return { start: 8, end: 12 }; // Saturday
+  return { start: 8, end: 17 }; // Mon–Fri
+}
+
+// ── Generate time slots (30-min intervals) ───────────────────────────────────
+function generateTimeSlots(dateStr: string): { value: string; label: string; blocked: boolean }[] {
+  const hours = getAvailableHours(dateStr);
+  if (!hours) return [];
+  const slots: { value: string; label: string; blocked: boolean }[] = [];
+  for (let h = hours.start; h < hours.end; h++) {
+    for (const m of [0, 30]) {
+      const hh = String(h).padStart(2, '0');
+      const mm = String(m).padStart(2, '0');
+      const value = `${hh}:${mm}`;
+      const ampm = h < 12 ? 'AM' : 'PM';
+      const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
+      const label = `${h12}:${mm} ${ampm}`;
+      slots.push({ value, label, blocked: false });
+    }
+  }
+  return slots;
+}
+
+// ── Status config ────────────────────────────────────────────────────────────
 const statusColors: Record<string, string> = {
-  'New': 'bg-accent/10 text-accent',
-  'Contacted': 'bg-blue-50 text-blue-600',
-  'Qualified': 'bg-purple-50 text-purple-600',
+  'New':            'bg-accent/10 text-accent',
+  'Contacted':      'bg-blue-50 text-blue-600',
+  'Qualified':      'bg-purple-50 text-purple-600',
   'Demo Scheduled': 'bg-amber-50 text-amber-600',
-  'Closed Won': 'bg-green-50 text-green-700',
-  'Closed Lost': 'bg-red-50 text-red-600',
+  'Closed Won':     'bg-green-50 text-green-700',
+  'Closed Lost':    'bg-red-50 text-red-600',
 };
 const statuses = Object.keys(statusColors);
 
-export default function LeadsManager({ data, onSave }: P) {
-  const [search, setSearch] = useState('');
-  const [filterStatus, setFilterStatus] = useState('All');
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+// ── Manual booking form ──────────────────────────────────────────────────────
+interface BookingForm {
+  clientName: string; clientPhone: string; clientEmail: string;
+  clientCompany: string; clientIndustry: string;
+  demoType: 'online' | 'physical';
+  demoDate: string; demoTime: string; demoLocation: string; demoNotes: string;
+  teamMemberName: string; teamMemberPhone: string;
+  notifyClient: boolean;
+}
+const emptyBooking: BookingForm = {
+  clientName: '', clientPhone: '', clientEmail: '',
+  clientCompany: '', clientIndustry: '',
+  demoType: 'online', demoDate: '', demoTime: '', demoLocation: '', demoNotes: '',
+  teamMemberName: '', teamMemberPhone: '',
+  notifyClient: true,
+};
 
+// ── Schedule panel state ─────────────────────────────────────────────────────
+interface ScheduleForm {
+  scheduledDate: string; scheduledTime: string;
+  demoType: 'online' | 'physical'; demoLocation: string;
+  teamMemberName: string; teamMemberPhone: string;
+  demoNotes: string;
+}
+
+export default function LeadsManager({ data, onSave }: P) {
+  const [search, setSearch]           = useState('');
+  const [filterStatus, setFilterStatus] = useState('All');
+  const [expandedId, setExpandedId]   = useState<string | null>(null);
+
+  // Booking panel
+  const [showBooking, setShowBooking] = useState(false);
+  const [booking, setBooking]         = useState<BookingForm>(emptyBooking);
+  const [bookingError, setBookingError] = useState('');
+  const [bookingSubmitting, setBookingSubmitting] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState(false);
+
+  // Schedule panel (per-lead)
+  const [schedulingId, setSchedulingId] = useState<string | null>(null);
+  const [schedForm, setSchedForm]       = useState<ScheduleForm>({
+    scheduledDate: '', scheduledTime: '', demoType: 'online',
+    demoLocation: '', teamMemberName: '', teamMemberPhone: '', demoNotes: '',
+  });
+  const [schedSubmitting, setSchedSubmitting] = useState(false);
+  const [schedError, setSchedError]           = useState('');
+
+  const setB = (f: keyof BookingForm, v: string | boolean) =>
+    setBooking(prev => ({ ...prev, [f]: v }));
+  const setS = (f: keyof ScheduleForm, v: string) =>
+    setSchedForm(prev => ({ ...prev, [f]: v }));
+
+  // ── Booked slots (for conflict detection) ───────────────────────────────
+  const bookedSlots = useMemo(() =>
+    new Set(
+      data.leads
+        .filter(l => l.status === 'Demo Scheduled' && l.scheduledDate && l.scheduledTime)
+        .map(l => `${l.scheduledDate}|${l.scheduledTime}`)
+    ), [data.leads]);
+
+  // ── Filtered leads ───────────────────────────────────────────────────────
   const filtered = data.leads
     .filter(l => filterStatus === 'All' || l.status === filterStatus)
     .filter(l => {
       if (!search.trim()) return true;
       const q = search.toLowerCase();
-      return l.name.toLowerCase().includes(q) || l.email.toLowerCase().includes(q) || l.company.toLowerCase().includes(q) || l.phone.includes(q);
+      return l.name.toLowerCase().includes(q)
+        || l.email.toLowerCase().includes(q)
+        || (l.company || '').toLowerCase().includes(q)
+        || l.phone.includes(q);
     })
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
+  // ── Status update ────────────────────────────────────────────────────────
   const updateStatus = (id: string, status: string) => {
     onSave({ ...data, leads: data.leads.map(l => l.id === id ? { ...l, status } : l) });
+    if (status === 'Demo Scheduled') {
+      setSchedulingId(id);
+      const lead = data.leads.find(l => l.id === id);
+      setSchedForm({
+        scheduledDate: lead?.scheduledDate || '',
+        scheduledTime: lead?.scheduledTime || '',
+        demoType: lead?.demoType || 'online',
+        demoLocation: lead?.demoLocation || '',
+        teamMemberName: lead?.teamMemberName || '',
+        teamMemberPhone: lead?.teamMemberPhone || '',
+        demoNotes: lead?.demoNotes || '',
+      });
+      setSchedError('');
+    } else {
+      if (schedulingId === id) setSchedulingId(null);
+    }
   };
 
   const removeLead = (id: string) => {
@@ -38,30 +194,226 @@ export default function LeadsManager({ data, onSave }: P) {
     }
   };
 
+  // ── Export CSV ───────────────────────────────────────────────────────────
   const exportCSV = () => {
-    const headers = ['Name', 'Email', 'Phone', 'Company', 'Business Type', 'Demo Date', 'Current Software', 'Message', 'Status', 'Date'];
-    const rows = data.leads.map(l => [l.name, l.email, l.phone, l.company, l.businessType, l.demoDate, l.currentSoftware, l.message, l.status, l.createdAt]);
+    const headers = ['Name', 'Email', 'Phone', 'Company', 'Industry', 'Business Type',
+      'Demo Date (Requested)', 'Scheduled Date', 'Scheduled Time', 'Demo Type',
+      'Location', 'Team Member', 'Current Software', 'Message', 'Status', 'Source', 'Date Submitted'];
+    const rows = data.leads.map(l => [
+      l.name, l.email, l.phone, l.company, l.industry || l.businessType, l.businessType,
+      l.demoDate, l.scheduledDate || '', l.scheduledTime || '', l.demoType || '',
+      l.demoLocation || '', l.teamMemberName || '', l.currentSoftware, l.message,
+      l.status, l.source || 'website', l.createdAt,
+    ]);
     const csv = [headers, ...rows].map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'leads.csv'; a.click();
+    const a = document.createElement('a'); a.href = url; a.download = 'demo-leads.csv'; a.click();
     URL.revokeObjectURL(url);
+  };
+
+  // ── Manual booking submit ────────────────────────────────────────────────
+  const validateBooking = () => {
+    if (!booking.clientName.trim()) return 'Client name is required';
+    if (!booking.clientPhone.trim()) return 'Client phone is required';
+    if (!booking.clientCompany.trim()) return 'Company name is required';
+    if (!booking.clientIndustry) return 'Please select an industry';
+    if (!booking.demoDate) return 'Demo date is required';
+    if (!booking.demoTime) return 'Demo time is required';
+    if (isDateBlocked(booking.demoDate)) return 'This date is a Sunday or public holiday — please choose another day';
+    if (booking.demoType === 'physical' && !booking.demoLocation.trim()) return 'Location is required for physical demos';
+    if (!booking.teamMemberName.trim()) return 'Your name is required';
+    if (!booking.teamMemberPhone.trim()) return 'Your phone number is required';
+    return null;
+  };
+
+  const handleBookingSubmit = async () => {
+    const err = validateBooking();
+    if (err) { setBookingError(err); return; }
+    setBookingError('');
+    setBookingSubmitting(true);
+
+    try {
+      // 1. Save lead to siteData (appears in Demo Leads list)
+      const newLead: Lead = {
+        id: Date.now().toString(),
+        name: booking.clientName,
+        phone: booking.clientPhone,
+        email: booking.clientEmail,
+        company: booking.clientCompany,
+        industry: booking.clientIndustry,
+        businessType: booking.clientIndustry,
+        demoDate: booking.demoDate,
+        currentSoftware: '',
+        message: booking.demoNotes,
+        createdAt: new Date().toISOString(),
+        status: 'Demo Scheduled',
+        source: 'manual',
+        scheduledDate: booking.demoDate,
+        scheduledTime: booking.demoTime,
+        demoType: booking.demoType,
+        demoLocation: booking.demoLocation,
+        demoNotes: booking.demoNotes,
+        teamMemberName: booking.teamMemberName,
+        teamMemberPhone: booking.teamMemberPhone,
+        meetSent: false,
+      };
+      onSave({ ...data, leads: [newLead, ...data.leads] });
+
+      // 2. Send notifications via backend (Meet link generated server-side)
+      await fetch(`${BACKEND_URL}/book-demo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: booking.clientName,
+          clientPhone: booking.clientPhone,
+          clientEmail: booking.clientEmail,
+          clientCompany: booking.clientCompany,
+          clientIndustry: booking.clientIndustry,
+          demoDate: booking.demoDate,
+          demoTime: booking.demoTime,
+          demoType: booking.demoType,
+          demoLocation: booking.demoLocation,
+          demoNotes: booking.demoNotes,
+          teamMemberName: booking.teamMemberName,
+          teamMemberPhone: booking.teamMemberPhone,
+          notifyClient: booking.notifyClient,
+          source: 'manual',
+        }),
+      });
+
+      setBookingSuccess(true);
+      setBooking(emptyBooking);
+      setShowBooking(false);
+      setTimeout(() => setBookingSuccess(false), 5000);
+    } catch {
+      setBookingError('Failed to send notifications. Please check your connection.');
+    } finally {
+      setBookingSubmitting(false);
+    }
+  };
+
+  // ── Schedule a lead (status → Demo Scheduled) ────────────────────────────
+  const validateSched = () => {
+    if (!schedForm.scheduledDate) return 'Please select a date';
+    if (!schedForm.scheduledTime) return 'Please select a time';
+    if (isDateBlocked(schedForm.scheduledDate)) return 'This date is a Sunday or public holiday';
+    if (schedForm.demoType === 'physical' && !schedForm.demoLocation.trim()) return 'Location is required for physical demos';
+    if (!schedForm.teamMemberName.trim()) return 'Assign a team member';
+    if (!schedForm.teamMemberPhone.trim()) return 'Team member phone is required';
+    return null;
+  };
+
+  const handleScheduleSubmit = async (lead: Lead) => {
+    const err = validateSched();
+    if (err) { setSchedError(err); return; }
+    setSchedError('');
+    setSchedSubmitting(true);
+
+    try {
+      // Update lead record with schedule details
+      const updated: Lead = {
+        ...lead,
+        status: 'Demo Scheduled',
+        scheduledDate: schedForm.scheduledDate,
+        scheduledTime: schedForm.scheduledTime,
+        demoType: schedForm.demoType,
+        demoLocation: schedForm.demoLocation,
+        teamMemberName: schedForm.teamMemberName,
+        teamMemberPhone: schedForm.teamMemberPhone,
+        demoNotes: schedForm.demoNotes,
+        meetSent: true,
+      };
+      onSave({ ...data, leads: data.leads.map(l => l.id === lead.id ? updated : l) });
+
+      // Send Meet link + confirmation via backend
+      await fetch(`${BACKEND_URL}/book-demo`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientName: lead.name,
+          clientPhone: lead.phone,
+          clientEmail: lead.email,
+          clientCompany: lead.company,
+          clientIndustry: lead.industry || lead.businessType,
+          demoDate: schedForm.scheduledDate,
+          demoTime: schedForm.scheduledTime,
+          demoType: schedForm.demoType,
+          demoLocation: schedForm.demoLocation,
+          demoNotes: schedForm.demoNotes,
+          teamMemberName: schedForm.teamMemberName,
+          teamMemberPhone: schedForm.teamMemberPhone,
+          notifyClient: true,
+          source: 'scheduled',
+        }),
+      });
+
+      setSchedulingId(null);
+    } catch {
+      setSchedError('Failed to send notifications. Please try again.');
+    } finally {
+      setSchedSubmitting(false);
+    }
   };
 
   const newCount = data.leads.filter(l => l.status === 'New').length;
 
+  // ── Booking form time slots ──────────────────────────────────────────────
+  const bookingSlots = useMemo(() => {
+    const slots = generateTimeSlots(booking.demoDate);
+    return slots.map(s => ({
+      ...s,
+      blocked: bookedSlots.has(`${booking.demoDate}|${s.value}`),
+    }));
+  }, [booking.demoDate, bookedSlots]);
+
+  // ── Schedule form time slots ─────────────────────────────────────────────
+  const schedSlots = useMemo(() => {
+    const slots = generateTimeSlots(schedForm.scheduledDate);
+    return slots.map(s => ({
+      ...s,
+      blocked: bookedSlots.has(`${schedForm.scheduledDate}|${s.value}`),
+    }));
+  }, [schedForm.scheduledDate, bookedSlots]);
+
   return (
     <div className="mx-auto max-w-4xl space-y-5">
-      {/* Stats Strip */}
+
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 className="text-xl font-bold text-navy-900">Demo Leads</h2>
+          <p className="text-sm text-navy-500 mt-0.5">All demo requests — website and manually booked</p>
+        </div>
+        <button
+          onClick={() => { setShowBooking(true); setBookingError(''); setBooking(emptyBooking); }}
+          className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
+          style={{ backgroundColor: '#e53e3e' }}
+        >
+          <Plus className="h-4 w-4" /> Book New Demo
+        </button>
+      </div>
+
+      {/* ── Success banner ── */}
+      {bookingSuccess && (
+        <div className="flex items-center gap-3 rounded-2xl bg-green-50 border border-green-200 px-5 py-4">
+          <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+          <div>
+            <p className="text-sm font-semibold text-green-800">Demo booked and lead added!</p>
+            <p className="text-xs text-green-600 mt-0.5">WhatsApp notifications sent to the office, team member, and client.</p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Stats Strip ── */}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
         {[
-          { label: 'Total', value: data.leads.length, color: 'bg-navy-50 text-navy-700' },
-          { label: 'New', value: newCount, color: 'bg-accent/10 text-accent' },
-          { label: 'Contacted', value: data.leads.filter(l => l.status === 'Contacted').length, color: 'bg-blue-50 text-blue-600' },
-          { label: 'Qualified', value: data.leads.filter(l => l.status === 'Qualified').length, color: 'bg-purple-50 text-purple-600' },
-          { label: 'Demo Set', value: data.leads.filter(l => l.status === 'Demo Scheduled').length, color: 'bg-amber-50 text-amber-600' },
-          { label: 'Won', value: data.leads.filter(l => l.status === 'Closed Won').length, color: 'bg-green-50 text-green-700' },
+          { label: 'Total',     value: data.leads.length,                                          color: 'bg-navy-50 text-navy-700' },
+          { label: 'New',       value: newCount,                                                    color: 'bg-accent/10 text-accent' },
+          { label: 'Contacted', value: data.leads.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
+          { label: 'Qualified', value: data.leads.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
+          { label: 'Demo Set',  value: data.leads.filter(l => l.status === 'Demo Scheduled').length, color: 'bg-amber-50 text-amber-600' },
+          { label: 'Won',       value: data.leads.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
         ].map(s => (
           <div key={s.label} className={`rounded-xl p-3 text-center ${s.color}`}>
             <p className="text-xl font-bold">{s.value}</p>
@@ -70,11 +422,12 @@ export default function LeadsManager({ data, onSave }: P) {
         ))}
       </div>
 
-      {/* Toolbar */}
+      {/* ── Toolbar ── */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-400" />
-          <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search leads by name, email, phone..."
+          <input value={search} onChange={e => setSearch(e.target.value)}
+            placeholder="Search by name, email, phone, company..."
             className="w-full rounded-lg border border-navy-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
         </div>
         <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
@@ -84,58 +437,255 @@ export default function LeadsManager({ data, onSave }: P) {
         </select>
         <button onClick={exportCSV} disabled={data.leads.length === 0}
           className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
-          <Download className="h-4 w-4" />Export CSV
+          <Download className="h-4 w-4" /> Export CSV
         </button>
       </div>
 
-      {/* Leads List */}
+      {/* ── Manual Booking Panel (slide-in) ── */}
+      {showBooking && (
+        <div className="rounded-2xl border border-accent/30 bg-white shadow-lg overflow-hidden">
+          <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100 bg-navy-50">
+            <div className="flex items-center gap-2">
+              <CalendarDays className="h-5 w-5 text-accent" />
+              <h3 className="font-bold text-navy-900">Book a New Demo</h3>
+            </div>
+            <button onClick={() => setShowBooking(false)} className="rounded-lg p-1.5 hover:bg-navy-200 transition">
+              <X className="h-4 w-4 text-navy-500" />
+            </button>
+          </div>
+
+          <div className="p-6 space-y-5">
+            {bookingError && (
+              <div className="flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                <AlertCircle className="h-4 w-4 shrink-0" />{bookingError}
+              </div>
+            )}
+
+            <div className="grid gap-5 lg:grid-cols-2">
+              {/* Client Details */}
+              <div className="space-y-3">
+                <p className="text-xs font-bold text-navy-500 uppercase tracking-wider">Client Details</p>
+                <input value={booking.clientName} onChange={e => setB('clientName', e.target.value)}
+                  placeholder="Client name *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                <div className="grid grid-cols-2 gap-3">
+                  <input value={booking.clientPhone} onChange={e => setB('clientPhone', e.target.value)}
+                    placeholder="+254 7XX XXX XXX *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                  <input value={booking.clientEmail} onChange={e => setB('clientEmail', e.target.value)}
+                    placeholder="Email (optional)" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                </div>
+                <input value={booking.clientCompany} onChange={e => setB('clientCompany', e.target.value)}
+                  placeholder="Company name *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                <select value={booking.clientIndustry} onChange={e => setB('clientIndustry', e.target.value)}
+                  className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-white">
+                  <option value="">Select industry *</option>
+                  {INDUSTRIES.map(i => <option key={i} value={i}>{i}</option>)}
+                </select>
+              </div>
+
+              {/* Demo Schedule */}
+              <div className="space-y-3">
+                <p className="text-xs font-bold text-navy-500 uppercase tracking-wider">Demo Schedule</p>
+
+                {/* Demo Type */}
+                <div className="flex rounded-xl overflow-hidden border border-navy-200">
+                  <button type="button" onClick={() => setB('demoType', 'online')}
+                    className={`flex-1 py-2.5 text-sm font-semibold transition ${booking.demoType === 'online' ? 'bg-blue-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                    💻 Online
+                  </button>
+                  <button type="button" onClick={() => setB('demoType', 'physical')}
+                    className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-navy-200 ${booking.demoType === 'physical' ? 'bg-green-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                    📍 Physical
+                  </button>
+                </div>
+
+                {/* Date */}
+                <div>
+                  <input type="date" value={booking.demoDate}
+                    min={new Date().toISOString().split('T')[0]}
+                    onChange={e => { setB('demoDate', e.target.value); setB('demoTime', ''); }}
+                    className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent ${booking.demoDate && isDateBlocked(booking.demoDate) ? 'border-red-400 bg-red-50' : 'border-navy-200'}`} />
+                  {booking.demoDate && isDateBlocked(booking.demoDate) && (
+                    <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(booking.demoDate) === 0 ? 'Sundays are not available' : 'This is a public holiday'} — please choose another date.</p>
+                  )}
+                  {booking.demoDate && getDayOfWeek(booking.demoDate) === 6 && !isDateBlocked(booking.demoDate) && (
+                    <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — available slots: 8:00 AM – 12:00 PM only.</p>
+                  )}
+                </div>
+
+                {/* Time slots */}
+                {booking.demoDate && !isDateBlocked(booking.demoDate) && bookingSlots.length > 0 && (
+                  <div>
+                    <p className="text-xs font-semibold text-navy-500 mb-1.5">Select time *</p>
+                    <div className="grid grid-cols-4 gap-1.5 max-h-36 overflow-y-auto pr-1">
+                      {bookingSlots.map(s => (
+                        <button key={s.value} type="button"
+                          disabled={s.blocked}
+                          onClick={() => setB('demoTime', s.value)}
+                          title={s.blocked ? 'Already booked' : ''}
+                          className={`rounded-lg py-1.5 text-xs font-medium transition border ${
+                            s.blocked
+                              ? 'border-navy-100 bg-navy-100 text-navy-300 cursor-not-allowed line-through'
+                              : booking.demoTime === s.value
+                                ? 'border-accent bg-accent text-white'
+                                : 'border-navy-200 bg-white text-navy-700 hover:border-accent hover:bg-accent/5'
+                          }`}>
+                          {s.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Location for physical */}
+                {booking.demoType === 'physical' && (
+                  <input value={booking.demoLocation} onChange={e => setB('demoLocation', e.target.value)}
+                    placeholder="Location / address *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                )}
+
+                <textarea value={booking.demoNotes} onChange={e => setB('demoNotes', e.target.value)}
+                  placeholder="Notes (optional)" rows={2}
+                  className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
+              </div>
+            </div>
+
+            {/* Team Member */}
+            <div className="space-y-3">
+              <p className="text-xs font-bold text-navy-500 uppercase tracking-wider">Assigned Team Member</p>
+              <div className="grid grid-cols-2 gap-3">
+                <input value={booking.teamMemberName} onChange={e => setB('teamMemberName', e.target.value)}
+                  placeholder="Your name *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                <input value={booking.teamMemberPhone} onChange={e => setB('teamMemberPhone', e.target.value)}
+                  placeholder="Your phone *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+              </div>
+            </div>
+
+            {/* Notify client toggle */}
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input type="checkbox" checked={booking.notifyClient} onChange={e => setB('notifyClient', e.target.checked)}
+                className="h-4 w-4 rounded border-navy-300 text-accent focus:ring-accent" />
+              <span className="text-sm text-navy-700">Send WhatsApp confirmation to client</span>
+            </label>
+
+            {/* Submit */}
+            <button onClick={handleBookingSubmit} disabled={bookingSubmitting}
+              className="w-full flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white disabled:opacity-60 transition"
+              style={{ backgroundColor: '#e53e3e' }}>
+              {bookingSubmitting
+                ? <><Loader2 className="h-4 w-4 animate-spin" /> Booking & Notifying...</>
+                : <><Send className="h-4 w-4" /> Book Demo & Notify All</>}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Leads List ── */}
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-navy-200 bg-white py-16 text-center">
-          <Users className="mx-auto h-10 w-10 text-navy-300" />
-          <p className="mt-3 text-sm font-medium text-navy-500">{data.leads.length === 0 ? 'No leads yet' : 'No leads match your filters'}</p>
-          <p className="mt-1 text-xs text-navy-400">{data.leads.length === 0 ? 'Demo requests from the contact form will appear here.' : 'Try a different search or status filter.'}</p>
+          <UsersIcon className="mx-auto h-10 w-10 text-navy-300" />
+          <p className="mt-3 text-sm font-medium text-navy-500">
+            {data.leads.length === 0 ? 'No leads yet' : 'No leads match your filters'}
+          </p>
+          <p className="mt-1 text-xs text-navy-400">
+            {data.leads.length === 0
+              ? 'Demo requests from the website and manual bookings will appear here.'
+              : 'Try a different search or status filter.'}
+          </p>
         </div>
       ) : (
         <div className="space-y-3">
           {filtered.map(l => (
             <div key={l.id} className={`rounded-2xl border bg-white overflow-hidden transition ${expandedId === l.id ? 'border-accent/30 shadow-md' : 'border-navy-200'}`}>
+              {/* Lead row */}
               <div className="flex items-center gap-4 p-4 cursor-pointer" onClick={() => setExpandedId(expandedId === l.id ? null : l.id)}>
                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-navy-700 to-navy-900 flex items-center justify-center text-xs font-bold text-white shrink-0">
-                  {l.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
+                  {l.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-bold text-navy-900 truncate">{l.name}</p>
                     {l.status === 'New' && <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />}
+                    {l.source === 'manual' && (
+                      <span className="rounded-full bg-navy-100 px-2 py-0.5 text-[9px] font-semibold text-navy-500">MANUAL</span>
+                    )}
                   </div>
-                  <p className="text-xs text-navy-500 truncate">{l.email} · {l.company || 'No company'}</p>
+                  <p className="text-xs text-navy-500 truncate">{l.phone} · {l.company || 'No company'}</p>
                 </div>
                 <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold whitespace-nowrap ${statusColors[l.status] || 'bg-navy-100 text-navy-600'}`}>
                   {l.status}
                 </span>
+                {l.scheduledDate && (
+                  <span className="text-[10px] text-navy-400 hidden sm:block whitespace-nowrap">
+                    📅 {new Date(l.scheduledDate + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
+                    {l.scheduledTime && ` · ${l.scheduledTime}`}
+                  </span>
+                )}
                 <span className="text-[10px] text-navy-400 hidden sm:block whitespace-nowrap">
                   {new Date(l.createdAt).toLocaleDateString()}
                 </span>
                 <ChevronDown className={`h-4 w-4 text-navy-400 transition-transform shrink-0 ${expandedId === l.id ? 'rotate-180' : ''}`} />
               </div>
 
+              {/* Expanded detail */}
               {expandedId === l.id && (
                 <div className="border-t border-navy-100 p-5 space-y-4">
+                  {/* Info grid */}
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div className="flex items-start gap-2"><Mail className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" /><div><p className="text-[10px] text-navy-500 font-medium">Email</p><p className="text-sm text-navy-900">{l.email}</p></div></div>
-                    <div className="flex items-start gap-2"><Phone className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" /><div><p className="text-[10px] text-navy-500 font-medium">Phone</p><p className="text-sm text-navy-900">{l.phone}</p></div></div>
-                    <div className="flex items-start gap-2"><Building2 className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" /><div><p className="text-[10px] text-navy-500 font-medium">Company</p><p className="text-sm text-navy-900">{l.company || 'N/A'}</p></div></div>
-                    <div className="flex items-start gap-2"><Calendar className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" /><div><p className="text-[10px] text-navy-500 font-medium">Demo Date</p><p className="text-sm text-navy-900">{l.demoDate || 'Flexible'}</p></div></div>
+                    <div className="flex items-start gap-2">
+                      <Mail className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
+                      <div><p className="text-[10px] text-navy-500 font-medium">Email</p><p className="text-sm text-navy-900">{l.email || '—'}</p></div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Phone className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
+                      <div><p className="text-[10px] text-navy-500 font-medium">Phone</p><p className="text-sm text-navy-900">{l.phone}</p></div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Building2 className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
+                      <div><p className="text-[10px] text-navy-500 font-medium">Company</p><p className="text-sm text-navy-900">{l.company || '—'}</p></div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Calendar className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
+                      <div><p className="text-[10px] text-navy-500 font-medium">Requested Date</p><p className="text-sm text-navy-900">{l.demoDate || 'Flexible'}</p></div>
+                    </div>
                   </div>
+
                   <div className="grid grid-cols-2 gap-3">
-                    <div><p className="text-[10px] text-navy-500 font-medium mb-0.5">Business Type</p><p className="text-sm text-navy-900">{l.businessType || 'Not specified'}</p></div>
-                    <div><p className="text-[10px] text-navy-500 font-medium mb-0.5">Current Software</p><p className="text-sm text-navy-900">{l.currentSoftware || 'Not specified'}</p></div>
+                    <div><p className="text-[10px] text-navy-500 font-medium mb-0.5">Industry</p><p className="text-sm text-navy-900">{l.industry || l.businessType || '—'}</p></div>
+                    <div><p className="text-[10px] text-navy-500 font-medium mb-0.5">Current Software</p><p className="text-sm text-navy-900">{l.currentSoftware || '—'}</p></div>
                   </div>
+
                   {l.message && (
-                    <div><p className="text-[10px] text-navy-500 font-medium mb-1">Message</p>
-                      <p className="text-sm text-navy-700 bg-navy-50 rounded-xl p-3 leading-relaxed">{l.message}</p></div>
+                    <div>
+                      <p className="text-[10px] text-navy-500 font-medium mb-1">Message</p>
+                      <p className="text-sm text-navy-700 bg-navy-50 rounded-xl p-3 leading-relaxed">{l.message}</p>
+                    </div>
                   )}
-                  <div className="flex items-center justify-between border-t border-navy-100 pt-4">
+
+                  {/* Scheduled demo info (if already scheduled) */}
+                  {l.status === 'Demo Scheduled' && l.scheduledDate && l.meetSent && (
+                    <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 space-y-1">
+                      <p className="text-xs font-bold text-amber-700 mb-2">📅 Demo Scheduled</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-amber-800">
+                        <div><span className="font-semibold">Date:</span> {new Date(l.scheduledDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                        <div><span className="font-semibold">Time:</span> {l.scheduledTime} EAT</div>
+                        <div><span className="font-semibold">Type:</span> {l.demoType === 'online' ? '💻 Online' : '📍 Physical'}</div>
+                        {l.teamMemberName && <div><span className="font-semibold">Team:</span> {l.teamMemberName}</div>}
+                      </div>
+                      {l.demoType === 'physical' && l.demoLocation && (
+                        <div className="text-xs text-amber-800 flex items-center gap-1 mt-1">
+                          <MapPin className="h-3 w-3" />{l.demoLocation}
+                        </div>
+                      )}
+                      {l.meetLink && (
+                        <a href={l.meetLink} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline mt-1">
+                          📹 {l.meetLink}
+                        </a>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Status + actions */}
+                  <div className="flex items-center justify-between border-t border-navy-100 pt-4 flex-wrap gap-3">
                     <div className="flex items-center gap-2">
                       <label className="text-xs font-semibold text-navy-600">Status:</label>
                       <select value={l.status} onChange={e => updateStatus(l.id, e.target.value)}
@@ -144,13 +694,150 @@ export default function LeadsManager({ data, onSave }: P) {
                       </select>
                     </div>
                     <div className="flex items-center gap-2">
-                      <a href={`mailto:${l.email}`} className="rounded-lg bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-accent/20 transition">
-                        Send Email
+                      {l.email && (
+                        <a href={`mailto:${l.email}`}
+                          className="rounded-lg bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-accent/20 transition">
+                          Send Email
+                        </a>
+                      )}
+                      <a href={`https://wa.me/${l.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer"
+                        className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
+                        WhatsApp
                       </a>
                       <button onClick={() => removeLead(l.id)}
-                        className="rounded-lg p-1.5 text-red-400 hover:bg-red-50 transition"><Trash2 className="h-4 w-4" /></button>
+                        className="rounded-lg p-1.5 text-red-400 hover:bg-red-50 transition">
+                        <Trash2 className="h-4 w-4" />
+                      </button>
                     </div>
                   </div>
+
+                  {/* ── Schedule Panel (shown when status = Demo Scheduled and not yet sent) ── */}
+                  {schedulingId === l.id && !l.meetSent && (
+                    <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <CalendarDays className="h-5 w-5 text-amber-600" />
+                        <p className="font-bold text-amber-800">Schedule the Demo & Send Confirmation</p>
+                      </div>
+                      <p className="text-xs text-amber-700">
+                        Fill in the details below. The client will receive a WhatsApp confirmation
+                        {schedForm.demoType === 'online' ? ' with a Google Meet link.' : ' with the location.'}
+                      </p>
+
+                      {schedError && (
+                        <div className="flex items-center gap-2 rounded-xl bg-red-50 border border-red-200 px-4 py-3 text-sm text-red-700">
+                          <AlertCircle className="h-4 w-4 shrink-0" />{schedError}
+                        </div>
+                      )}
+
+                      <div className="grid gap-4 sm:grid-cols-2">
+                        {/* Demo type */}
+                        <div className="sm:col-span-2">
+                          <div className="flex rounded-xl overflow-hidden border border-amber-300">
+                            <button type="button" onClick={() => setS('demoType', 'online')}
+                              className={`flex-1 py-2.5 text-sm font-semibold transition ${schedForm.demoType === 'online' ? 'bg-blue-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                              💻 Online (Google Meet)
+                            </button>
+                            <button type="button" onClick={() => setS('demoType', 'physical')}
+                              className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-amber-300 ${schedForm.demoType === 'physical' ? 'bg-green-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                              📍 Physical / On-site
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Date */}
+                        <div>
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Date *</label>
+                          <input type="date" value={schedForm.scheduledDate}
+                            min={new Date().toISOString().split('T')[0]}
+                            onChange={e => { setS('scheduledDate', e.target.value); setS('scheduledTime', ''); }}
+                            className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent ${schedForm.scheduledDate && isDateBlocked(schedForm.scheduledDate) ? 'border-red-400 bg-red-50' : 'border-navy-200'}`} />
+                          {schedForm.scheduledDate && isDateBlocked(schedForm.scheduledDate) && (
+                            <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(schedForm.scheduledDate) === 0 ? 'Sundays not available' : 'Public holiday'} — choose another date.</p>
+                          )}
+                          {schedForm.scheduledDate && getDayOfWeek(schedForm.scheduledDate) === 6 && !isDateBlocked(schedForm.scheduledDate) && (
+                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–12:00 PM only.</p>
+                          )}
+                        </div>
+
+                        {/* Time slots */}
+                        <div>
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Time *</label>
+                          {schedForm.scheduledDate && !isDateBlocked(schedForm.scheduledDate) && schedSlots.length > 0 ? (
+                            <div className="grid grid-cols-3 gap-1.5 max-h-32 overflow-y-auto pr-1">
+                              {schedSlots.map(s => (
+                                <button key={s.value} type="button"
+                                  disabled={s.blocked}
+                                  onClick={() => setS('scheduledTime', s.value)}
+                                  title={s.blocked ? 'Already booked' : ''}
+                                  className={`rounded-lg py-1.5 text-xs font-medium transition border ${
+                                    s.blocked
+                                      ? 'border-navy-100 bg-navy-100 text-navy-300 cursor-not-allowed line-through'
+                                      : schedForm.scheduledTime === s.value
+                                        ? 'border-accent bg-accent text-white'
+                                        : 'border-navy-200 bg-white text-navy-700 hover:border-accent hover:bg-accent/5'
+                                  }`}>
+                                  {s.label}
+                                </button>
+                              ))}
+                            </div>
+                          ) : (
+                            <p className="text-xs text-navy-400 italic">Select a date first</p>
+                          )}
+                        </div>
+
+                        {/* Location (physical only) */}
+                        {schedForm.demoType === 'physical' && (
+                          <div className="sm:col-span-2">
+                            <label className="block text-xs font-semibold text-navy-600 mb-1.5">Location / Address *</label>
+                            <input value={schedForm.demoLocation} onChange={e => setS('demoLocation', e.target.value)}
+                              placeholder="e.g. Client's office — Moi Avenue, Nairobi"
+                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                          </div>
+                        )}
+
+                        {/* Team member */}
+                        <div>
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">
+                            <User className="h-3 w-3 inline mr-1" />Team Member *
+                          </label>
+                          <input value={schedForm.teamMemberName} onChange={e => setS('teamMemberName', e.target.value)}
+                            placeholder="Name"
+                            className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">
+                            <Phone className="h-3 w-3 inline mr-1" />Team Member Phone *
+                          </label>
+                          <input value={schedForm.teamMemberPhone} onChange={e => setS('teamMemberPhone', e.target.value)}
+                            placeholder="+254 7XX XXX XXX"
+                            className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                        </div>
+
+                        {/* Notes */}
+                        <div className="sm:col-span-2">
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Notes (optional)</label>
+                          <textarea value={schedForm.demoNotes} onChange={e => setS('demoNotes', e.target.value)}
+                            placeholder="e.g. Focus on manufacturing module, client uses QuickBooks currently"
+                            rows={2} className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <button onClick={() => handleScheduleSubmit(l)} disabled={schedSubmitting}
+                          className="flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white disabled:opacity-60 transition"
+                          style={{ backgroundColor: '#e53e3e' }}>
+                          {schedSubmitting
+                            ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending...</>
+                            : <><Send className="h-4 w-4" /> Confirm & Send {schedForm.demoType === 'online' ? 'Meet Link' : 'Location'}</>}
+                        </button>
+                        <button onClick={() => setSchedulingId(null)}
+                          className="rounded-xl border border-navy-200 px-4 py-3 text-sm font-medium text-navy-600 hover:bg-navy-50 transition">
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
                   <p className="text-[10px] text-navy-400">Submitted: {new Date(l.createdAt).toLocaleString()}</p>
                 </div>
               )}
@@ -162,6 +849,14 @@ export default function LeadsManager({ data, onSave }: P) {
   );
 }
 
-function Users(props: React.SVGProps<SVGSVGElement>) {
-  return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>;
+function UsersIcon(props: React.SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+      fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
+      <circle cx="9" cy="7" r="4"/>
+      <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
+      <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+    </svg>
+  );
 }

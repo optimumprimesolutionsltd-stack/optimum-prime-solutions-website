@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   LayoutDashboard, Building2, Briefcase, ShoppingCart, Globe,
   MessageSquare, HelpCircle, Users, FileText, Phone,
-  LogOut, Menu, X, ExternalLink, RotateCcw, CalendarDays
+  LogOut, Menu, X, ExternalLink, RotateCcw
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import { defaultData, type SiteData } from '../data/siteData';
@@ -16,7 +16,6 @@ import FaqEditor from './editors/FaqEditor';
 import LeadsManager from './editors/LeadsManager';
 import BlogEditor from './editors/BlogEditor';
 import ContactEditor from './editors/ContactEditor';
-import BookDemoManager from './editors/BookDemoManager';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -29,7 +28,7 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'leads', label: 'Demo Leads', icon: Users },
   { id: 'blogs', label: 'Blog Posts', icon: FileText },
   { id: 'contact', label: 'Contact Info', icon: Phone },
-  { id: 'bookdemo', label: 'Book a Demo', icon: CalendarDays },
+  // Book a Demo is now embedded inside Demo Leads tab
 ];
 
 interface Props { onLogout: () => void }
@@ -65,7 +64,7 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')} />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
       case 'contact': return <ContactEditor data={data} onSave={d => handleSave(d, 'Contact info saved!')} />;
-      case 'bookdemo': return <BookDemoManager />;
+      case 'bookdemo': return null; // merged into leads tab
     }
   };
 
