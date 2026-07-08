@@ -1,7 +1,7 @@
-import { Building2, Briefcase, ShoppingCart, Globe, MessageSquare, HelpCircle, Users, FileText, Phone } from 'lucide-react';
+import { Building2, Briefcase, ShoppingCart, Globe, HelpCircle, Users, FileText, Phone } from 'lucide-react';
 import type { SiteData } from '../data/siteData';
 
-export type TabId = 'dashboard' | 'company' | 'services' | 'products' | 'industries' | 'testimonials' | 'faqs' | 'leads' | 'blogs' | 'contact';
+export type TabId = 'dashboard' | 'company' | 'services' | 'products' | 'industries' | 'faqs' | 'leads' | 'blogs' | 'contact' | 'bookdemo';
 
 interface P { data: SiteData; onNav: (t: TabId) => void }
 
@@ -13,7 +13,6 @@ export default function DashboardHome({ data, onNav }: P) {
     { id: 'services', label: 'Services', icon: Briefcase, stat: `${data.services.length}`, desc: 'Manage service cards & features' },
     { id: 'products', label: 'Products & Pricing', icon: ShoppingCart, stat: `${data.products.length}`, desc: 'Edit products, pricing, features' },
     { id: 'industries', label: 'Industries', icon: Globe, stat: `${data.industries.length}`, desc: 'Manage industry cards' },
-    { id: 'testimonials', label: 'Testimonials', icon: MessageSquare, stat: `${data.testimonials.length}`, desc: 'Manage client reviews' },
     { id: 'faqs', label: 'FAQ & Chatbot', icon: HelpCircle, stat: `${data.faqs.length}`, desc: 'FAQs also power the chatbot' },
     { id: 'leads', label: 'Demo Requests', icon: Users, stat: `${data.leads.length}`, desc: 'View & manage submitted leads', alert: newLeads > 0 },
     { id: 'blogs', label: 'Blog Posts', icon: FileText, stat: `${data.blogs.length}`, desc: 'Create & manage blog articles' },

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   LayoutDashboard, Building2, Briefcase, ShoppingCart, Globe,
-  MessageSquare, HelpCircle, Users, FileText, Phone,
+  HelpCircle, Users, FileText, Phone,
   LogOut, Menu, X, ExternalLink, RotateCcw
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
@@ -11,7 +11,6 @@ import CompanyEditor from './editors/CompanyEditor';
 import ServicesEditor from './editors/ServicesEditor';
 import ProductsEditor from './editors/ProductsEditor';
 import IndustriesEditor from './editors/IndustriesEditor';
-import TestimonialsEditor from './editors/TestimonialsEditor';
 import FaqEditor from './editors/FaqEditor';
 import LeadsManager from './editors/LeadsManager';
 import BlogEditor from './editors/BlogEditor';
@@ -23,7 +22,6 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'services', label: 'Services', icon: Briefcase },
   { id: 'products', label: 'Products & Pricing', icon: ShoppingCart },
   { id: 'industries', label: 'Industries', icon: Globe },
-  { id: 'testimonials', label: 'Testimonials', icon: MessageSquare },
   { id: 'faqs', label: 'FAQ & Chatbot', icon: HelpCircle },
   { id: 'leads', label: 'Demo Leads', icon: Users },
   { id: 'blogs', label: 'Blog Posts', icon: FileText },
@@ -59,7 +57,6 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'services': return <ServicesEditor data={data} onSave={d => handleSave(d, 'Services saved!')} />;
       case 'products': return <ProductsEditor data={data} onSave={d => handleSave(d, 'Products & pricing saved!')} />;
       case 'industries': return <IndustriesEditor data={data} onSave={d => handleSave(d, 'Industries saved!')} />;
-      case 'testimonials': return <TestimonialsEditor data={data} onSave={d => handleSave(d, 'Testimonials saved!')} />;
       case 'faqs': return <FaqEditor data={data} onSave={d => handleSave(d, 'FAQs saved!')} />;
       case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')} />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
