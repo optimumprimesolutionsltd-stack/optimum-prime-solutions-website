@@ -182,13 +182,9 @@ export default function Footer() {
                 <Sparkles className="h-6 w-6" />
               </div>
               <div>
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-white">Coming Soon</span>
-                  <span className="text-xs text-amber-700 font-semibold">Early Access Beta Available Now</span>
-                </div>
                 <p className="text-base font-bold text-slate-900">TallyPrime 7.1 — The Next Generation of Business Management</p>
                 <p className="mt-1 text-sm text-slate-600 max-w-2xl">
-                  Tally Solutions has released TallyPrime 7.1 Beta with powerful new features: <strong>8 professional invoice print templates</strong>, <strong>auto wrap text</strong>, <strong>scheduled auto backup</strong>, <strong>eTIMS-ready compliance</strong>, and more. As your certified TallyPrime partner in Kenya, we will upgrade and support your transition seamlessly.
+                  Tally Solutions has released TallyPrime 7.1 with powerful new features: <strong>8 professional invoice print templates</strong>, <strong>auto wrap text</strong>, <strong>scheduled auto backup</strong>, <strong>eTIMS-ready compliance</strong>, and more. As your certified TallyPrime partner in Kenya, we will upgrade and support your transition seamlessly.
                 </p>
               </div>
             </div>
@@ -219,7 +215,7 @@ export default function Footer() {
               <img
                 src="/tally-solutions-new-logo.png"
                 alt="TallyPrime accounting software logo — official partner Optimum Prime Solutions Kenya"
-                className="h-16 w-auto rounded-2xl bg-white/10 p-2 shadow-lg shadow-black/10"
+                className="h-16 w-auto rounded-xl object-contain bg-white/10 p-2 shadow-lg shadow-black/10"
                 width={64}
                 height={64}
                 loading="lazy"
