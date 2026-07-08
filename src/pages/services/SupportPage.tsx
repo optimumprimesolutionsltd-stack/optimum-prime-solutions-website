@@ -67,12 +67,17 @@ const faqs = [
 
 export default function SupportPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="TallyPrime Support & Maintenance Kenya — AMC, Remote & On-Site Support"
         description="Reliable TallyPrime support and maintenance in Kenya. Annual Maintenance Contracts, remote desktop support, WhatsApp helpdesk, and on-site visits in Nairobi, Ruiru and Kiambu."
         canonical="/tallyprime/support"
         keywords="TallyPrime support Kenya, Tally maintenance Kenya, TallyPrime AMC Kenya, Tally helpdesk Nairobi, TallyPrime technical support Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
+          { name: 'Support', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/support/' },
+        ]}
       />
 
       {/* Hero */}
@@ -96,7 +101,7 @@ export default function SupportPage() {
               <a
                 href="https://wa.me/254116246074?text=Hi%2C%20I%20need%20TallyPrime%20support"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full bg-green-600 hover:bg-green-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition"
               >
                 <MessageSquare className="h-4 w-4" /> Get Support Now
@@ -262,6 +267,6 @@ export default function SupportPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

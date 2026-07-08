@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 
 const partners = [
@@ -36,12 +35,12 @@ function OrbitIcon({ partner, radius, duration, delay }: {
         marginLeft: -radius,
       }}
       animate={{ rotate: 360 }}
-      transition={{ duration, repeat: Infinity, ease: 'linear', delay }}
+      transition={{ duration, repeat: Infinity, ease: 'linear' as const, delay }}
     >
       <motion.div
         className="absolute -top-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1"
         animate={{ rotate: -360 }}
-        transition={{ duration, repeat: Infinity, ease: 'linear', delay }}
+        transition={{ duration, repeat: Infinity, ease: 'linear' as const, delay }}
         title={partner.name}
         whileHover={{ scale: 1.15 }}
       >
@@ -67,6 +66,9 @@ function OrbitIcon({ partner, radius, duration, delay }: {
             src={partner.logo}
             alt={partner.name}
             className="w-full h-full object-contain relative z-10 filter drop-shadow-md"
+            width={64}
+            height={64}
+            loading="lazy"
             style={{ imageRendering: 'auto', ...(partner.invertOnDark ? { filter: 'brightness(0) invert(1)' } : {}) }}
             onError={(e) => {
               const el = e.target as HTMLImageElement;
@@ -106,12 +108,12 @@ export default function EcosystemOrbit() {
         <motion.div
           className="absolute -left-32 top-1/3 h-96 w-96 rounded-full bg-red-600/10 blur-[120px]"
           animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' as const }}
         />
         <motion.div
           className="absolute -right-32 bottom-1/3 h-96 w-96 rounded-full bg-sky-500/10 blur-[120px]"
           animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' as const, delay: 2 }}
         />
       </div>
 
@@ -137,7 +139,7 @@ export default function EcosystemOrbit() {
                   border: '1.5px dashed rgba(220,38,38,0.25)',
                 }}
                 animate={{ rotate: 360 }}
-                transition={{ duration: 60, repeat: Infinity, ease: 'linear' }}
+                transition={{ duration: 60, repeat: Infinity, ease: 'linear' as const }}
               />
 
               <motion.div
@@ -149,7 +151,7 @@ export default function EcosystemOrbit() {
                   border: '1px solid rgba(14,165,233,0.2)',
                 }}
                 animate={{ rotate: -360 }}
-                transition={{ duration: 80, repeat: Infinity, ease: 'linear' }}
+                transition={{ duration: 80, repeat: Infinity, ease: 'linear' as const }}
               />
 
               {/* Orbiting partner icons */}
@@ -170,7 +172,7 @@ export default function EcosystemOrbit() {
               >
                 <motion.div
                   animate={{ scale: [1, 1.05, 1] }}
-                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+                  transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' as const }}
                   className="w-28 h-28 rounded-full flex flex-col items-center justify-center shadow-2xl relative z-10"
                   style={{
                     background: '#0f172a',
@@ -182,6 +184,9 @@ export default function EcosystemOrbit() {
                     src="/logo.png"
                     alt="Optimum Prime Solutions"
                     className="w-16 h-16 object-contain filter drop-shadow-lg"
+                    width={64}
+                    height={64}
+                    loading="lazy"
                     onError={(e) => {
                       const el = e.target as HTMLImageElement;
                       el.style.display = 'none';

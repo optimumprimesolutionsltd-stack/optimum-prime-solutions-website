@@ -7,6 +7,8 @@ interface SEOProps {
   ogImage?: string;
   ogType?: string;
   keywords?: string;
+  noIndex?: boolean;
+  breadcrumbs?: { name: string; item: string }[];
 }
 
 const BASE_URL = 'https://www.optimumprimesolutions.co.ke';
@@ -19,11 +21,29 @@ export default function SEO({
   ogImage = DEFAULT_OG_IMAGE,
   ogType = 'website',
   keywords,
+  noIndex = false,
+  breadcrumbs,
 }: SEOProps) {
   const fullTitle = title.includes('Optimum Prime')
     ? title
     : `${title} | Optimum Prime Solutions`;
-  const canonicalUrl = canonical ? `${BASE_URL}${canonical}` : BASE_URL;
+  // Ensure canonical URL has trailing slash for consistency
+  const rawCanonical = canonical ? canonical.replace(/\/?$/, '/') : '/';
+  const canonicalUrl = `${BASE_URL}${rawCanonical}`;
+
+  // Generate breadcrumb JSON-LD if provided
+  const breadcrumbJsonLd = breadcrumbs && breadcrumbs.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbs.map((crumb, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: crumb.name,
+          item: crumb.item,
+        })),
+      }
+    : null;
 
   return (
     <Helmet>
@@ -31,6 +51,7 @@ export default function SEO({
       <meta name="description" content={description} />
       {keywords && <meta name="keywords" content={keywords} />}
       <link rel="canonical" href={canonicalUrl} />
+      {noIndex && <meta name="robots" content="noindex, nofollow" />}
 
       {/* Open Graph */}
       <meta property="og:title" content={fullTitle} />
@@ -46,6 +67,13 @@ export default function SEO({
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={ogImage} />
+
+      {/* Breadcrumb structured data */}
+      {breadcrumbJsonLd && (
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbJsonLd)}
+        </script>
+      )}
     </Helmet>
   );
 }

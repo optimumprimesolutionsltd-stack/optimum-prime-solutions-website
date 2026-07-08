@@ -40,6 +40,9 @@ export default function TallyLogo({
           src="/tally-solutions-new-logo.png"
           alt="Tally Solutions logo"
           className={imageClass}
+          width={220}
+          height={40}
+          loading="lazy"
         />
       )}
     </span>

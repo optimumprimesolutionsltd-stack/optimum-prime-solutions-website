@@ -68,12 +68,17 @@ const faqs = [
 
 export default function ManufacturingPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="TallyPrime for Manufacturing Companies Kenya — BOM, Production Costing & Inventory"
         description="TallyPrime manufacturing solution in Kenya. Bill of Materials, production costing, batch tracking, multi-godown inventory, and KRA eTIMS compliance. Serving manufacturers in Nairobi, Ruiru, Kiambu and across Kenya."
         canonical="/industries/manufacturing"
         keywords="TallyPrime manufacturing Kenya, Tally BOM Kenya, production costing software Kenya, manufacturing accounting software Nairobi, TallyPrime factory Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
+          { name: 'Manufacturing', item: 'https://www.optimumprimesolutions.co.ke/industries/manufacturing/' },
+        ]}
       />
 
       {/* Hero */}
@@ -97,7 +102,7 @@ export default function ManufacturingPage() {
               <Link to="/contact#demo-form" className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition">
                 Book a Free Demo <ArrowRight className="h-4 w-4" />
               </Link>
-              <a href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20about%20TallyPrime%20for%20manufacturing" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition">
+              <a href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20about%20TallyPrime%20for%20manufacturing" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition">
                 <MessageSquare className="h-4 w-4" /> Chat on WhatsApp
               </a>
             </div>
@@ -211,6 +216,6 @@ export default function ManufacturingPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

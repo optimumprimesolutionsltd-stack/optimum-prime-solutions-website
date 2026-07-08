@@ -59,6 +59,9 @@ export default function Footer() {
                   src="/tally-solutions-new-logo.png"
                   alt="Tally Solutions logo"
                   className="h-auto w-full max-h-14 object-contain object-left"
+                  width={160}
+                  height={56}
+                  loading="lazy"
                 />
               </div>
               <Logo className="h-12 w-auto" />
@@ -82,7 +85,7 @@ export default function Footer() {
               <a
                 href="https://www.instagram.com/optimumprimesolutionsltd"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label="Follow us on Instagram"
                 className="flex items-center justify-center h-9 w-9 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white shadow-md hover:scale-110 transition-transform"
               >
@@ -91,7 +94,7 @@ export default function Footer() {
               <a
                 href="https://www.facebook.com/optimumprimesolutionsltd"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 aria-label="Follow us on Facebook"
                 className="flex items-center justify-center h-9 w-9 rounded-full bg-[#1877F2] text-white shadow-md hover:scale-110 transition-transform"
               >
@@ -103,7 +106,7 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div className="rounded-3xl bg-slate-50 p-8">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Quick Links</h4>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Quick Links</h3>
             <ul className="space-y-2 text-sm text-slate-700">
               {quickLinks.map((link) => (
                 <li key={link.h}>
@@ -121,7 +124,7 @@ export default function Footer() {
 
           {/* TallyPrime Services */}
           <div className="rounded-3xl bg-slate-50 p-8">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">TallyPrime Services</h4>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">TallyPrime Services</h3>
             <ul className="space-y-2 text-sm text-slate-700">
               {tallyPrimeLinks.map((link) => (
                 <li key={link.h}>
@@ -139,24 +142,30 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div className="rounded-3xl bg-slate-50 p-8">
-            <h4 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Stay updated</h4>
+            <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Stay updated</h3>
             <p className="text-sm text-slate-700 mb-4">Receive TallyPrime tips, cloud hosting guides, and EOS® business insights.</p>
             {submitted ? (
               <div className="rounded-2xl bg-green-50 border border-green-200 px-4 py-4 text-sm text-green-700 font-medium text-center">
                 ✓ Got it! Redirecting you to our contact page...
               </div>
             ) : (
-              <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-3">
+              <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-3" aria-label="Newsletter signup">
+                <label htmlFor="newsletter-email" className="sr-only">Email address for newsletter</label>
                 <input
+                  id="newsletter-email"
+                  name="newsletter-email"
                   type="email"
                   value={newsletterEmail}
                   onChange={(e) => setNewsletterEmail(e.target.value)}
                   placeholder="Your email"
+                  required
+                  aria-label="Enter your email address for the newsletter"
                   className="rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 placeholder:text-slate-500"
                 />
                 <button
                   type="submit"
                   className="rounded-full bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+                  aria-label="Subscribe to newsletter"
                 >
                   Join
                 </button>
@@ -177,7 +186,7 @@ export default function Footer() {
                   <span className="inline-block rounded-full bg-amber-400 px-3 py-0.5 text-xs font-bold uppercase tracking-wider text-white">Coming Soon</span>
                   <span className="text-xs text-amber-700 font-semibold">Early Access Beta Available Now</span>
                 </div>
-                <h4 className="text-base font-bold text-slate-900">TallyPrime 7.1 — The Next Generation of Business Management</h4>
+                <p className="text-base font-bold text-slate-900">TallyPrime 7.1 — The Next Generation of Business Management</p>
                 <p className="mt-1 text-sm text-slate-600 max-w-2xl">
                   Tally Solutions has released TallyPrime 7.1 Beta with powerful new features: <strong>8 professional invoice print templates</strong>, <strong>auto wrap text</strong>, <strong>scheduled auto backup</strong>, <strong>eTIMS-ready compliance</strong>, and more. As your certified TallyPrime partner in Kenya, we will upgrade and support your transition seamlessly.
                 </p>
@@ -187,7 +196,7 @@ export default function Footer() {
               <a
                 href="https://tallysolutions.com/download-tallyprime-7-1-beta/"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center rounded-full bg-amber-400 hover:bg-amber-500 px-6 py-3 text-sm font-semibold text-white shadow-md transition"
               >
                 Explore 7.1 Features
@@ -211,6 +220,9 @@ export default function Footer() {
                 src="/tally-solutions-new-logo.png"
                 alt="Tally Solutions logo"
                 className="h-16 w-auto rounded-2xl bg-white/10 p-2 shadow-lg shadow-black/10"
+                width={64}
+                height={64}
+                loading="lazy"
               />
               <span className="max-w-xl text-sm font-semibold leading-6 text-white">
                 Try TallyPrime free — Education Mode. Or contact us for official Silver, Gold & Enterprise licensing.
@@ -219,7 +231,7 @@ export default function Footer() {
             <a
               href="https://tallysolutions.com/ssa/download/"
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/10 transition hover:bg-slate-100"
             >
               Download Now

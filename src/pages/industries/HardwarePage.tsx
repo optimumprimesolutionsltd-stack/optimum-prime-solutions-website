@@ -21,12 +21,17 @@ const faqs = [
 
 export default function HardwarePage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="TallyPrime for Hardware Shops Kenya — Inventory, Credit Control & KRA Compliance"
         description="TallyPrime hardware shop solution in Kenya. Manage thousands of SKUs, contractor credit, bulk pricing, and KRA eTIMS compliance for hardware and building materials businesses."
         canonical="/industries/hardware"
         keywords="TallyPrime hardware shop Kenya, hardware accounting software Kenya, building materials software Nairobi, hardware inventory Kenya, contractor credit management Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
+          { name: 'Hardware', item: 'https://www.optimumprimesolutions.co.ke/industries/hardware/' },
+        ]}
       />
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-slate-700/40 via-transparent to-transparent pointer-events-none" />
@@ -44,7 +49,7 @@ export default function HardwarePage() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to="/contact#demo-form" className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition">Book a Free Demo <ArrowRight className="h-4 w-4" /></Link>
-              <a href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20about%20TallyPrime%20for%20hardware" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"><MessageSquare className="h-4 w-4" /> Chat on WhatsApp</a>
+              <a href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20about%20TallyPrime%20for%20hardware" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"><MessageSquare className="h-4 w-4" /> Chat on WhatsApp</a>
             </div>
           </div>
         </div>
@@ -86,6 +91,6 @@ export default function HardwarePage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

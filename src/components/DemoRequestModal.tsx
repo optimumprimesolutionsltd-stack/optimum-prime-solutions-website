@@ -23,7 +23,7 @@ export default function DemoRequestModal({ isOpen, onClose, companyPhone, compan
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleFormSubmit = async (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     
     // Call Formspree handler
@@ -100,7 +100,7 @@ export default function DemoRequestModal({ isOpen, onClose, companyPhone, compan
               </motion.div>
             ) : (
               <form onSubmit={handleFormSubmit} className="space-y-4">
-                {state.errors && state.errors.length > 0 && (
+                {state.errors && Object.keys(state.errors).length > 0 && (
                   <motion.div
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}

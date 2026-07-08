@@ -59,12 +59,17 @@ const faqs = [
 
 export default function CustomizationPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="TallyPrime Customization Kenya — Custom Reports, Templates & TDL Development"
         description="TallyPrime customization services in Kenya. Custom invoice templates, MIS reports, TDL development, payslip design, and system integrations. Serving businesses across Nairobi and Kenya."
         canonical="/tallyprime/customization"
         keywords="TallyPrime customization Kenya, Tally TDL development Kenya, custom Tally reports Kenya, TallyPrime invoice template Kenya, Tally integration Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
+          { name: 'Customization', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/customization/' },
+        ]}
       />
 
       {/* Hero */}
@@ -94,7 +99,7 @@ export default function CustomizationPage() {
               <a
                 href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20enquire%20about%20TallyPrime%20customization"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"
               >
                 <MessageSquare className="h-4 w-4" /> Chat on WhatsApp
@@ -237,6 +242,6 @@ export default function CustomizationPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

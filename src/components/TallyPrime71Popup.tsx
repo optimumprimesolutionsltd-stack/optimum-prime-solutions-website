@@ -157,7 +157,10 @@ export default function TallyPrime71Popup() {
                 <img
                   src="/optimum-logo-white.png"
                   alt="Optimum Prime Solutions"
+                  width={150}
+                  height={28}
                   style={{ height: '28px', objectFit: 'contain', marginBottom: '12px' }}
+                  loading="lazy"
                 />
                 <h2 style={{
                   fontSize: '2rem',

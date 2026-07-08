@@ -21,8 +21,8 @@ export const lazyLoadElement = (selector: string, threshold = 0.1) => {
           element.src = element.dataset.src;
           delete element.dataset.src;
         }
-        if (element.dataset.srcset) {
-          element.srcset = element.dataset.srcset;
+        if (element.dataset.srcset && 'srcset' in element) {
+          (element as HTMLImageElement).srcset = element.dataset.srcset;
           delete element.dataset.srcset;
         }
         
@@ -68,35 +68,7 @@ export const getResponsiveImageSrcset = (basePath: string): string => {
   return `${basePath}-sm.webp 480w, ${basePath}-md.webp 768w, ${basePath}-lg.webp 1024w, ${basePath}-xl.webp 1280w`;
 };
 
-/**
- * Image component with lazy loading and WebP support
- * Usage: <LazyImage src="/image.jpg" alt="Description" />
- */
-export const LazyImage = ({ 
-  src, 
-  alt, 
-  className = '',
-  width,
-  height,
-}: {
-  src: string;
-  alt: string;
-  className?: string;
-  width?: number;
-  height?: number;
-}) => {
-  return (
-    <img
-      src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7"
-      data-src={src}
-      alt={alt}
-      className={`lazy-load-image ${className}`}
-      width={width}
-      height={height}
-      loading="lazy"
-    />
-  );
-};
+
 
 /**
  * Initialize performance monitoring
@@ -109,7 +81,7 @@ export const initPerformanceMonitoring = () => {
       const lcpObserver = new PerformanceObserver((list) => {
         const entries = list.getEntries();
         const lastEntry = entries[entries.length - 1];
-        console.log('LCP:', lastEntry.renderTime || lastEntry.loadTime);
+        console.log('LCP:', (lastEntry as any).renderTime || (lastEntry as any).loadTime);
       });
       lcpObserver.observe({ entryTypes: ['largest-contentful-paint'] });
     } catch (e) {

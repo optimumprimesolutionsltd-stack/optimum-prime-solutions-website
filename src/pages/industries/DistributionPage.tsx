@@ -61,12 +61,17 @@ const faqs = [
 
 export default function DistributionPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="TallyPrime for Distributors & Wholesalers Kenya — Multi-Branch, Credit Control & eTIMS"
         description="TallyPrime distribution solution in Kenya. Multi-branch inventory, credit control, sales order management, and KRA eTIMS compliance for wholesale distributors across Kenya."
         canonical="/industries/distribution"
         keywords="TallyPrime distribution Kenya, wholesale accounting software Kenya, distributor software Nairobi, multi-branch inventory Kenya, TallyPrime wholesale Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
+          { name: 'Distribution', item: 'https://www.optimumprimesolutions.co.ke/industries/distribution/' },
+        ]}
       />
 
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
@@ -89,7 +94,7 @@ export default function DistributionPage() {
               <Link to="/contact#demo-form" className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition">
                 Book a Free Demo <ArrowRight className="h-4 w-4" />
               </Link>
-              <a href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20about%20TallyPrime%20for%20distribution" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition">
+              <a href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20about%20TallyPrime%20for%20distribution" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition">
                 <MessageSquare className="h-4 w-4" /> Chat on WhatsApp
               </a>
             </div>
@@ -183,6 +188,6 @@ export default function DistributionPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

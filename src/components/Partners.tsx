@@ -64,7 +64,7 @@ export default function Partners() {
               key={partner.name}
               href={partner.url}
               target="_blank"
-              rel="noreferrer"
+              rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -77,6 +77,9 @@ export default function Partners() {
                   src={partner.logo}
                   alt={`${partner.name} logo`}
                   className={partner.logoClass}
+                  width={160}
+                  height={64}
+                  loading="lazy"
                 />
               </div>
 
@@ -106,7 +109,7 @@ export default function Partners() {
           <div className="flex -space-x-3">
             {partners.map((p) => (
               <div key={p.name} className="h-10 w-10 rounded-full bg-slate-800 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
-                <img src={p.logo} alt={p.name} className="h-7 w-7 object-contain" />
+                <img src={p.logo} alt={p.name} className="h-7 w-7 object-contain" width={28} height={28} loading="lazy" />
               </div>
             ))}
           </div>

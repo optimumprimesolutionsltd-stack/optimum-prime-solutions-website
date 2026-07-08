@@ -6,7 +6,7 @@ import { useSiteContent } from "../lib/useSiteContent";
 const floatVariants = {
   animate: {
     y: [0, -12, 0],
-    transition: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+    transition: { duration: 4, repeat: Infinity, ease: "easeInOut" as const },
   },
 };
 
@@ -16,7 +16,7 @@ const cardVariants = {
     opacity: 1,
     y: 0,
     scale: 1,
-    transition: { delay: 0.5 + i * 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+    transition: { delay: 0.5 + i * 0.15, duration: 0.6, ease: [0.22, 1, 0.36, 1] as any },
   }),
 };
 
@@ -48,13 +48,14 @@ const floatingCards = [
 ];
 
 export default function Hero() {
-  const { content } = useSiteContent();
+  const { data } = useSiteContent();
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
   const y = useTransform(scrollYProgress, [0, 1], [0, 120]);
   const opacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
 
-  const hero = content?.hero;
+  // Handle case where hero data might not be in data object
+  const hero = (data as any)?.hero;
   const badge = hero?.badgeText || "🇰🇪 Trusted by Kenyan Businesses";
   const headline = hero?.headline || "Business Systems That Actually Work";
   const subheadline =
@@ -110,7 +111,7 @@ export default function Hero() {
               transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
               className="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight text-[#1f3a5f] tracking-tight"
             >
-              {headline.split(" ").map((word, i) => (
+              {headline.split(" ").map((word: string, i: number) => (
                 <motion.span
                   key={i}
                   initial={{ opacity: 0, y: 20 }}
@@ -209,7 +210,7 @@ export default function Hero() {
                     key={i}
                     initial={{ scaleY: 0 }}
                     animate={{ scaleY: 1 }}
-                    transition={{ delay: 0.6 + i * 0.08, duration: 0.4, ease: "easeOut" }}
+                    transition={{ delay: 0.6 + i * 0.08, duration: 0.4, ease: "easeOut" as const }}
                     style={{ height: `${h}%` }}
                     className={`flex-1 rounded-sm origin-bottom ${i === 5 ? "bg-blue-600" : "bg-blue-200"}`}
                   />

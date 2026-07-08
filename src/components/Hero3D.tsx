@@ -17,13 +17,13 @@ export default function Hero3D() {
 
           {/* Left column */}
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-            <h1 className="mt-0 max-w-3xl text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
+            <h2 className="mt-0 max-w-3xl text-3xl font-bold tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
               Kenya's Certified{' '}
               <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
                 TallyPrime Partner
               </span>{' '}
               — Cloud Hosting, EOS® Consulting &amp; Business Automation
-            </h1>
+            </h2>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-400">
               We sell and implement TallyPrime (Silver, Gold &amp; Enterprise), provide secure cloud hosting for remote access, and help leadership teams run their businesses on the Entrepreneurial Operating System (EOS®) — the proven framework by Gino Wickman used by 280,000+ companies worldwide.
             </p>

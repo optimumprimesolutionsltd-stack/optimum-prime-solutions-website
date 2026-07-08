@@ -21,12 +21,17 @@ const faqs = [
 
 export default function SACCOPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="TallyPrime for SACCOs Kenya — Member Accounting, Loans & SASRA Compliance"
         description="TallyPrime SACCO accounting solution in Kenya. Member savings tracking, loan management, SASRA compliance reports, and financial statements for SACCOs across Kenya."
         canonical="/industries/sacco"
         keywords="TallyPrime SACCO Kenya, SACCO accounting software Kenya, SACCO management software Nairobi, SASRA compliance Kenya, cooperative accounting Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'Industries', item: 'https://www.optimumprimesolutions.co.ke/industries/' },
+          { name: 'SACCO', item: 'https://www.optimumprimesolutions.co.ke/industries/sacco/' },
+        ]}
       />
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-green-900/20 via-transparent to-transparent pointer-events-none" />
@@ -44,7 +49,7 @@ export default function SACCOPage() {
             </p>
             <div className="flex flex-wrap gap-4">
               <Link to="/contact#demo-form" className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition">Book a Free Demo <ArrowRight className="h-4 w-4" /></Link>
-              <a href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20about%20TallyPrime%20for%20SACCOs" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"><MessageSquare className="h-4 w-4" /> Chat on WhatsApp</a>
+              <a href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20about%20TallyPrime%20for%20SACCOs" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"><MessageSquare className="h-4 w-4" /> Chat on WhatsApp</a>
             </div>
           </div>
         </div>
@@ -86,6 +91,6 @@ export default function SACCOPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

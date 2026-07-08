@@ -85,12 +85,17 @@ const faqs = [
 
 export default function LicensingPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="Buy TallyPrime Licence Kenya — Silver, Gold & Edit Log | Optimum Prime Solutions"
         description="Buy genuine TallyPrime Silver, Gold and Edit Log licences in Kenya. Authorised Tally partner in Nairobi and Ruiru. Competitive prices, full local support, and TSS included."
         canonical="/tallyprime/licensing"
         keywords="buy TallyPrime Kenya, TallyPrime licence Kenya, TallyPrime Silver Kenya, TallyPrime Gold Kenya, TallyPrime price Kenya, Tally reseller Nairobi"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
+          { name: 'Licensing', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/licensing/' },
+        ]}
       />
 
       {/* Hero */}
@@ -120,7 +125,7 @@ export default function LicensingPage() {
               <a
                 href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20enquire%20about%20TallyPrime%20licensing"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"
               >
                 <MessageSquare className="h-4 w-4" /> Chat on WhatsApp
@@ -278,6 +283,6 @@ export default function LicensingPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

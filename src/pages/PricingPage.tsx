@@ -4,12 +4,16 @@ import Products from '../components/Products';
 
 export default function PricingPage() {
   return (
-    <>
+    <main className="min-h-screen bg-slate-900">
       <SEO
         title="TallyPrime Pricing Kenya — Silver, Gold, Cloud Hosting & Enterprise Editions"
         description="View TallyPrime pricing in Kenya. Official Silver, Gold & Enterprise licences, cloud hosting packages, and implementation bundles. Competitive prices with full local support from Kenya's certified TallyPrime partner."
         canonical="/pricing"
         keywords="TallyPrime price Kenya, TallyPrime Silver price Kenya, TallyPrime Gold price Kenya, TallyPrime cost Kenya, buy TallyPrime Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'Pricing', item: 'https://www.optimumprimesolutions.co.ke/pricing/' },
+        ]}
       />
 
       {/* Hero */}
@@ -34,6 +38,6 @@ export default function PricingPage() {
 
       {/* Products / Pricing Component */}
       <Products />
-    </>
+    </main>
   );
 }

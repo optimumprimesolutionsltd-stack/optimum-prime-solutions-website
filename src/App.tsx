@@ -26,6 +26,7 @@ import IndustriesPage from './pages/IndustriesPage';
 import KnowledgeHubPage from './pages/KnowledgeHubPage';
 import PricingPage from './pages/PricingPage';
 import ComingSoonPage from './pages/ComingSoonPage';
+import NotFoundPage from './pages/NotFoundPage';
 import WebinarPage from './pages/WebinarPage';
 
 // Phase 2 — Service pages
@@ -56,7 +57,7 @@ function SiteRoutes() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950 flex flex-col">
       <Navbar />
-      <main className="flex-grow pt-[72px]">
+      <main className="flex-grow pt-[72px]" id="main-content">
         <Routes>
           {/* ── Core pages ── */}
           <Route path="/" element={<HomePage />} />
@@ -111,8 +112,8 @@ function SiteRoutes() {
           {/* ── Why Choose Us ── */}
           <Route path="/why-choose-us" element={<ComingSoonPage />} />
 
-          {/* ── Catch-all ── */}
-          <Route path="*" element={<Navigate to="/" replace />} />
+          {/* ── Catch-all (404) ── */}
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </main>
       <Footer />

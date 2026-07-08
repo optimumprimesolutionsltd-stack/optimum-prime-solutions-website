@@ -61,12 +61,17 @@ const faqs = [
 
 export default function CloudHostingPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="TallyPrime Cloud Hosting Kenya — Secure Remote Access for Your Tally Data"
         description="Host TallyPrime on the cloud in Kenya. Access your accounting data from anywhere, on any device. 99.9% uptime, daily backups, and multi-user access. Serving Nairobi, Ruiru and all of Kenya."
         canonical="/tallyprime/cloud-hosting"
         keywords="TallyPrime cloud hosting Kenya, Tally cloud Kenya, TallyPrime remote access Kenya, Tally on cloud Nairobi, cloud accounting Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
+          { name: 'Cloud Hosting', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/cloud-hosting/' },
+        ]}
       />
 
       {/* Hero */}
@@ -96,7 +101,7 @@ export default function CloudHostingPage() {
               <a
                 href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20enquire%20about%20TallyPrime%20cloud%20hosting"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"
               >
                 <MessageSquare className="h-4 w-4" /> Chat on WhatsApp
@@ -254,6 +259,6 @@ export default function CloudHostingPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

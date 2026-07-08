@@ -106,12 +106,17 @@ const faqs = [
 
 export default function TrainingPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="TallyPrime Training Kenya — On-Site, Remote & Classroom | Optimum Prime Solutions"
         description="Professional TallyPrime training in Kenya. Foundation, advanced, KRA compliance and administrator courses. On-site training in Nairobi, Ruiru and Kiambu. Remote training available nationwide."
         canonical="/tallyprime/training"
         keywords="TallyPrime training Kenya, Tally training Nairobi, TallyPrime course Kenya, Tally Prime classes Kenya, TallyPrime KRA compliance training"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
+          { name: 'Training', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/training/' },
+        ]}
       />
 
       {/* Hero */}
@@ -141,7 +146,7 @@ export default function TrainingPage() {
               <a
                 href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20enquire%20about%20TallyPrime%20training"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"
               >
                 <MessageSquare className="h-4 w-4" /> Chat on WhatsApp
@@ -285,6 +290,6 @@ export default function TrainingPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

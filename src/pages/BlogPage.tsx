@@ -4,12 +4,16 @@ import SEO from '../components/SEO';
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-slate-900">
+    <main className="min-h-screen bg-slate-900">
       <SEO
         title="Blog | TallyPrime, KRA Compliance & Business Tips for Kenya"
         description="Practical guides, case studies, and expert insights on TallyPrime implementation, KRA compliance, eTIMS, cloud hosting, payroll, and EOS® — tailored for Kenyan business owners."
         canonical="/blog"
         keywords="TallyPrime blog Kenya, KRA compliance tips, eTIMS guide Kenya, accounting tips Kenya, TallyPrime tutorial, EOS business tips Kenya, payroll Kenya guide"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'Blog', item: 'https://www.optimumprimesolutions.co.ke/blog/' },
+        ]}
       />
       <AfricanLaptopShowcase
         tag="Insights & Articles"
@@ -19,6 +23,6 @@ export default function BlogPage() {
         theme="blog"
       />
       <Blog />
-    </div>
+    </main>
   );
 }

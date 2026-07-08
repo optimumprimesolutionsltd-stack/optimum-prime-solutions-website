@@ -71,7 +71,7 @@ Join 500+ Kenyan businesses already running smarter with TallyPrime, cloud hosti
               <Link to="/contact#demo-form" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="rounded-xl bg-red-600 px-8 py-4 text-sm font-bold text-white shadow-xl shadow-red-900/30 hover:bg-red-700 transition-all hover:scale-105">
                 Request Free Demo
               </Link>
-              <a href="https://tallysolutions.com/ssa/download/" target="_blank" rel="noreferrer"
+              <a href="https://tallysolutions.com/ssa/download/" target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-3 rounded-xl border border-white/20 bg-slate-800/90 px-6 py-4 text-sm font-bold text-white backdrop-blur-sm hover:bg-slate-700 transition-all">
                 <TallyLogo className="h-5 w-auto" />
                 Download TallyPrime

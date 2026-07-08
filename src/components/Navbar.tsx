@@ -114,7 +114,15 @@ export default function Navbar() {
   };
 
   return (
-    <motion.nav
+    <>
+      <a
+        href="#main-content"
+        className="skip-nav"
+        aria-label="Skip to main content"
+      >
+        Skip to main content
+      </a>
+      <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 backdrop-blur-sm bg-gradient-to-b from-slate-100/95 via-slate-50/80 to-transparent border-b border-slate-200/10 ${scrolled ? 'shadow-[0_20px_80px_-40px_rgba(15,23,42,0.16)] border-slate-200/20' : 'shadow-none'}`}
@@ -302,5 +310,6 @@ export default function Navbar() {
         )}
       </AnimatePresence>
     </motion.nav>
+    </>
   );
 }

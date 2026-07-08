@@ -245,7 +245,7 @@ export default function Contact() {
               <a
                 href={`https://wa.me/${c.whatsapp}`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#25D366] px-6 py-4 text-sm font-semibold text-white shadow-xl shadow-[#25D366]/30 transition hover:bg-[#1DA851]"
               >
                 <WhatsAppIcon className="h-4 w-4 text-white" /> Chat on WhatsApp
@@ -253,7 +253,7 @@ export default function Contact() {
               <a
                 href={facebookLink}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex w-full items-center justify-center gap-3 rounded-full bg-[#1877F2] px-6 py-4 text-sm font-semibold text-white shadow-xl shadow-[#1877F2]/30 transition hover:bg-[#166fe5]"
               >
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>

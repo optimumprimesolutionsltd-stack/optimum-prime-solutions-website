@@ -54,12 +54,17 @@ const faqs = [
 
 export default function ConsultingPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
-        title="EOS® Business Consulting Kenya — Entrepreneurial Operating System | Optimum Prime Solutions"
-        description="Certified EOS® Implementers in Kenya. Help your leadership team get aligned, gain traction, and achieve your vision using the Entrepreneurial Operating System. Serving businesses across Nairobi and Kenya."
+        title="EOS Business Consulting Kenya — Entrepreneurial Operating System | Optimum Prime Solutions"
+        description="Certified EOS Implementers in Kenya. Help your leadership team get aligned, gain traction, and achieve your vision using the Entrepreneurial Operating System. Serving businesses across Nairobi and Kenya."
         canonical="/tallyprime/consulting"
         keywords="EOS Kenya, Entrepreneurial Operating System Kenya, business consulting Nairobi, EOS implementer Kenya, Traction book Kenya, business operating system Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
+          { name: 'Consulting', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/consulting/' },
+        ]}
       />
 
       {/* Hero */}
@@ -89,7 +94,7 @@ export default function ConsultingPage() {
               <a
                 href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20more%20about%20EOS%20business%20consulting"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"
               >
                 <MessageSquare className="h-4 w-4" /> Chat on WhatsApp
@@ -232,6 +237,6 @@ export default function ConsultingPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

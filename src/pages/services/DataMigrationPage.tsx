@@ -75,12 +75,17 @@ const faqs = [
 
 export default function DataMigrationPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="TallyPrime Data Migration Kenya — From QuickBooks, Excel, Sage & TallyERP 9"
         description="Professional TallyPrime data migration in Kenya. Migrate from QuickBooks, Excel, Sage, TallyERP 9, and other systems with zero data loss. Full reconciliation and sign-off before go-live."
         canonical="/tallyprime/data-migration"
         keywords="TallyPrime data migration Kenya, migrate QuickBooks to Tally Kenya, TallyERP 9 to TallyPrime upgrade Kenya, Tally data import Kenya, accounting data migration Nairobi"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
+          { name: 'Data Migration', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/data-migration/' },
+        ]}
       />
 
       {/* Hero */}
@@ -110,7 +115,7 @@ export default function DataMigrationPage() {
               <a
                 href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20enquire%20about%20data%20migration%20to%20TallyPrime"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"
               >
                 <MessageSquare className="h-4 w-4" /> Chat on WhatsApp
@@ -280,6 +285,6 @@ export default function DataMigrationPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

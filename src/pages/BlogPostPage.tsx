@@ -34,7 +34,7 @@ export default function BlogPostPage() {
   const BASE_URL = 'https://www.optimumprimesolutions.co.ke';
 
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title={`${post.title} | Optimum Prime Solutions`}
         description={post.excerpt}
@@ -42,6 +42,11 @@ export default function BlogPostPage() {
         ogType="article"
         ogImage={`${BASE_URL}/og-image.png`}
         keywords={`${post.category}, TallyPrime Kenya, KRA compliance, ${post.title}`}
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'Blog', item: 'https://www.optimumprimesolutions.co.ke/blog/' },
+          { name: post.title, item: `${BASE_URL}/blog/${slugify(post.title)}/` },
+        ]}
       />
 
       {/* Hero */}
@@ -125,6 +130,6 @@ export default function BlogPostPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

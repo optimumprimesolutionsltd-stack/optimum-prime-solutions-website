@@ -64,12 +64,17 @@ const faqs = [
 
 export default function ImplementationPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="TallyPrime Implementation Kenya — Setup, Configuration & Go-Live Support"
         description="Professional TallyPrime implementation in Kenya. End-to-end setup, KRA eTIMS integration, data migration, staff training, and go-live support. Serving Nairobi, Ruiru, Kiambu and all of Kenya."
         canonical="/tallyprime/implementation"
         keywords="TallyPrime implementation Kenya, TallyPrime setup Kenya, TallyPrime configuration Nairobi, TallyPrime go-live support Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
+          { name: 'Implementation', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/implementation/' },
+        ]}
       />
 
       {/* Hero */}
@@ -99,7 +104,7 @@ export default function ImplementationPage() {
               <a
                 href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20enquire%20about%20TallyPrime%20implementation"
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"
               >
                 <MessageSquare className="h-4 w-4" /> Chat on WhatsApp
@@ -228,6 +233,6 @@ export default function ImplementationPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

@@ -244,9 +244,9 @@ export default function Products() {
                     </span>
                   </motion.div>
                   <p className="text-xs text-slate-400 mt-1">{p.period}</p>
-                  {p.note && (
+                  {(p as any).note && (
                     <p className="mt-2 text-xs text-amber-400 font-medium">
-                      💡 {p.note}
+                      💡 {(p as any).note}
                     </p>
                   )}
                   {p.popular && (

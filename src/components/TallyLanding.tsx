@@ -118,7 +118,7 @@ export default function TallyLanding() {
               Get a Free Quote
             </button>
             <Link
-              to="/tally-prime-kenya"
+              to="/tallyprime"
               onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
               className="w-full rounded-full border border-white/30 bg-white/5 px-8 py-4 text-sm font-bold text-white backdrop-blur-md transition-all hover:scale-105 hover:border-white/70 hover:bg-white/10 active:scale-95 sm:w-auto"
             >

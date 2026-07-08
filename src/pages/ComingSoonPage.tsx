@@ -40,12 +40,17 @@ export default function ComingSoonPage() {
   };
 
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title={`${info.title} — Coming Soon | Optimum Prime Solutions`}
         description={info.desc}
         canonical={location.pathname}
         noIndex={true}
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: info.parent, item: `https://www.optimumprimesolutions.co.ke${info.parentHref.replace(/\/?$/, '/')}` },
+          { name: info.title, item: `https://www.optimumprimesolutions.co.ke${location.pathname.replace(/\/?$/, '/')}` },
+        ]}
       />
 
       <section className="min-h-[70vh] flex items-center bg-slate-50">
@@ -65,6 +70,7 @@ export default function ComingSoonPage() {
                 to="/contact#demo-form"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition"
+                rel="nofollow"
               >
                 Talk to Our Team <ArrowRight className="h-4 w-4" />
               </Link>
@@ -79,6 +85,6 @@ export default function ComingSoonPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

@@ -109,12 +109,16 @@ export default function TallyPrimeKenyaPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <main className="min-h-screen bg-slate-50">
       <SEO
         title="TallyPrime Kenya | Buy, Implement & Train — Official Tally Partner"
         description="Buy genuine TallyPrime in Kenya from the official certified partner. Expert TallyPrime implementation, training, KRA eTIMS compliance setup, and cloud hosting. Serving Ruiru, Nairobi and all of Kenya. Call +254 116 246 074."
         canonical="/tally-prime-kenya"
         keywords="TallyPrime Kenya, buy TallyPrime Kenya, official Tally partner Kenya, TallyPrime implementation Kenya, TallyPrime training Kenya, TallyPrime price Kenya, TallyPrime reseller Nairobi, KRA eTIMS TallyPrime, TallyPrime cloud hosting Kenya, TallyPrime Silver Gold Kenya, TallyPrime Ruiru"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'TallyPrime Kenya', item: 'https://www.optimumprimesolutions.co.ke/tally-prime-kenya/' },
+        ]}
       />
 
       {/* ── Hero ── */}
@@ -399,7 +403,7 @@ export default function TallyPrimeKenyaPage() {
               <a
                 href={`https://wa.me/${data.contact.whatsapp}?text=Hi,%20I%20would%20like%20to%20buy%20TallyPrime%20in%20Kenya`}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/10 px-8 py-4 text-sm font-bold text-white backdrop-blur-sm transition-all hover:scale-105 hover:bg-white/20 active:scale-95"
               >
                 WhatsApp Us
@@ -408,6 +412,6 @@ export default function TallyPrimeKenyaPage() {
           </motion.div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

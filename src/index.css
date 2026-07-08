@@ -79,6 +79,63 @@ h6 {
 }
 
 @layer utilities {
+  /* Skip navigation link */
+  .skip-nav {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    z-index: 9999;
+    background: #dc2626;
+    color: #ffffff;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    text-decoration: none;
+  }
+  .skip-nav:focus {
+    position: fixed;
+    top: 0.5rem;
+    left: 0.5rem;
+    width: auto;
+    height: auto;
+    overflow: visible;
+  }
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+  .sr-only:focus {
+    position: absolute;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
+
+  /* Lazy-loaded image transition */
+  .lazy-load-image {
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out;
+  }
+  .lazy-load-image.loaded {
+    opacity: 1;
+  }
+  /* Aspect ratio for images */
+  .lazy-load-image,
+  .lazy-load-image img {
+    aspect-ratio: attr(width) / attr(height);
+  }
   .surface {
     @apply bg-slate-800 border border-white/10 shadow-sm;
   }

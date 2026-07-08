@@ -89,12 +89,16 @@ const featuredTopics = [
 
 export default function KnowledgeHubPage() {
   return (
-    <>
+    <main className="min-h-screen">
       <SEO
         title="Knowledge Hub — TallyPrime Guides, Blog, FAQs & Resources Kenya"
         description="Your central TallyPrime learning resource. Access blog articles, implementation guides, video tutorials, FAQs, case studies, and downloadable templates from Kenya's certified TallyPrime partner."
         canonical="/knowledge-hub"
         keywords="TallyPrime guides Kenya, TallyPrime tutorials Kenya, TallyPrime FAQ Kenya, TallyPrime blog Kenya, TallyPrime resources Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'Knowledge Hub', item: 'https://www.optimumprimesolutions.co.ke/knowledge-hub/' },
+        ]}
       />
 
       {/* Hero */}
@@ -239,7 +243,7 @@ export default function KnowledgeHubPage() {
                 <a
                   href="https://wa.me/254116246074?text=Hi,%20I%20have%20a%20TallyPrime%20question"
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   className="flex items-center justify-between rounded-2xl bg-green-50 border border-green-200 px-4 py-3 text-sm font-medium text-green-700 hover:bg-green-100 transition"
                 >
                   WhatsApp Us Now <ArrowRight className="h-4 w-4" />
@@ -273,6 +277,6 @@ export default function KnowledgeHubPage() {
           </div>
         </div>
       </section>
-    </>
+    </main>
   );
 }

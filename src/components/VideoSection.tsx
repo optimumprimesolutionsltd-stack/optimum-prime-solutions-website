@@ -53,6 +53,9 @@ export default function VideoSection() {
                     src={`https://img.youtube.com/vi/${TALLY_VIDEO_ID}/maxresdefault.jpg`}
                     alt="TallyPrime Product Video"
                     className="w-full aspect-video object-cover"
+                    width={1280}
+                    height={720}
+                    loading="lazy"
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${TALLY_VIDEO_ID}/hqdefault.jpg`;
                     }}

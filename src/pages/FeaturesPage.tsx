@@ -5,12 +5,16 @@ import SEO from '../components/SEO';
 
 export default function FeaturesPage() {
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen">
       <SEO
-        title="Services | TallyPrime Installation, Cloud Hosting & EOS® Consulting Kenya"
-        description="Explore Optimum Prime Solutions' services: TallyPrime installation & setup, inventory management, payroll (PAYE/NHIF/NSSF), KRA compliance, cloud hosting, and EOS® business consulting for Kenyan businesses."
+        title="Services | TallyPrime Installation, Cloud Hosting & EOS Consulting Kenya"
+        description="Explore Optimum Prime Solutions' services: TallyPrime installation & setup, inventory management, payroll (PAYE/NHIF/NSSF), KRA compliance, cloud hosting, and EOS business consulting for Kenyan businesses."
         canonical="/features"
         keywords="TallyPrime installation Kenya, TallyPrime setup Nairobi, cloud hosting Kenya, KRA compliance accounting, payroll software Kenya, PAYE NHIF NSSF Kenya, EOS consulting Kenya, inventory management Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'Services', item: 'https://www.optimumprimesolutions.co.ke/features/' },
+        ]}
       />
       <AfricanLaptopShowcase
         tag="Our Services"
@@ -21,6 +25,6 @@ export default function FeaturesPage() {
       />
       <Features />
       <HowItWorks />
-    </div>
+    </main>
   );
 }

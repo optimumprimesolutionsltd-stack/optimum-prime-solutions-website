@@ -3,12 +3,16 @@ import SEO from '../components/SEO';
 
 export default function ProductsPage() {
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen">
       <SEO
         title="TallyPrime Products & Pricing Kenya | Silver, Gold & Enterprise"
-        description="Buy TallyPrime Silver, Gold or Enterprise in Kenya. Official pricing, cloud hosting packages from KES 3,000/month, and EOS® consulting. Kenya's certified TallyPrime reseller."
+        description="Buy TallyPrime Silver, Gold or Enterprise in Kenya. Official pricing, cloud hosting packages from KES 3,000/month, and EOS consulting. Kenya's certified TallyPrime reseller."
         canonical="/products"
         keywords="TallyPrime price Kenya, TallyPrime Silver Kenya, TallyPrime Gold Kenya, TallyPrime Enterprise Kenya, buy TallyPrime Nairobi, TallyPrime licence Kenya, cloud hosting Kenya price"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'Products', item: 'https://www.optimumprimesolutions.co.ke/products/' },
+        ]}
       />
       <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -56,6 +60,6 @@ export default function ProductsPage() {
       </section>
 
       <Products />
-    </div>
+    </main>
   );
 }

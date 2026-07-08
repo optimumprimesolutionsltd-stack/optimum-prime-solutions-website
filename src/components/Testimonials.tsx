@@ -69,6 +69,9 @@ export default function Testimonials() {
                 src="/ujenzi-video-thumbnail.webp?v=2" 
                 alt="Frederick Chege Testimonial Video" 
                 className="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-opacity duration-500"
+                width={854}
+                height={480}
+                loading="lazy"
               />
               
               {/* Play Button Overlay */}
@@ -90,7 +93,7 @@ export default function Testimonials() {
                   <a 
                     href="https://www.facebook.com/TallySolutions" 
                     target="_blank" 
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
                     className="bg-[#1877F2] text-white text-xs font-bold px-4 py-2 rounded-full shadow-lg hover:bg-[#166fe5] transition flex items-center gap-2"
                   >
@@ -126,6 +129,9 @@ export default function Testimonials() {
                     src="/client-ujenzi-logo.png" 
                     alt="Ujenzi Distributors Logo" 
                     className="w-full h-full object-contain"
+                    width={128}
+                    height={96}
+                    loading="lazy"
                   />
                 </div>
                 <div>

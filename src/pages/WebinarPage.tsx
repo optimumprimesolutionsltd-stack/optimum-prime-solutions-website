@@ -80,7 +80,7 @@ export default function WebinarPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900">
+    <main className="min-h-screen bg-slate-900">
       <SEO
         title="Free Webinar — What's New in TallyPrime 7.1 | Optimum Prime Solutions"
         description="Join our free webinar on Wednesday 15th July 2026 and discover the powerful new features in TallyPrime 7.1 — Auto Wrap Text, Invoice Templates, Scheduled Backup & more."
@@ -231,6 +231,6 @@ export default function WebinarPage() {
           )}
         </div>
       </section>
-    </div>
+    </main>
   );
 }

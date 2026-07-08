@@ -39,6 +39,8 @@ export default function About() {
                 src="/images/about-team-meeting.webp" 
                 alt="Optimum Prime Solutions professional business office environment" 
                 className="w-full h-full object-cover aspect-[4/3]"
+                width={800}
+                height={600}
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-slate-950/20 mix-blend-multiply pointer-events-none" />

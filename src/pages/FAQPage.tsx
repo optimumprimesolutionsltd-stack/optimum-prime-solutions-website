@@ -4,12 +4,16 @@ import SEO from '../components/SEO';
 
 export default function FAQPage() {
   return (
-    <div className="min-h-screen bg-slate-900">
+    <main className="min-h-screen bg-slate-900">
       <SEO
         title="FAQ | TallyPrime Kenya — Pricing, Licensing & KRA Compliance Questions"
         description="Answers to the most common questions about TallyPrime Kenya pricing, licensing, KRA & eTIMS compliance, cloud hosting, remote access, payroll setup, and EOS® consulting."
         canonical="/faq"
         keywords="TallyPrime FAQ Kenya, TallyPrime price Kenya, TallyPrime licence questions, KRA compliance FAQ, eTIMS questions Kenya, cloud hosting FAQ Kenya, EOS FAQ Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'FAQ', item: 'https://www.optimumprimesolutions.co.ke/faq/' },
+        ]}
       />
       <AfricanLaptopShowcase
         tag="Frequently Asked Questions"
@@ -19,6 +23,6 @@ export default function FAQPage() {
         theme="faq"
       />
       <FAQ />
-    </div>
+    </main>
   );
 }

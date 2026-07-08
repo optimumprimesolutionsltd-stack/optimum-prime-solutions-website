@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import { Package, BookOpen, Wallet, Factory, FileCheck, Code, Headphones, BarChart3, Sparkles, type LucideIcon } from 'lucide-react';
+import { Package, BookOpen, Wallet, Factory, FileCheck, Code, Headphones, BarChart3, Sparkles, type LucideIcon, Download, Cloud, Users } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import TallyPrimeIcon from './TallyPrimeIcon';
 
 const iconMap: Record<string, LucideIcon> = {
-  Package, BookOpen, Wallet, Factory, FileCheck, Code, Headphones, BarChart3, Download: Package
+  Package, BookOpen, Wallet, Factory, FileCheck, Code, Headphones, BarChart3, Download, Cloud, Users
 };
 
 export default function Features() {
@@ -39,7 +39,7 @@ export default function Features() {
       opacity: 1,
       y: 0,
       rotateX: 0,
-      transition: { duration: 0.6, ease: "easeOut" }
+      transition: { duration: 0.6, ease: "easeOut" as const }
     }
   };
 
@@ -143,9 +143,9 @@ export default function Features() {
                   ))}
                 </ul>
                 <motion.a
-                  href={svc.link || svc.cta || '#'}
+                  href={svc.link || (svc as any).cta || '#'}
                   target="_blank"
-                  rel="noreferrer"
+                  rel="noopener noreferrer"
                   whileHover={{ y: -2 }}
                   className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-slate-900/20 transition duration-300 hover:bg-slate-800"
                 >
