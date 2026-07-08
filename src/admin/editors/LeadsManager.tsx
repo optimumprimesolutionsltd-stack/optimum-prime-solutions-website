@@ -102,6 +102,7 @@ interface BookingForm {
   demoType: 'online' | 'physical';
   demoDate: string; demoTime: string; demoLocation: string; demoNotes: string;
   teamMemberName: string; teamMemberPhone: string;
+  extraTeam: TeamMember[];
   notifyClient: boolean;
 }
 const emptyBooking: BookingForm = {
@@ -109,6 +110,7 @@ const emptyBooking: BookingForm = {
   clientCompany: '', clientIndustry: '',
   demoType: 'online', demoDate: '', demoTime: '', demoLocation: '', demoNotes: '',
   teamMemberName: '', teamMemberPhone: '',
+  extraTeam: [],
   notifyClient: true,
 };
 
@@ -157,7 +159,7 @@ export default function LeadsManager({ data, onSave }: P) {
   const setS = (f: keyof ScheduleForm, v: string) =>
     setSchedForm(prev => ({ ...prev, [f]: v }));
 
-  // ── Extra team members helpers ───────────────────────────────────────────
+  // ── Extra team members helpers (schedule/edit panel) ────────────────────
   const addExtraTeam = () =>
     setSchedForm(prev => ({ ...prev, extraTeam: [...prev.extraTeam, { name: '', phone: '' }] }));
   const removeExtraTeam = (i: number) =>
@@ -168,13 +170,25 @@ export default function LeadsManager({ data, onSave }: P) {
       extraTeam: prev.extraTeam.map((m, idx) => idx === i ? { ...m, [field]: val } : m),
     }));
 
+  // ── Extra team members helpers (booking panel) ───────────────────────────
+  const addBookingExtraTeam = () =>
+    setBooking(prev => ({ ...prev, extraTeam: [...prev.extraTeam, { name: '', phone: '' }] }));
+  const removeBookingExtraTeam = (i: number) =>
+    setBooking(prev => ({ ...prev, extraTeam: prev.extraTeam.filter((_, idx) => idx !== i) }));
+  const setBookingExtraTeam = (i: number, field: keyof TeamMember, val: string) =>
+    setBooking(prev => ({
+      ...prev,
+      extraTeam: prev.extraTeam.map((m, idx) => idx === i ? { ...m, [field]: val } : m),
+    }));
+
   // ── Booked slots (for conflict detection) ───────────────────────────────
+  // Excludes the lead currently being edited so its own slot isn't shown as blocked
   const bookedSlots = useMemo(() =>
     new Set(
       data.leads
-        .filter(l => l.status === 'Demo Scheduled' && l.scheduledDate && l.scheduledTime)
+        .filter(l => l.status === 'Demo Scheduled' && l.scheduledDate && l.scheduledTime && l.id !== editingId)
         .map(l => `${l.scheduledDate}|${l.scheduledTime}`)
-    ), [data.leads]);
+    ), [data.leads, editingId]);
 
   // ── Filtered leads ───────────────────────────────────────────────────────
   const filtered = data.leads
@@ -286,6 +300,10 @@ export default function LeadsManager({ data, onSave }: P) {
       onSave({ ...data, leads: [newLead, ...data.leads] });
 
       // 2. Send notifications via backend (Meet link generated server-side)
+      const allBookingTeam = [
+        { name: booking.teamMemberName, phone: booking.teamMemberPhone },
+        ...booking.extraTeam.filter(m => m.name.trim()),
+      ];
       await fetch(`${BACKEND_URL}/book-demo`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -300,8 +318,12 @@ export default function LeadsManager({ data, onSave }: P) {
           demoType: booking.demoType,
           demoLocation: booking.demoLocation,
           demoNotes: booking.demoNotes,
-          teamMemberName: booking.teamMemberName,
-          teamMemberPhone: booking.teamMemberPhone,
+          teamMemberName: allBookingTeam[0]?.name || '',
+          teamMemberPhone: allBookingTeam[0]?.phone || '',
+          teamMember2Name: allBookingTeam[1]?.name || '',
+          teamMember2Phone: allBookingTeam[1]?.phone || '',
+          teamMember3Name: allBookingTeam[2]?.name || '',
+          teamMember3Phone: allBookingTeam[2]?.phone || '',
           notifyClient: booking.notifyClient,
           source: 'manual',
         }),
@@ -677,15 +699,41 @@ export default function LeadsManager({ data, onSave }: P) {
               </div>
             </div>
 
-            {/* Team Member */}
+            {/* Team Members */}
             <div className="space-y-3">
-              <p className="text-xs font-bold text-navy-500 uppercase tracking-wider">Assigned Team Member</p>
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-bold text-navy-500 uppercase tracking-wider">Assigned Team Members</p>
+                {booking.extraTeam.length < 2 && (
+                  <button type="button" onClick={addBookingExtraTeam}
+                    className="text-xs text-accent font-semibold hover:underline flex items-center gap-1">
+                    <Plus className="h-3 w-3" /> Add member
+                  </button>
+                )}
+              </div>
+              {/* Primary */}
               <div className="grid grid-cols-2 gap-3">
                 <input value={booking.teamMemberName} onChange={e => setB('teamMemberName', e.target.value)}
                   placeholder="Your name *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                 <input value={booking.teamMemberPhone} onChange={e => setB('teamMemberPhone', e.target.value)}
                   placeholder="Your phone *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
               </div>
+              {/* Extra members */}
+              {booking.extraTeam.map((m, i) => (
+                <div key={i} className="grid grid-cols-2 gap-2 items-center">
+                  <input value={m.name} onChange={e => setBookingExtraTeam(i, 'name', e.target.value)}
+                    placeholder={`Member ${i + 2} name`}
+                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                  <div className="flex gap-1">
+                    <input value={m.phone} onChange={e => setBookingExtraTeam(i, 'phone', e.target.value)}
+                      placeholder="+254 7XX XXX XXX"
+                      className="flex-1 rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                    <button type="button" onClick={() => removeBookingExtraTeam(i)}
+                      className="rounded-lg p-2 text-red-400 hover:bg-red-50 transition shrink-0">
+                      <X className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Notify client toggle */}
