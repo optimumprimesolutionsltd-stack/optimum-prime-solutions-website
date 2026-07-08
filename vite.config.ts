@@ -3,7 +3,6 @@ import { fileURLToPath } from "url";
 import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
-import { viteSingleFile } from "vite-plugin-singlefile";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +27,8 @@ export default defineConfig({
   plugins: [
     react(),
     tailwindcss(),
-    viteSingleFile(),
+    // Removed viteSingleFile() to allow proper multi-page SSG output
+    // prerender.mjs will generate individual HTML files per route after build
   ],
   resolve: {
     alias: {
@@ -53,5 +53,11 @@ export default defineConfig({
     chunkSizeWarningLimit: 500,
     // Optimize images and assets
     assetsInlineLimit: 4096, // Inline assets smaller than 4KB
+    // Disable single file output - we need separate files for SSG
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      },
+    },
   },
 });
