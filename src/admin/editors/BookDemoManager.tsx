@@ -443,7 +443,8 @@ export default function BookDemoManager() {
         <button
           onClick={handleSubmit}
           disabled={submitting}
-          className="w-full flex items-center justify-center gap-2 rounded-2xl bg-accent hover:bg-accent/90 disabled:opacity-60 px-8 py-4 text-base font-bold text-white shadow-lg shadow-accent/20 transition mb-8"
+          className="w-full flex items-center justify-center gap-2 rounded-2xl disabled:opacity-60 px-8 py-4 text-base font-bold text-white shadow-lg transition mb-8"
+          style={{ backgroundColor: '#e53e3e' }}
         >
           {submitting ? (
             <><Loader2 className="h-5 w-5 animate-spin" /> Sending notifications...</>
