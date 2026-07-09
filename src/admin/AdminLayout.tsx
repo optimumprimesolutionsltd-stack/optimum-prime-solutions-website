@@ -15,6 +15,7 @@ import FaqEditor from './editors/FaqEditor';
 import LeadsManager from './editors/LeadsManager';
 import BlogEditor from './editors/BlogEditor';
 import ContactEditor from './editors/ContactEditor';
+import TestimonialsEditor from './editors/TestimonialsEditor';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -26,6 +27,7 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'leads', label: 'Demo Leads', icon: Users },
   { id: 'blogs', label: 'Blog Posts', icon: FileText },
   { id: 'contact', label: 'Contact Info', icon: Phone },
+  { id: 'testimonials', label: 'Reviews & Testimonials', icon: Users },
   // Book a Demo is now embedded inside Demo Leads tab
 ];
 
@@ -61,6 +63,7 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')} />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
       case 'contact': return <ContactEditor data={data} onSave={d => handleSave(d, 'Contact info saved!')} />;
+      case 'testimonials': return <TestimonialsEditor data={data} onSave={d => handleSave(d, 'Testimonials saved!')} />;
       case 'bookdemo': return null; // merged into leads tab
     }
   };

@@ -30,6 +30,30 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- Webinar -->
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/webinar</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Biz Analyst -->
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/biz-analyst</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- TallyPrime Kenya (main TallyPrime landing) -->
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/tally-prime-kenya</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.95</priority>
+  </url>
+
   <!-- FAQ -->
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/faq</loc>
