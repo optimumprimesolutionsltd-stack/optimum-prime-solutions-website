@@ -130,6 +130,14 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- TallyPrime / EOS Consulting -->
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/tallyprime/consulting</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.85</priority>
+  </url>
+
   <!-- ═══════════════════════════════════════════════════════ -->
   <!-- INDUSTRIES (Phase 0)                                    -->
   <!-- ═══════════════════════════════════════════════════════ -->
@@ -206,6 +214,22 @@
     <priority>0.8</priority>
   </url>
 
+  <!-- NGO (canonical alias) -->
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/industries/ngo</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- SACCO (canonical alias) -->
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/industries/sacco</loc>
+    <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- ═══════════════════════════════════════════════════════ -->
   <!-- KNOWLEDGE HUB (Phase 0)                                 -->
   <!-- ═══════════════════════════════════════════════════════ -->
@@ -258,6 +282,22 @@
     <priority>0.7</priority>
   </url>
 
+  <!-- Webinars -->
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/webinars</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- Templates -->
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/templates</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
   <!-- ═══════════════════════════════════════════════════════ -->
   <!-- PRICING (Phase 0)                                       -->
   <!-- ═══════════════════════════════════════════════════════ -->
@@ -296,6 +336,14 @@
     <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
+  </url>
+
+  <!-- Why Choose Us -->
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/why-choose-us</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 
   <!-- ═══════════════════════════════════════════════════════ -->
