@@ -129,16 +129,20 @@ export default function Chatbot() {
     };
     setMsgs((prev) => [...prev, userMsg]);
 
-    // Prepare history for AI, excluding the initial greeting
-    const aiHistory: ChatMessage[] = msgs
-      .filter(msg => msg.text !== botGreeting)
-      .map((msg) => ({
-        role: msg.role === 'bot' ? 'assistant' : 'user',
-        content: msg.text,
-      }));
-
-    // Add current user message to AI history
-    aiHistory.push({ role: 'user', content: trimmedText });
+    // Build the full conversation history for the AI.
+    // Include ALL prior messages (both user and bot) so Gemini has complete context
+    // and never re-asks questions the user already answered.
+    // Exclude only the static bot greeting (it is not part of the real conversation).
+    const aiHistory: ChatMessage[] = [
+      ...msgs
+        .filter(msg => msg.text !== botGreeting)
+        .map((msg) => ({
+          role: msg.role === 'bot' ? ('assistant' as const) : ('user' as const),
+          content: msg.text,
+        })),
+      // Append the new user message at the end
+      { role: 'user' as const, content: trimmedText },
+    ];
 
     try {
       const chatResult = await getChatResponse(trimmedText, aiHistory);
