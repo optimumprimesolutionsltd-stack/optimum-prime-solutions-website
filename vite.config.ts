@@ -50,13 +50,31 @@ export default defineConfig({
     // Enable source maps in production for error tracking
     sourcemap: false,
     // Chunk size warnings
-    chunkSizeWarningLimit: 500,
+    chunkSizeWarningLimit: 600,
     // Optimize images and assets
     assetsInlineLimit: 4096, // Inline assets smaller than 4KB
     // Disable single file output - we need separate files for SSG
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        // Split vendor libraries into separate cacheable chunks
+        manualChunks(id) {
+          if (id.includes('node_modules/firebase')) return 'vendor-firebase';
+          if (id.includes('node_modules/framer-motion')) return 'vendor-framer';
+          if (id.includes('node_modules/react-dom')) return 'vendor-react';
+          if (id.includes('node_modules/react/')) return 'vendor-react';
+          if (id.includes('node_modules/react-router')) return 'vendor-router';
+          if (id.includes('node_modules/lucide-react')) return 'vendor-icons';
+          if (
+            id.includes('node_modules/react-markdown') ||
+            id.includes('node_modules/remark') ||
+            id.includes('node_modules/rehype') ||
+            id.includes('node_modules/unified') ||
+            id.includes('node_modules/micromark') ||
+            id.includes('node_modules/mdast') ||
+            id.includes('node_modules/hast')
+          ) return 'vendor-markdown';
+          if (id.includes('node_modules')) return 'vendor-misc';
+        },
       },
     },
   },

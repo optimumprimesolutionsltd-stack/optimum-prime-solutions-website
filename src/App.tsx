@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { SiteProvider } from './context/SiteContext';
 import ErrorBoundary from './components/ErrorBoundary';
@@ -6,130 +6,145 @@ import { OfflineBanner } from './components/OfflineBanner';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
-import AdminLogin from './admin/AdminLogin';
-import AdminLayout from './admin/AdminLayout';
-
-// Existing pages
-import HomePage from './pages/HomePage';
-import AboutPage from './pages/AboutPage';
-import FeaturesPage from './pages/FeaturesPage';
-import ProductsPage from './pages/ProductsPage';
-import TestimonialsPage from './pages/TestimonialsPage';
-import BlogPage from './pages/BlogPage';
-import BlogPostPage from './pages/BlogPostPage';
-import FAQPage from './pages/FAQPage';
-import ContactPage from './pages/ContactPage';
-
-// Phase 0 — Parent landing pages
-import TallyPrimePage from './pages/TallyPrimePage';
-import TallyPrimeKenyaPage from './pages/TallyPrimeKenyaPage';
-import IndustriesPage from './pages/IndustriesPage';
-import KnowledgeHubPage from './pages/KnowledgeHubPage';
-import PricingPage from './pages/PricingPage';
-import ComingSoonPage from './pages/ComingSoonPage';
-import NotFoundPage from './pages/NotFoundPage';
-import WebinarPage from './pages/WebinarPage';
-import BizAnalystPage from './pages/BizAnalystPage';
-
-// Phase 2 — Service pages
-import ImplementationPage from './pages/services/ImplementationPage';
-import LicensingPage from './pages/services/LicensingPage';
-import CloudHostingPage from './pages/services/CloudHostingPage';
-import TrainingPage from './pages/services/TrainingPage';
-import SupportPage from './pages/services/SupportPage';
-import CustomizationPage from './pages/services/CustomizationPage';
-import DataMigrationPage from './pages/services/DataMigrationPage';
-import ConsultingPage from './pages/services/ConsultingPage';
-
-// Phase 2 — Industry pages
-import ManufacturingPage from './pages/industries/ManufacturingPage';
-import DistributionPage from './pages/industries/DistributionPage';
-import RetailPage from './pages/industries/RetailPage';
-import ConstructionPage from './pages/industries/ConstructionPage';
-import HardwarePage from './pages/industries/HardwarePage';
-import NGOPage from './pages/industries/NGOPage';
-import SchoolsPage from './pages/industries/SchoolsPage';
-import SACCOPage from './pages/industries/SACCOPage';
-
 import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth } from './firebase/config';
 import type { User } from 'firebase/auth';
 import { signInAnonymously } from 'firebase/auth';
+
+// ── Critical: loaded eagerly (homepage + admin shell) ──────────────────────
+import HomePage from './pages/HomePage';
+import AdminLogin from './admin/AdminLogin';
+import AdminLayout from './admin/AdminLayout';
+import NotFoundPage from './pages/NotFoundPage';
+import ComingSoonPage from './pages/ComingSoonPage';
+
+// ── Core pages — lazy loaded ───────────────────────────────────────────────
+const AboutPage         = lazy(() => import('./pages/AboutPage'));
+const FeaturesPage      = lazy(() => import('./pages/FeaturesPage'));
+const ProductsPage      = lazy(() => import('./pages/ProductsPage'));
+const TestimonialsPage  = lazy(() => import('./pages/TestimonialsPage'));
+const BlogPage          = lazy(() => import('./pages/BlogPage'));
+const BlogPostPage      = lazy(() => import('./pages/BlogPostPage'));
+const FAQPage           = lazy(() => import('./pages/FAQPage'));
+const ContactPage       = lazy(() => import('./pages/ContactPage'));
+const PricingPage       = lazy(() => import('./pages/PricingPage'));
+const WebinarPage       = lazy(() => import('./pages/WebinarPage'));
+const BizAnalystPage    = lazy(() => import('./pages/BizAnalystPage'));
+const KnowledgeHubPage  = lazy(() => import('./pages/KnowledgeHubPage'));
+const IndustriesPage    = lazy(() => import('./pages/IndustriesPage'));
+
+// ── TallyPrime pages — lazy loaded ────────────────────────────────────────
+const TallyPrimePage      = lazy(() => import('./pages/TallyPrimePage'));
+const TallyPrimeKenyaPage = lazy(() => import('./pages/TallyPrimeKenyaPage'));
+
+// ── Service pages — lazy loaded ───────────────────────────────────────────
+const ImplementationPage  = lazy(() => import('./pages/services/ImplementationPage'));
+const LicensingPage       = lazy(() => import('./pages/services/LicensingPage'));
+const CloudHostingPage    = lazy(() => import('./pages/services/CloudHostingPage'));
+const TrainingPage        = lazy(() => import('./pages/services/TrainingPage'));
+const SupportPage         = lazy(() => import('./pages/services/SupportPage'));
+const CustomizationPage   = lazy(() => import('./pages/services/CustomizationPage'));
+const DataMigrationPage   = lazy(() => import('./pages/services/DataMigrationPage'));
+const ConsultingPage      = lazy(() => import('./pages/services/ConsultingPage'));
+
+// ── Industry pages — lazy loaded ──────────────────────────────────────────
+const ManufacturingPage = lazy(() => import('./pages/industries/ManufacturingPage'));
+const DistributionPage  = lazy(() => import('./pages/industries/DistributionPage'));
+const RetailPage        = lazy(() => import('./pages/industries/RetailPage'));
+const ConstructionPage  = lazy(() => import('./pages/industries/ConstructionPage'));
+const HardwarePage      = lazy(() => import('./pages/industries/HardwarePage'));
+const NGOPage           = lazy(() => import('./pages/industries/NGOPage'));
+const SchoolsPage       = lazy(() => import('./pages/industries/SchoolsPage'));
+const SACCOPage         = lazy(() => import('./pages/industries/SACCOPage'));
+
+// ── Page loading fallback ─────────────────────────────────────────────────
+function PageLoader() {
+  return (
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-8 w-8 rounded-full border-2 border-red-600 border-t-transparent animate-spin" />
+        <p className="text-sm text-slate-500">Loading...</p>
+      </div>
+    </div>
+  );
+}
 
 function SiteRoutes() {
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950 flex flex-col">
       <Navbar />
       <main className="flex-grow pt-[72px]" id="main-content">
-        <Routes>
-          {/* ── Core pages ── */}
-          <Route path="/" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/testimonials" element={<TestimonialsPage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/blog/:slug" element={<BlogPostPage />} />
-          <Route path="/faq" element={<FAQPage />} />
-          <Route path="/contact" element={<ContactPage />} />
+        <Suspense fallback={<PageLoader />}>
+          <Routes>
+            {/* ── Core pages ── */}
+            <Route path="/" element={<HomePage />} />
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/testimonials" element={<TestimonialsPage />} />
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogPostPage />} />
+            <Route path="/faq" element={<FAQPage />} />
+            <Route path="/contact" element={<ContactPage />} />
 
-          {/* ── Legacy URLs preserved ── */}
-          <Route path="/features" element={<FeaturesPage />} />
-          <Route path="/products" element={<ProductsPage />} />
+            {/* ── Legacy URLs preserved ── */}
+            <Route path="/features" element={<FeaturesPage />} />
+            <Route path="/products" element={<ProductsPage />} />
 
-          {/* ── TallyPrime Solutions ── */}
-          <Route path="/tallyprime" element={<TallyPrimePage />} />
-          <Route path="/tally-prime-kenya" element={<TallyPrimeKenyaPage />} />
-          <Route path="/tallyprime/implementation" element={<ImplementationPage />} />
-          <Route path="/tallyprime/licensing" element={<LicensingPage />} />
-          <Route path="/tallyprime/cloud-hosting" element={<CloudHostingPage />} />
-          <Route path="/tallyprime/training" element={<TrainingPage />} />
-          <Route path="/tallyprime/support" element={<SupportPage />} />
-          <Route path="/tallyprime/customization" element={<CustomizationPage />} />
-          <Route path="/tallyprime/data-migration" element={<DataMigrationPage />} />
-          <Route path="/tallyprime/consulting" element={<ConsultingPage />} />
+            {/* ── TallyPrime Solutions ── */}
+            <Route path="/tallyprime" element={<TallyPrimePage />} />
+            <Route path="/tally-prime-kenya" element={<TallyPrimeKenyaPage />} />
+            <Route path="/tallyprime/implementation" element={<ImplementationPage />} />
+            <Route path="/tallyprime/licensing" element={<LicensingPage />} />
+            <Route path="/tallyprime/cloud-hosting" element={<CloudHostingPage />} />
+            <Route path="/tallyprime/training" element={<TrainingPage />} />
+            <Route path="/tallyprime/support" element={<SupportPage />} />
+            <Route path="/tallyprime/customization" element={<CustomizationPage />} />
+            <Route path="/tallyprime/data-migration" element={<DataMigrationPage />} />
+            <Route path="/tallyprime/consulting" element={<ConsultingPage />} />
 
-          {/* ── Industries ── */}
-          <Route path="/industries" element={<IndustriesPage />} />
-          <Route path="/industries/manufacturing" element={<ManufacturingPage />} />
-          <Route path="/industries/distribution" element={<DistributionPage />} />
-          <Route path="/industries/retail" element={<RetailPage />} />
-          <Route path="/industries/construction" element={<ConstructionPage />} />
-          <Route path="/industries/hardware" element={<HardwarePage />} />
-          <Route path="/industries/ngo" element={<NGOPage />} />
-          <Route path="/industries/ngos" element={<NGOPage />} />
-          <Route path="/industries/schools" element={<SchoolsPage />} />
-          <Route path="/industries/sacco" element={<SACCOPage />} />
-          <Route path="/industries/saccos" element={<SACCOPage />} />
-          {/* ── Industry short URL aliases ── */}
-          <Route path="/manufacturing" element={<Navigate to="/industries/manufacturing" replace />} />
-          <Route path="/distribution" element={<Navigate to="/industries/distribution" replace />} />
-          <Route path="/retail" element={<Navigate to="/industries/retail" replace />} />
-          <Route path="/construction" element={<Navigate to="/industries/construction" replace />} />
-          <Route path="/hardware" element={<Navigate to="/industries/hardware" replace />} />
-          <Route path="/ngo" element={<Navigate to="/industries/ngo" replace />} />
-          <Route path="/schools" element={<Navigate to="/industries/schools" replace />} />
-          <Route path="/sacco" element={<Navigate to="/industries/sacco" replace />} />
+            {/* ── Industries ── */}
+            <Route path="/industries" element={<IndustriesPage />} />
+            <Route path="/industries/manufacturing" element={<ManufacturingPage />} />
+            <Route path="/industries/distribution" element={<DistributionPage />} />
+            <Route path="/industries/retail" element={<RetailPage />} />
+            <Route path="/industries/construction" element={<ConstructionPage />} />
+            <Route path="/industries/hardware" element={<HardwarePage />} />
+            <Route path="/industries/ngo" element={<NGOPage />} />
+            <Route path="/industries/ngos" element={<NGOPage />} />
+            <Route path="/industries/schools" element={<SchoolsPage />} />
+            <Route path="/industries/sacco" element={<SACCOPage />} />
+            <Route path="/industries/saccos" element={<SACCOPage />} />
+            {/* ── Industry short URL aliases ── */}
+            <Route path="/manufacturing" element={<Navigate to="/industries/manufacturing" replace />} />
+            <Route path="/distribution" element={<Navigate to="/industries/distribution" replace />} />
+            <Route path="/retail" element={<Navigate to="/industries/retail" replace />} />
+            <Route path="/construction" element={<Navigate to="/industries/construction" replace />} />
+            <Route path="/hardware" element={<Navigate to="/industries/hardware" replace />} />
+            <Route path="/ngo" element={<Navigate to="/industries/ngo" replace />} />
+            <Route path="/schools" element={<Navigate to="/industries/schools" replace />} />
+            <Route path="/sacco" element={<Navigate to="/industries/sacco" replace />} />
 
-          {/* ── Knowledge Hub ── */}
-          <Route path="/knowledge-hub" element={<KnowledgeHubPage />} />
-          <Route path="/knowledge-hub/guides" element={<ComingSoonPage />} />
-          <Route path="/knowledge-hub/downloads" element={<ComingSoonPage />} />
-          <Route path="/knowledge-hub/case-studies" element={<ComingSoonPage />} />
-          <Route path="/knowledge-hub/videos" element={<ComingSoonPage />} />
-          <Route path="/webinar" element={<WebinarPage />} />
-          <Route path="/knowledge-hub/webinars" element={<ComingSoonPage />} />
-          <Route path="/knowledge-hub/templates" element={<ComingSoonPage />} />
+            {/* ── Knowledge Hub ── */}
+            <Route path="/knowledge-hub" element={<KnowledgeHubPage />} />
+            <Route path="/knowledge-hub/guides" element={<ComingSoonPage />} />
+            <Route path="/knowledge-hub/downloads" element={<ComingSoonPage />} />
+            <Route path="/knowledge-hub/case-studies" element={<ComingSoonPage />} />
+            <Route path="/knowledge-hub/videos" element={<ComingSoonPage />} />
+            <Route path="/webinar" element={<WebinarPage />} />
+            <Route path="/knowledge-hub/webinars" element={<ComingSoonPage />} />
+            <Route path="/knowledge-hub/templates" element={<ComingSoonPage />} />
 
-          {/* ── Biz Analyst ── */}
-          <Route path="/biz-analyst" element={<BizAnalystPage />} />
+            {/* ── Biz Analyst ── */}
+            <Route path="/biz-analyst" element={<BizAnalystPage />} />
 
-          {/* ── Pricing ── */}
-          <Route path="/pricing" element={<PricingPage />} />
+            {/* ── Pricing ── */}
+            <Route path="/pricing" element={<PricingPage />} />
 
-          {/* ── Why Choose Us ── */}
-          <Route path="/why-choose-us" element={<ComingSoonPage />} />
+            {/* ── Why Choose Us ── */}
+            <Route path="/why-choose-us" element={<ComingSoonPage />} />
 
-          {/* ── Catch-all (404) ── */}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
+            {/* ── Catch-all (404) ── */}
+            <Route path="*" element={<NotFoundPage />} />
+          </Routes>
+        </Suspense>
       </main>
       <Footer />
       <Chatbot />
