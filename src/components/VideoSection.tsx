@@ -78,7 +78,7 @@ export default function VideoSection() {
             </div>
           </motion.div>
 
-          {/* Feature highlights + CTA */}
+          {/* Why TallyPrime — unique differentiators, not repeating the services list */}
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -86,11 +86,12 @@ export default function VideoSection() {
             transition={{ duration: 0.6, delay: 0.1 }}
             className="flex flex-col gap-3"
           >
+            <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-1">Why businesses choose TallyPrime</p>
             {[
-              { title: 'Accounting & KRA Compliance', desc: 'Full double-entry accounting, eTIMS invoicing, VAT and payroll — automated.', color: 'text-red-400' },
-              { title: 'Inventory & Stock Control', desc: 'Real-time stock tracking, multi-location warehouses, batch management.', color: 'text-sky-400' },
-              { title: 'Cloud Hosting from KES 3,000/mo', desc: 'Access TallyPrime from anywhere. 99.9% uptime, daily backups included.', color: 'text-emerald-400' },
-              { title: 'Certified Kenya Support', desc: 'Local implementation, training and ongoing support — in your timezone.', color: 'text-amber-400' },
+              { title: 'No subscription fees', desc: 'One-time license — own it forever. No monthly SaaS fees eating into your margins.', color: 'text-red-400' },
+              { title: 'Go live in 5 business days', desc: 'Our certified team handles setup, data migration and staff training — fast.', color: 'text-sky-400' },
+              { title: 'Works offline & online', desc: 'Run on your local network or our cloud — no internet dependency for daily operations.', color: 'text-emerald-400' },
+              { title: 'Used by 7 million+ businesses', desc: "Tally is Africa's most widely used accounting platform — proven at every business size.", color: 'text-amber-400' },
             ].map((item) => (
               <div
                 key={item.title}
