@@ -4,6 +4,7 @@ import { useSite } from '../context/SiteContext';
 import SEO from '../components/SEO';
 import ReactMarkdown from 'react-markdown';
 import { Calendar, Clock, ArrowLeft, User, ArrowRight } from 'lucide-react';
+import { slugify } from '../utils/slugify';
 
 // Per-post contextual related resources
 const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: string }[]> = {
@@ -40,7 +41,6 @@ const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: str
 };
 
 export { slugify } from '../utils/slugify';
-import { slugify } from '../utils/slugify';
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
