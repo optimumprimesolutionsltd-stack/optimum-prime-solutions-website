@@ -35,10 +35,10 @@ export const defaultData: SiteData = {
     mission:'To empower Kenyan businesses with world-class TallyPrime solutions, secure cloud infrastructure, and the Entrepreneurial Operating System (EOS®) — helping leadership teams get aligned, gain traction, and achieve sustainable growth.',
     vision:'To be the leading TallyPrime partner and EOS® consulting firm in East Africa, transforming how businesses manage their finances, operations, and leadership systems.',
     about:[
-      'Optimum Prime Solutions is Kenya\'s certified TallyPrime partner, delivering end-to-end business automation and cloud solutions. With over 15 years of combined experience, our certified team has helped 500+ businesses across East Africa transform their operations using TallyPrime Silver, Gold, and Enterprise editions.',
+      'Optimum Prime Solutions is Kenya\'s certified TallyPrime partner, delivering end-to-end business automation and cloud solutions. With over 15 years of combined experience, our certified team helps Kenyan businesses join the 2.5 million+ companies worldwide already running on TallyPrime — across Silver, Gold, and Enterprise editions.',
       'Beyond accounting software, we are licensed EOS® implementers — helping entrepreneurial leadership teams run their businesses on the Entrepreneurial Operating System by Gino Wickman. EOS strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. We combine TallyPrime\'s financial power with EOS® operational discipline to give your business both the numbers and the systems to grow.',
     ],
-    stats:[{label:'Clients Served',value:'500+'},{label:'Years Experience',value:'15+'},{label:'Uptime Guarantee',value:'99.9%'},{label:'Support Response',value:'< 1hr'}],
+    stats:[{label:'TallyPrime Users Worldwide',value:'2.5M+'},{label:'Years Experience',value:'15+'},{label:'Uptime Guarantee',value:'99.9%'},{label:'Support Response',value:'< 1hr'}],
   },
   contact: {
     location:'Ruiru, Kenya',

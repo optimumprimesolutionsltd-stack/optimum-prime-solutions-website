@@ -105,7 +105,7 @@ export default function TallyLanding() {
 
           {/* Sub-headline */}
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-200/90">
-            Trusted by 500+ Kenyan businesses for TallyPrime implementation, cloud hosting, KRA eTIMS compliance, and EOS® consulting. Genuine licences, hands-on training, and local support — in Ruiru, Nairobi, and nationwide.
+            Kenya’s certified TallyPrime partner — part of a global network trusted by 2.5 million+ businesses in 100+ countries. Genuine licences, hands-on training, KRA eTIMS compliance, and local support in Ruiru, Nairobi, and nationwide.
           </p>
 
           {/* CTA buttons */}

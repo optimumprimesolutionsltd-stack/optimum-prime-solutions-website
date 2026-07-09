@@ -4,7 +4,7 @@ import TallyPrimeIcon from './TallyPrimeIcon';
 import KraLogo from './KraLogo';
 
 const stats = [
-  { icon: Users, value: 500, suffix: '+', label: 'Businesses Served' },
+  { icon: Users, value: '2.5M', suffix: '+', label: 'TallyPrime Users Worldwide' },
   { icon: Award, value: 15, suffix: '+', label: 'Years Experience' },
   { icon: Shield, value: 99, suffix: '.9%', label: 'Uptime Guarantee' },
   { icon: Clock, value: 1, suffix: 'hr', label: 'Avg Response Time' },

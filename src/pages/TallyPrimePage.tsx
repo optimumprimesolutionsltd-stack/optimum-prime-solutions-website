@@ -163,7 +163,7 @@ breadcrumbs={[
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 text-center">
             {[
-              { value: '500+', label: 'Businesses Served' },
+              { value: '2.5M+', label: 'TallyPrime Users Worldwide' },
               { value: '15+', label: 'Years Experience' },
               { value: '99.9%', label: 'Cloud Uptime SLA' },
               { value: '< 1hr', label: 'Support Response' },

@@ -54,7 +54,7 @@ export default function HomePage() {
               Streamline your business with TallyPrime today
             </h2>
             <p className="text-red-100 text-base max-w-xl mx-auto mb-8">
-              Join 500+ Kenyan businesses already running on TallyPrime. Our team will have you live in 5 business days — guaranteed.
+              Join 2.5 million+ businesses worldwide already running on TallyPrime. Our team will have you live in 5 business days — guaranteed.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link

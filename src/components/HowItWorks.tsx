@@ -65,7 +65,7 @@ We implement TallyPrime, set up cloud hosting, and help your leadership team ado
               Ready to transform your business? 🚀
             </h3>
             <p className="mt-3 text-slate-100 max-w-xl mx-auto">
-Join 500+ Kenyan businesses already running smarter with TallyPrime, cloud hosting, and EOS®. Get a free, personalized demo from Kenya's certified TallyPrime partner.
+Join 2.5 million+ businesses worldwide already running on TallyPrime. Get a free, personalized demo from Kenya’s certified TallyPrime partner — and be live in 5 business days.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link to="/contact#demo-form" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="rounded-xl bg-red-600 px-8 py-4 text-sm font-bold text-white shadow-xl shadow-red-900/30 hover:bg-red-700 transition-all hover:scale-105">

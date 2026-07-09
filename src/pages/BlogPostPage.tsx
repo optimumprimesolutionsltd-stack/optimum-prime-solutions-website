@@ -25,7 +25,7 @@ const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: str
   ],
   'what-is-eos-and-why-kenyan-businesses-are-adopting-it': [
     { label: 'EOS® Business Consulting', href: '/tallyprime/consulting', desc: 'We are licensed EOS® Implementers in Kenya.' },
-    { label: 'Why Choose Us', href: '/why-choose-us', desc: 'See why 500+ businesses trust Optimum Prime Solutions.' },
+    { label: 'Why Choose Us', href: '/why-choose-us', desc: 'See why Kenyan businesses choose Optimum Prime Solutions.' },
     { label: 'Book a Free Session', href: '/contact#demo-form', desc: 'Free introductory EOS® session — no commitment.' },
   ],
   'tallyprime-cloud-hosting-access-your-business-data-from-anywhere': [

@@ -190,7 +190,7 @@ breadcrumbs={[
             </div>
             <div className="grid grid-cols-2 gap-4">
               {[
-                { value: '500+', label: 'Businesses Implemented' },
+                { value: '2.5M+', label: 'TallyPrime Users Worldwide' },
                 { value: '8+', label: 'Industries Served' },
                 { value: '15+', label: 'Years in Kenya' },
                 { value: '< 1hr', label: 'Support Response' },

@@ -92,8 +92,8 @@ const themeConfig: Record<ShowcaseTheme, {
     dotColor: '#14b8a6',
     imageUrl: '/images/testimonials-business-success.webp',
     imageCaption: 'Trusted by businesses across Kenya',
-    stat: '500+',
-    statLabel: 'Happy clients',
+    stat: '2.5M+',
+    statLabel: 'TallyPrime users worldwide',
     alt: 'Successful Kenyan business operation using TallyPrime ERP',
   },
   blog: {
