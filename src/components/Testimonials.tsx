@@ -187,14 +187,12 @@ export default function Testimonials() {
               ))}
             </div>
             <p className="text-sm text-slate-400 mb-4">5 reviews on Google</p>
-            <a
-              href="https://g.page/r/CflY2N7AE6slEAE/review"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              to="/testimonials#review-form"
               className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 border border-white/20 px-4 py-2 text-xs font-semibold text-white hover:bg-white/20 transition-colors"
             >
               Leave us a review
-            </a>
+            </Link>
           </motion.div>
 
         </div>
