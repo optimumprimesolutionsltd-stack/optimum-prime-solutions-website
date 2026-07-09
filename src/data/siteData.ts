@@ -122,9 +122,9 @@ export const defaultData: SiteData = {
     {id:'8',name:'Education & NGOs',icon:'GraduationCap',desc:'Fee management, donor tracking, and grant accounting.'},
   ],
   blogs: [
-    {id:'1',title:'Why Every Kenyan Business Needs Tally Prime in 2025',excerpt:'Discover how Tally Prime is transforming business operations across Kenya with automated accounting, KRA compliance, and real-time reporting.',date:'2025-01-15',category:'Insights',readTime:'5 min',content:`Tally Prime has become the backbone of business operations across Kenya. Whether you're a small retail shop, a manufacturing facility, or a growing services company, the need for accurate financial management and KRA compliance is non-negotiable.
+    {id:'1',title:'Why Every Kenyan Business Needs TallyPrime Today',excerpt:'Discover how Tally Prime is transforming business operations across Kenya with automated accounting, KRA compliance, and real-time reporting.',date:'2025-01-15',category:'Insights',readTime:'5 min',content:`Tally Prime has become the backbone of business operations across Kenya. Whether you're a small retail shop, a manufacturing facility, or a growing services company, the need for accurate financial management and KRA compliance is non-negotiable.
 
-Why should your business invest in Tally Prime in 2025?
+Why should your business invest in TallyPrime today?
 
 1. KRA Compliance Made Easy
 Kenya's tax environment demands precision. Tally Prime simplifies VAT calculations, PAYE processing, and e-filing integration. The eTIMS module ensures real-time invoice tracking, and automated compliance reports keep your business audit-ready. No more manual calculations or missed deadlines.
@@ -163,9 +163,9 @@ Implementing Tally Prime typically reduces operational costs by 15-25% through:
 As your business grows, Tally Prime grows with you. Multi-user access, role-based controls, and unlimited transaction capacity ensure you're never outgrowing your system.
 
 The Bottom Line
-In 2025, manual accounting is not just inefficient—it's risky. Tally Prime eliminates operational friction, ensures compliance, and gives you the visibility needed to scale confidently.
+Today, manual accounting is not just inefficient—it's risky. Tally Prime eliminates operational friction, ensures compliance, and gives you the visibility needed to scale confidently.
 
-Ready to transform your business? The businesses that embrace Tally Prime this year will be the ones leading their industries next year.`},
+Ready to transform your business? The businesses that embrace TallyPrime today will be the ones leading their industries tomorrow.`},
     {id:'2',title:'Complete Guide to KRA e-Filing with Tally Prime',excerpt:'Step-by-step guide to setting up and filing your KRA returns directly from Tally Prime. Save time and avoid penalties.',date:'2025-02-01',category:'Tutorial',readTime:'8 min',content:`KRA compliance can be intimidating, but with Tally Prime, it's surprisingly straightforward. This guide walks you through the entire e-filing process.
 
 What You Need Before Starting

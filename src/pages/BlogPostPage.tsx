@@ -3,7 +3,41 @@ import { useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
 import SEO from '../components/SEO';
 import ReactMarkdown from 'react-markdown';
-import { Calendar, Clock, ArrowLeft, User } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, User, ArrowRight } from 'lucide-react';
+
+// Per-post contextual related resources
+const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: string }[]> = {
+  'why-every-kenyan-business-needs-tallyprime-today': [
+    { label: 'TallyPrime Implementation', href: '/tallyprime/implementation', desc: 'Go live in 5 business days with full setup & training.' },
+    { label: 'KRA eTIMS Compliance', href: '/tallyprime/licensing', desc: 'Stay 100% compliant with automated VAT & e-filing.' },
+    { label: 'View Pricing', href: '/pricing', desc: 'Transparent pricing — Silver, Gold & Enterprise editions.' },
+  ],
+  'complete-guide-to-kra-e-filing-with-tally-prime': [
+    { label: 'KRA eTIMS & Compliance', href: '/tallyprime/licensing', desc: 'Automated VAT, PAYE, and e-filing built into TallyPrime.' },
+    { label: 'TallyPrime for Retail', href: '/industries/retail', desc: 'See how retailers use TallyPrime for KRA compliance.' },
+    { label: 'Book a Free Demo', href: '/contact#demo-form', desc: 'See the e-filing workflow live — no obligation.' },
+  ],
+  'tally-prime-silver-vs-gold-which-edition-is-right-for-you': [
+    { label: 'TallyPrime Licensing', href: '/tallyprime/licensing', desc: 'Official Silver, Gold & Enterprise licences in Kenya.' },
+    { label: 'View Pricing', href: '/pricing', desc: 'Compare edition prices side by side.' },
+    { label: 'Cloud Hosting', href: '/tallyprime/cloud-hosting', desc: 'Host Gold on the cloud — access from anywhere.' },
+  ],
+  'what-is-eos-and-why-kenyan-businesses-are-adopting-it': [
+    { label: 'EOS® Business Consulting', href: '/tallyprime/consulting', desc: 'We are licensed EOS® Implementers in Kenya.' },
+    { label: 'Why Choose Us', href: '/why-choose-us', desc: 'See why 500+ businesses trust Optimum Prime Solutions.' },
+    { label: 'Book a Free Session', href: '/contact#demo-form', desc: 'Free introductory EOS® session — no commitment.' },
+  ],
+  'tallyprime-cloud-hosting-access-your-business-data-from-anywhere': [
+    { label: 'Cloud Hosting Plans', href: '/tallyprime/cloud-hosting', desc: 'KES 3,000/mo — 99.9% uptime, daily backups included.' },
+    { label: 'TallyPrime for Distribution', href: '/industries/distribution', desc: 'Multi-location access for distributors & wholesalers.' },
+    { label: 'View Pricing', href: '/pricing', desc: 'Compare cloud hosting packages and bundles.' },
+  ],
+  'tallyprime-71-is-here-whats-new-and-what-it-means-for-your-business': [
+    { label: 'TallyPrime Licensing', href: '/tallyprime/licensing', desc: 'Upgrade to TallyPrime 7.1 — official licences in Kenya.' },
+    { label: 'TallyPrime Implementation', href: '/tallyprime/implementation', desc: 'Upgrade & migrate with zero downtime.' },
+    { label: 'View Pricing', href: '/pricing', desc: 'See upgrade and new licence pricing.' },
+  ],
+};
 
 export function slugify(title: string): string {
   return title
@@ -106,8 +140,33 @@ breadcrumbs={[
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </article>
 
+          {/* Related Resources */}
+          {(() => {
+            const resources = RELATED_RESOURCES[slug || ''];
+            if (!resources) return null;
+            return (
+              <div className="mt-14 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+                <h3 className="text-base font-bold text-slate-900 mb-4">Related Resources</h3>
+                <div className="grid sm:grid-cols-3 gap-4">
+                  {resources.map((r) => (
+                    <Link
+                      key={r.href}
+                      to={r.href}
+                      className="group flex flex-col gap-1 rounded-xl border border-slate-200 bg-white hover:border-red-300 p-4 transition"
+                    >
+                      <span className="text-sm font-semibold text-slate-900 group-hover:text-red-600 flex items-center gap-1">
+                        {r.label} <ArrowRight className="h-3.5 w-3.5 opacity-0 group-hover:opacity-100 transition" />
+                      </span>
+                      <span className="text-xs text-slate-500 leading-relaxed">{r.desc}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
+
           {/* CTA */}
-          <div className="mt-16 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-8 text-center text-white">
+          <div className="mt-10 rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 p-8 text-center text-white">
             <h3 className="text-xl font-bold">Ready to get started?</h3>
             <p className="mt-2 text-slate-300 text-sm">
               Talk to Kenya's certified TallyPrime partner today — free consultation, no obligation.
