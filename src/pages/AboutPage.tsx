@@ -31,8 +31,8 @@ const certifications = [
   },
   {
     icon: BookOpen,
-    title: 'HubSpot Partner',
-    body: 'Certified HubSpot partner offering CRM setup, marketing automation, and sales pipeline management for growing Kenyan businesses.',
+    title: 'Biz Analyst Partner',
+    body: 'Official Biz Analyst mobile app partner — giving your team real-time TallyPrime data on their phones, anytime, anywhere.',
     color: '#dd6b20',
   },
 ];

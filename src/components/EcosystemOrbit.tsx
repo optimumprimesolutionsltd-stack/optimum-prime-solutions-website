@@ -5,7 +5,6 @@ const partners = [
   { name: 'TallyPrime',  logo: '/tally-solutions-new-logo.png', angle: 0,   color: '#dc2626', invertOnDark: false },
   { name: 'EOS®',        logo: '/partner-eos.png',        angle: 60,  color: '#0ea5e9', invertOnDark: false },
   { name: 'Biz Analyst', logo: '/partner-biz-analyst.png', angle: 120, color: '#34d399', invertOnDark: false },
-  { name: 'HubSpot',     logo: '/partner-hubspot.png',    angle: 180, color: '#f97316', invertOnDark: false },
   { name: 'TSplus',      logo: '/partner-tsplus.png',     angle: 240, color: '#8b5cf6', invertOnDark: false },
   { name: 'KRA eTIMS',   logo: '/kra-logo-official.png', angle: 300, color: '#16a34a', invertOnDark: true },
 ];
@@ -217,7 +216,7 @@ export default function EcosystemOrbit() {
                 One Partner. A Complete Solution.
               </h2>
               <p className="mt-4 text-lg text-slate-300 leading-relaxed">
-                We bring together the best-in-class tools — TallyPrime for accounting, the **Biz Analyst mobile app** for real-time data, EOS® for leadership, HubSpot for sales, and secure cloud infrastructure — so you get everything you need in one trusted partnership.
+                We bring together the best-in-class tools — TallyPrime for accounting, the Biz Analyst mobile app for real-time data, EOS® for leadership, and secure cloud infrastructure — so you get everything you need in one trusted partnership.
               </p>
             </div>
 

@@ -65,38 +65,26 @@ export default function Hero3D() {
             </div>
           </motion.div>
 
-          {/* Right column — dark benefits card */}
+          {/* Right column — what we do card */}
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}>
             <div className="relative overflow-hidden rounded-2xl sm:rounded-[2rem] border border-white/10 bg-slate-800/80 shadow-2xl shadow-black/40 backdrop-blur-sm">
               <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-red-500/20 blur-[60px]" />
-              <div className="p-4 sm:p-6 text-white">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.35em] text-slate-400">Business benefits</p>
-                    <h2 className="mt-3 text-3xl font-semibold text-white">Key benefits</h2>
-                  </div>
-                  <div className="rounded-2xl bg-red-600/20 border border-red-500/30 px-4 py-2 text-xs font-semibold text-red-400">Top Picks</div>
-                </div>
+              <div className="p-5 sm:p-6">
+                <p className="text-xs uppercase tracking-[0.35em] text-slate-400">What we do</p>
+                <h2 className="mt-2 text-2xl font-bold text-white">Our Core Services</h2>
               </div>
-              <div className="grid grid-cols-2 gap-3 px-4 pb-4 sm:px-6 sm:pb-6">
-                {data.company.stats.map((s) => (
-                  <div key={s.label} className="rounded-2xl border border-white/10 bg-slate-700/60 p-5 text-center">
-                    <p className="text-2xl font-extrabold text-white">{s.value}</p>
-                    <p className="mt-1 text-xs text-slate-400">{s.label}</p>
+              <div className="space-y-2 px-5 pb-5 sm:px-6 sm:pb-6">
+                {[
+                  { label: 'TallyPrime Sales & Implementation', sub: 'Silver, Gold & Enterprise editions — licensed & deployed', color: 'text-red-400', border: 'border-red-500/20', bg: 'bg-red-500/5' },
+                  { label: 'Cloud Hosting & Remote Access', sub: 'Secure cloud server setup with 99.9% uptime SLA', color: 'text-sky-400', border: 'border-sky-500/20', bg: 'bg-sky-500/5' },
+                  { label: 'EOS® Business Consulting', sub: 'Align your leadership team and gain traction', color: 'text-amber-400', border: 'border-amber-500/20', bg: 'bg-amber-500/5' },
+                  { label: 'KRA eTIMS Compliance', sub: 'Automated eTIMS invoicing built into TallyPrime', color: 'text-emerald-400', border: 'border-emerald-500/20', bg: 'bg-emerald-500/5' },
+                ].map((item) => (
+                  <div key={item.label} className={`rounded-xl border ${item.border} ${item.bg} px-4 py-3`}>
+                    <p className={`text-sm font-semibold ${item.color}`}>{item.label}</p>
+                    <p className="mt-0.5 text-xs text-slate-400">{item.sub}</p>
                   </div>
                 ))}
-              </div>
-              <div className="border-t border-white/10 bg-slate-900/40 p-4 sm:p-6">
-                <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
-                  <div className="rounded-2xl border border-sky-500/20 bg-sky-500/5 p-5">
-                    <p className="text-xs uppercase tracking-[0.3em] text-sky-400">TallyPrime certified</p>
-                    <h3 className="mt-3 text-xl font-semibold text-white">Official partner</h3>
-                  </div>
-                  <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
-                    <p className="text-xs uppercase tracking-[0.3em] text-amber-400">EOS® consulting</p>
-                    <h3 className="mt-3 text-xl font-semibold text-white">Gain traction</h3>
-                  </div>
-                </div>
               </div>
             </div>
           </motion.div>

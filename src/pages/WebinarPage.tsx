@@ -53,7 +53,7 @@ export default function WebinarPage() {
         `_(Click to join at 3:00 PM EAT on 15th July)_\n\n` +
         `📞 *+254 116 246 074*\n` +
         `🌐 *www.optimumprimesolutions.co.ke*\n\n` +
-        `_Optimum Prime Solutions — TallyPrime · Cloud · EOS® · HubSpot CRM · Biz Analyst_`;
+        `_Optimum Prime Solutions — TallyPrime · Cloud · EOS® · Biz Analyst_`;
       const payload = {
         ...form,
         interest: 'Webinar Registration — TallyPrime 7.1',
