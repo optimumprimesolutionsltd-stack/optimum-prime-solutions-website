@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import EcosystemOrbit from '../components/EcosystemOrbit';
+import ProcessFlow from '../components/ProcessFlow';
 import { ArrowRight, Download, Cloud, GraduationCap, Headphones, Code2, Database, CheckCircle2, Layers } from 'lucide-react';
 import SEO from '../components/SEO';
 import Breadcrumb from '../components/Breadcrumb';
@@ -174,6 +176,12 @@ breadcrumbs={[
           </div>
         </div>
       </section>
+
+      {/* Ecosystem — One Partner. A Complete Solution. */}
+      <EcosystemOrbit />
+
+      {/* Implementation Journey */}
+      <ProcessFlow />
 
       {/* CTA */}
       <section className="bg-slate-900 py-16">
