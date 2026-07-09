@@ -42,13 +42,15 @@ export default function Hero3D() {
               >
                 Request a Demo
               </Link>
-              <button
-                onClick={() => window.dispatchEvent(new CustomEvent('zawadi:open'))}
+              <a
+                href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20speak%20to%20an%20expert%20about%20TallyPrime"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] px-5 py-3 text-sm sm:text-base font-semibold text-white shadow-lg shadow-[#25D366]/30 hover:bg-[#1DA851] hover:scale-105 active:scale-95 transition-all w-full sm:w-auto"
               >
                 <WhatsAppIcon className="h-5 w-5 text-white" />
-                Talk to an Expert
-              </button>
+                WhatsApp Us
+              </a>
             </div>
             <div className="mt-10 sm:mt-12 flex flex-wrap gap-3">
               {[
