@@ -112,7 +112,7 @@ export default function TallyLanding() {
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
             <button
               type="button"
-              onClick={() => { navigate('/contact'); window.scrollTo({ top: 0, behavior: 'instant' }); }}
+              onClick={() => { navigate('/contact#demo-form'); setTimeout(() => { const el = document.getElementById('demo-form'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 300); }}
               className="w-full rounded-full bg-red-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-red-600/20 transition-all hover:scale-105 hover:bg-red-500 hover:shadow-red-600/40 active:scale-95 sm:w-auto"
             >
               Get a Free Quote
