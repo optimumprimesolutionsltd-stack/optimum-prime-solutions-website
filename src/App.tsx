@@ -22,6 +22,7 @@ import ContactPage from './pages/ContactPage';
 
 // Phase 0 — Parent landing pages
 import TallyPrimePage from './pages/TallyPrimePage';
+import TallyPrimeKenyaPage from './pages/TallyPrimeKenyaPage';
 import IndustriesPage from './pages/IndustriesPage';
 import KnowledgeHubPage from './pages/KnowledgeHubPage';
 import PricingPage from './pages/PricingPage';
@@ -75,6 +76,7 @@ function SiteRoutes() {
 
           {/* ── TallyPrime Solutions ── */}
           <Route path="/tallyprime" element={<TallyPrimePage />} />
+          <Route path="/tally-prime-kenya" element={<TallyPrimeKenyaPage />} />
           <Route path="/tallyprime/implementation" element={<ImplementationPage />} />
           <Route path="/tallyprime/licensing" element={<LicensingPage />} />
           <Route path="/tallyprime/cloud-hosting" element={<CloudHostingPage />} />
