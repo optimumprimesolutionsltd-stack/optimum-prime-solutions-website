@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   Award, CheckCircle, Cloud, BookOpen, Wrench, Phone,
-  ArrowRight, Star, Shield, Users, BarChart3, Zap, MapPin
+  ArrowRight, Shield, Users, BarChart3, Zap, MapPin
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import { useSite } from '../context/SiteContext';
@@ -78,33 +78,6 @@ export default function TallyPrimeKenyaPage() {
       features: ['Everything in Gold', 'TallyPrime Server included', 'Centralised data management', 'Group company consolidation', 'Priority support'],
       cta: 'Talk to Us',
       highlight: false,
-    },
-  ];
-
-  const faqs = [
-    {
-      q: 'Where can I buy TallyPrime in Kenya?',
-      a: 'You can buy genuine TallyPrime licences directly from Optimum Prime Solutions, Kenya\'s certified TallyPrime partner. We serve clients in Ruiru, Nairobi, and across Kenya. Contact us via phone, WhatsApp, or our online form for a quote.',
-    },
-    {
-      q: 'What is the price of TallyPrime in Kenya?',
-      a: 'TallyPrime pricing in Kenya depends on the edition (Silver, Gold or Enterprise) and the number of users. Contact us for current pricing — we offer competitive rates and flexible payment options for Kenyan businesses.',
-    },
-    {
-      q: 'Is TallyPrime approved by KRA for eTIMS?',
-      a: 'Yes. TallyPrime is a KRA-approved eTIMS solution. Optimum Prime Solutions handles the full eTIMS integration setup as part of our implementation service, ensuring your business is fully compliant with Kenya\'s e-invoicing requirements.',
-    },
-    {
-      q: 'Do you offer TallyPrime training in Kenya?',
-      a: 'Yes. We provide hands-on TallyPrime training for end users, accountants, and system administrators. Training is available on-site, at our Ruiru office, or online. We tailor every session to your team\'s specific needs.',
-    },
-    {
-      q: 'What does TallyPrime implementation involve?',
-      a: 'Our implementation service covers requirements gathering, software installation, company setup, chart of accounts configuration, opening balance migration, user training, and go-live support. We ensure your team is fully operational from day one.',
-    },
-    {
-      q: 'Can I access TallyPrime from anywhere in Kenya?',
-      a: 'Yes. With our TallyPrime cloud hosting service, you and your team can securely access your company data from any device — laptop, desktop, or tablet — from anywhere in Kenya with an internet connection.',
     },
   ];
 
@@ -278,18 +251,7 @@ breadcrumbs={[
                 ))}
               </div>
 
-              {/* Testimonial snippet */}
-              {data.testimonials.length > 0 && (
-                <div className="mt-6 rounded-2xl border border-white/10 bg-slate-800/60 p-6">
-                  <div className="flex gap-1 mb-3">
-                    {Array.from({ length: data.testimonials[0].rating }).map((_, i) => (
-                      <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
-                    ))}
-                  </div>
-                  <p className="text-sm italic leading-6 text-slate-300">"{data.testimonials[0].text.slice(0, 160)}…"</p>
-                  <p className="mt-3 text-xs font-semibold text-slate-400">— {data.testimonials[0].name}, {data.testimonials[0].company}</p>
-                </div>
-              )}
+
             </motion.div>
           </div>
         </div>
@@ -348,34 +310,6 @@ breadcrumbs={[
                 >
                   {ed.cta} <ArrowRight className="h-4 w-4" />
                 </Link>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── FAQ ── */}
-      <section className="bg-slate-50 py-20">
-        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-          <motion.div variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }} className="text-center">
-            <span className="inline-block rounded-full bg-red-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-red-600">
-              Common Questions
-            </span>
-            <h2 className="mt-4 text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-              TallyPrime Kenya — FAQs
-            </h2>
-          </motion.div>
-
-          <div className="mt-12 space-y-4">
-            {faqs.map((faq, i) => (
-              <motion.div
-                key={faq.q}
-                variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true }}
-                transition={{ delay: i * 0.06 }}
-                className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm"
-              >
-                <h3 className="text-sm font-bold text-slate-900">{faq.q}</h3>
-                <p className="mt-2 text-sm leading-6 text-slate-500">{faq.a}</p>
               </motion.div>
             ))}
           </div>
