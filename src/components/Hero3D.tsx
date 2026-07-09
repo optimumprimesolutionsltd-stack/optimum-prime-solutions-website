@@ -50,18 +50,17 @@ export default function Hero3D() {
                 Talk to an Expert
               </button>
             </div>
-            <div className="mt-10 sm:mt-12 grid gap-3 grid-cols-1 sm:grid-cols-2">
+            <div className="mt-10 sm:mt-12 flex flex-wrap gap-3">
               {[
-                { title: 'Certified Tally Partner', description: 'Official TallyPrime reseller & implementation expert.' },
-                { title: 'Cloud & Remote Access', description: 'Secure cloud hosting with anywhere access.' },
-                { title: 'Biz Analyst Mobile App', description: 'Real-time TallyPrime data on your mobile phone — anytime, anywhere.' },
-                { title: 'EOS® Consulting', description: 'Run your business on the Entrepreneurial Operating System.' },
-                { title: 'HubSpot CRM Integration', description: 'Connect your sales pipeline to TallyPrime for a 360° business view.' },
-              ].map((item) => (
-                <div key={item.title} className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-sky-400">{item.title}</p>
-                  <p className="mt-2 text-sm text-slate-300">{item.description}</p>
-                </div>
+                '✓ Certified Tally Partner',
+                '✓ KRA eTIMS Approved',
+                '✓ 500+ Clients Served',
+                '✓ Licensed EOS® Implementer',
+                '✓ < 1hr Support Response',
+              ].map((badge) => (
+                <span key={badge} className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 backdrop-blur-sm">
+                  {badge}
+                </span>
               ))}
             </div>
           </motion.div>
@@ -79,16 +78,11 @@ export default function Hero3D() {
                   <div className="rounded-2xl bg-red-600/20 border border-red-500/30 px-4 py-2 text-xs font-semibold text-red-400">Top Picks</div>
                 </div>
               </div>
-              <div className="space-y-3 px-4 pb-4 sm:px-6 sm:pb-6">
-                {[
-                  { title: 'TallyPrime Sales & Licensing', description: 'Official Silver, Gold & Enterprise editions at best prices.' },
-                  { title: 'Biz Analyst Mobile App', description: 'Access real-time accounting data on your phone — monitor sales, expenses & KRA compliance on the go.' },
-                  { title: 'Cloud Hosting & Remote Access', description: 'Access your TallyPrime data securely from anywhere.' },
-                  { title: 'EOS® Business Operating System', description: 'Strengthen Vision, People, Data, Process & Traction in your business.' },
-                ].map((item) => (
-                  <div key={item.title} className="rounded-2xl border border-white/10 bg-slate-700/60 p-5 hover:border-sky-500/30 transition-colors">
-                    <p className="text-sm font-semibold text-white">{item.title}</p>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">{item.description}</p>
+              <div className="grid grid-cols-2 gap-3 px-4 pb-4 sm:px-6 sm:pb-6">
+                {data.company.stats.map((s) => (
+                  <div key={s.label} className="rounded-2xl border border-white/10 bg-slate-700/60 p-5 text-center">
+                    <p className="text-2xl font-extrabold text-white">{s.value}</p>
+                    <p className="mt-1 text-xs text-slate-400">{s.label}</p>
                   </div>
                 ))}
               </div>
