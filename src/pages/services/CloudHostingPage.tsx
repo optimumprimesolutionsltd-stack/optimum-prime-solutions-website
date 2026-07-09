@@ -241,21 +241,54 @@ breadcrumbs={[
         </div>
       </section>
 
-      {/* Related Services */}
+      {/* Related Resources */}
       <section className="bg-slate-50 py-14 border-t border-slate-100">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h3 className="text-lg font-bold text-slate-900 mb-6">Related Services</h3>
-          <div className="flex flex-wrap gap-3">
-            {[
-              { label: 'TallyPrime Licensing', href: '/tallyprime/licensing' },
-              { label: 'Implementation', href: '/tallyprime/implementation' },
-              { label: 'Support & Maintenance', href: '/tallyprime/support' },
-              { label: 'Training', href: '/tallyprime/training' },
-            ].map((s) => (
-              <Link key={s.href} to={s.href} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white hover:border-red-300 hover:text-red-600 px-4 py-2 text-sm font-medium text-slate-700 transition">
-                {s.label} <ArrowRight className="h-3.5 w-3.5" />
-              </Link>
-            ))}
+          <div className="grid md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Related Services</h3>
+              <div className="flex flex-col gap-2">
+                {[
+                  { label: 'TallyPrime Licensing', href: '/tallyprime/licensing' },
+                  { label: 'Implementation', href: '/tallyprime/implementation' },
+                  { label: 'Support & Maintenance', href: '/tallyprime/support' },
+                  { label: 'Training', href: '/tallyprime/training' },
+                ].map((s) => (
+                  <Link key={s.href} to={s.href} className="inline-flex items-center gap-1.5 text-sm text-slate-700 hover:text-red-600 transition">
+                    <ArrowRight className="h-3.5 w-3.5 text-red-400" /> {s.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Industries We Serve</h3>
+              <div className="flex flex-col gap-2">
+                {[
+                  { label: 'Distribution & Wholesale', href: '/industries/distribution' },
+                  { label: 'Manufacturing', href: '/industries/manufacturing' },
+                  { label: 'Retail', href: '/industries/retail' },
+                  { label: 'Construction', href: '/industries/construction' },
+                ].map((s) => (
+                  <Link key={s.href} to={s.href} className="inline-flex items-center gap-1.5 text-sm text-slate-700 hover:text-red-600 transition">
+                    <ArrowRight className="h-3.5 w-3.5 text-red-400" /> {s.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-slate-500 uppercase tracking-widest mb-4">Pricing & Next Steps</h3>
+              <div className="flex flex-col gap-2">
+                {[
+                  { label: 'View Cloud Hosting Pricing', href: '/pricing' },
+                  { label: 'Book a Free Demo', href: '/contact#demo-form' },
+                  { label: 'Read Our Blog', href: '/blog' },
+                ].map((s) => (
+                  <Link key={s.href} to={s.href} className="inline-flex items-center gap-1.5 text-sm text-slate-700 hover:text-red-600 transition">
+                    <ArrowRight className="h-3.5 w-3.5 text-red-400" /> {s.label}
+                  </Link>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>

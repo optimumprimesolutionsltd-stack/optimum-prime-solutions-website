@@ -17,11 +17,6 @@ const securityHeaders = {
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
 };
 
-// Caching headers for static assets
-const cachingHeaders = {
-  'Cache-Control': 'public, max-age=31536000, immutable', // 1 year for hashed assets
-};
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
@@ -56,14 +51,21 @@ export default defineConfig({
     // Disable single file output - we need separate files for SSG
     rollupOptions: {
       output: {
-        // Split vendor libraries into separate cacheable chunks
+        // Split vendor libraries into separate cacheable chunks.
+        // react + react-dom + scheduler must be in the SAME chunk to avoid circular dependency.
         manualChunks(id) {
-          if (id.includes('node_modules/firebase')) return 'vendor-firebase';
+          // Firebase — all subpackages (firebase/app, firebase/auth, firebase/database, etc.)
+          if (id.includes('node_modules/firebase/') || id.includes('node_modules/@firebase/')) return 'vendor-firebase';
           if (id.includes('node_modules/framer-motion')) return 'vendor-framer';
-          if (id.includes('node_modules/react-dom')) return 'vendor-react';
-          if (id.includes('node_modules/react/')) return 'vendor-react';
+          // React core, DOM, and scheduler together to avoid circular chunk warning
+          if (
+            id.includes('node_modules/react/') ||
+            id.includes('node_modules/react-dom/') ||
+            id.includes('node_modules/scheduler/')
+          ) return 'vendor-react';
           if (id.includes('node_modules/react-router')) return 'vendor-router';
           if (id.includes('node_modules/lucide-react')) return 'vendor-icons';
+          // Markdown stack — only needed on blog post pages (lazy loaded)
           if (
             id.includes('node_modules/react-markdown') ||
             id.includes('node_modules/remark') ||
@@ -71,7 +73,9 @@ export default defineConfig({
             id.includes('node_modules/unified') ||
             id.includes('node_modules/micromark') ||
             id.includes('node_modules/mdast') ||
-            id.includes('node_modules/hast')
+            id.includes('node_modules/hast') ||
+            id.includes('node_modules/vfile') ||
+            id.includes('node_modules/unist')
           ) return 'vendor-markdown';
           if (id.includes('node_modules')) return 'vendor-misc';
         },

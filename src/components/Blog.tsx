@@ -3,7 +3,7 @@ import { Calendar, Clock, ArrowRight, Play, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
-import { slugify } from '../pages/BlogPostPage';
+import { slugify } from '../utils/slugify';
 
 const categoryStyles: Record<string, { badge: string; shadow: string }> = {
   Insights: { badge: 'from-red-500 to-orange-400 text-white', shadow: 'shadow-red-500/20' },

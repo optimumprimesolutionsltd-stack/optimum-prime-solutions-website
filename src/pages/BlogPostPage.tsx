@@ -39,15 +39,8 @@ const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: str
   ],
 };
 
-export function slugify(title: string): string {
-  return title
-    .toLowerCase()
-    .replace(/[®©™]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-}
+export { slugify } from '../utils/slugify';
+import { slugify } from '../utils/slugify';
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
