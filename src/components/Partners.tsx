@@ -26,7 +26,7 @@ const partners = [
     description: 'Biz Analyst is the official TallyPrime mobile app that brings your accounting data to your fingertips. Monitor sales, expenses, inventory, and KRA compliance in real-time from your phone — no computer needed.',
     badge: 'Mobile App Partner',
     badgeColor: 'bg-emerald-100 text-emerald-700',
-    url: 'https://www.bizanalyst.co',
+    url: 'https://www.bizanalyst.in',
     logoClass: 'h-10 object-contain',
   },
   {
