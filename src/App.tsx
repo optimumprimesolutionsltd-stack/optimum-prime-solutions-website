@@ -98,6 +98,15 @@ function SiteRoutes() {
           <Route path="/industries/schools" element={<SchoolsPage />} />
           <Route path="/industries/sacco" element={<SACCOPage />} />
           <Route path="/industries/saccos" element={<SACCOPage />} />
+          {/* ── Industry short URL aliases ── */}
+          <Route path="/manufacturing" element={<Navigate to="/industries/manufacturing" replace />} />
+          <Route path="/distribution" element={<Navigate to="/industries/distribution" replace />} />
+          <Route path="/retail" element={<Navigate to="/industries/retail" replace />} />
+          <Route path="/construction" element={<Navigate to="/industries/construction" replace />} />
+          <Route path="/hardware" element={<Navigate to="/industries/hardware" replace />} />
+          <Route path="/ngo" element={<Navigate to="/industries/ngo" replace />} />
+          <Route path="/schools" element={<Navigate to="/industries/schools" replace />} />
+          <Route path="/sacco" element={<Navigate to="/industries/sacco" replace />} />
 
           {/* ── Knowledge Hub ── */}
           <Route path="/knowledge-hub" element={<KnowledgeHubPage />} />

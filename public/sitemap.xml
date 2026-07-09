@@ -231,6 +231,59 @@
   </url>
 
   <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- INDUSTRY SHORT URL ALIASES (redirect to canonical)      -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/manufacturing</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/distribution</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/retail</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/construction</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/hardware</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/ngo</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/schools</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/sacco</loc>
+    <lastmod>2026-07-09</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
   <!-- KNOWLEDGE HUB (Phase 0)                                 -->
   <!-- ═══════════════════════════════════════════════════════ -->
 
