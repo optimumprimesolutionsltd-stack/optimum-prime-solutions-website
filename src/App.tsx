@@ -10,12 +10,13 @@ import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth } from './firebase/conf
 import type { User } from 'firebase/auth';
 import { signInAnonymously } from 'firebase/auth';
 
-// ── Critical: loaded eagerly (homepage + admin shell) ──────────────────────
+// ── Critical: loaded eagerly (homepage only) ────────────────────────────────
 import HomePage from './pages/HomePage';
-import AdminLogin from './admin/AdminLogin';
-import AdminLayout from './admin/AdminLayout';
 import NotFoundPage from './pages/NotFoundPage';
 import ComingSoonPage from './pages/ComingSoonPage';
+// ── Admin panel — lazy loaded (only downloads when /admin is visited) ──────────
+const AdminLogin  = lazy(() => import('./admin/AdminLogin'));
+const AdminLayout = lazy(() => import('./admin/AdminLayout'));
 
 // ── Core pages — lazy loaded ───────────────────────────────────────────────
 const AboutPage         = lazy(() => import('./pages/AboutPage'));
@@ -214,11 +215,13 @@ function App() {
     <ErrorBoundary>
       <SiteProvider>
         <Routes>
-          <Route path="/admin" element={<AdminLogin onLogin={handleLogin} />} />
+          <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminLogin onLogin={handleLogin} /></Suspense>} />
           <Route
             path="/admin/*"
             element={
-              isAuthenticated ? <AdminLayout onLogout={handleLogout} /> : <Navigate to="/admin" replace />
+              isAuthenticated
+                ? <Suspense fallback={<PageLoader />}><AdminLayout onLogout={handleLogout} /></Suspense>
+                : <Navigate to="/admin" replace />
             }
           />
           <Route path="/*" element={<SiteRoutes />} />
