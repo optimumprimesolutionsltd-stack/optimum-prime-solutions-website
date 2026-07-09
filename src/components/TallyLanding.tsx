@@ -92,20 +92,20 @@ export default function TallyLanding() {
         >
           {/* Badge */}
           <div className="mx-auto inline-block rounded-full border border-white/20 bg-slate-800/10 px-5 py-2 text-xs uppercase tracking-[0.3em] text-slate-100/80 shadow-sm backdrop-blur-sm">
-            Kenya's Official TallyPrime Partner · Ruiru &amp; Nationwide
+            Certified TallyPrime Partner · Ruiru &amp; Nationwide
           </div>
 
           {/* H1 — primary keyword target */}
           <h1 className="mx-auto max-w-4xl text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl drop-shadow-lg">
-            Official TallyPrime Partner in Kenya —{' '}
+            Grow Your Business with{' '}
             <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
-              Ruiru Tally Support &amp; Implementation
+              Kenya's Certified TallyPrime Experts
             </span>
           </h1>
 
           {/* Sub-headline */}
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-200/90">
-            Optimum Prime Solutions is Kenya's certified TallyPrime partner — authorised to sell genuine TallyPrime licences, deliver professional implementation, provide hands-on training, and host your data securely in the cloud. Serving businesses across Ruiru, Nairobi and all of Kenya.
+            Trusted by 500+ Kenyan businesses for TallyPrime implementation, cloud hosting, KRA eTIMS compliance, and EOS® consulting. Genuine licences, hands-on training, and local support — in Ruiru, Nairobi, and nationwide.
           </p>
 
           {/* CTA buttons */}
