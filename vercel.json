@@ -315,6 +315,34 @@
       "dest": "/dist/blog/index.html"
     },
     {
+      "src": "^/blog/why\\-every\\-kenyan\\-business\\-needs\\-tally\\-prime\\-in\\-2025(/)?$",
+      "dest": "/dist/blog/why-every-kenyan-business-needs-tally-prime-in-2025/index.html"
+    },
+    {
+      "src": "^/blog/complete\\-guide\\-to\\-kra\\-e\\-filing\\-with\\-tally\\-prime(/)?$",
+      "dest": "/dist/blog/complete-guide-to-kra-e-filing-with-tally-prime/index.html"
+    },
+    {
+      "src": "^/blog/tally\\-prime\\-silver\\-vs\\-gold\\-which\\-edition\\-is\\-right\\-for\\-you(/)?$",
+      "dest": "/dist/blog/tally-prime-silver-vs-gold-which-edition-is-right-for-you/index.html"
+    },
+    {
+      "src": "^/blog/what\\-is\\-eos\\-and\\-why\\-kenyan\\-businesses\\-are\\-adopting\\-it(/)?$",
+      "dest": "/dist/blog/what-is-eos-and-why-kenyan-businesses-are-adopting-it/index.html"
+    },
+    {
+      "src": "^/blog/tallyprime\\-cloud\\-hosting\\-access\\-your\\-business\\-data\\-from\\-anywhere(/)?$",
+      "dest": "/dist/blog/tallyprime-cloud-hosting-access-your-business-data-from-anywhere/index.html"
+    },
+    {
+      "src": "^/blog/tallyprime\\-71\\-is\\-here\\-whats\\-new\\-and\\-what\\-it\\-means\\-for\\-your\\-business(/)?$",
+      "dest": "/dist/blog/tallyprime-71-is-here-whats-new-and-what-it-means-for-your-business/index.html"
+    },
+    {
+      "src": "^/blog(/)?$",
+      "dest": "/dist/blog/index.html"
+    },
+    {
       "src": "^/(.*)$",
       "dest": "/dist/index.html"
     }

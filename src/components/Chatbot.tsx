@@ -60,7 +60,7 @@ export default function Chatbot() {
     return () => window.removeEventListener('zawadi:open', handleOpen);
   }, []);
 
-  const botGreeting = `Hey there! 👋 Welcome to Optimum Prime Solutions — Kenya's certified TallyPrime partner.\n\nI'm Zawadi, your business solutions guide. I'm here to help you find the right tools to grow your business.\n\nWhat's your name? I'd love to make this feel a bit more personal! 😊`;
+  const botGreeting = `Hey there! 👋 Welcome to **Optimum Prime Solutions** — Kenya's certified TallyPrime partner.\n\nI'm **Zawadi**, your business solutions guide. I'm here to help you find the right tools to grow your business.\n\nWhat's your name? I'd love to make this feel a bit more personal! 😊`;
 
   useEffect(() => {
     if (open) {
@@ -297,7 +297,13 @@ export default function Chatbot() {
                               : 'bg-white border border-slate-200 text-slate-800 rounded-bl-sm shadow-sm'
                           }`}
                         >
-                          <p className="whitespace-pre-wrap break-words">{msg.text}</p>
+                          <p className="whitespace-pre-wrap break-words">
+                            {msg.text.split(/(\*\*[^*]+\*\*)/g).map((part, i) =>
+                              part.startsWith('**') && part.endsWith('**')
+                                ? <strong key={i}>{part.slice(2, -2)}</strong>
+                                : part
+                            )}
+                          </p>
                           <p className={`text-xs mt-1.5 ${msg.role === 'user' ? 'text-white/70 text-right' : 'text-slate-400'}`}>
                             {msg.time}
                           </p>
