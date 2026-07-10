@@ -60,7 +60,7 @@ export default function Chatbot() {
     return () => window.removeEventListener('zawadi:open', handleOpen);
   }, []);
 
-  const botGreeting = `Hey there! 👋 Welcome to **Optimum Prime Solutions** — Kenya's certified TallyPrime partner.\n\nI'm **Zawadi**, your business solutions guide. I'm here to help you find the right tools to grow your business.\n\nWhat's your name? I'd love to make this feel a bit more personal! 😊`;
+  const botGreeting = `Hey there! 👋 Welcome to Optimum Prime Solutions — Kenya's certified TallyPrime partner.\n\nI'm Zawadi, your business solutions guide. I'm here to help you find the right tools to grow your business.\n\nWhat's your name? I'd love to make this feel a bit more personal! 😊`;
 
   useEffect(() => {
     if (open) {
