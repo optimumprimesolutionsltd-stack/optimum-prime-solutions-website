@@ -55,10 +55,19 @@ export default function Footer() {
     }
 
     setSubscribing(true);
-    await fbSet(`newsletterSignups/${Date.now()}`, {
+    await fbSet(`newsletter_subscribers/${Date.now()}`, {
       email: newsletterEmail,
       subscribedAt: new Date().toISOString(),
+      status: 'active',
     });
+
+    // Notify team via WhatsApp (fire-and-forget)
+    fetch('https://optimum-prime-lead-notifier.onrender.com/newsletter-subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: newsletterEmail }),
+    }).catch(() => {});
+
     setSubscribing(false);
     setSubmitted(true);
     setNewsletterEmail('');
