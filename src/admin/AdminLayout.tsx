@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Building2, Briefcase, ShoppingCart, Globe,
-  HelpCircle, Users, FileText, Phone,
+  HelpCircle, Users, FileText, Phone, MessageCircle,
   LogOut, Menu, X, ExternalLink, RotateCcw
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import { defaultData, type SiteData } from '../data/siteData';
+import { fbSubscribe } from '../firebase/config';
 import DashboardHome, { type TabId } from './DashboardHome';
 import CompanyEditor from './editors/CompanyEditor';
 import ServicesEditor from './editors/ServicesEditor';
@@ -16,6 +17,7 @@ import LeadsManager from './editors/LeadsManager';
 import BlogEditor from './editors/BlogEditor';
 import ContactEditor from './editors/ContactEditor';
 import TestimonialsEditor from './editors/TestimonialsEditor';
+import WhatsAppManager from './editors/WhatsAppManager';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -25,6 +27,7 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'industries', label: 'Industries', icon: Globe },
   { id: 'faqs', label: 'FAQ & Chatbot', icon: HelpCircle },
   { id: 'leads', label: 'Demo Leads', icon: Users },
+  { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
   { id: 'blogs', label: 'Blog Posts', icon: FileText },
   { id: 'contact', label: 'Contact Info', icon: Phone },
   { id: 'testimonials', label: 'Reviews & Testimonials', icon: Users },
@@ -38,6 +41,15 @@ export default function AdminLayout({ onLogout }: Props) {
   const [tab, setTab] = useState<TabId>('dashboard');
   const [sidebar, setSidebar] = useState(false);
   const [toast, setToast] = useState('');
+  const [unreadWa, setUnreadWa] = useState(0);
+
+  useEffect(() => {
+    const unsubscribe = fbSubscribe('whatsapp_conversations', (raw: Record<string, any> | null) => {
+      const count = raw ? Object.values(raw).filter((n: any) => n?.meta?.unread).length : 0;
+      setUnreadWa(count);
+    });
+    return unsubscribe;
+  }, []);
 
   const notify = (m: string) => { setToast(m); setTimeout(() => setToast(''), 3000); };
   
@@ -61,6 +73,7 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'industries': return <IndustriesEditor data={data} onSave={d => handleSave(d, 'Industries saved!')} />;
       case 'faqs': return <FaqEditor data={data} onSave={d => handleSave(d, 'FAQs saved!')} />;
       case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')} />;
+      case 'whatsapp': return <WhatsAppManager />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
       case 'contact': return <ContactEditor data={data} onSave={d => handleSave(d, 'Contact info saved!')} />;
       case 'testimonials': return <TestimonialsEditor data={data} onSave={d => handleSave(d, 'Testimonials saved!')} />;
@@ -73,7 +86,7 @@ export default function AdminLayout({ onLogout }: Props) {
       {tabs.map(t => {
         const Icon = t.icon;
         const isActive = tab === t.id;
-        const showBadge = t.id === 'leads' && newLeads > 0;
+        const badgeCount = t.id === 'leads' ? newLeads : t.id === 'whatsapp' ? unreadWa : 0;
         return (
           <button
             key={t.id}
@@ -86,10 +99,10 @@ export default function AdminLayout({ onLogout }: Props) {
           >
             <Icon className="h-4 w-4 shrink-0" />
             <span className="flex-1 text-left">{t.label}</span>
-            {showBadge && (
+            {badgeCount > 0 && (
               <span className={`h-5 min-w-[20px] rounded-full flex items-center justify-center text-[10px] font-bold ${
                 isActive ? 'bg-accent text-white' : 'bg-accent/10 text-accent'
-              }`}>{newLeads}</span>
+              }`}>{badgeCount}</span>
             )}
           </button>
         );
