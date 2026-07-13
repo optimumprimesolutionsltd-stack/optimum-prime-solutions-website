@@ -303,54 +303,6 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- Guides -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/guides</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Downloads -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/downloads</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Case Studies -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/case-studies</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Videos -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/videos</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- Webinars -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/webinars</loc>
-    <lastmod>2026-07-09</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
-  <!-- Templates -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/templates</loc>
-    <lastmod>2026-07-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
   <!-- ═══════════════════════════════════════════════════════ -->
   <!-- PRICING (Phase 0)                                       -->
   <!-- ═══════════════════════════════════════════════════════ -->
@@ -389,14 +341,6 @@
     <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
-  </url>
-
-  <!-- Why Choose Us -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/why-choose-us</loc>
-    <lastmod>2026-07-09</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
   </url>
 
   <!-- ═══════════════════════════════════════════════════════ -->
