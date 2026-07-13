@@ -1,14 +1,15 @@
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
 import SEO from '../components/SEO';
 import ReactMarkdown from 'react-markdown';
 import { Calendar, Clock, ArrowLeft, User, ArrowRight } from 'lucide-react';
-import { slugify } from '../utils/slugify';
+import { getPostSlug } from '../utils/slugify';
+import NotFoundPage from './NotFoundPage';
 
 // Per-post contextual related resources
 const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: string }[]> = {
-  'why-every-kenyan-business-needs-tallyprime-today': [
+  'why-every-kenyan-business-needs-tally-prime-in-2025': [
     { label: 'TallyPrime Implementation', href: '/tallyprime/implementation', desc: 'Go live in 5 business days with full setup & training.' },
     { label: 'KRA eTIMS Compliance', href: '/tallyprime/licensing', desc: 'Stay 100% compliant with automated VAT & e-filing.' },
     { label: 'View Pricing', href: '/pricing', desc: 'Transparent pricing — Silver, Gold & Enterprise editions.' },
@@ -40,23 +41,22 @@ const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: str
   ],
 };
 
-export { slugify } from '../utils/slugify';
-
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
   const { data } = useSite();
-  const navigate = useNavigate();
 
-  const post = data.blogs.find((b) => slugify(b.title) === slug);
+  const post = data.blogs.find((b) => getPostSlug(b) === slug);
 
   useEffect(() => {
-    if (!post && data.blogs.length > 0) {
-      navigate('/blog', { replace: true });
-    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [post, data.blogs.length, navigate]);
+  }, [post]);
 
-  if (!post) return null;
+  if (!post) {
+    // Post not found (e.g. a stale/old URL) — render a proper not-found
+    // state instead of silently redirecting, so it doesn't look like the
+    // requested article is the /blog listing page to users or crawlers.
+    return <NotFoundPage />;
+  }
 
   const BASE_URL = 'https://www.optimumprimesolutions.co.ke';
 
@@ -65,13 +65,13 @@ export default function BlogPostPage() {
       <SEO
         title={`${post.title} | Optimum Prime Solutions`}
         description={post.excerpt}
-        canonical={`/blog/${slugify(post.title)}`}
+        canonical={`/blog/${getPostSlug(post)}`}
         ogType="article"
         ogImage={`${BASE_URL}/og-image.png`}
 breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Blog', item: 'https://www.optimumprimesolutions.co.ke/blog/' },
-          { name: post.title, item: `${BASE_URL}/blog/${slugify(post.title)}/` },
+          { name: post.title, item: `${BASE_URL}/blog/${getPostSlug(post)}/` },
         ]}
       />
 

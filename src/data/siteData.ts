@@ -3,7 +3,7 @@ export interface ProductItem { id:string; name:string; edition:string; price:str
 export interface TestimonialItem { id:string; name:string; role:string; company:string; text:string; rating:number }
 export interface FaqItem { id:string; q:string; a:string; cat:string }
 export interface IndustryItem { id:string; name:string; icon:string; desc:string }
-export interface BlogPost { id:string; title:string; excerpt:string; date:string; category:string; readTime:string; content:string; youtubeUrl?:string }
+export interface BlogPost { id:string; title:string; slug?:string; excerpt:string; date:string; category:string; readTime:string; content:string; youtubeUrl?:string }
 export interface Lead {
   id:string; name:string; company:string; phone:string; email:string;
   businessType:string; demoDate:string; demoTime?:string; currentSoftware:string; message:string;
@@ -122,7 +122,7 @@ export const defaultData: SiteData = {
     {id:'8',name:'Education & NGOs',icon:'GraduationCap',desc:'Fee management, donor tracking, and grant accounting.'},
   ],
   blogs: [
-    {id:'1',title:'Why Every Kenyan Business Needs TallyPrime Today',excerpt:'Discover how Tally Prime is transforming business operations across Kenya with automated accounting, KRA compliance, and real-time reporting.',date:'2025-01-15',category:'Insights',readTime:'5 min',content:`Tally Prime has become the backbone of business operations across Kenya. Whether you're a small retail shop, a manufacturing facility, or a growing services company, the need for accurate financial management and KRA compliance is non-negotiable.
+    {id:'1',title:'Why Every Kenyan Business Needs TallyPrime Today',slug:'why-every-kenyan-business-needs-tally-prime-in-2025',excerpt:'Discover how Tally Prime is transforming business operations across Kenya with automated accounting, KRA compliance, and real-time reporting.',date:'2025-01-15',category:'Insights',readTime:'5 min',content:`Tally Prime has become the backbone of business operations across Kenya. Whether you're a small retail shop, a manufacturing facility, or a growing services company, the need for accurate financial management and KRA compliance is non-negotiable.
 
 Why should your business invest in TallyPrime today?
 
@@ -166,7 +166,7 @@ The Bottom Line
 Today, manual accounting is not just inefficient—it's risky. Tally Prime eliminates operational friction, ensures compliance, and gives you the visibility needed to scale confidently.
 
 Ready to transform your business? The businesses that embrace TallyPrime today will be the ones leading their industries tomorrow.`},
-    {id:'2',title:'Complete Guide to KRA e-Filing with Tally Prime',excerpt:'Step-by-step guide to setting up and filing your KRA returns directly from Tally Prime. Save time and avoid penalties.',date:'2025-02-01',category:'Tutorial',readTime:'8 min',content:`KRA compliance can be intimidating, but with Tally Prime, it's surprisingly straightforward. This guide walks you through the entire e-filing process.
+    {id:'2',title:'Complete Guide to KRA e-Filing with Tally Prime',slug:'complete-guide-to-kra-e-filing-with-tally-prime',excerpt:'Step-by-step guide to setting up and filing your KRA returns directly from Tally Prime. Save time and avoid penalties.',date:'2025-02-01',category:'Tutorial',readTime:'8 min',content:`KRA compliance can be intimidating, but with Tally Prime, it's surprisingly straightforward. This guide walks you through the entire e-filing process.
 
 What You Need Before Starting
 ✓ Active KRA PIN
@@ -249,7 +249,7 @@ Keep records of:
 The entire process, once set up correctly, takes just 2-3 hours per month. Tally Prime handles the heavy lifting—you just need to ensure accurate data entry daily.
 
 Need help with your first filing? Our team can guide you through every step.`},
-    {id:'3',title:'Tally Prime Silver vs Gold: Which Edition Is Right for You?',excerpt:'A detailed comparison of Tally Prime Silver and Gold editions to help you choose the perfect solution for your business size.',date:'2025-02-15',category:'Comparison',readTime:'6 min',content:`Choosing between Tally Prime Silver and Gold is one of the first decisions you'll make. This comprehensive comparison helps you pick the right fit for your business.
+    {id:'3',title:'Tally Prime Silver vs Gold: Which Edition Is Right for You?',slug:'tally-prime-silver-vs-gold-which-edition-is-right-for-you',excerpt:'A detailed comparison of Tally Prime Silver and Gold editions to help you choose the perfect solution for your business size.',date:'2025-02-15',category:'Comparison',readTime:'6 min',content:`Choosing between Tally Prime Silver and Gold is one of the first decisions you'll make. This comprehensive comparison helps you pick the right fit for your business.
 
 Quick Comparison Table:
 
@@ -378,7 +378,7 @@ The Bottom Line
 Don't overthink it. Both Silver and Gold are excellent investments. Silver gets you started affordably. Gold is when you've outgrown single-user limitations. Many successful businesses started with Silver and upgraded—that's perfectly normal.
 
 Ready to get started? Our team can help you choose and implement the right edition for your situation.`},
-    {id:'4',title:'What is EOS® and Why Kenyan Businesses Are Adopting It',excerpt:'The Entrepreneurial Operating System (EOS®) by Gino Wickman is transforming how leadership teams in Kenya run their businesses. Here\'s what it is and how to get started.',date:'2025-03-01',category:'EOS',readTime:'7 min',content:`The Entrepreneurial Operating System (EOS®) is a complete, practical system for running a business. Developed by Gino Wickman and detailed in his bestselling book \"Traction\", EOS is used by over 280,000 companies worldwide to get more of what they want from their businesses.
+    {id:'4',title:'What is EOS® and Why Kenyan Businesses Are Adopting It',slug:'what-is-eos-and-why-kenyan-businesses-are-adopting-it',excerpt:'The Entrepreneurial Operating System (EOS®) by Gino Wickman is transforming how leadership teams in Kenya run their businesses. Here\'s what it is and how to get started.',date:'2025-03-01',category:'EOS',readTime:'7 min',content:`The Entrepreneurial Operating System (EOS®) is a complete, practical system for running a business. Developed by Gino Wickman and detailed in his bestselling book \"Traction\", EOS is used by over 280,000 companies worldwide to get more of what they want from their businesses.
 
 What Problem Does EOS Solve?
 
@@ -417,7 +417,7 @@ As certified EOS implementers, Optimum Prime Solutions can guide your leadership
 The result: a business where everyone is aligned, accountable, and moving in the same direction.
 
 Ready to gain traction? Contact us to book your first EOS session.`},
-    {id:'5',title:'TallyPrime Cloud Hosting: Access Your Business Data From Anywhere',excerpt:'Learn how cloud-hosted TallyPrime gives your team secure, real-time access to accounting and inventory data from any location in Kenya and beyond.',date:'2025-03-15',category:'Cloud',readTime:'5 min',content:`One of the most common challenges for growing Kenyan businesses is data access. Your accountant is at the office, your sales manager is in the field, and you\'re at a client meeting — but the TallyPrime data is locked on one computer.
+    {id:'5',title:'TallyPrime Cloud Hosting: Access Your Business Data From Anywhere',slug:'tallyprime-cloud-hosting-access-your-business-data-from-anywhere',excerpt:'Learn how cloud-hosted TallyPrime gives your team secure, real-time access to accounting and inventory data from any location in Kenya and beyond.',date:'2025-03-15',category:'Cloud',readTime:'5 min',content:`One of the most common challenges for growing Kenyan businesses is data access. Your accountant is at the office, your sales manager is in the field, and you\'re at a client meeting — but the TallyPrime data is locked on one computer.
 
 Cloud hosting solves this completely.
 
@@ -456,7 +456,7 @@ Getting Started
 Our cloud hosting packages start from as low as KES 3,000 per month. Setup takes 1-2 days and includes migration of your existing TallyPrime data to the cloud, user access configuration, and training on remote access.
 
 Contact us today to get your TallyPrime on the cloud.`},
-    {id:'6',title:'TallyPrime 7.1 Is Here: What\'s New and What It Means for Your Business',excerpt:'Tally Solutions has released TallyPrime 7.1 Beta with major upgrades to invoicing, banking, compliance, and reporting. Here\'s everything you need to know as a Kenyan business owner.',date:'2026-06-01',category:'Product Update',readTime:'6 min',content:`Tally Solutions has officially released TallyPrime 7.1 as an early access Beta — and it is packed with features that will make a real difference for Kenyan businesses.
+    {id:'6',title:'TallyPrime 7.1 Is Here: What\'s New and What It Means for Your Business',slug:'tallyprime-71-is-here-whats-new-and-what-it-means-for-your-business',excerpt:'Tally Solutions has released TallyPrime 7.1 Beta with major upgrades to invoicing, banking, compliance, and reporting. Here\'s everything you need to know as a Kenyan business owner.',date:'2026-06-01',category:'Product Update',readTime:'6 min',content:`Tally Solutions has officially released TallyPrime 7.1 as an early access Beta — and it is packed with features that will make a real difference for Kenyan businesses.
 
 As Kenya\'s certified TallyPrime partner, we have reviewed all the new features and here is what you need to know.
 

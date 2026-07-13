@@ -3,7 +3,7 @@ import { Calendar, Clock, ArrowRight, Play, ChevronUp } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
-import { slugify } from '../utils/slugify';
+import { getPostSlug } from '../utils/slugify';
 
 const categoryStyles: Record<string, { badge: string; shadow: string }> = {
   Insights: { badge: 'from-red-500 to-orange-400 text-white', shadow: 'shadow-red-500/20' },
@@ -43,7 +43,7 @@ export default function Blog() {
               transition={{delay:(i % 3)*0.1}}
               className="group rounded-[2rem] border border-white/10 bg-slate-800 shadow-xl overflow-hidden hover:-translate-y-1 hover:shadow-2xl hover:border-red-500/30 transition-all"
             >
-              <Link to={`/blog/${slugify(b.title)}`} className="block h-full">
+              <Link to={`/blog/${getPostSlug(b)}`} className="block h-full">
                 <div className="h-44 bg-gradient-to-br from-sky-500 via-cyan-400 to-indigo-600 flex items-center justify-center relative overflow-hidden">
                   <span
                     className={`absolute top-4 left-4 inline-flex items-center rounded-full bg-gradient-to-r ${categoryStyles[b.category]?.badge || 'from-slate-700 to-slate-600 text-white'} px-3 py-1 text-[11px] font-semibold uppercase tracking-wide shadow-lg ${categoryStyles[b.category]?.shadow || 'shadow-slate-900/30'}`}
