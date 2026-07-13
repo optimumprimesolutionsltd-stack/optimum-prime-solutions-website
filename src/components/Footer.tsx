@@ -1,7 +1,9 @@
 import { ArrowRight, ArrowUp, Calculator, FileCheck, Mail, MapPin, Package, Phone, Sparkles, Wallet } from 'lucide-react';
 import { FormEvent, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
+import { fbSet } from '../firebase/config';
+import { isValidEmail } from '../utils/validation';
 import Logo from './Logo';
 
 const quickLinks = [
@@ -41,22 +43,25 @@ export default function Footer() {
   const { data } = useSite();
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
-  const navigate = useNavigate();
+  const [subscribing, setSubscribing] = useState(false);
   const c = data.contact;
 
-  const handleNewsletterSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleNewsletterSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!newsletterEmail || !newsletterEmail.includes('@')) {
+    if (!isValidEmail(newsletterEmail)) {
       window.alert('Please enter a valid email address to join.');
       return;
     }
 
+    setSubscribing(true);
+    await fbSet(`newsletterSignups/${Date.now()}`, {
+      email: newsletterEmail,
+      subscribedAt: new Date().toISOString(),
+    });
+    setSubscribing(false);
     setSubmitted(true);
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      navigate(`/contact?email=${encodeURIComponent(newsletterEmail)}&subject=${encodeURIComponent('Newsletter Signup — Please add me to your mailing list')}`);
-    }, 1200);
+    setNewsletterEmail('');
   };
 
   return (
@@ -193,7 +198,7 @@ export default function Footer() {
             <p className="text-sm text-slate-700 mb-4">Receive TallyPrime tips, cloud hosting guides, and EOS® business insights.</p>
             {submitted ? (
               <div className="rounded-2xl bg-green-50 border border-green-200 px-4 py-4 text-sm text-green-700 font-medium text-center">
-                ✓ Got it! Redirecting you to our contact page...
+                ✓ You're subscribed! We'll be in touch with updates.
               </div>
             ) : (
               <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-3" aria-label="Newsletter signup">
@@ -211,10 +216,11 @@ export default function Footer() {
                 />
                 <button
                   type="submit"
-                  className="rounded-full bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+                  disabled={subscribing}
+                  className="rounded-full bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700 disabled:opacity-50"
                   aria-label="Subscribe to newsletter"
                 >
-                  Join
+                  {subscribing ? 'Joining...' : 'Join'}
                 </button>
               </form>
             )}
