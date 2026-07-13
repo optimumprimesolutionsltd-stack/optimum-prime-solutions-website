@@ -229,13 +229,13 @@ export default function Contact() {
               {info.map(({ icon: Icon, title, lines }) => (
                 <div key={title} className="rounded-3xl border border-white/10 bg-slate-900 p-5 shadow-sm">
                   <div className="flex items-center gap-3 text-white">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-3xl bg-sky-100 text-sky-700">
+                    <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-3xl bg-sky-100 text-sky-700">
                       <Icon className="h-5 w-5" />
                     </div>
-                    <div>
+                    <div className="min-w-0">
                       <p className="text-sm font-semibold text-white">{title}</p>
                       {lines.map((line) => (
-                        <p key={line} className="mt-1 text-sm text-slate-400">{line}</p>
+                        <p key={line} className="mt-1 text-sm text-slate-400 break-words">{line}</p>
                       ))}
                     </div>
                   </div>
