@@ -37,6 +37,24 @@ const getWeekKey = () => {
 const getTime = () =>
   new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
+const VISITOR_ID_KEY = 'ops_visitor_id';
+
+const getVisitorId = () => {
+  try {
+    let id = localStorage.getItem(VISITOR_ID_KEY);
+    if (!id) {
+      id = typeof crypto !== 'undefined' && crypto.randomUUID
+        ? crypto.randomUUID()
+        : `visitor-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem(VISITOR_ID_KEY, id);
+    }
+    return id;
+  } catch {
+    // localStorage unavailable (private browsing, etc.) — fall back to a per-tab id
+    return `visitor-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+};
+
 export default function Chatbot() {
   const [open, setOpen] = useState(false);
   const [min, setMin] = useState(false);
@@ -46,6 +64,7 @@ export default function Chatbot() {
   const [showTypingIndicator, setShowTypingIndicator] = useState(false);
   const [lead, setLead] = useState<LeadProfile>({});
   const [demoOpen, setDemoOpen] = useState(false);
+  const [visitorId] = useState(() => getVisitorId());
 
   const { data } = useSite();
   const endRef = useRef<HTMLDivElement>(null);
@@ -82,8 +101,8 @@ export default function Chatbot() {
     // Load conversation history and lead profile from Firebase
     const loadHistory = async () => {
       const weekKey = getWeekKey();
-      const historyPath = `chatHistory/${weekKey}/anonUser`; // Using anonUser for now
-      const leadPath = `leadProfiles/${weekKey}/anonUser`;
+      const historyPath = `chatHistory/${weekKey}/${visitorId}`;
+      const leadPath = `leadProfiles/${weekKey}/${visitorId}`;
       const savedMsgs = await fbGet(historyPath);
       const savedLead = await fbGet(leadPath);
       if (savedMsgs) setMsgs(savedMsgs);
@@ -106,12 +125,12 @@ export default function Chatbot() {
   useEffect(() => {
     if (msgs.length > 0) {
       const weekKey = getWeekKey();
-      const historyPath = `chatHistory/${weekKey}/anonUser`;
-      const leadPath = `leadProfiles/${weekKey}/anonUser`;
+      const historyPath = `chatHistory/${weekKey}/${visitorId}`;
+      const leadPath = `leadProfiles/${weekKey}/${visitorId}`;
       fbSet(historyPath, msgs);
       fbSet(leadPath, lead);
     }
-  }, [msgs, lead]);
+  }, [msgs, lead, visitorId]);
 
   const handleSend = useCallback(async (message: string) => {
     const trimmedText = message.trim();
