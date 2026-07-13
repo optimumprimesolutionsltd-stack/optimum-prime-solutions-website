@@ -150,13 +150,9 @@ breadcrumbs={[
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {resources.map((resource) => {
               const Icon = resource.icon;
-              return (
-                <Link
-                  key={resource.href}
-                  to={resource.href}
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="group flex flex-col rounded-3xl bg-white border border-slate-200 p-6 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200"
-                >
+              const isComingSoon = resource.badge === 'Coming Soon';
+              const cardContent = (
+                <>
                   <div className="flex items-start justify-between mb-4">
                     <div className={`inline-flex h-12 w-12 items-center justify-center rounded-2xl ${resource.color}`}>
                       <Icon className="h-6 w-6" />
@@ -171,9 +167,36 @@ breadcrumbs={[
                   </div>
                   <h3 className="text-base font-bold text-slate-900 mb-2">{resource.title}</h3>
                   <p className="text-sm text-slate-600 leading-relaxed flex-grow">{resource.desc}</p>
-                  <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-red-600 group-hover:gap-2 transition-all">
-                    {resource.cta} <ArrowRight className="h-4 w-4" />
+                  {!isComingSoon && (
+                    <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-red-600 group-hover:gap-2 transition-all">
+                      {resource.cta} <ArrowRight className="h-4 w-4" />
+                    </div>
+                  )}
+                </>
+              );
+
+              // "Coming Soon" resources aren't built yet — render as a non-clickable
+              // teaser instead of a Link, so search engines don't discover/index
+              // pages that don't exist yet.
+              if (isComingSoon) {
+                return (
+                  <div
+                    key={resource.href}
+                    className="flex flex-col rounded-3xl bg-white border border-slate-200 p-6 shadow-sm opacity-70"
+                  >
+                    {cardContent}
                   </div>
+                );
+              }
+
+              return (
+                <Link
+                  key={resource.href}
+                  to={resource.href}
+                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                  className="group flex flex-col rounded-3xl bg-white border border-slate-200 p-6 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200"
+                >
+                  {cardContent}
                 </Link>
               );
             })}
