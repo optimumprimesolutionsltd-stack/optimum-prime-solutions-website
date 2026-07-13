@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUp, Mail, MapPin, Phone, Sparkles } from 'lucide-react';
+import { ArrowRight, ArrowUp, Calculator, FileCheck, Mail, MapPin, Package, Phone, Sparkles, Wallet } from 'lucide-react';
 import { FormEvent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
@@ -9,6 +9,7 @@ const quickLinks = [
   { l: 'About', h: '/about' },
   { l: 'TallyPrime Solutions', h: '/tallyprime' },
   { l: 'Industries', h: '/industries' },
+  { l: 'Biz Analyst', h: '/biz-analyst' },
   { l: 'Knowledge Hub', h: '/knowledge-hub' },
   { l: 'Pricing', h: '/pricing' },
   { l: 'Blog', h: '/blog' },
@@ -27,6 +28,13 @@ const tallyPrimeLinks = [
 
 const upcomingEvents = [
   { l: 'Free TallyPrime 7.1 Webinar', h: '/webinar', badge: 'Live — Wed 15 July' },
+];
+
+const coreServices = [
+  { icon: Calculator, label: 'Accounting & Bookkeeping' },
+  { icon: Package, label: 'Inventory Management' },
+  { icon: Wallet, label: 'Payroll Processing' },
+  { icon: FileCheck, label: 'KRA eTIMS Compliance' },
 ];
 
 export default function Footer() {
@@ -87,15 +95,6 @@ export default function Footer() {
             {/* Social Media Links */}
             <div className="flex items-center gap-3 pt-2">
               <a
-                href="https://www.instagram.com/optimumprimesolutionsltd"
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label="Follow us on Instagram"
-                className="flex items-center justify-center h-9 w-9 rounded-full bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white shadow-md hover:scale-110 transition-transform"
-              >
-                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
-              </a>
-              <a
                 href="https://www.facebook.com/optimumprimesolutionsltd"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -105,6 +104,16 @@ export default function Footer() {
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
               </a>
               <span className="text-xs text-slate-400">Follow us</span>
+            </div>
+
+            {/* Core Services Summary */}
+            <div className="grid grid-cols-2 gap-2 pt-2">
+              {coreServices.map((service) => (
+                <div key={service.label} className="flex items-center gap-2 rounded-xl bg-slate-50 px-3 py-2">
+                  <service.icon className="h-3.5 w-3.5 shrink-0 text-red-600" />
+                  <span className="text-xs text-slate-600 leading-tight">{service.label}</span>
+                </div>
+              ))}
             </div>
           </div>
 

@@ -203,7 +203,7 @@ export default function Contact() {
     { icon: Clock, title: 'Hours', lines: c.workingHours },
   ];
 
-  const facebookLink = "https://www.facebook.com/profile.php?id=100041376170510";
+  const facebookLink = "https://www.facebook.com/optimumprimesolutionsltd";
 
   return (
     <section id="contact" className="relative overflow-hidden bg-slate-900 py-24">

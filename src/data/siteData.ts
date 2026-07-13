@@ -43,7 +43,7 @@ export const defaultData: SiteData = {
   contact: {
     location:'Ruiru, Kenya',
     phones:['+254 116 246 074','+254 727 209 720'],
-    emails:['optimumprimesolutionsltd@gmail.com','Info@optimumprimesolutionsltd.co.ke'],
+    emails:['info@optimumprimesolutions.co.ke'],
     workingHours:['Mon – Fri: 8:00 AM – 6:00 PM','Sat: 9:00 AM – 1:00 PM'],
     whatsapp:'254116246074',
     mapUrl:'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15955.37!2d36.96!3d-1.15!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sRuiru!5e0!3m2!1sen!2ske!4v1',

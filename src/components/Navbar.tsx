@@ -18,9 +18,9 @@ interface NavLink {
 
 const links: NavLink[] = [
   { label: 'Home', href: '/' },
-  { label: 'About', href: '/about' },
+  { label: 'About Us', href: '/about' },
   {
-    label: 'TallyPrime Solutions',
+    label: 'Services',
     href: '/tallyprime',
     children: [
       { label: 'TallyPrime Overview', href: '/tallyprime', desc: 'All TallyPrime services in one place' },
@@ -32,45 +32,12 @@ const links: NavLink[] = [
       { label: 'Customization', href: '/tallyprime/customization', desc: 'TDL & workflow customization' },
       { label: 'Data Migration', href: '/tallyprime/data-migration', desc: 'Migrate from any system' },
       { label: 'Business Consulting', href: '/tallyprime/consulting', desc: 'EOS® for business growth' },
-    ],
-  },
-  {
-    label: 'Industries',
-    href: '/industries',
-    children: [
-      { label: 'All Industries', href: '/industries', desc: 'Solutions for every sector' },
-      { label: 'Retail', href: '/industries/retail', desc: 'POS, stock & billing' },
-      { label: 'Distribution', href: '/industries/distribution', desc: 'Multi-location & route sales' },
-      { label: 'Manufacturing', href: '/industries/manufacturing', desc: 'BOM, production & costing' },
-      { label: 'Construction', href: '/industries/construction', desc: 'Project costing & contracts' },
-      { label: 'Hardware & Wholesale', href: '/industries/hardware', desc: 'Inventory & trade management' },
-      { label: 'NGOs', href: '/industries/ngo', desc: 'Fund accounting & donor reports' },
-      { label: 'Schools', href: '/industries/schools', desc: 'Fee management & payroll' },
-      { label: 'SACCOs', href: '/industries/sacco', desc: 'Member accounts & SASRA compliance' },
-    ],
-  },
-  {
-    label: 'Knowledge Hub',
-    href: '/knowledge-hub',
-    children: [
-      { label: 'Knowledge Hub', href: '/knowledge-hub', desc: 'Your TallyPrime learning centre' },
-      { label: 'Blog', href: '/blog', desc: 'Tips, guides & news' },
-      { label: 'Guides', href: '/knowledge-hub/guides', desc: 'Step-by-step implementation guides' },
-      { label: 'Downloads', href: '/knowledge-hub/downloads', desc: 'Templates & resources' },
-      { label: 'FAQs', href: '/faq', desc: 'Common questions answered' },
-      { label: 'Case Studies', href: '/knowledge-hub/case-studies', desc: 'Real client success stories' },
-      { label: 'Videos', href: '/knowledge-hub/videos', desc: 'Tutorials & demos' },
-    ],
-  },
-  {
-    label: 'Biz Analyst',
-    href: '/biz-analyst',
-    children: [
+      { label: 'Industries We Serve', href: '/industries', desc: 'Solutions for every sector' },
       { label: 'Biz Analyst App', href: '/biz-analyst', desc: 'Real-time TallyPrime data on your phone' },
+      { label: 'Pricing', href: '/pricing', desc: 'Silver, Gold & Enterprise plans' },
     ],
   },
-  { label: 'Pricing', href: '/pricing' },
-  { label: 'Contact', href: '/contact' },
+  { label: 'Contact Us', href: '/contact' },
 ];
 
 export default function Navbar() {
@@ -180,11 +147,13 @@ export default function Navbar() {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: 8 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute top-full left-0 mt-1 w-64 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-sm shadow-xl shadow-slate-200/40 overflow-hidden"
+                        className={`absolute top-full left-0 mt-1 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-sm shadow-xl shadow-slate-200/40 overflow-hidden ${
+                          link.children.length > 6 ? 'w-[560px]' : 'w-64'
+                        }`}
                         onMouseEnter={() => handleMouseEnter(link.label)}
                         onMouseLeave={handleMouseLeave}
                       >
-                        <div className="p-2">
+                        <div className={`p-2 ${link.children.length > 6 ? 'grid grid-cols-2 gap-1' : ''}`}>
                           {link.children.map((child) => (
                             <Link
                               key={child.href}
