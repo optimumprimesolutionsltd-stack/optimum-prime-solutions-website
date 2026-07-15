@@ -59,7 +59,10 @@ export default function BizAnalystPage() {
         description="Biz Analyst is the official TallyPrime mobile app by Khatabook. Monitor sales, expenses, inventory, KRA compliance and financial reports in real-time from your phone. No computer needed."
         socialDescription="Access your TallyPrime accounting data on your phone — anytime, anywhere. Biz Analyst by Khatabook brings real-time business intelligence to your fingertips."
         canonical="/biz-analyst"
-        keywords="Biz Analyst, TallyPrime mobile app, Khatabook, real-time accounting, KRA compliance, business dashboard, mobile ERP Kenya"
+        breadcrumbs={[
+          { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
+          { name: 'Biz Analyst', item: 'https://www.optimumprimesolutions.co.ke/biz-analyst/' },
+        ]}
       />
 
       {/* Hero */}

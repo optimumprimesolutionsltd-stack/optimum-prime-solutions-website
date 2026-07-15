@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { MessageCircle, Send, Loader2, User } from 'lucide-react';
+import { MessageCircle, Send, Loader2, User, Bot, BotOff } from 'lucide-react';
 import { fbSubscribe, fbSet } from '../../firebase/config';
 
 const BACKEND_URL = 'https://optimum-prime-lead-notifier.onrender.com';
@@ -18,11 +18,12 @@ interface WaThread {
   lastMessageAt: string;
   lastDirection: 'in' | 'out';
   unread: boolean;
+  botPaused: boolean;
   messages: WaMessage[];
 }
 
 type RawConvos = Record<string, {
-  meta?: { phone?: string; name?: string; lastMessage?: string; lastMessageAt?: string; lastDirection?: 'in' | 'out'; unread?: boolean };
+  meta?: { phone?: string; name?: string; lastMessage?: string; lastMessageAt?: string; lastDirection?: 'in' | 'out'; unread?: boolean; botPaused?: boolean };
   messages?: Record<string, WaMessage>;
 }>;
 
@@ -39,6 +40,7 @@ function parseThreads(raw: RawConvos | null): WaThread[] {
       lastMessageAt: node.meta?.lastMessageAt || '',
       lastDirection: node.meta?.lastDirection || 'in',
       unread: !!node.meta?.unread,
+      botPaused: !!node.meta?.botPaused,
       messages,
     };
   }).sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime());
@@ -68,6 +70,11 @@ export default function WhatsAppManager() {
     fbSet(`whatsapp_conversations/${digits}/meta/unread`, false).catch(() => {});
   };
 
+  const toggleBot = (phone: string, paused: boolean) => {
+    const digits = phone.replace(/[^0-9]/g, '');
+    fbSet(`whatsapp_conversations/${digits}/meta/botPaused`, paused).catch(() => {});
+  };
+
   const sendReply = async () => {
     if (!active || !reply.trim()) return;
     setSending(true);
@@ -92,7 +99,7 @@ export default function WhatsAppManager() {
     <div className="mx-auto max-w-5xl">
       <div className="mb-5">
         <h2 className="text-xl font-bold text-navy-900">WhatsApp Conversations</h2>
-        <p className="text-sm text-navy-500 mt-0.5">Chats from your WhatsApp Business number — auto-replies and team alerts are sent automatically.</p>
+        <p className="text-sm text-navy-500 mt-0.5">Zawadi (our AI assistant) replies automatically. Send a message yourself to take over a conversation, or use the toggle to switch back.</p>
       </div>
 
       {threads.length === 0 ? (
@@ -139,9 +146,20 @@ export default function WhatsAppManager() {
               </div>
             ) : (
               <>
-                <div className="border-b border-navy-100 px-5 py-3">
-                  <p className="text-sm font-bold text-navy-900">{active.name || active.phone}</p>
-                  <p className="text-xs text-navy-500">{active.phone}</p>
+                <div className="border-b border-navy-100 px-5 py-3 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-sm font-bold text-navy-900">{active.name || active.phone}</p>
+                    <p className="text-xs text-navy-500">{active.phone}</p>
+                  </div>
+                  <button
+                    onClick={() => toggleBot(active.phone, !active.botPaused)}
+                    className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-semibold transition shrink-0 ${
+                      active.botPaused ? 'bg-navy-100 text-navy-600 hover:bg-navy-200' : 'bg-green-50 text-green-700 hover:bg-green-100'
+                    }`}
+                    title={active.botPaused ? 'Zawadi is paused — you are replying manually' : 'Zawadi is replying automatically'}
+                  >
+                    {active.botPaused ? <><BotOff className="h-3.5 w-3.5" /> Zawadi paused</> : <><Bot className="h-3.5 w-3.5" /> Zawadi active</>}
+                  </button>
                 </div>
                 <div className="flex-1 overflow-y-auto p-5 space-y-3">
                   {active.messages.map((m, i) => (

@@ -295,6 +295,14 @@
     <priority>0.9</priority>
   </url>
 
+  <!-- Video Tutorials -->
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/knowledge-hub/videos</loc>
+    <lastmod>2026-07-15</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Blog -->
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/blog</loc>
@@ -382,5 +390,16 @@
     <lastmod>2026-06-01</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+
+  <!-- ═══════════════════════════════════════════════════════ -->
+  <!-- LEGAL                                                   -->
+  <!-- ═══════════════════════════════════════════════════════ -->
+
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/privacy-policy</loc>
+    <lastmod>2026-07-15</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
   </url>
 </urlset>

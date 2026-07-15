@@ -68,58 +68,40 @@ export default function Breadcrumb({ items, className = '' }: BreadcrumbProps) {
   // Don't show breadcrumbs on homepage
   if (location.pathname === '/' || crumbs.length <= 1) return null;
 
-  // JSON-LD BreadcrumbList schema
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: crumbs.map((crumb, index) => ({
-      '@type': 'ListItem',
-      position: index + 1,
-      name: crumb.label,
-      item: crumb.href
-        ? `https://www.optimumprimesolutions.co.ke${crumb.href}`
-        : undefined,
-    })),
-  };
-
+  // BreadcrumbList JSON-LD is owned by the SEO component's `breadcrumbs` prop,
+  // not here — every page already passes an explicit, page-specific list to
+  // <SEO breadcrumbs={...}>. This component used to also emit its own schema
+  // auto-derived from the URL, which meant every page shipped two conflicting
+  // BreadcrumbList blocks (plus a third, stale one hardcoded in index.html).
   return (
-    <>
-      {/* JSON-LD Schema */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
-      />
+    <nav
+      aria-label="Breadcrumb"
+      className={`flex items-center gap-1.5 text-sm text-slate-500 flex-wrap ${className}`}
+    >
+      {crumbs.map((crumb, index) => {
+        const isFirst = index === 0;
+        const isLast = index === crumbs.length - 1;
 
-      {/* Visual Breadcrumb */}
-      <nav
-        aria-label="Breadcrumb"
-        className={`flex items-center gap-1.5 text-sm text-slate-500 flex-wrap ${className}`}
-      >
-        {crumbs.map((crumb, index) => {
-          const isFirst = index === 0;
-          const isLast = index === crumbs.length - 1;
-
-          return (
-            <span key={index} className="flex items-center gap-1.5">
-              {index > 0 && <ChevronRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />}
-              {isLast ? (
-                <span className="font-medium text-slate-800 truncate max-w-[200px]" aria-current="page">
-                  {crumb.label}
-                </span>
-              ) : (
-                <Link
-                  to={crumb.href || '/'}
-                  onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className="flex items-center gap-1 hover:text-red-600 transition-colors"
-                >
-                  {isFirst && <Home className="h-3.5 w-3.5" />}
-                  <span>{crumb.label}</span>
-                </Link>
-              )}
-            </span>
-          );
-        })}
-      </nav>
-    </>
+        return (
+          <span key={index} className="flex items-center gap-1.5">
+            {index > 0 && <ChevronRight className="h-3.5 w-3.5 text-slate-400 shrink-0" />}
+            {isLast ? (
+              <span className="font-medium text-slate-800 truncate max-w-[200px]" aria-current="page">
+                {crumb.label}
+              </span>
+            ) : (
+              <Link
+                to={crumb.href || '/'}
+                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+                className="flex items-center gap-1 hover:text-red-600 transition-colors"
+              >
+                {isFirst && <Home className="h-3.5 w-3.5" />}
+                <span>{crumb.label}</span>
+              </Link>
+            )}
+          </span>
+        );
+      })}
+    </nav>
   );
 }
