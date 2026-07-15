@@ -46,6 +46,7 @@ const SupportPage         = lazy(() => import('./pages/services/SupportPage'));
 const CustomizationPage   = lazy(() => import('./pages/services/CustomizationPage'));
 const DataMigrationPage   = lazy(() => import('./pages/services/DataMigrationPage'));
 const ConsultingPage      = lazy(() => import('./pages/services/ConsultingPage'));
+const PrivacyPolicyPage   = lazy(() => import('./pages/PrivacyPolicyPage'));
 
 // ── Industry pages — lazy loaded ──────────────────────────────────────────
 const ManufacturingPage = lazy(() => import('./pages/industries/ManufacturingPage'));
@@ -141,6 +142,9 @@ function SiteRoutes() {
 
             {/* ── Why Choose Us ── */}
             <Route path="/why-choose-us" element={<ComingSoonPage />} />
+
+            {/* ── Legal ── */}
+            <Route path="/privacy-policy" element={<PrivacyPolicyPage />} />
 
             {/* ── Catch-all (404) ── */}
             <Route path="*" element={<NotFoundPage />} />

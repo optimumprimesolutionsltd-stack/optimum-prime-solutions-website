@@ -55,11 +55,18 @@ export default function Footer() {
     }
 
     setSubscribing(true);
-    await fbSet(`newsletter_subscribers/${Date.now()}`, {
+    const saved = await fbSet(`newsletter_subscribers/${Date.now()}`, {
       email: newsletterEmail,
       subscribedAt: new Date().toISOString(),
       status: 'active',
     });
+
+    setSubscribing(false);
+
+    if (!saved) {
+      window.alert('Something went wrong subscribing you. Please try again in a moment.');
+      return;
+    }
 
     // Notify team via WhatsApp (fire-and-forget)
     fetch('https://optimum-prime-lead-notifier.onrender.com/newsletter-subscribe', {
@@ -68,7 +75,6 @@ export default function Footer() {
       body: JSON.stringify({ email: newsletterEmail }),
     }).catch(() => {});
 
-    setSubscribing(false);
     setSubmitted(true);
     setNewsletterEmail('');
   };
@@ -301,7 +307,12 @@ export default function Footer() {
 
         {/* Bottom Bar */}
         <div className="flex flex-col gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} {data.company.name}. All rights reserved.</p>
+          <p className="flex flex-wrap items-center gap-x-4 gap-y-1">
+            <span>© {new Date().getFullYear()} {data.company.name}. All rights reserved.</span>
+            <Link to="/privacy-policy" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-red-600 transition-colors">
+              Privacy Policy
+            </Link>
+          </p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="inline-flex items-center gap-2 text-slate-700 transition hover:text-red-600"
