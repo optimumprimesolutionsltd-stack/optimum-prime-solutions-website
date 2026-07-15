@@ -13,6 +13,7 @@ const quickLinks = [
   { l: 'Industries', h: '/industries' },
   { l: 'Biz Analyst', h: '/biz-analyst' },
   { l: 'Knowledge Hub', h: '/knowledge-hub' },
+  { l: 'Video Tutorials', h: '/knowledge-hub/videos' },
   { l: 'Pricing', h: '/pricing' },
   { l: 'Blog', h: '/blog' },
   { l: 'FAQ', h: '/faq' },

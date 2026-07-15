@@ -37,6 +37,17 @@ const links: NavLink[] = [
       { label: 'Pricing', href: '/pricing', desc: 'Silver, Gold & Enterprise plans' },
     ],
   },
+  {
+    label: 'Resources',
+    href: '/knowledge-hub',
+    children: [
+      { label: 'Knowledge Hub', href: '/knowledge-hub', desc: 'All guides, videos & resources in one place' },
+      { label: 'Video Tutorials', href: '/knowledge-hub/videos', desc: 'Step-by-step TallyPrime walkthroughs' },
+      { label: 'Blog', href: '/blog', desc: 'Tips, updates & compliance guides' },
+      { label: 'FAQ', href: '/faq', desc: 'Answers to common questions' },
+      { label: 'Webinars', href: '/webinar', desc: 'Live & recorded sessions' },
+    ],
+  },
   { label: 'Contact Us', href: '/contact' },
 ];
 

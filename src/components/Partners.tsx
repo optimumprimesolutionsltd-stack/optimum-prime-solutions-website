@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
-import { ExternalLink } from 'lucide-react';
+import { ArrowRight, ExternalLink } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const partners = [
   {
@@ -105,18 +106,27 @@ export default function Partners() {
         </div>
 
         {/* Bottom trust bar */}
-        <div className="mt-12 rounded-2xl bg-slate-900 border border-white/10 px-6 py-5 flex flex-col sm:flex-row items-center justify-center gap-4 text-center sm:text-left">
-          <div className="flex -space-x-3">
-            {partners.map((p) => (
-              <div key={p.name} className="h-10 w-10 rounded-full bg-slate-800 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
-                <img src={p.logo} alt={p.name} className="h-7 w-7 object-contain" width={28} height={28} loading="lazy" />
-              </div>
-            ))}
+        <div className="mt-12 rounded-2xl bg-slate-900 border border-white/10 px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <div className="flex -space-x-3">
+              {partners.map((p) => (
+                <div key={p.name} className="h-10 w-10 rounded-full bg-slate-800 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
+                  <img src={p.logo} alt={p.name} className="h-7 w-7 object-contain" width={28} height={28} loading="lazy" />
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-slate-400">
+              <span className="font-semibold text-white">Certified across 4 platforms.</span>{' '}
+              One trusted partner to implement, integrate, and support them all for your business.
+            </p>
           </div>
-          <p className="text-sm text-slate-400">
-            <span className="font-semibold text-white">Certified across 4 platforms.</span>{' '}
-            One trusted partner to implement, integrate, and support them all for your business.
-          </p>
+          <Link
+            to="/contact#demo-form"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-red-500 shadow-md shadow-red-600/30 transition-colors shrink-0"
+          >
+            Talk to Our Team <ArrowRight className="h-4 w-4" />
+          </Link>
         </div>
       </div>
     </section>
