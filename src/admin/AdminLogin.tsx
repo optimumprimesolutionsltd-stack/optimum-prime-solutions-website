@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Eye, EyeOff } from 'lucide-react';
+import SEO from '../components/SEO';
 
 interface Props {
   onLogin: (email: string, password: string) => Promise<void>;
@@ -36,13 +37,14 @@ export default function AdminLogin({ onLogin }: Props) {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#001f3f] px-4">
+    <main className="flex min-h-screen items-center justify-center bg-[#001f3f] px-4">
+      <SEO title="Admin Login" description="Optimum Prime Solutions admin panel." canonical="/admin" noIndex={true} />
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-3">
             <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center font-black text-sm text-white">OP</div>
           </div>
-          <p className="text-xl font-bold text-white">Admin Panel</p>
+          <h1 className="text-xl font-bold text-white">Admin Panel</h1>
           <p className="text-sm text-navy-400">Sign in to manage your website content</p>
         </div>
 
@@ -102,6 +104,6 @@ export default function AdminLogin({ onLogin }: Props) {
           </p>
         </form>
       </div>
-    </div>
+    </main>
   );
 }
