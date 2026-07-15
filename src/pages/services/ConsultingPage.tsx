@@ -56,8 +56,8 @@ export default function ConsultingPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="EOS Business Consulting Kenya — Entrepreneurial Operating System | Optimum Prime Solutions"
-        description="Certified EOS Implementers in Kenya. Help your leadership team get aligned, gain traction, and achieve your vision using the Entrepreneurial Operating System. Serving businesses across Nairobi and Kenya."
+        title="EOS Business Consulting Kenya"
+        description="Certified EOS Implementers in Kenya. Help your leadership team get aligned, gain traction, and achieve your vision."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Consulting solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/consulting"
 breadcrumbs={[

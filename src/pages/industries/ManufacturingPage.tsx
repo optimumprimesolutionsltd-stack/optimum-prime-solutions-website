@@ -70,8 +70,8 @@ export default function ManufacturingPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime for Manufacturing Companies Kenya — BOM, Production Costing & Inventory"
-        description="TallyPrime manufacturing solution in Kenya. Bill of Materials, production costing, batch tracking, multi-godown inventory, and KRA eTIMS compliance. Serving manufacturers in Nairobi, Ruiru, Kiambu and across Kenya."
+        title="TallyPrime for Manufacturers Kenya | Optimum Prime"
+        description="TallyPrime manufacturing solution in Kenya — Bill of Materials, production costing, batch tracking, and KRA eTIMS compliance."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Manufacturing solutions for your business in Ruiru and beyond."
         canonical="/industries/manufacturing"
 breadcrumbs={[

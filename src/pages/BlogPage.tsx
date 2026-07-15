@@ -6,8 +6,8 @@ export default function BlogPage() {
   return (
     <main className="min-h-screen bg-slate-900">
       <SEO
-        title="Blog | TallyPrime, KRA Compliance & Business Tips for Kenya"
-        description="Practical guides, case studies, and expert insights on TallyPrime implementation, KRA compliance, eTIMS, cloud hosting, payroll, and EOS® — tailored for Kenyan business owners."
+        title="Blog | TallyPrime & KRA Compliance Tips | Optimum Prime"
+        description="Practical guides and expert insights on TallyPrime, KRA compliance, eTIMS, cloud hosting, payroll, and EOS® for Kenyan business owners."
         socialDescription="Stay informed with the latest insights on TallyPrime, KRA eTIMS compliance, and business automation in Kenya."
         canonical="/blog"
 breadcrumbs={[

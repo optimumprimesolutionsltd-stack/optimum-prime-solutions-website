@@ -23,8 +23,8 @@ export default function RetailPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime for Retail Businesses Kenya — POS, Inventory & KRA eTIMS Compliance"
-        description="TallyPrime retail solution in Kenya. POS integration, stock management, multiple price lists, and KRA eTIMS compliance for retail shops and supermarkets across Kenya."
+        title="TallyPrime for Retail Kenya | Optimum Prime"
+        description="TallyPrime retail solution in Kenya — POS integration, stock management, multiple price lists, and KRA eTIMS compliance."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Retail solutions for your business in Ruiru and beyond."
         canonical="/industries/retail"
 breadcrumbs={[

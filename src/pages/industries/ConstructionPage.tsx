@@ -23,8 +23,8 @@ export default function ConstructionPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime for Construction Companies Kenya — Project Costing, BOQ & Compliance"
-        description="TallyPrime construction solution in Kenya. Project cost accounting, BOQ tracking, subcontractor management, withholding tax, and KRA eTIMS compliance for construction companies."
+        title="TallyPrime for Construction Kenya | Optimum Prime"
+        description="TallyPrime for construction in Kenya — project cost accounting, BOQ tracking, subcontractor management, and KRA eTIMS compliance."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Construction solutions for your business in Ruiru and beyond."
         canonical="/industries/construction"
 breadcrumbs={[

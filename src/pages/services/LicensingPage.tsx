@@ -87,8 +87,8 @@ export default function LicensingPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="Buy TallyPrime Licence Kenya — Silver, Gold & Edit Log | Optimum Prime Solutions"
-        description="Buy genuine TallyPrime Silver, Gold and Edit Log licences in Kenya. Authorised Tally partner in Nairobi and Ruiru. Competitive prices, full local support, and TSS included."
+        title="Buy TallyPrime Licence Kenya | Optimum Prime"
+        description="Buy genuine TallyPrime Silver, Gold and Edit Log licences in Kenya. Authorised partner with competitive prices and full local support."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Licensing solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/licensing"
 breadcrumbs={[

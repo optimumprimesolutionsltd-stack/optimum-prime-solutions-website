@@ -63,8 +63,8 @@ export default function DistributionPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime for Distributors & Wholesalers Kenya — Multi-Branch, Credit Control & eTIMS"
-        description="TallyPrime distribution solution in Kenya. Multi-branch inventory, credit control, sales order management, and KRA eTIMS compliance for wholesale distributors across Kenya."
+        title="TallyPrime for Distributors Kenya | Optimum Prime"
+        description="TallyPrime distribution solution in Kenya — multi-branch inventory, credit control, sales order management, and KRA eTIMS compliance."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Distribution solutions for your business in Ruiru and beyond."
         canonical="/industries/distribution"
 breadcrumbs={[

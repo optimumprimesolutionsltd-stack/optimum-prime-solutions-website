@@ -69,8 +69,8 @@ export default function SupportPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime Support & Maintenance Kenya — AMC, Remote & On-Site Support"
-        description="Reliable TallyPrime support and maintenance in Kenya. Annual Maintenance Contracts, remote desktop support, WhatsApp helpdesk, and on-site visits in Nairobi, Ruiru and Kiambu."
+        title="TallyPrime Support & Maintenance | Optimum Prime"
+        description="Reliable TallyPrime support in Kenya — Annual Maintenance Contracts, remote desktop support, WhatsApp helpdesk, and on-site visits."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Support solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/support"
 breadcrumbs={[

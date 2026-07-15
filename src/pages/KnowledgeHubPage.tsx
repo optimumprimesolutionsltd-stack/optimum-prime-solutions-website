@@ -73,8 +73,8 @@ export default function KnowledgeHubPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="Knowledge Hub — TallyPrime Guides, Blog, FAQs & Resources Kenya"
-        description="Your central TallyPrime learning resource. Access blog articles, implementation guides, video tutorials, FAQs, case studies, and downloadable templates from Kenya's certified TallyPrime partner."
+        title="Knowledge Hub — TallyPrime Guides | Optimum Prime"
+        description="Your central TallyPrime learning resource — blog articles, guides, video tutorials, FAQs, and case studies from Kenya's certified partner."
         socialDescription="Access guides, templates, case studies, and resources for TallyPrime and business management in Kenya."
         canonical="/knowledge-hub"
 breadcrumbs={[

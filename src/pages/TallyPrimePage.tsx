@@ -76,8 +76,8 @@ export default function TallyPrimePage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime Solutions Kenya — Implementation, Licensing, Cloud, Training & Support"
-        description="Kenya's certified TallyPrime partner. We offer TallyPrime implementation, licensing, cloud hosting, training, support, customization, and data migration. Serving businesses across Nairobi, Ruiru and all of Kenya."
+        title="TallyPrime Kenya — Setup to Support | Optimum Prime"
+        description="Kenya's certified TallyPrime partner. Implementation, licensing, cloud hosting, training, support, and customization for local businesses."
         socialDescription="Transform your business with Kenya's leading TallyPrime partner. Get expert implementation, KRA eTIMS compliance, and reliable cloud hosting today."
         canonical="/tallyprime"
 breadcrumbs={[

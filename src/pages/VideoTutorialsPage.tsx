@@ -162,8 +162,8 @@ export default function VideoTutorialsPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="Video Tutorials — TallyPrime Walkthroughs for Kenyan Businesses"
-        description="Watch official TallyPrime video tutorials covering KRA eTIMS integration, getting started, accounting & inventory, and VAT-ready invoicing — curated for Kenyan businesses."
+        title="Video Tutorials — TallyPrime Kenya | Optimum Prime"
+        description="Watch official TallyPrime video tutorials covering KRA eTIMS, getting started, accounting & inventory, and invoicing for Kenyan businesses."
         socialDescription="Free TallyPrime video tutorials for Kenyan businesses — eTIMS, invoicing, accounting & inventory, and more."
         canonical="/knowledge-hub/videos"
         breadcrumbs={[

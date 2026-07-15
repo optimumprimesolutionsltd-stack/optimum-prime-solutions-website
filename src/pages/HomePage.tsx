@@ -13,7 +13,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       <SEO
-        title="Official TallyPrime Partner Kenya | Optimum Prime Solutions Ruiru"
+        title="TallyPrime Partner Kenya | Optimum Prime Solutions"
         description="Official TallyPrime partner in Kenya. Get KRA eTIMS compliance, cloud hosting, and expert training for your business in Nairobi, Ruiru, and beyond."
         socialDescription="Empower your business with Kenya's trusted TallyPrime experts. From KRA eTIMS compliance to cloud hosting, we help you grow with confidence."
         canonical="/"

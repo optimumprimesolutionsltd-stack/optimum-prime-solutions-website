@@ -7,6 +7,29 @@ import { Calendar, Clock, ArrowLeft, User, ArrowRight } from 'lucide-react';
 import { getPostSlug } from '../utils/slugify';
 import NotFoundPage from './NotFoundPage';
 
+// Keep the <title> tag within Google's ~60-char display budget even though
+// article H1s run longer — truncates only the meta title, never the
+// on-page heading.
+// Cuts at the last full word before maxLength rather than mid-word, so
+// truncated snippets don't end on something like "Tally P…".
+function truncateAtWord(text: string, maxLength: number): string {
+  if (text.length <= maxLength) return text;
+  const slice = text.slice(0, maxLength - 1);
+  const lastSpace = slice.lastIndexOf(' ');
+  return `${(lastSpace > 0 ? slice.slice(0, lastSpace) : slice).trimEnd()}…`;
+}
+
+const SEO_TITLE_SUFFIX = ' | Optimum Prime';
+function truncateTitle(title: string): string {
+  return truncateAtWord(title, 60 - SEO_TITLE_SUFFIX.length);
+}
+
+// Same idea for the meta description — the visible excerpt on the page is
+// left untouched, only the <meta name="description"> gets capped.
+function truncateDescription(excerpt: string): string {
+  return truncateAtWord(excerpt, 160);
+}
+
 // Per-post contextual related resources
 const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: string }[]> = {
   'why-every-kenyan-business-needs-tally-prime-in-2025': [
@@ -63,8 +86,8 @@ export default function BlogPostPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title={`${post.title} | Optimum Prime Solutions`}
-        description={post.excerpt}
+        title={`${truncateTitle(post.title)}${SEO_TITLE_SUFFIX}`}
+        description={truncateDescription(post.excerpt)}
         canonical={`/blog/${getPostSlug(post)}`}
         ogType="article"
         ogImage={`${BASE_URL}/og-image.png`}

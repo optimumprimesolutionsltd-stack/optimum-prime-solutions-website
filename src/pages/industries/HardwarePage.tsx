@@ -23,8 +23,8 @@ export default function HardwarePage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime for Hardware Shops Kenya — Inventory, Credit Control & KRA Compliance"
-        description="TallyPrime hardware shop solution in Kenya. Manage thousands of SKUs, contractor credit, bulk pricing, and KRA eTIMS compliance for hardware and building materials businesses."
+        title="TallyPrime for Hardware Shops Kenya | Optimum Prime"
+        description="TallyPrime for hardware shops in Kenya — manage thousands of SKUs, contractor credit, bulk pricing, and KRA eTIMS compliance."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Hardware solutions for your business in Ruiru and beyond."
         canonical="/industries/hardware"
 breadcrumbs={[

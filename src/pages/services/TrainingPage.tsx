@@ -108,8 +108,8 @@ export default function TrainingPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime Training Kenya — On-Site, Remote & Classroom | Optimum Prime Solutions"
-        description="Professional TallyPrime training in Kenya. Foundation, advanced, KRA compliance and administrator courses. On-site training in Nairobi, Ruiru and Kiambu. Remote training available nationwide."
+        title="TallyPrime Training Kenya | Optimum Prime"
+        description="Professional TallyPrime training in Kenya — foundation, advanced, KRA compliance, and administrator courses, on-site or remote."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Training solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/training"
 breadcrumbs={[

@@ -74,8 +74,8 @@ export default function IndustriesPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime Industry Solutions Kenya — Retail, Manufacturing, NGOs, Schools & More"
-        description="Optimum Prime Solutions delivers TallyPrime solutions tailored for your industry. Serving retail, distribution, manufacturing, construction, hardware, NGOs, schools, and SACCOs across Kenya."
+        title="TallyPrime Industry Solutions Kenya | Optimum Prime"
+        description="TallyPrime solutions tailored for your industry — retail, distribution, manufacturing, construction, hardware, NGOs, schools, and SACCOs in Kenya."
         socialDescription="TallyPrime solutions for every industry in Kenya — manufacturing, retail, construction, NGOs, schools, and more."
         canonical="/industries"
 breadcrumbs={[

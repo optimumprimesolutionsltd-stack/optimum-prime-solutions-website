@@ -6,8 +6,8 @@ export default function PricingPage() {
   return (
     <main className="min-h-screen bg-slate-900">
       <SEO
-        title="TallyPrime Pricing Kenya — Silver, Gold, Cloud Hosting & Enterprise Editions"
-        description="View TallyPrime pricing in Kenya. Official Silver, Gold & Enterprise licences, cloud hosting packages, and implementation bundles. Competitive prices with full local support from Kenya's certified TallyPrime partner."
+        title="TallyPrime Pricing Kenya | Optimum Prime"
+        description="TallyPrime pricing in Kenya. Official Silver, Gold & Enterprise licences, cloud hosting packages, and implementation bundles with local support."
         socialDescription="Transparent pricing for TallyPrime in Kenya. Get genuine licences, cloud hosting, and expert support — no hidden fees."
         canonical="/pricing"
 breadcrumbs={[

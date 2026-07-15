@@ -55,8 +55,8 @@ export default function BizAnalystPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="Biz Analyst Mobile App — Real-Time TallyPrime Data on Your Phone | Optimum Prime Solutions"
-        description="Biz Analyst is the official TallyPrime mobile app by Khatabook. Monitor sales, expenses, inventory, KRA compliance and financial reports in real-time from your phone. No computer needed."
+        title="Biz Analyst — TallyPrime On Your Phone | Optimum Prime"
+        description="Biz Analyst is the official TallyPrime mobile app. Monitor sales, expenses, inventory, and KRA compliance in real-time from your phone."
         socialDescription="Access your TallyPrime accounting data on your phone — anytime, anywhere. Biz Analyst by Khatabook brings real-time business intelligence to your fingertips."
         canonical="/biz-analyst"
         breadcrumbs={[

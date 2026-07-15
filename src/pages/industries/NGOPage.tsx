@@ -23,8 +23,8 @@ export default function NGOPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime for NGOs & Non-Profits Kenya — Fund Accounting, Donor Reports & Compliance"
-        description="TallyPrime NGO accounting solution in Kenya. Multi-donor fund accounting, budget tracking, donor report generation, and KRA compliance for NGOs and non-profit organisations."
+        title="TallyPrime for NGOs Kenya | Optimum Prime"
+        description="TallyPrime NGO accounting in Kenya — multi-donor fund accounting, budget tracking, donor reports, and KRA compliance."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. NGO solutions for your business in Ruiru and beyond."
         canonical="/industries/ngo"
 breadcrumbs={[

@@ -5,8 +5,8 @@ export default function ProductsPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime Products & Pricing Kenya | Silver, Gold & Enterprise"
-        description="Buy TallyPrime Silver, Gold or Enterprise in Kenya. Official pricing, cloud hosting packages from KES 3,000/month, and EOS consulting. Kenya's certified TallyPrime reseller."
+        title="TallyPrime Products & Pricing Kenya | Optimum Prime"
+        description="Buy TallyPrime Silver, Gold or Enterprise in Kenya. Official pricing, cloud hosting from KES 3,000/month, and EOS consulting."
         socialDescription="Discover our full range of business solutions — TallyPrime, cloud hosting, EOS consulting, and business automation."
         canonical="/products"
 breadcrumbs={[

@@ -51,8 +51,8 @@ export default function AboutPage() {
   return (
     <main className="min-h-screen bg-slate-50">
       <SEO
-        title="About Us | Optimum Prime Solutions Ltd — TallyPrime Partner & Business Automation, Ruiru Kenya"
-        description="Learn about Optimum Prime Solutions Ltd — a certified TallyPrime partner in Ruiru, Kenya. We help SMEs with accounting, KRA/eTIMS compliance, cloud hosting, and business consulting."
+        title="About Us | Optimum Prime Solutions — TallyPrime Kenya"
+        description="Optimum Prime Solutions is a certified TallyPrime partner in Ruiru, Kenya, helping SMEs with accounting, KRA eTIMS compliance, and cloud hosting."
         socialDescription="Based in Ruiru, Kenya, we are your trusted TallyPrime partner. From implementation to cloud hosting, we help Kenyan businesses thrive."
         canonical="/about"
         breadcrumbs={[

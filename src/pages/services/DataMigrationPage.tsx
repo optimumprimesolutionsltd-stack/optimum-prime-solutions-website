@@ -77,8 +77,8 @@ export default function DataMigrationPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime Data Migration Kenya — From QuickBooks, Excel, Sage & TallyERP 9"
-        description="Professional TallyPrime data migration in Kenya. Migrate from QuickBooks, Excel, Sage, TallyERP 9, and other systems with zero data loss. Full reconciliation and sign-off before go-live."
+        title="TallyPrime Data Migration Kenya"
+        description="Professional TallyPrime data migration in Kenya from QuickBooks, Excel, Sage, or TallyERP 9 — zero data loss, full reconciliation."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. DataMigration solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/data-migration"
 breadcrumbs={[

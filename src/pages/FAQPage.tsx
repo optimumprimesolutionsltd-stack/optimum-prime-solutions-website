@@ -6,8 +6,8 @@ export default function FAQPage() {
   return (
     <main className="min-h-screen bg-slate-900">
       <SEO
-        title="FAQ | TallyPrime Kenya — Pricing, Licensing & KRA Compliance Questions"
-        description="Answers to the most common questions about TallyPrime Kenya pricing, licensing, KRA & eTIMS compliance, cloud hosting, remote access, payroll setup, and EOS® consulting."
+        title="TallyPrime Kenya FAQ | Optimum Prime"
+        description="Answers to common questions about TallyPrime Kenya pricing, licensing, KRA eTIMS compliance, cloud hosting, and EOS® consulting."
         socialDescription="Got questions about TallyPrime in Kenya? Find answers to the most common questions about implementation, pricing, and KRA compliance."
         canonical="/faq"
 breadcrumbs={[
