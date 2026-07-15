@@ -83,7 +83,7 @@ export default function Contact() {
     return new Date(dateStr + 'T00:00:00').getDay() === 6;
   };
 
-  // Time slots — full week vs Saturday (2PM onwards only)
+  // Time slots — full week vs Saturday (before 2PM only)
   const ALL_TIME_SLOTS = [
     '8:00 AM – 9:00 AM',
     '9:00 AM – 10:00 AM',
@@ -95,9 +95,11 @@ export default function Contact() {
     '4:00 PM – 5:00 PM',
   ];
   const SATURDAY_TIME_SLOTS = [
-    '2:00 PM – 3:00 PM',
-    '3:00 PM – 4:00 PM',
-    '4:00 PM – 5:00 PM',
+    '8:00 AM – 9:00 AM',
+    '9:00 AM – 10:00 AM',
+    '10:00 AM – 11:00 AM',
+    '11:00 AM – 12:00 PM',
+    '12:00 PM – 1:00 PM',
   ];
   const availableTimeSlots = isSaturday(form.demoDate) ? SATURDAY_TIME_SLOTS : ALL_TIME_SLOTS;
 
@@ -444,7 +446,7 @@ export default function Contact() {
                       </div>
                       {getFieldError(errors, 'demoDate') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'demoDate')}</p>}
                       {form.demoDate && isSaturday(form.demoDate) && !isBlockedDate(form.demoDate) && (
-                        <p className="mt-1 text-xs text-amber-400">Saturday — demo slots available from 2:00 PM only.</p>
+                        <p className="mt-1 text-xs text-amber-400">Saturday — demo slots available before 2:00 PM only.</p>
                       )}
                     </label>
 

@@ -213,7 +213,7 @@ export default function Footer() {
             <p className="text-sm text-slate-700 mb-4">Receive TallyPrime tips, cloud hosting guides, and EOS® business insights.</p>
             {submitted ? (
               <div className="rounded-2xl bg-green-50 border border-green-200 px-4 py-4 text-sm text-green-700 font-medium text-center">
-                ✓ You're subscribed! We'll be in touch with updates.
+                🎉 Congratulations — you're subscribed! We'll be in touch with updates.
               </div>
             ) : (
               <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-3" aria-label="Newsletter signup">
