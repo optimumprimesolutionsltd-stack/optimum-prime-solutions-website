@@ -222,7 +222,7 @@ export default function LeadsManager({ data, onSave }: P) {
         // then fall back to the client's requested preferences
         scheduledDate: lead?.scheduledDate || lead?.demoDate || '',
         scheduledTime: lead?.scheduledTime || lead?.demoTime || '',
-        demoType: lead?.demoType || (lead?.demoMode as 'online' | 'physical') || 'online',
+        demoType: lead?.demoType || 'online',
         demoLocation: lead?.demoLocation || '',
         teamMemberName: lead?.teamMemberName || '',
         teamMemberPhone: lead?.teamMemberPhone || '',

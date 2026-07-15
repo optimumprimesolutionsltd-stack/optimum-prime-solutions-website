@@ -63,13 +63,15 @@ export const fbGet = async (path: string) => {
   }
 };
 
-export const fbSet = async (path: string, data: any) => {
+export const fbSet = async (path: string, data: any): Promise<boolean> => {
   try {
-    if (!database) return;
+    if (!database) return false;
     await set(fbRef(path), data);
     console.log('Firebase data saved:', path);
+    return true;
   } catch (error) {
     console.error('Firebase set error:', error);
+    return false;
   }
 };
 
