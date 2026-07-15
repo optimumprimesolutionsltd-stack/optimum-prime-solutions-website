@@ -11,7 +11,11 @@ const require = createRequire(import.meta.url);
 const routes = [
   '/',
   '/about',
+  '/testimonials',
+  '/features',
+  '/products',
   '/tallyprime',
+  '/tally-prime-kenya',
   '/industries',
   '/pricing',
   '/contact',
@@ -25,14 +29,25 @@ const routes = [
   '/tallyprime/support',
   '/tallyprime/customization',
   '/tallyprime/data-migration',
+  '/tallyprime/consulting',
   '/industries/manufacturing',
   '/industries/distribution',
   '/industries/retail',
   '/industries/construction',
   '/industries/hardware',
+  '/industries/ngo',
   '/industries/ngos',
   '/industries/schools',
+  '/industries/sacco',
   '/industries/saccos',
+  '/knowledge-hub/guides',
+  '/knowledge-hub/downloads',
+  '/knowledge-hub/case-studies',
+  '/knowledge-hub/videos',
+  '/knowledge-hub/webinars',
+  '/knowledge-hub/templates',
+  '/webinar',
+  '/why-choose-us',
   '/biz-analyst',
 ];
 
@@ -53,7 +68,7 @@ const MIME_TYPES = {
   '.eot': 'application/vnd.ms-fontobject',
 };
 
-function createStaticServer(distDir, port) {
+function createStaticServer(distDir, port, spaShellHtml) {
   return new Promise((resolve) => {
     const server = createServer((req, res) => {
       let url = new URL(req.url, `http://localhost:${port}`).pathname;
@@ -71,10 +86,20 @@ function createStaticServer(distDir, port) {
         try {
           const { readFile } = await import('fs/promises');
           let content;
-          try { content = await readFile(filePath, 'utf-8'); }
-          catch { content = await readFile(join(distDir, 'index.html'), 'utf-8'); }
-          const ext = extname(filePath).toLowerCase();
-          const contentType = MIME_TYPES[ext] || 'application/octet-stream';
+          let contentType;
+          try {
+            content = await readFile(filePath, 'utf-8');
+            contentType = MIME_TYPES[extname(filePath).toLowerCase()] || 'application/octet-stream';
+          } catch {
+            // SPA fallback: always serve the original, unrendered shell in memory
+            // rather than re-reading dist/index.html from disk. That file gets
+            // overwritten with each route's rendered output as the loop below
+            // progresses, so a disk re-read would serve the PREVIOUS route's
+            // already-tagged <head> as the base for the next route, causing
+            // Helmet to stack a second title/canonical/robots tag on top of it.
+            content = spaShellHtml;
+            contentType = 'text/html';
+          }
           res.writeHead(200, { 'Content-Type': contentType });
           res.end(content);
         } catch (err) { res.writeHead(404); res.end('Not Found'); }
@@ -131,13 +156,18 @@ async function prerender() {
     
     // Create route directories from SPA shell for any missing routes
     const routes = [
-      '/', '/about', '/tallyprime', '/industries', '/pricing', '/contact',
+      '/', '/about', '/testimonials', '/features', '/products', '/tallyprime', '/tally-prime-kenya',
+      '/industries', '/pricing', '/contact',
       '/faq', '/blog', '/knowledge-hub',
       '/tallyprime/implementation', '/tallyprime/licensing', '/tallyprime/cloud-hosting',
       '/tallyprime/training', '/tallyprime/support', '/tallyprime/customization', '/tallyprime/data-migration',
+      '/tallyprime/consulting',
       '/industries/manufacturing', '/industries/distribution', '/industries/retail',
-      '/industries/construction', '/industries/hardware', '/industries/ngos',
-      '/industries/schools', '/industries/saccos',
+      '/industries/construction', '/industries/hardware', '/industries/ngo', '/industries/ngos',
+      '/industries/schools', '/industries/sacco', '/industries/saccos',
+      '/knowledge-hub/guides', '/knowledge-hub/downloads', '/knowledge-hub/case-studies',
+      '/knowledge-hub/videos', '/knowledge-hub/webinars', '/knowledge-hub/templates',
+      '/webinar', '/why-choose-us',
       '/biz-analyst',
     ];
     for (const route of routes) {
@@ -188,7 +218,7 @@ async function prerender() {
     const puppeteerModule = await import('puppeteer');
     const puppeteer = puppeteerModule.default;
     
-    const server = await createStaticServer(join(__dirname, 'dist'), 5178);
+    const server = await createStaticServer(join(__dirname, 'dist'), 5178, spaShell);
     const browser = await puppeteer.launch({
       headless: 'new',
       args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-gpu'],
@@ -236,22 +266,15 @@ async function prerender() {
           mkdirSync(dirname(outputPath), { recursive: true });
         }
         
-        // KEY FIX: Inject the rendered body into the original SPA shell
-        // Preserve DOCTYPE + <head> from original, replace <body> with prerendered content
-        const doctypeMatch = spaShell.match(/<!DOCTYPE[^>]*>/i);
-        const doctype = doctypeMatch ? doctypeMatch[0] : '<!DOCTYPE html>';
-        
-        const bodyMatch = html.match(/<body[^>]*>[\s\S]*?<\/body>/);
-        const bodyHtml = bodyMatch ? bodyMatch[0] : '';
-        
-        // Reconstruct: DOCTYPE + original shell with replaced body
-        const finalHtml = doctype + '\n' + spaShell.replace(
-          /<!DOCTYPE[^>]*>\s*\n?/i, ''
-        ).replace(
-          /<body[^>]*>[\s\S]*?<\/body>/,
-          bodyHtml
-        );
-        
+        // Use Puppeteer's fully rendered document as-is: it already contains the
+        // route-specific <head> (title/description/robots/canonical/OG set by
+        // this route's <SEO> component via react-helmet-async) plus the static
+        // tags from index.html (favicons, JSON-LD, GA4, etc). Previously this
+        // discarded the rendered <head> and reused index.html's head verbatim
+        // for every route, which is why every page shared the homepage's title,
+        // canonical, and robots tag regardless of its own SEO settings.
+        const finalHtml = /^<!doctype/i.test(html) ? html : `<!DOCTYPE html>\n${html}`;
+
         writeFileSync(outputPath, finalHtml);
         console.log(`  ✓ ${route} (${finalHtml.length} bytes)`);
         successCount++;

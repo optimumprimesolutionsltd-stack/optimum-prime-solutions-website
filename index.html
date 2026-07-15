@@ -3,30 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Optimum Prime Solutions | Official TallyPrime Partner Kenya — Implementation, Training & Cloud Hosting</title>
-    <meta name="description" content="Certified TallyPrime partner in Kenya. We specialize in TallyPrime implementation, KRA eTIMS compliance, training, and cloud hosting for SMEs in Nairobi & Ruiru." />
-
+    <!--
+      No static title, meta description/robots, canonical, or OG/Twitter tags here:
+      every route renders its own via the SEO component (react-helmet-async).
+      Hardcoding them here caused duplicate/conflicting tags once Helmet added its
+      own on top (e.g. noindex pages still carried a static "index, follow" tag,
+      and every route's canonical pointed at "/"). See src/components/SEO.tsx.
+    -->
     <meta name="theme-color" content="#0a1929" />
     <meta name="author" content="Optimum Prime Solutions" />
     <meta name="google-site-verification" content="kLipKSikUscauwTHz5zpXbuRSIsp3EiwlGSdMUXB4lc" />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
     <meta http-equiv="X-Content-Type-Options" content="nosniff" />
     <meta http-equiv="X-Frame-Options" content="DENY" />
-    <link rel="canonical" href="https://www.optimumprimesolutions.co.ke/" />
     <link rel="manifest" href="/manifest.json" />
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <meta property="og:title" content="Optimum Prime Solutions | Official TallyPrime Partner Kenya — Implementation, Training & Cloud Hosting" />
-    <meta property="og:description" content="Transform your business with Kenya's leading TallyPrime partner. Get expert implementation, KRA eTIMS compliance, and reliable cloud hosting today." />
-    <meta property="og:type" content="website" />
-    <meta property="og:locale" content="en_KE" />
-    <meta property="og:image" content="https://www.optimumprimesolutions.co.ke/og-image.png" />
-    <meta property="og:url" content="https://www.optimumprimesolutions.co.ke/" />
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Optimum Prime Solutions | Official TallyPrime Partner Kenya" />
-    <meta name="twitter:description" content="Kenya's leading Tally Prime partner for accounting, KRA compliance, payroll & business automation." />
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
