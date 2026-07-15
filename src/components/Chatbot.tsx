@@ -347,7 +347,7 @@ export default function Chatbot() {
                         {/* WhatsApp handoff button */}
                         {msg.role === 'bot' && msg.action === 'whatsapp' && (
                           <motion.a
-                            href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20speak%20to%20an%20expert%20about%20TallyPrime"
+                            href="https://wa.me/254727209720?text=Hi%2C%20I%27d%20like%20to%20speak%20to%20an%20expert%20about%20TallyPrime"
                             target="_blank"
                             rel="noopener noreferrer"
                             initial={{ opacity: 0, scale: 0.9 }}

@@ -12,7 +12,7 @@ export default function MobileStickyCTA() {
           Book a Free Demo
         </Link>
         <a
-          href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20more%20about%20TallyPrime"
+          href="https://wa.me/254727209720?text=Hi%2C%20I%27d%20like%20to%20learn%20more%20about%20TallyPrime"
           target="_blank"
           rel="noopener noreferrer"
           className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold text-white"

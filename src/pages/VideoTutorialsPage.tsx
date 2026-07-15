@@ -1,5 +1,6 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight, ChevronDown, Play } from 'lucide-react';
 import SEO from '../components/SEO';
 import Breadcrumb from '../components/Breadcrumb';
 
@@ -138,7 +139,26 @@ const categories: VideoCategory[] = [
   },
 ];
 
+const featuredVideo: Video = categories[1].videos[0]; // "Get Started with TallyPrime"
+const totalVideoCount = categories.reduce((sum, c) => sum + c.videos.length, 0);
+
 export default function VideoTutorialsPage() {
+  const [playing, setPlaying] = useState(false);
+  const [showAll, setShowAll] = useState(false);
+  const featuredId = getYouTubeId(featuredVideo.url);
+
+  const libraryRef = useRef<HTMLDivElement>(null);
+  const [libraryHeight, setLibraryHeight] = useState('0px');
+
+  useEffect(() => {
+    const recalc = () => {
+      if (libraryRef.current) setLibraryHeight(showAll ? `${libraryRef.current.scrollHeight}px` : '0px');
+    };
+    recalc();
+    window.addEventListener('resize', recalc);
+    return () => window.removeEventListener('resize', recalc);
+  }, [showAll]);
+
   return (
     <main className="min-h-screen">
       <SEO
@@ -183,7 +203,7 @@ export default function VideoTutorialsPage() {
                 Browse FAQs
               </Link>
               <a
-                href="https://wa.me/254116246074?text=Hi,%20I%20have%20a%20question%20about%20a%20TallyPrime%20tutorial"
+                href="https://wa.me/254727209720?text=Hi,%20I%20have%20a%20question%20about%20a%20TallyPrime%20tutorial"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-full border border-green-500/40 bg-green-500/10 hover:bg-green-500/20 px-6 py-3 text-sm font-semibold text-green-400 transition"
@@ -195,9 +215,69 @@ export default function VideoTutorialsPage() {
         </div>
       </section>
 
-      {/* Video Categories */}
-      <section className="bg-slate-50 py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 space-y-16">
+      {/* Featured Video — plays inline, no click-away required */}
+      <section className="bg-white py-16">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+          <p className="text-center text-sm font-semibold uppercase tracking-[0.25em] text-red-600 mb-6">
+            Start Here
+          </p>
+          <div className="relative rounded-3xl overflow-hidden border border-slate-200 shadow-xl">
+            {!playing ? (
+              <>
+                <img
+                  src={getThumbnail(featuredVideo.url)}
+                  alt={featuredVideo.title}
+                  className="w-full aspect-video object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-slate-900/30 hover:bg-slate-900/10 transition-colors" />
+                <button
+                  onClick={() => setPlaying(true)}
+                  className="absolute inset-0 flex items-center justify-center"
+                  aria-label={`Play ${featuredVideo.title}`}
+                >
+                  <div className="flex items-center justify-center h-16 w-16 rounded-full bg-red-600 shadow-xl hover:scale-110 transition-transform">
+                    <Play className="h-6 w-6 text-white fill-white ml-0.5" />
+                  </div>
+                </button>
+                <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-slate-900/90 to-transparent px-6 pt-12 pb-5">
+                  <h2 className="text-lg sm:text-xl font-bold text-white">{featuredVideo.title}</h2>
+                  <p className="text-sm text-slate-300 mt-1 max-w-2xl">{featuredVideo.desc}</p>
+                </div>
+              </>
+            ) : (
+              <iframe
+                className="w-full aspect-video"
+                src={`https://www.youtube.com/embed/${featuredId}?autoplay=1&rel=0`}
+                title={featuredVideo.title}
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            )}
+          </div>
+
+          <div className="mt-8 text-center">
+            <button
+              onClick={() => setShowAll((prev) => !prev)}
+              className="inline-flex items-center gap-2 rounded-full bg-slate-900 hover:bg-slate-800 px-6 py-3 text-sm font-semibold text-white shadow-lg transition"
+              aria-expanded={showAll}
+            >
+              {showAll ? 'Hide Full Library' : `Browse All ${totalVideoCount} Tutorials`}
+              <ChevronDown className={`h-4 w-4 transition-transform ${showAll ? 'rotate-180' : ''}`} />
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Categories — collapsed until "Browse All" is clicked. Stays mounted (height-animated
+          via measured scrollHeight, not conditionally rendered) so the full tutorial library is still
+          present in the prerendered HTML for SEO, even though it's visually hidden by default. */}
+      <section
+        style={{ height: libraryHeight, opacity: showAll ? 1 : 0 }}
+        className="bg-slate-50 overflow-hidden transition-[height,opacity] duration-500 ease-in-out"
+        aria-hidden={!showAll}
+      >
+        <div ref={libraryRef} className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 space-y-16">
           {categories.map((category, index) => (
             <div key={category.title}>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">{category.title}</h2>
@@ -297,7 +377,7 @@ export default function VideoTutorialsPage() {
               Book a Free Consultation <ArrowRight className="h-4 w-4" />
             </Link>
             <a
-              href="https://wa.me/254116246074?text=Hi,%20I%20have%20a%20question%20about%20a%20TallyPrime%20tutorial"
+              href="https://wa.me/254727209720?text=Hi,%20I%20have%20a%20question%20about%20a%20TallyPrime%20tutorial"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-2 rounded-full border border-green-500/40 bg-green-500/10 hover:bg-green-500/20 px-8 py-3 text-sm font-semibold text-green-400 transition"

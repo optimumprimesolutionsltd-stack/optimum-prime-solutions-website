@@ -241,7 +241,7 @@ export default function EcosystemOrbit() {
               whileTap={{ scale: 0.98 }}
             >
               <a
-                href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20speak%20to%20an%20expert%20about%20TallyPrime"
+                href="https://wa.me/254727209720?text=Hi%2C%20I%27d%20like%20to%20speak%20to%20an%20expert%20about%20TallyPrime"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-lg bg-[#25D366] px-6 py-3 font-semibold text-white shadow-lg transition hover:bg-[#1DA851]"

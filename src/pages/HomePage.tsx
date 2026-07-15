@@ -65,7 +65,7 @@ export default function HomePage() {
                 Book a Free Demo
               </Link>
               <a
-                href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20more%20about%20TallyPrime"
+                href="https://wa.me/254727209720?text=Hi%2C%20I%27d%20like%20to%20learn%20more%20about%20TallyPrime"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 rounded-xl px-7 py-3.5 text-sm font-bold text-white transition-colors" style={{backgroundColor:'#25D366'}} onMouseEnter={e=>(e.currentTarget.style.backgroundColor='#1ebe5d')} onMouseLeave={e=>(e.currentTarget.style.backgroundColor='#25D366')}
