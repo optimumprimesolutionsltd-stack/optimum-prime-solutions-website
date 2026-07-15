@@ -88,16 +88,16 @@ export default function Blog() {
           ))}
         </div>
 
-        {data.blogs.length > 3 && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="mt-12 text-center"
-          >
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-3"
+        >
+          {data.blogs.length > 3 && (
             <button
               onClick={() => setShowAll(prev => !prev)}
-              className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-3 text-sm font-semibold text-white shadow-sm shadow-red-900/10 hover:bg-red-700 transition"
+              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"
             >
               {showAll ? (
                 <>Show Less <ChevronUp className="h-4 w-4" /></>
@@ -105,8 +105,15 @@ export default function Blog() {
                 <>View All Articles <ArrowRight className="h-4 w-4" /></>
               )}
             </button>
-          </motion.div>
-        )}
+          )}
+          <Link
+            to="/contact#demo-form"
+            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+            className="inline-flex items-center gap-2 rounded-full bg-red-600 px-8 py-3 text-sm font-semibold text-white shadow-sm shadow-red-900/10 hover:bg-red-700 transition"
+          >
+            Book a Free Demo <ArrowRight className="h-4 w-4" />
+          </Link>
+        </motion.div>
       </div>
     </section>
   );
