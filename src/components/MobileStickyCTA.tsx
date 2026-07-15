@@ -1,0 +1,26 @@
+import { Link } from 'react-router-dom';
+
+export default function MobileStickyCTA() {
+  return (
+    <div className="sm:hidden fixed bottom-0 inset-x-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-sm shadow-[0_-8px_30px_-12px_rgba(15,23,42,0.25)]">
+      <div className="flex items-stretch gap-2 px-3 py-2.5">
+        <Link
+          to="/contact#demo-form"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="flex-1 inline-flex items-center justify-center rounded-xl bg-red-600 px-4 py-2.5 text-sm font-bold text-white shadow-md shadow-red-600/30"
+        >
+          Book a Free Demo
+        </Link>
+        <a
+          href="https://wa.me/254116246074?text=Hi%2C%20I%27d%20like%20to%20learn%20more%20about%20TallyPrime"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-bold text-white"
+          style={{ backgroundColor: '#25D366' }}
+        >
+          WhatsApp Us
+        </a>
+      </div>
+    </div>
+  );
+}

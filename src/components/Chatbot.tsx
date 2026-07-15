@@ -239,7 +239,7 @@ export default function Chatbot() {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
-            className="fixed bottom-6 right-6 z-40 h-16 w-16 rounded-full bg-[#25D366] text-white shadow-2xl shadow-[#25D366]/40 hover:scale-110 transition-all flex items-center justify-center"
+            className="fixed bottom-24 right-6 sm:bottom-6 z-40 h-16 w-16 rounded-full bg-[#25D366] text-white shadow-2xl shadow-[#25D366]/40 hover:scale-110 transition-all flex items-center justify-center"
             aria-label="Chat with Zawadi"
             title="Chat with Zawadi — AI Assistant"
           >
@@ -263,7 +263,7 @@ export default function Chatbot() {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className={`fixed z-50 transition-all duration-300 ${
               min
-                ? 'bottom-6 right-6 h-14 w-72'
+                ? 'bottom-24 right-6 sm:bottom-6 h-14 w-72'
                 : 'bottom-0 right-0 sm:bottom-6 sm:right-6 h-[100dvh] w-full sm:h-[620px] sm:w-[420px]'
             } flex flex-col overflow-hidden border border-slate-200 bg-white shadow-2xl sm:rounded-2xl`}
           >

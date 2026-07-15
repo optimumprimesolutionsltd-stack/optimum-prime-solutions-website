@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, PlayCircle } from 'lucide-react';
+import { ArrowRight, Play } from 'lucide-react';
 import SEO from '../components/SEO';
 import Breadcrumb from '../components/Breadcrumb';
 
@@ -7,6 +7,17 @@ interface Video {
   title: string;
   desc: string;
   url: string;
+}
+
+function getYouTubeId(url: string): string {
+  if (url.includes('youtu.be/')) return url.split('youtu.be/')[1].split(/[?&]/)[0];
+  const match = url.match(/[?&]v=([^&]+)/);
+  return match ? match[1] : '';
+}
+
+function getThumbnail(url: string): string {
+  const id = getYouTubeId(url);
+  return `https://img.youtube.com/vi/${id}/hqdefault.jpg`;
 }
 
 interface VideoCategory {
@@ -198,15 +209,28 @@ export default function VideoTutorialsPage() {
                     href={video.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group flex flex-col rounded-3xl bg-white border border-slate-200 p-6 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200"
+                    className="group flex flex-col rounded-3xl bg-white border border-slate-200 shadow-sm hover:shadow-md hover:border-slate-300 transition-all duration-200 overflow-hidden"
                   >
-                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-pink-50 text-pink-600 mb-4">
-                      <PlayCircle className="h-6 w-6" />
+                    <div className="relative aspect-video bg-slate-200 overflow-hidden">
+                      <img
+                        src={getThumbnail(video.url)}
+                        alt={video.title}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-slate-900/20 group-hover:bg-slate-900/10 transition-colors" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="flex items-center justify-center h-12 w-12 rounded-full bg-red-600 shadow-lg group-hover:scale-110 transition-transform">
+                          <Play className="h-5 w-5 text-white fill-white ml-0.5" />
+                        </div>
+                      </div>
                     </div>
-                    <h3 className="text-base font-bold text-slate-900 mb-2">{video.title}</h3>
-                    <p className="text-sm text-slate-600 leading-relaxed flex-grow">{video.desc}</p>
-                    <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-red-600 group-hover:gap-2 transition-all">
-                      Watch on YouTube <ArrowRight className="h-4 w-4" />
+                    <div className="flex flex-col flex-grow p-6">
+                      <h3 className="text-base font-bold text-slate-900 mb-2">{video.title}</h3>
+                      <p className="text-sm text-slate-600 leading-relaxed flex-grow">{video.desc}</p>
+                      <div className="mt-4 flex items-center gap-1 text-sm font-semibold text-red-600 group-hover:gap-2 transition-all">
+                        Watch on YouTube <ArrowRight className="h-4 w-4" />
+                      </div>
                     </div>
                   </a>
                 ))}

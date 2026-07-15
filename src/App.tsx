@@ -6,6 +6,7 @@ import { OfflineBanner } from './components/OfflineBanner';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
+import MobileStickyCTA from './components/MobileStickyCTA';
 import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth } from './firebase/config';
 import type { User } from 'firebase/auth';
 import { signInAnonymously } from 'firebase/auth';
@@ -73,7 +74,7 @@ function PageLoader() {
 
 function SiteRoutes() {
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-950 flex flex-col">
+    <div className="min-h-screen bg-slate-50 text-slate-950 flex flex-col pb-16 sm:pb-0">
       <Navbar />
       <main className="flex-grow pt-[72px]" id="main-content">
         <Suspense fallback={<PageLoader />}>
@@ -152,6 +153,7 @@ function SiteRoutes() {
       </main>
       <Footer />
       <Chatbot />
+      <MobileStickyCTA />
     </div>
   );
 }
