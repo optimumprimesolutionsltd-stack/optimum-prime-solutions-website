@@ -31,6 +31,7 @@ const PricingPage       = lazy(() => import('./pages/PricingPage'));
 const WebinarPage       = lazy(() => import('./pages/WebinarPage'));
 const BizAnalystPage    = lazy(() => import('./pages/BizAnalystPage'));
 const KnowledgeHubPage  = lazy(() => import('./pages/KnowledgeHubPage'));
+const VideoTutorialsPage = lazy(() => import('./pages/VideoTutorialsPage'));
 const IndustriesPage    = lazy(() => import('./pages/IndustriesPage'));
 
 // ── TallyPrime pages — lazy loaded ────────────────────────────────────────
@@ -127,12 +128,10 @@ function SiteRoutes() {
             {/* ── Knowledge Hub ── */}
             <Route path="/knowledge-hub" element={<KnowledgeHubPage />} />
             <Route path="/knowledge-hub/guides" element={<ComingSoonPage />} />
-            <Route path="/knowledge-hub/downloads" element={<ComingSoonPage />} />
             <Route path="/knowledge-hub/case-studies" element={<ComingSoonPage />} />
-            <Route path="/knowledge-hub/videos" element={<ComingSoonPage />} />
+            <Route path="/knowledge-hub/videos" element={<VideoTutorialsPage />} />
             <Route path="/webinar" element={<WebinarPage />} />
             <Route path="/knowledge-hub/webinars" element={<ComingSoonPage />} />
-            <Route path="/knowledge-hub/templates" element={<ComingSoonPage />} />
 
             {/* ── Biz Analyst ── */}
             <Route path="/biz-analyst" element={<BizAnalystPage />} />

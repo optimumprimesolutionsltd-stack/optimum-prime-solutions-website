@@ -21,11 +21,8 @@ const pageTitles: Record<string, { title: string; desc: string; parent: string; 
   '/industries/schools': { title: 'TallyPrime for Schools', desc: 'Fee collection, payroll, and financial reporting for educational institutions.', parent: 'Industries', parentHref: '/industries' },
   '/industries/saccos': { title: 'TallyPrime for SACCOs', desc: 'Member accounts, loan tracking, and dividend calculations.', parent: 'Industries', parentHref: '/industries' },
   '/knowledge-hub/guides': { title: 'TallyPrime Implementation Guides', desc: 'Step-by-step guides for TallyPrime setup and configuration.', parent: 'Knowledge Hub', parentHref: '/knowledge-hub' },
-  '/knowledge-hub/downloads': { title: 'Downloads & Templates', desc: 'Free TallyPrime templates, checklists, and resources.', parent: 'Knowledge Hub', parentHref: '/knowledge-hub' },
   '/knowledge-hub/case-studies': { title: 'Case Studies', desc: 'Real stories from Kenyan businesses that transformed with TallyPrime.', parent: 'Knowledge Hub', parentHref: '/knowledge-hub' },
-  '/knowledge-hub/videos': { title: 'Video Tutorials', desc: 'TallyPrime tutorials, feature walkthroughs, and implementation demos.', parent: 'Knowledge Hub', parentHref: '/knowledge-hub' },
   '/knowledge-hub/webinars': { title: 'Webinars', desc: 'Live and recorded webinars on TallyPrime and business management.', parent: 'Knowledge Hub', parentHref: '/knowledge-hub' },
-  '/knowledge-hub/templates': { title: 'Templates Library', desc: 'Ready-to-use TallyPrime report templates and business document templates.', parent: 'Knowledge Hub', parentHref: '/knowledge-hub' },
   '/why-choose-us': { title: 'Why Choose Optimum Prime Solutions', desc: 'What makes us Kenya\'s most trusted TallyPrime partner.', parent: 'Home', parentHref: '/' },
   '/features': { title: 'TallyPrime Features', desc: 'Explore the full range of TallyPrime features for your business.', parent: 'TallyPrime Solutions', parentHref: '/tallyprime' },
 };

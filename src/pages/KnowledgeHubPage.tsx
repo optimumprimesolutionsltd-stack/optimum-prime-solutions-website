@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, FileText, Download, HelpCircle, PlayCircle, Users, BookMarked, Layout } from 'lucide-react';
+import { ArrowRight, BookOpen, FileText, HelpCircle, PlayCircle, Users, BookMarked } from 'lucide-react';
 import SEO from '../components/SEO';
 import Breadcrumb from '../components/Breadcrumb';
 
@@ -23,15 +23,6 @@ const resources = [
     badge: 'Coming Soon',
   },
   {
-    icon: Download,
-    title: 'Downloads & Templates',
-    desc: 'Free TallyPrime templates, checklists, and resources to help you get the most from your software.',
-    href: '/knowledge-hub/downloads',
-    cta: 'View Downloads',
-    color: 'bg-green-50 text-green-600',
-    badge: 'Coming Soon',
-  },
-  {
     icon: HelpCircle,
     title: 'FAQ & Troubleshooting',
     desc: 'Answers to the most common TallyPrime, cloud hosting, KRA compliance, and EOS® questions.',
@@ -52,11 +43,11 @@ const resources = [
   {
     icon: PlayCircle,
     title: 'Video Tutorials',
-    desc: 'Watch TallyPrime tutorials, feature walkthroughs, and implementation demos from our certified team.',
+    desc: 'Official TallyPrime tutorials covering eTIMS, getting started, accounting & inventory, and invoicing.',
     href: '/knowledge-hub/videos',
     cta: 'Watch Videos',
     color: 'bg-pink-50 text-pink-600',
-    badge: 'Coming Soon',
+    badge: 'Live',
   },
   {
     icon: BookMarked,
@@ -66,15 +57,6 @@ const resources = [
     cta: 'View Webinars',
     color: 'bg-teal-50 text-teal-600',
     badge: 'Live — 15 July',
-  },
-  {
-    icon: Layout,
-    title: 'Templates Library',
-    desc: 'Ready-to-use TallyPrime report templates, invoice formats, and business document templates.',
-    href: '/knowledge-hub/templates',
-    cta: 'Browse Templates',
-    color: 'bg-amber-50 text-amber-600',
-    badge: 'Coming Soon',
   },
 ];
 

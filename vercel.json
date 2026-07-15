@@ -107,10 +107,6 @@
       "dest": "/dist/knowledge-hub/guides/index.html"
     },
     {
-      "src": "^/knowledge-hub/downloads(/.*)?$",
-      "dest": "/dist/knowledge-hub/downloads/index.html"
-    },
-    {
       "src": "^/knowledge-hub/case-studies(/.*)?$",
       "dest": "/dist/knowledge-hub/case-studies/index.html"
     },
@@ -121,10 +117,6 @@
     {
       "src": "^/knowledge-hub/webinars(/.*)?$",
       "dest": "/dist/knowledge-hub/webinars/index.html"
-    },
-    {
-      "src": "^/knowledge-hub/templates(/.*)?$",
-      "dest": "/dist/knowledge-hub/templates/index.html"
     },
     {
       "src": "^/knowledge-hub(/.*)?$",
