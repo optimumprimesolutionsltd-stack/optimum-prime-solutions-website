@@ -159,6 +159,10 @@
       "dest": "/dist/why-choose-us/index.html"
     },
     {
+      "src": "^/privacy-policy(/.*)?$",
+      "dest": "/dist/privacy-policy/index.html"
+    },
+    {
       "src": "^/contact(/.*)?$",
       "dest": "/dist/contact/index.html"
     },

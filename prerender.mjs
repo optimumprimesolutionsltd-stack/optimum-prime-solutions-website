@@ -49,6 +49,7 @@ const routes = [
   '/webinar',
   '/why-choose-us',
   '/biz-analyst',
+  '/privacy-policy',
 ];
 
 const MIME_TYPES = {
@@ -168,7 +169,7 @@ async function prerender() {
       '/knowledge-hub/guides', '/knowledge-hub/downloads', '/knowledge-hub/case-studies',
       '/knowledge-hub/videos', '/knowledge-hub/webinars', '/knowledge-hub/templates',
       '/webinar', '/why-choose-us',
-      '/biz-analyst',
+      '/biz-analyst', '/privacy-policy',
     ];
     for (const route of routes) {
       if (route !== '/') {
