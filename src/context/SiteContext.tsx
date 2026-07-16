@@ -72,11 +72,16 @@ export function SiteProvider({ children }: { children: ReactNode }) {
       save(merged);
     };
 
+    // /leads holds every customer's name, phone, email and message — only the
+    // authenticated admin panel needs it. Public pages only ever write a new
+    // lead (see Contact.tsx); they never read the list.
+    const isAdminRoute = window.location.pathname.startsWith('/admin');
+
     const syncData = async () => {
       try {
         const [fbData, rawLeads] = await Promise.all([
           fbGet('siteData'),
-          fbGet('leads'),
+          isAdminRoute ? fbGet('leads') : Promise.resolve(null),
         ]);
         latestSiteData = fbData || {};
         latestRawLeads = rawLeads;
@@ -99,11 +104,13 @@ export function SiteProvider({ children }: { children: ReactNode }) {
           }
         });
 
-        // Subscribe to /leads changes (new website submissions)
-        unsubscribeLeads = fbSubscribe('leads', (rawLeads) => {
-          latestRawLeads = rawLeads;
-          applyMerge();
-        });
+        // Subscribe to /leads changes (new website submissions) — admin only
+        if (isAdminRoute) {
+          unsubscribeLeads = fbSubscribe('leads', (rawLeads) => {
+            latestRawLeads = rawLeads;
+            applyMerge();
+          });
+        }
       } catch (error) {
         console.log('Firebase sync failed, using local storage');
         setSynced(true);
