@@ -30,6 +30,10 @@
       "dest": "/dist/$1"
     },
     {
+      "src": "^/$",
+      "dest": "/dist/index.html"
+    },
+    {
       "src": "^/tallyprime/implementation(/.*)?$",
       "dest": "/dist/tallyprime/implementation/index.html"
     },
