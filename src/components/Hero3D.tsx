@@ -1,10 +1,18 @@
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
+import { Play } from 'lucide-react';
+import { useState } from 'react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { useSite } from '../context/SiteContext';
 
+// "TallyPrime 7.0 | Witness the Launch" — was the homepage's only video
+// until it got replaced by an intro video elsewhere on the page; kept
+// here so both are still on the homepage, not one instead of the other.
+const LAUNCH_VIDEO_ID = '5fAaRE-J3QE';
+
 export default function Hero3D() {
   const { data } = useSite();
+  const [playing, setPlaying] = useState(false);
   return (
     <section id="home" className="relative overflow-hidden bg-slate-900">
       {/* Ambient glow blobs */}
@@ -67,26 +75,57 @@ export default function Hero3D() {
             </div>
           </motion.div>
 
-          {/* Right column — what we do card */}
+          {/* Right column — TallyPrime 7.0 launch video */}
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}>
             <div className="relative overflow-hidden rounded-2xl sm:rounded-[2rem] border border-white/10 bg-slate-800/80 shadow-2xl shadow-black/40 backdrop-blur-sm">
               <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-red-500/20 blur-[60px]" />
-              <div className="p-5 sm:p-6">
-                <p className="text-xs uppercase tracking-[0.35em] text-slate-400">What we do</p>
-                <h2 className="mt-2 text-2xl font-bold text-white">Our Core Services</h2>
+              <div className="p-5 sm:p-6 pb-0">
+                <p className="text-xs uppercase tracking-[0.35em] text-slate-400">What's New</p>
+                <h2 className="mt-2 text-2xl font-bold text-white">TallyPrime 7.0 Launch</h2>
               </div>
-              <div className="space-y-2 px-5 pb-5 sm:px-6 sm:pb-6">
-                {[
-                  { label: 'TallyPrime Sales & Implementation', sub: 'Silver, Gold & Enterprise editions — licensed & deployed', color: 'text-red-400', border: 'border-red-500/20', bg: 'bg-red-500/5' },
-                  { label: 'Cloud Hosting & Remote Access', sub: 'Secure cloud server setup with 99.9% uptime SLA', color: 'text-sky-400', border: 'border-sky-500/20', bg: 'bg-sky-500/5' },
-                  { label: 'EOS® Business Consulting', sub: 'Align your leadership team and gain traction', color: 'text-amber-400', border: 'border-amber-500/20', bg: 'bg-amber-500/5' },
-                  { label: 'KRA eTIMS Compliance', sub: 'Automated eTIMS invoicing built into TallyPrime', color: 'text-emerald-400', border: 'border-emerald-500/20', bg: 'bg-emerald-500/5' },
-                ].map((item) => (
-                  <div key={item.label} className={`rounded-xl border ${item.border} ${item.bg} px-4 py-3`}>
-                    <p className={`text-sm font-semibold ${item.color}`}>{item.label}</p>
-                    <p className="mt-0.5 text-xs text-slate-400">{item.sub}</p>
-                  </div>
-                ))}
+              <div className="p-5 sm:p-6">
+                <div className="relative rounded-xl overflow-hidden border border-white/10 group">
+                  {!playing ? (
+                    <>
+                      <img
+                        src={`https://img.youtube.com/vi/${LAUNCH_VIDEO_ID}/maxresdefault.jpg`}
+                        alt="TallyPrime 7.0 Launch"
+                        className="w-full aspect-video object-cover"
+                        width={1280}
+                        height={720}
+                        loading="lazy"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${LAUNCH_VIDEO_ID}/hqdefault.jpg`;
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-slate-900/30 group-hover:bg-slate-900/10 transition-colors duration-300" />
+                      <button
+                        onClick={() => setPlaying(true)}
+                        className="absolute inset-0 flex items-center justify-center"
+                        aria-label="Play TallyPrime 7.0 Launch video"
+                      >
+                        <motion.div
+                          whileHover={{ scale: 1.08 }}
+                          whileTap={{ scale: 0.95 }}
+                          className="flex items-center justify-center w-12 h-12 rounded-full bg-red-600 shadow-xl shadow-red-600/40 border-2 border-white/20"
+                        >
+                          <Play className="h-5 w-5 text-white ml-0.5" fill="white" />
+                        </motion.div>
+                      </button>
+                    </>
+                  ) : (
+                    <iframe
+                      className="w-full aspect-video"
+                      src={`https://www.youtube.com/embed/${LAUNCH_VIDEO_ID}?autoplay=1&rel=0`}
+                      title="TallyPrime 7.0 Launch"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  )}
+                </div>
+                <p className="mt-3 text-xs text-slate-400">
+                  Sales & implementation, cloud hosting, EOS® consulting, and KRA eTIMS compliance — see it all in action.
+                </p>
               </div>
             </div>
           </motion.div>
