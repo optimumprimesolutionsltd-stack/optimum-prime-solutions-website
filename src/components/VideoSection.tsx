@@ -3,7 +3,10 @@ import { Link } from 'react-router-dom';
 import { Play, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
-const TALLY_VIDEO_ID = '5fAaRE-J3QE';
+// "Get Started with TallyPrime" — the same intro video featured on the
+// Video Tutorials page. Replaces a "TallyPrime 7.0 launch" video that
+// wasn't actually an introduction and would read as dated over time.
+const TALLY_VIDEO_ID = 'st036Km_Lfk';
 
 export default function VideoSection() {
   const [playing, setPlaying] = useState(false);
@@ -18,7 +21,7 @@ export default function VideoSection() {
             See It In Action
           </p>
           <h2 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-            TallyPrime — Built for Growing Businesses
+            New to TallyPrime? Watch the Introduction
           </h2>
         </div>
 
@@ -38,7 +41,7 @@ export default function VideoSection() {
                 <>
                   <img
                     src={`https://img.youtube.com/vi/${TALLY_VIDEO_ID}/maxresdefault.jpg`}
-                    alt="TallyPrime Product Video"
+                    alt="Introduction to TallyPrime"
                     className="w-full aspect-video object-cover"
                     width={1280}
                     height={720}
@@ -51,7 +54,7 @@ export default function VideoSection() {
                   <button
                     onClick={() => setPlaying(true)}
                     className="absolute inset-0 flex items-center justify-center"
-                    aria-label="Play TallyPrime video"
+                    aria-label="Play Introduction to TallyPrime video"
                   >
                     <motion.div
                       whileHover={{ scale: 1.08 }}
@@ -70,7 +73,7 @@ export default function VideoSection() {
                 <iframe
                   className="w-full aspect-video"
                   src={`https://www.youtube.com/embed/${TALLY_VIDEO_ID}?autoplay=1&rel=0`}
-                  title="TallyPrime Product Video"
+                  title="Introduction to TallyPrime"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 />
