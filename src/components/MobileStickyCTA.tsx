@@ -2,10 +2,12 @@ import { Link, useLocation } from 'react-router-dom';
 
 export default function MobileStickyCTA() {
   const { pathname } = useLocation();
-  // Hidden on /contact — the demo-form there is already on-screen, and the
-  // fixed bar would otherwise sit on top of its Submit button once scrolled
+  // Hidden on pages that already have their own dedicated registration/demo
+  // form — showing "Book a Free Demo" alongside a different on-screen CTA
+  // (workshop RSVP, webinar signup) is confusing, and on /contact the fixed
+  // bar would otherwise sit on top of the form's Submit button once scrolled
   // into view, blocking taps on it.
-  if (pathname.startsWith('/contact')) return null;
+  if (pathname.startsWith('/contact') || pathname.startsWith('/workshop-rsvp') || pathname.startsWith('/webinar')) return null;
 
   return (
     <div className="sm:hidden fixed bottom-0 inset-x-0 z-30 border-t border-slate-200 bg-white/95 backdrop-blur-sm shadow-[0_-8px_30px_-12px_rgba(15,23,42,0.25)]">

@@ -24,8 +24,7 @@ export default function WorkshopPage() {
     const e: Partial<FormState> = {};
     if (!form.name.trim()) e.name = 'Full name is required';
     if (!form.phone.trim()) e.phone = 'Phone number is required';
-    if (!form.email.trim()) e.email = 'Email is required';
-    else if (!/\S+@\S+\.\S+/.test(form.email)) e.email = 'Enter a valid email address';
+    if (form.email.trim() && !/\S+@\S+\.\S+/.test(form.email)) e.email = 'Enter a valid email address';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -121,6 +120,7 @@ export default function WorkshopPage() {
           <h2 className="text-2xl font-bold text-white mb-6">What We'll Cover</h2>
           <ul className="space-y-5">
             {[
+              { icon: '🤝', title: 'Networking Breakfast', desc: 'Connect with fellow business owners and our team over breakfast before the session starts.' },
               { icon: '📦', title: 'Stock Control Fundamentals', desc: 'Practical methods to track stock levels, reduce waste, and avoid stockouts.' },
               { icon: '📊', title: 'Reorder Point Planning', desc: 'Set smart reorder points so you never run out — or over-order — again.' },
               { icon: '🧮', title: 'TallyPrime for Inventory', desc: 'See how TallyPrime automates stock valuation, batch tracking, and reporting.' },
@@ -198,7 +198,7 @@ export default function WorkshopPage() {
                 </div>
                 {/* Email */}
                 <div>
-                  <label className="block text-sm font-medium text-slate-300 mb-1">Email Address *</label>
+                  <label className="block text-sm font-medium text-slate-300 mb-1">Email Address (optional)</label>
                   <input
                     type="email"
                     value={form.email}
