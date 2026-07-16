@@ -103,6 +103,46 @@
       "dest": "/dist/industries/index.html"
     },
     {
+      "src": "^/manufacturing/?$",
+      "status": 301,
+      "headers": { "Location": "/industries/manufacturing/" }
+    },
+    {
+      "src": "^/distribution/?$",
+      "status": 301,
+      "headers": { "Location": "/industries/distribution/" }
+    },
+    {
+      "src": "^/retail/?$",
+      "status": 301,
+      "headers": { "Location": "/industries/retail/" }
+    },
+    {
+      "src": "^/construction/?$",
+      "status": 301,
+      "headers": { "Location": "/industries/construction/" }
+    },
+    {
+      "src": "^/hardware/?$",
+      "status": 301,
+      "headers": { "Location": "/industries/hardware/" }
+    },
+    {
+      "src": "^/ngo/?$",
+      "status": 301,
+      "headers": { "Location": "/industries/ngo/" }
+    },
+    {
+      "src": "^/schools/?$",
+      "status": 301,
+      "headers": { "Location": "/industries/schools/" }
+    },
+    {
+      "src": "^/sacco/?$",
+      "status": 301,
+      "headers": { "Location": "/industries/sacco/" }
+    },
+    {
       "src": "^/knowledge-hub/guides(/.*)?$",
       "dest": "/dist/knowledge-hub/guides/index.html"
     },

@@ -25,17 +25,19 @@ export default function HomePage() {
         {/* 1. Hero — animated particle landing */}
         <TallyLanding />
 
-        {/* 2. Value proposition + feature cards */}
+        {/* 2. Product video — moved up from position 5 so it's seen right after
+            the hero instead of several scrolls down: keeps visitors engaged
+            early and sits right above the CTA-heavy section that follows. */}
+        <VideoSection />
+
+        {/* 3. Value proposition + feature cards */}
         <Hero3D />
 
-        {/* 3. Stats — 500+ businesses, 15+ years, 99.9% uptime, 1hr response */}
+        {/* 4. Stats — 500+ businesses, 15+ years, 99.9% uptime, 1hr response */}
         <TrustBanner />
 
-        {/* 4. Partner logos — TallyPrime, EOS, Biz Analyst, KRA */}
+        {/* 5. Partner logos — TallyPrime, EOS, Biz Analyst, KRA */}
         <Partners />
-
-        {/* 5. Product video */}
-        <VideoSection />
 
         {/* 6. Industries — 4-column grid */}
         <Industries />
