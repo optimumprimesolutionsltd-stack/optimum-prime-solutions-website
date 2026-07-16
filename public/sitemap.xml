@@ -190,14 +190,6 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- NGOs -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries/ngos</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-
   <!-- Schools -->
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/industries/schools</loc>
@@ -206,28 +198,20 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- SACCOs -->
+  <!-- NGO (/industries/ngos also routes here but declares this URL as canonical, so only this one is submitted) -->
   <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries/saccos</loc>
+    <loc>https://www.optimumprimesolutions.co.ke/industries/ngo</loc>
     <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
-  <!-- NGO (canonical alias) -->
-  <url>
-    <loc>https://www.optimumprimesolutions.co.ke/industries/ngo</loc>
-    <lastmod>2026-07-08</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-
-  <!-- SACCO (canonical alias) -->
+  <!-- SACCO (/industries/saccos also routes here but declares this URL as canonical, so only this one is submitted) -->
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/industries/sacco</loc>
     <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
+    <priority>0.8</priority>
   </url>
 
   <!-- ═══════════════════════════════════════════════════════ -->

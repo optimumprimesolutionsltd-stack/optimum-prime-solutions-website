@@ -79,6 +79,13 @@ export default function VideoSection() {
                 />
               )}
             </div>
+            <Link
+              to="/knowledge-hub/videos"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-red-500 hover:text-red-400 transition-colors"
+            >
+              Watch more TallyPrime tutorials <ArrowRight className="h-4 w-4" />
+            </Link>
           </motion.div>
 
           {/* Why TallyPrime — unique differentiators, not repeating the services list */}
