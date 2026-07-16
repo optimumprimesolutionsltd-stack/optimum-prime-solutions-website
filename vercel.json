@@ -8,6 +8,17 @@
   ],
   "routes": [
     {
+      "src": "^/(.*)$",
+      "headers": {
+        "X-Content-Type-Options": "nosniff",
+        "X-Frame-Options": "SAMEORIGIN",
+        "Referrer-Policy": "strict-origin-when-cross-origin",
+        "Permissions-Policy": "geolocation=(), microphone=(), camera=(), payment=()",
+        "Strict-Transport-Security": "max-age=63072000; includeSubDomains; preload"
+      },
+      "continue": true
+    },
+    {
       "src": "^/assets/(.*)$",
       "headers": {
         "Cache-Control": "public, max-age=31536000, immutable"
@@ -192,6 +203,10 @@
       "dest": "/dist/webinar/index.html"
     },
     {
+      "src": "^/workshop-rsvp(/.*)?$",
+      "dest": "/dist/workshop-rsvp/index.html"
+    },
+    {
       "src": "^/why-choose-us(/.*)?$",
       "dest": "/dist/why-choose-us/index.html"
     },
@@ -260,7 +275,8 @@
     },
     {
       "src": "^/(.*)$",
-      "dest": "/dist/index.html"
+      "status": 404,
+      "dest": "/dist/404.html"
     }
   ]
 }

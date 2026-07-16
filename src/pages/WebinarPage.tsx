@@ -2,7 +2,7 @@ import { useState } from 'react';
 import SEO from '../components/SEO';
 import { fbSet } from '../firebase/config';
 
-const WEBINAR_DATE = 'Wednesday, 15th July 2026';
+const WEBINAR_DATE = 'Wednesday, 22nd July 2026';
 const WEBINAR_TIME = '3:00 PM – 4:00 PM (EAT)';
 const WEBINAR_MEET_LINK = 'https://meet.google.com/ded-fdcf-aac';
 const NOTIFIER_URL = 'https://optimum-prime-lead-notifier.onrender.com/new-lead';
@@ -83,7 +83,7 @@ export default function WebinarPage() {
     <main className="min-h-screen bg-slate-900">
       <SEO
         title="Free Webinar — TallyPrime 7.1 | Optimum Prime"
-        description="Join our free webinar on Wed 15th July 2026 and discover TallyPrime 7.1's new features — invoice templates, scheduled backup & more."
+        description="Join our free webinar on Wed 22nd July 2026 and discover TallyPrime 7.1's new features — invoice templates, scheduled backup & more."
         socialDescription="Join our free webinars on TallyPrime best practices, KRA compliance, and business growth in Kenya."
         canonical="/webinar"
 />
@@ -156,7 +156,7 @@ export default function WebinarPage() {
                 We've sent the Google Meet join link to your WhatsApp. We look forward to seeing you on <strong className="text-teal-400">{WEBINAR_DATE}</strong>.
               </p>
               <a
-                href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=TallyPrime+7.1+Webinar&dates=20260715T120000Z/20260715T130000Z&details=Free+webinar+by+Optimum+Prime+Solutions&location=Google+Meet`}
+                href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=TallyPrime+7.1+Webinar&dates=20260722T120000Z/20260722T130000Z&details=Free+webinar+by+Optimum+Prime+Solutions&location=Google+Meet`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-block bg-teal-500 hover:bg-teal-400 text-white font-semibold px-6 py-3 rounded-lg text-sm transition-colors"

@@ -56,7 +56,7 @@ const resources = [
     href: '/webinar',
     cta: 'View Webinars',
     color: 'bg-teal-50 text-teal-600',
-    badge: 'Live — 15 July',
+    badge: 'Live — 22 July',
   },
 ];
 

@@ -1,29 +1,15 @@
 import { Link, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
 import { ArrowRight, Home, Search } from 'lucide-react';
 import SEO from '../components/SEO';
 
 export default function NotFoundPage() {
   const location = useLocation();
 
-  // Set proper 404 status code via meta tag for search engines
-  useEffect(() => {
-    const meta = document.createElement('meta');
-    meta.name = 'status';
-    meta.content = '404';
-    document.head.appendChild(meta);
-
-    // Also set the robots noindex to prevent indexing of the 404 page
-    const robots = document.createElement('meta');
-    robots.name = 'robots';
-    robots.content = 'noindex';
-    document.head.appendChild(robots);
-
-    return () => {
-      document.head.removeChild(meta);
-      document.head.removeChild(robots);
-    };
-  }, []);
+  // The real 404 HTTP status is set by vercel.json (routes[] catch-all,
+  // status: 404, serving the prerendered dist/404.html) — status codes
+  // can't be set via meta tags, browsers/crawlers only honor them as
+  // actual HTTP response headers. `noIndex` below (via react-helmet-async)
+  // is what actually keeps this page out of the index.
 
   return (
     <main className="min-h-screen">

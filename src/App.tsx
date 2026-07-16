@@ -30,6 +30,7 @@ const FAQPage           = lazy(() => import('./pages/FAQPage'));
 const ContactPage       = lazy(() => import('./pages/ContactPage'));
 const PricingPage       = lazy(() => import('./pages/PricingPage'));
 const WebinarPage       = lazy(() => import('./pages/WebinarPage'));
+const WorkshopPage      = lazy(() => import('./pages/WorkshopPage'));
 const BizAnalystPage    = lazy(() => import('./pages/BizAnalystPage'));
 const KnowledgeHubPage  = lazy(() => import('./pages/KnowledgeHubPage'));
 const VideoTutorialsPage = lazy(() => import('./pages/VideoTutorialsPage'));
@@ -132,6 +133,7 @@ function SiteRoutes() {
             <Route path="/knowledge-hub/case-studies" element={<ComingSoonPage />} />
             <Route path="/knowledge-hub/videos" element={<VideoTutorialsPage />} />
             <Route path="/webinar" element={<WebinarPage />} />
+            <Route path="/workshop-rsvp" element={<WorkshopPage />} />
             <Route path="/knowledge-hub/webinars" element={<ComingSoonPage />} />
 
             {/* ── Biz Analyst ── */}

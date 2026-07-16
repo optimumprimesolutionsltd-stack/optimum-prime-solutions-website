@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Building2, Briefcase, ShoppingCart, Globe,
-  HelpCircle, Users, FileText, Phone, MessageCircle,
+  HelpCircle, Users, FileText, Phone, MessageCircle, CalendarDays,
   LogOut, Menu, X, ExternalLink, RotateCcw
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
@@ -18,6 +18,7 @@ import BlogEditor from './editors/BlogEditor';
 import ContactEditor from './editors/ContactEditor';
 import TestimonialsEditor from './editors/TestimonialsEditor';
 import WhatsAppManager from './editors/WhatsAppManager';
+import WorkshopRegistrationsManager from './editors/WorkshopRegistrationsManager';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -27,6 +28,7 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'industries', label: 'Industries', icon: Globe },
   { id: 'faqs', label: 'FAQ & Chatbot', icon: HelpCircle },
   { id: 'leads', label: 'Demo Leads', icon: Users },
+  { id: 'workshop', label: 'Workshop RSVPs', icon: CalendarDays },
   { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
   { id: 'blogs', label: 'Blog Posts', icon: FileText },
   { id: 'contact', label: 'Contact Info', icon: Phone },
@@ -73,6 +75,7 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'industries': return <IndustriesEditor data={data} onSave={d => handleSave(d, 'Industries saved!')} />;
       case 'faqs': return <FaqEditor data={data} onSave={d => handleSave(d, 'FAQs saved!')} />;
       case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')} />;
+      case 'workshop': return <WorkshopRegistrationsManager />;
       case 'whatsapp': return <WhatsAppManager />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
       case 'contact': return <ContactEditor data={data} onSave={d => handleSave(d, 'Contact info saved!')} />;

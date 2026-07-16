@@ -45,10 +45,12 @@ const routes = [
   '/knowledge-hub/videos',
   '/knowledge-hub/webinars',
   '/webinar',
+  '/workshop-rsvp',
   '/why-choose-us',
   '/biz-analyst',
   '/privacy-policy',
   '/admin',
+  '/404',
 ];
 
 const MIME_TYPES = {
@@ -167,12 +169,18 @@ async function prerender() {
       '/industries/schools', '/industries/sacco', '/industries/saccos',
       '/knowledge-hub/guides', '/knowledge-hub/case-studies',
       '/knowledge-hub/videos', '/knowledge-hub/webinars',
-      '/webinar', '/why-choose-us',
+      '/webinar', '/workshop-rsvp', '/why-choose-us',
       '/biz-analyst', '/privacy-policy', '/admin',
+      '/404',
     ];
     for (const route of routes) {
       if (route !== '/') {
-        const outputPath = join(__dirname, 'dist', route, 'index.html');
+        // /404 is served as a flat dist/404.html by vercel.json's catch-all
+        // (with a real 404 status), not as a directory — every other route
+        // is a directory-style /route/index.html.
+        const outputPath = route === '/404'
+          ? join(__dirname, 'dist', '404.html')
+          : join(__dirname, 'dist', route, 'index.html');
         if (!existsSync(outputPath)) {
           if (!existsSync(dirname(outputPath))) {
             mkdirSync(dirname(outputPath), { recursive: true });
@@ -258,8 +266,10 @@ async function prerender() {
           throw new Error('No semantic content');
         }
 
-        const outputPath = route === '/' 
-          ? join(__dirname, 'dist', 'index.html') 
+        const outputPath = route === '/'
+          ? join(__dirname, 'dist', 'index.html')
+          : route === '/404'
+          ? join(__dirname, 'dist', '404.html')
           : join(__dirname, 'dist', route, 'index.html');
         
         if (!existsSync(dirname(outputPath))) {

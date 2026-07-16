@@ -30,7 +30,8 @@ const tallyPrimeLinks = [
 ];
 
 const upcomingEvents = [
-  { l: 'Free TallyPrime 7.1 Webinar', h: '/webinar', badge: 'Live — Wed 15 July' },
+  { l: 'Free TallyPrime 7.1 Webinar', h: '/webinar', badge: 'Live — Wed 22 July' },
+  { l: 'Inventory Management Breakfast Workshop', h: '/workshop-rsvp', badge: 'Fri 24 July' },
 ];
 
 const coreServices = [

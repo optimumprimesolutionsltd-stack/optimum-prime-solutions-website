@@ -13,8 +13,12 @@
     <meta name="theme-color" content="#0a1929" />
     <meta name="author" content="Optimum Prime Solutions" />
     <meta name="google-site-verification" content="kLipKSikUscauwTHz5zpXbuRSIsp3EiwlGSdMUXB4lc" />
-    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
+    <!--
+      X-Content-Type-Options and X-Frame-Options are intentionally NOT set here:
+      browsers only honor them as real HTTP response headers, never as
+      meta http-equiv tags. They're sent as actual headers from vercel.json
+      instead (see the routes[0] header rule).
+    -->
     <link rel="manifest" href="/manifest.json" />
     <!-- Favicons -->
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
