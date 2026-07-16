@@ -124,7 +124,7 @@ export default function Hero3D() {
                   )}
                 </div>
                 <p className="mt-3 text-xs text-slate-400">
-                  Sales & implementation, cloud hosting, EOS® consulting, and KRA eTIMS compliance — see it all in action.
+                  A first look at TallyPrime 7.0's newest features — auto wrap text, invoice templates, scheduled backup, and more.
                 </p>
               </div>
             </div>
