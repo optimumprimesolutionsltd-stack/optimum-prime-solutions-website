@@ -143,6 +143,11 @@
       "headers": { "Location": "/industries/sacco/" }
     },
     {
+      "src": "^/home/?$",
+      "status": 301,
+      "headers": { "Location": "/" }
+    },
+    {
       "src": "^/knowledge-hub/guides(/.*)?$",
       "dest": "/dist/knowledge-hub/guides/index.html"
     },
@@ -233,6 +238,21 @@
     {
       "src": "^/blog/tallyprime\\-71\\-is\\-here\\-whats\\-new\\-and\\-what\\-it\\-means\\-for\\-your\\-business(/)?$",
       "dest": "/dist/blog/tallyprime-71-is-here-whats-new-and-what-it-means-for-your-business/index.html"
+    },
+    {
+      "src": "^/blog/etims\\-income\\-tax\\-deadline\\-june\\-30\\-2026(/)?$",
+      "status": 301,
+      "headers": { "Location": "/blog/" }
+    },
+    {
+      "src": "^/blog/why\\-tallyprime\\-alone\\-isn\\-t\\-enough\\-for\\-growing\\-kenyan\\-businesses(/)?$",
+      "status": 301,
+      "headers": { "Location": "/blog/" }
+    },
+    {
+      "src": "^/blog/tallyprime\\-7\\-1\\-released\\-how\\-the\\-new\\-features\\-help\\-kenyan\\-businesses\\-navigate\\-etims\\-2026(/)?$",
+      "status": 301,
+      "headers": { "Location": "/blog/" }
     },
     {
       "src": "^/blog(/)?$",

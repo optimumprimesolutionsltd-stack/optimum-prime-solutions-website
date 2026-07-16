@@ -5,10 +5,10 @@ import { useState } from 'react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { useSite } from '../context/SiteContext';
 
-// "TallyPrime 7.0 | Witness the Launch" — was the homepage's only video
-// until it got replaced by an intro video elsewhere on the page; kept
-// here so both are still on the homepage, not one instead of the other.
-const LAUNCH_VIDEO_ID = '5fAaRE-J3QE';
+// "TallyPrime 7.0 | Witness the Launch" — a real product video, but the
+// heading/caption avoid naming a version number so it doesn't read as
+// stale once a newer release ships.
+const PRODUCT_VIDEO_ID = '5fAaRE-J3QE';
 
 export default function Hero3D() {
   const { data } = useSite();
@@ -75,34 +75,34 @@ export default function Hero3D() {
             </div>
           </motion.div>
 
-          {/* Right column — TallyPrime 7.0 launch video */}
+          {/* Right column — product video */}
           <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.1 }}>
             <div className="relative overflow-hidden rounded-2xl sm:rounded-[2rem] border border-white/10 bg-slate-800/80 shadow-2xl shadow-black/40 backdrop-blur-sm">
               <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-red-500/20 blur-[60px]" />
               <div className="p-5 sm:p-6 pb-0">
-                <p className="text-xs uppercase tracking-[0.35em] text-slate-400">What's New</p>
-                <h2 className="mt-2 text-2xl font-bold text-white">TallyPrime 7.0 Launch</h2>
+                <p className="text-xs uppercase tracking-[0.35em] text-slate-400">Product Walkthrough</p>
+                <h2 className="mt-2 text-2xl font-bold text-white">TallyPrime in Action</h2>
               </div>
               <div className="p-5 sm:p-6">
                 <div className="relative rounded-xl overflow-hidden border border-white/10 group">
                   {!playing ? (
                     <>
                       <img
-                        src={`https://img.youtube.com/vi/${LAUNCH_VIDEO_ID}/maxresdefault.jpg`}
-                        alt="TallyPrime 7.0 Launch"
+                        src={`https://img.youtube.com/vi/${PRODUCT_VIDEO_ID}/maxresdefault.jpg`}
+                        alt="TallyPrime in Action"
                         className="w-full aspect-video object-cover"
                         width={1280}
                         height={720}
                         loading="lazy"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${LAUNCH_VIDEO_ID}/hqdefault.jpg`;
+                          (e.target as HTMLImageElement).src = `https://img.youtube.com/vi/${PRODUCT_VIDEO_ID}/hqdefault.jpg`;
                         }}
                       />
                       <div className="absolute inset-0 bg-slate-900/30 group-hover:bg-slate-900/10 transition-colors duration-300" />
                       <button
                         onClick={() => setPlaying(true)}
                         className="absolute inset-0 flex items-center justify-center"
-                        aria-label="Play TallyPrime 7.0 Launch video"
+                        aria-label="Play TallyPrime in Action video"
                       >
                         <motion.div
                           whileHover={{ scale: 1.08 }}
@@ -116,15 +116,15 @@ export default function Hero3D() {
                   ) : (
                     <iframe
                       className="w-full aspect-video"
-                      src={`https://www.youtube.com/embed/${LAUNCH_VIDEO_ID}?autoplay=1&rel=0`}
-                      title="TallyPrime 7.0 Launch"
+                      src={`https://www.youtube.com/embed/${PRODUCT_VIDEO_ID}?autoplay=1&rel=0`}
+                      title="TallyPrime in Action"
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       allowFullScreen
                     />
                   )}
                 </div>
                 <p className="mt-3 text-xs text-slate-400">
-                  A first look at TallyPrime 7.0's newest features — auto wrap text, invoice templates, scheduled backup, and more.
+                  A closer look at TallyPrime's day-to-day features — accounting, inventory, invoicing, and reporting in one place.
                 </p>
               </div>
             </div>
