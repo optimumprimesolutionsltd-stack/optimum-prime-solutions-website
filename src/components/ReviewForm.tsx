@@ -32,6 +32,14 @@ export default function ReviewForm() {
   const [hoverRating, setHoverRating] = useState(0);
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
   const [errorMsg, setErrorMsg] = useState('');
+  const [showHints, setShowHints] = useState(false);
+
+  const reviewPrompts = [
+    'What problem were you facing before working with us?',
+    'Which service helped? (implementation, training, cloud hosting, support)',
+    "What's improved since — faster reporting, easier KRA eTIMS filing, better stock control?",
+    'How was the support or training experience?',
+  ];
 
   const ratingLabels: Record<number, string> = {
     1: 'Poor', 2: 'Fair', 3: 'Good', 4: 'Very Good', 5: 'Excellent',
@@ -230,9 +238,33 @@ export default function ReviewForm() {
 
                 {/* Review text */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Your Review <span className="text-red-400">*</span>
-                  </label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-300">
+                      Your Review <span className="text-red-400">*</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowHints((v) => !v)}
+                      className="text-xs text-red-400 hover:text-red-300 underline underline-offset-2 transition-colors"
+                    >
+                      {showHints ? 'Hide tips' : 'Not sure what to write?'}
+                    </button>
+                  </div>
+                  {showHints && (
+                    <motion.ul
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="mb-2 space-y-1 rounded-xl border border-white/10 bg-slate-700/30 px-4 py-3 text-xs text-slate-400"
+                    >
+                      {reviewPrompts.map((prompt) => (
+                        <li key={prompt} className="flex gap-2">
+                          <span className="text-red-400">•</span>
+                          <span>{prompt}</span>
+                        </li>
+                      ))}
+                    </motion.ul>
+                  )}
                   <textarea
                     value={form.text}
                     onChange={(e) => setForm((f) => ({ ...f, text: e.target.value }))}
