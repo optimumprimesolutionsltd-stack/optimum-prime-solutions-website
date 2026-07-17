@@ -1,0 +1,43 @@
+name: Rebuild dist/
+
+# Vercel is configured to deploy whatever is already committed under dist/
+# (see vercel.json: @vercel/static against "dist/**") rather than building
+# from source itself. That means a push that only changes src/ or public/
+# never reaches the live site until dist/ is rebuilt and committed too.
+# This workflow does that rebuild automatically so pushing to main is
+# enough on its own.
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+jobs:
+  rebuild:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm run build:ssg
+
+      - name: Commit rebuilt dist/ if it changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add dist/
+          if git diff --cached --quiet; then
+            echo "dist/ already up to date, nothing to commit"
+          else
+            git commit -m "build: rebuild dist/ [skip ci]"
+            git push
+          fi
