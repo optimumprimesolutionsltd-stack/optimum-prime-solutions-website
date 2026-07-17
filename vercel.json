@@ -211,6 +211,10 @@
       "dest": "/dist/workshop-rsvp/index.html"
     },
     {
+      "src": "^/workshop-attendees(/.*)?$",
+      "dest": "/dist/workshop-attendees/index.html"
+    },
+    {
       "src": "^/why-choose-us(/.*)?$",
       "dest": "/dist/why-choose-us/index.html"
     },
