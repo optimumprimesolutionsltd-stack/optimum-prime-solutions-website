@@ -8,6 +8,17 @@ import { extname } from 'path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
 
+// siteData.ts is TypeScript and this script runs under plain Node ESM (no ts-node/tsx
+// loader configured), so it can't be imported directly. Scrape blog slugs out of the
+// source text instead — this is what silently dropped every blog post route before,
+// since the static `routes` list below never included them.
+function getBlogRoutes() {
+  const source = readFileSync(join(__dirname, 'src', 'data', 'siteData.ts'), 'utf-8');
+  const slugs = [...source.matchAll(/slug:\s*'([^']+)'/g)].map((m) => m[1]);
+  return slugs.map((slug) => `/blog/${slug}`);
+}
+const blogRoutes = getBlogRoutes();
+
 const routes = [
   '/',
   '/about',
@@ -51,6 +62,7 @@ const routes = [
   '/privacy-policy',
   '/admin',
   '/404',
+  ...blogRoutes,
 ];
 
 const MIME_TYPES = {
@@ -172,6 +184,7 @@ async function prerender() {
       '/webinar', '/workshop-rsvp', '/why-choose-us',
       '/biz-analyst', '/privacy-policy', '/admin',
       '/404',
+      ...blogRoutes,
     ];
     for (const route of routes) {
       if (route !== '/') {
