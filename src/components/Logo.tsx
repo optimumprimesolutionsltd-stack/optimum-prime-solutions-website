@@ -13,10 +13,10 @@ export default function Logo({ className = 'h-10 w-auto', variant = 'full' }: Lo
       whileTap={{ scale: 0.95 }}
       transition={{ duration: 0.3 }}
     >
-      <img 
-        src="/optimum-logo-white.png" 
-        alt="Optimum Prime Solutions Ltd" 
-        className="h-full w-auto object-contain brightness-110"
+      <img
+        src="/optimum-logo-light-bg.png"
+        alt="Optimum Prime Solutions Ltd"
+        className="h-full w-auto object-contain"
         width={200}
         height={40}
         loading="lazy"

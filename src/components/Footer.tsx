@@ -99,6 +99,7 @@ export default function Footer() {
                 />
               </div>
               <Logo className="h-12 w-auto" />
+              <span className="h-0.5 w-7 rounded-full bg-blue-600" aria-hidden="true" />
             </div>
             <p className="max-w-md text-sm leading-relaxed text-slate-500">
               {data.company.tagline}. Kenya's certified TallyPrime reseller, cloud hosting provider & EOS® implementer.

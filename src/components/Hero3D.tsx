@@ -80,7 +80,7 @@ export default function Hero3D() {
             <div className="relative overflow-hidden rounded-2xl sm:rounded-[2rem] border border-white/10 bg-slate-800/80 shadow-2xl shadow-black/40 backdrop-blur-sm">
               <div className="pointer-events-none absolute -top-10 -right-10 h-40 w-40 rounded-full bg-red-500/20 blur-[60px]" />
               <div className="p-5 sm:p-6 pb-0">
-                <p className="text-xs uppercase tracking-[0.35em] text-slate-400">Product Walkthrough</p>
+                <p className="text-xs uppercase tracking-[0.35em] text-blue-400">Product Walkthrough</p>
                 <h2 className="mt-2 text-2xl font-bold text-white">TallyPrime in Action</h2>
               </div>
               <div className="p-5 sm:p-6">

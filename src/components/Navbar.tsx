@@ -135,9 +135,9 @@ export default function Navbar() {
                 <Link
                   to={link.href}
                   onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                  className={`flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 ${
+                  className={`relative flex items-center gap-1 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-150 ${
                     isActive(link)
-                      ? 'bg-slate-100 text-slate-950'
+                      ? 'bg-slate-100 text-slate-950 after:absolute after:bottom-0.5 after:left-3 after:right-3 after:h-0.5 after:rounded-full after:bg-blue-600'
                       : 'text-slate-700 hover:bg-slate-100 hover:text-slate-950'
                   }`}
                 >

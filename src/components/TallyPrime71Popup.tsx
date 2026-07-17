@@ -155,7 +155,7 @@ export default function TallyPrime71Popup() {
                 transition={{ delay: 0.25 }}
               >
                 <img
-                  src="/optimum-logo-white.png"
+                  src="/optimum-logo-dark-bg.png"
                   alt="Optimum Prime Solutions"
                   width={150}
                   height={28}

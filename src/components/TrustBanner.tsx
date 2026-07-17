@@ -41,7 +41,7 @@ export default function TrustBanner() {
                 transition={{ delay: index * 0.08 }}
                 className="rounded-3xl p-6 text-center bg-slate-800 border border-white/10 shadow-lg"
               >
-                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-red-600/20 text-red-400 border border-red-500/30">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-3xl bg-blue-600/20 text-blue-400 border border-blue-500/30">
                   <Icon className="h-6 w-6" />
                 </div>
                 <p className="text-3xl font-semibold text-white">{item.value}{item.suffix}</p>
