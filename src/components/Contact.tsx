@@ -1,7 +1,7 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Loader } from 'lucide-react';
+import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Loader, ChevronDown } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { useSite } from '../context/SiteContext';
 import { useOnlineStatus } from './OfflineBanner';
@@ -360,53 +360,59 @@ export default function Contact() {
                     {/* Business type dropdown */}
                     <label className="block text-sm text-slate-200">
                       <span className="block mb-2 font-semibold text-slate-100">Business type *</span>
-                      <select
-                        value={form.businessType}
-                        onChange={(e) => set('businessType', e.target.value)}
-                        required
-                        className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition appearance-none ${
-                          getFieldError(errors, 'businessType') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
-                        } ${!form.businessType ? 'text-slate-400' : 'text-white'}`}
-                      >
-                        <option value="" disabled>Select business type</option>
-                        <option value="Retail">Retail</option>
-                        <option value="Wholesale / Distribution">Wholesale / Distribution</option>
-                        <option value="Manufacturing">Manufacturing</option>
-                        <option value="Construction">Construction</option>
-                        <option value="Hardware">Hardware</option>
-                        <option value="School / Education">School / Education</option>
-                        <option value="NGO / Non-profit">NGO / Non-profit</option>
-                        <option value="SACCO / Microfinance">SACCO / Microfinance</option>
-                        <option value="Professional Services">Professional Services</option>
-                        <option value="Hospitality">Hospitality</option>
-                        <option value="Other">Other</option>
-                      </select>
+                      <div className="relative">
+                        <select
+                          value={form.businessType}
+                          onChange={(e) => set('businessType', e.target.value)}
+                          required
+                          className={`w-full rounded-3xl border px-4 py-3 pr-10 text-sm outline-none transition appearance-none ${
+                            getFieldError(errors, 'businessType') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
+                          } ${!form.businessType ? 'text-slate-400' : 'text-white'}`}
+                        >
+                          <option value="" disabled>Select business type</option>
+                          <option value="Retail">Retail</option>
+                          <option value="Wholesale / Distribution">Wholesale / Distribution</option>
+                          <option value="Manufacturing">Manufacturing</option>
+                          <option value="Construction">Construction</option>
+                          <option value="Hardware">Hardware</option>
+                          <option value="School / Education">School / Education</option>
+                          <option value="NGO / Non-profit">NGO / Non-profit</option>
+                          <option value="SACCO / Microfinance">SACCO / Microfinance</option>
+                          <option value="Professional Services">Professional Services</option>
+                          <option value="Hospitality">Hospitality</option>
+                          <option value="Other">Other</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      </div>
                       {getFieldError(errors, 'businessType') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'businessType')}</p>}
                     </label>
 
                     {/* Current software dropdown */}
                     <label className="block text-sm text-slate-200">
                       <span className="block mb-2 font-semibold text-slate-100">Current software *</span>
-                      <select
-                        value={form.currentSoftware}
-                        onChange={(e) => set('currentSoftware', e.target.value)}
-                        required
-                        className={`w-full rounded-3xl border px-4 py-3 text-sm outline-none transition appearance-none ${
-                          getFieldError(errors, 'currentSoftware') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
-                        } ${!form.currentSoftware ? 'text-slate-400' : 'text-white'}`}
-                      >
-                        <option value="" disabled>Select current software</option>
-                        <option value="QuickBooks">QuickBooks</option>
-                        <option value="Sage">Sage</option>
-                        <option value="Pastel">Pastel</option>
-                        <option value="Excel / Manual">Excel / Manual</option>
-                        <option value="TallyPrime (older version)">TallyPrime (older version)</option>
-                        <option value="Tally ERP 9">Tally ERP 9</option>
-                        <option value="Odoo">Odoo</option>
-                        <option value="SAP">SAP</option>
-                        <option value="None">None — starting fresh</option>
-                        <option value="Other">Other</option>
-                      </select>
+                      <div className="relative">
+                        <select
+                          value={form.currentSoftware}
+                          onChange={(e) => set('currentSoftware', e.target.value)}
+                          required
+                          className={`w-full rounded-3xl border px-4 py-3 pr-10 text-sm outline-none transition appearance-none ${
+                            getFieldError(errors, 'currentSoftware') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
+                          } ${!form.currentSoftware ? 'text-slate-400' : 'text-white'}`}
+                        >
+                          <option value="" disabled>Select current software</option>
+                          <option value="QuickBooks">QuickBooks</option>
+                          <option value="Sage">Sage</option>
+                          <option value="Pastel">Pastel</option>
+                          <option value="Excel / Manual">Excel / Manual</option>
+                          <option value="TallyPrime (older version)">TallyPrime (older version)</option>
+                          <option value="Tally ERP 9">Tally ERP 9</option>
+                          <option value="Odoo">Odoo</option>
+                          <option value="SAP">SAP</option>
+                          <option value="None">None — starting fresh</option>
+                          <option value="Other">Other</option>
+                        </select>
+                        <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                      </div>
                       {getFieldError(errors, 'currentSoftware') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'currentSoftware')}</p>}
                     </label>
 
@@ -461,7 +467,7 @@ export default function Contact() {
                           value={form.demoTime}
                           onChange={(e) => set('demoTime', e.target.value)}
                           required
-                          className={`w-full rounded-3xl border pl-10 pr-4 py-3 text-sm outline-none transition appearance-none ${
+                          className={`w-full rounded-3xl border pl-10 pr-10 py-3 text-sm outline-none transition appearance-none ${
                             getFieldError(errors, 'demoTime') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
                           } ${!form.demoTime ? 'text-slate-400' : 'text-white'}`}
                         >
@@ -472,6 +478,7 @@ export default function Contact() {
                             <option key={slot} value={slot}>{slot}</option>
                           ))}
                         </select>
+                        <ChevronDown className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                       </div>
                       {getFieldError(errors, 'demoTime') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'demoTime')}</p>}
                     </label>
