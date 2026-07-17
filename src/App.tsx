@@ -135,7 +135,6 @@ function SiteRoutes() {
             <Route path="/knowledge-hub/videos" element={<VideoTutorialsPage />} />
             <Route path="/webinar" element={<WebinarPage />} />
             <Route path="/workshop-rsvp" element={<WorkshopPage />} />
-            <Route path="/workshop-attendees" element={<WorkshopAttendeesPage />} />
             <Route path="/knowledge-hub/webinars" element={<ComingSoonPage />} />
 
             {/* ── Biz Analyst ── */}
@@ -224,6 +223,7 @@ function App() {
     <ErrorBoundary>
       <SiteProvider>
         <Routes>
+          <Route path="/workshop-attendees" element={<Suspense fallback={<PageLoader />}><WorkshopAttendeesPage /></Suspense>} />
           <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminLogin onLogin={handleLogin} /></Suspense>} />
           <Route
             path="/admin/*"
