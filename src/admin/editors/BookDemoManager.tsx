@@ -220,7 +220,7 @@ export default function BookDemoManager() {
                 type="text"
                 value={form.clientCompany}
                 onChange={e => set('clientCompany', e.target.value)}
-                placeholder="e.g. Ujenzi Distributors Ltd"
+                placeholder="e.g. ABC Ltd"
                 className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
               />
             </div>
