@@ -82,7 +82,10 @@ export default function TallyLanding() {
         </g>
       </svg>
 
-      <div ref={confettiRoot} className="relative z-40 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6 lg:px-8">
+      {/* Confetti layer — sits behind the text/CTA content and never captures clicks */}
+      <div ref={confettiRoot} className="pointer-events-none absolute inset-0 z-20 overflow-hidden" />
+
+      <div className="relative z-40 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 py-20 text-center sm:px-6 lg:px-8">
         <motion.div
           ref={logoRef}
           initial={{ opacity: 0, y: 20 }}
