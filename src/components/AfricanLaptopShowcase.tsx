@@ -210,7 +210,7 @@ export default function AfricanLaptopShowcase({ tag, title, description, feature
                   role="img"
                   aria-label={cfg.alt}
                 />
-                <div className="absolute inset-0 bg-slate-900/50" />
+                <div className="absolute inset-0 bg-slate-900/15" />
                 <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-slate-900/90 to-transparent" />
 
                 {/* Caption */}
