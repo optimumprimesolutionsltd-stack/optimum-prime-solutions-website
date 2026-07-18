@@ -107,9 +107,7 @@ export default function Navbar() {
       >
         Skip to main content
       </a>
-      <motion.nav
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
+      <nav
       className={`fixed top-0 inset-x-0 z-50 transition-all duration-300 backdrop-blur-sm bg-gradient-to-b from-slate-100/95 via-slate-50/80 to-transparent border-b border-slate-200/10 ${scrolled ? 'shadow-[0_20px_80px_-40px_rgba(15,23,42,0.16)] border-slate-200/20' : 'shadow-none'}`}
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" ref={dropdownRef}>
@@ -296,7 +294,7 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </nav>
     </>
   );
 }
