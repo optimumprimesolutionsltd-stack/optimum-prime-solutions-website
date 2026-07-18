@@ -8,7 +8,7 @@ const steps = [
   { icon: PhoneCall, num: '01', title: 'Free Consultation', desc: 'Tell us about your business. We\'ll analyze your needs and recommend the right TallyPrime solution — Silver, Gold, Plus, Enterprise, or Custom TDL.', color: 'from-yellow-400 to-blue-400' },
   { icon: Settings, num: '02', title: 'Setup & Migration', desc: 'Our certified team installs TallyPrime, migrates your data from Excel, QuickBooks, or Sage, and configures KRA/eTIMS compliance.', color: 'from-blue-500 to-cyan-400' },
   { icon: Rocket, num: '03', title: 'Training & Go Live', desc: 'Comprehensive hands-on training for your team — accounting, inventory, payroll, and reporting. Go live with confidence.', color: 'from-purple-500 to-pink-400' },
-  { icon: HeadphonesIcon, num: '04', title: 'Ongoing Support', desc: '24/7 remote support with < 1 hour response time. Regular updates, health checks, and on-site visits when you need them.', color: 'from-amber-500 to-orange-400' },
+  { icon: HeadphonesIcon, num: '04', title: 'Ongoing Support', desc: 'Business-hours remote support with < 1 hour response time. Regular updates, health checks, and on-site visits when you need them.', color: 'from-amber-500 to-orange-400' },
 ];
 
 export default function HowItWorks() {

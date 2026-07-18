@@ -21,7 +21,7 @@ export default function ContactEditor({ data, onSave }: P) {
   const sections: { key: 'phones' | 'emails' | 'workingHours'; label: string; icon: typeof Phone; placeholder: string }[] = [
     { key: 'phones', label: 'Phone Numbers', icon: Phone, placeholder: '+254 700 000 000' },
     { key: 'emails', label: 'Email Addresses', icon: Mail, placeholder: 'info@example.com' },
-    { key: 'workingHours', label: 'Working Hours', icon: Clock, placeholder: 'Mon – Fri: 8:00 AM – 6:00 PM' },
+    { key: 'workingHours', label: 'Working Hours', icon: Clock, placeholder: 'Mon – Fri: 8:00 AM – 5:00 PM' },
   ];
 
   return (

@@ -9,7 +9,7 @@ const pageTitles: Record<string, { title: string; desc: string; parent: string; 
   '/tallyprime/licensing': { title: 'TallyPrime Licensing', desc: 'Genuine TallyPrime Silver, Gold & Enterprise licences at competitive prices.', parent: 'TallyPrime Solutions', parentHref: '/tallyprime' },
   '/tallyprime/cloud-hosting': { title: 'TallyPrime Cloud Hosting', desc: 'Secure, always-on cloud access to your TallyPrime data from any device.', parent: 'TallyPrime Solutions', parentHref: '/tallyprime' },
   '/tallyprime/training': { title: 'TallyPrime Training', desc: 'Hands-on user training, admin workshops, and ongoing coaching for your team.', parent: 'TallyPrime Solutions', parentHref: '/tallyprime' },
-  '/tallyprime/support': { title: 'TallyPrime Support & Maintenance', desc: '24/7 remote assistance plus scheduled on-site visits.', parent: 'TallyPrime Solutions', parentHref: '/tallyprime' },
+  '/tallyprime/support': { title: 'TallyPrime Support & Maintenance', desc: 'Business-hours remote assistance plus scheduled on-site visits.', parent: 'TallyPrime Solutions', parentHref: '/tallyprime' },
   '/tallyprime/customization': { title: 'TallyPrime Customization (TDL)', desc: 'Custom Tally Definition Language development to tailor TallyPrime to your workflows.', parent: 'TallyPrime Solutions', parentHref: '/tallyprime' },
   '/tallyprime/data-migration': { title: 'TallyPrime Data Migration', desc: 'Seamless migration of your existing data from any accounting system into TallyPrime.', parent: 'TallyPrime Solutions', parentHref: '/tallyprime' },
   '/industries/retail': { title: 'TallyPrime for Retail', desc: 'POS billing, stock management, and KRA eTIMS compliance for retail businesses.', parent: 'Industries', parentHref: '/industries' },

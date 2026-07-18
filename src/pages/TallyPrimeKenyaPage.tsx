@@ -38,7 +38,7 @@ export default function TallyPrimeKenyaPage() {
       icon: Cloud,
       title: 'TallyPrime Cloud Hosting Kenya',
       description:
-        'Access your TallyPrime company data securely from any device, anywhere in Kenya. Our cloud hosting service provides dedicated server resources, daily backups, 99.9% uptime, and 24/7 technical support — starting from KES 3,000 per month.',
+        'Access your TallyPrime company data securely from any device, anywhere in Kenya. Our cloud hosting service provides dedicated server resources, daily backups, 99.9% uptime, and responsive technical support — starting from KES 3,000 per month.',
       keyword: 'tallyprime cloud hosting kenya',
     },
     {
@@ -144,7 +144,7 @@ breadcrumbs={[
 
             {/* Trust row */}
             <div className="mt-10 flex flex-wrap gap-4">
-              {['Certified Tally Partner', 'KRA eTIMS Approved', '24/7 Support', 'Ruiru & Nationwide'].map((badge) => (
+              {['Certified Tally Partner', 'KRA eTIMS Approved', '< 1hr Response', 'Ruiru & Nationwide'].map((badge) => (
                 <span key={badge} className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-medium text-slate-300">
                   <CheckCircle className="h-3.5 w-3.5 text-emerald-400" /> {badge}
                 </span>

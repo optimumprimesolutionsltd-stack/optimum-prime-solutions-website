@@ -28,7 +28,7 @@ const links: NavLink[] = [
       { label: 'Licensing', href: '/tallyprime/licensing', desc: 'Silver, Gold & Enterprise editions' },
       { label: 'Cloud Hosting', href: '/tallyprime/cloud-hosting', desc: 'Secure remote access from anywhere' },
       { label: 'Training', href: '/tallyprime/training', desc: 'Hands-on user & admin training' },
-      { label: 'Support', href: '/tallyprime/support', desc: '24/7 remote & on-site support' },
+      { label: 'Support', href: '/tallyprime/support', desc: 'Business-hours remote & on-site support' },
       { label: 'Customization', href: '/tallyprime/customization', desc: 'TDL & workflow customization' },
       { label: 'Data Migration', href: '/tallyprime/data-migration', desc: 'Migrate from any system' },
       { label: 'Business Consulting', href: '/tallyprime/consulting', desc: 'EOS® for business growth' },

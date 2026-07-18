@@ -6,7 +6,7 @@ import Breadcrumb from '../../components/Breadcrumb';
 
 const supportChannels = [
   { icon: MessageSquare, title: 'WhatsApp Support', desc: 'Send a message and get a response from a certified TallyPrime expert — typically within 30 minutes on business days.', badge: 'Fastest' },
-  { icon: Phone, title: 'Phone Support', desc: 'Speak directly with our support team for urgent issues. Available Monday to Saturday, 8am–6pm EAT.', badge: null },
+  { icon: Phone, title: 'Phone Support', desc: 'Speak directly with our support team for urgent issues. Available Mon – Fri 8am–5pm and Sat 8am–12pm EAT.', badge: null },
   { icon: Wrench, title: 'Remote Desktop', desc: 'We connect to your computer remotely and fix the issue while you watch — no waiting for a technician to travel to your office.', badge: 'Most Effective' },
   { icon: Headphones, title: 'On-Site Support', desc: 'For complex issues that require a physical visit, our team covers Nairobi, Ruiru, Kiambu, and surrounding areas.', badge: null },
 ];

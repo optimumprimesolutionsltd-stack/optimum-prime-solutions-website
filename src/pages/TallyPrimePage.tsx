@@ -49,7 +49,7 @@ const services = [
   {
     icon: Headphones,
     title: 'Support & Maintenance',
-    desc: '24/7 remote assistance plus scheduled on-site visits. Average response time under 1 hour.',
+    desc: 'Business-hours remote assistance plus scheduled on-site visits. Average response time under 1 hour.',
     href: '/tallyprime/support',
     cta: 'View Support',
     color: 'bg-orange-50 text-orange-600',
