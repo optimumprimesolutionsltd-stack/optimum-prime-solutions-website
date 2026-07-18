@@ -57,7 +57,7 @@ export default function TrustBanner() {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-6 py-3 text-sm font-bold text-white hover:bg-red-500 shadow-md shadow-red-600/30 transition-colors"
           >
-            Become Our Next Success Story <ArrowRight className="h-4 w-4" />
+            Book a Free Demo <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>

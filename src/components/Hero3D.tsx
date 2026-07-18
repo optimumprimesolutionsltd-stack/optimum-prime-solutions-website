@@ -41,14 +41,7 @@ export default function Hero3D() {
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
                 className="inline-flex items-center justify-center rounded-full bg-red-600 px-6 py-3 text-sm sm:text-base font-semibold text-white shadow-lg shadow-red-900/40 hover:bg-red-500 hover:scale-105 active:scale-95 transition-all w-full sm:w-auto text-center"
               >
-                Book a Consultation
-              </Link>
-              <Link
-                to="/contact#demo-form"
-                onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-                className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/5 px-6 py-3 text-sm sm:text-base font-semibold text-white hover:bg-white/10 hover:scale-105 active:scale-95 transition-all w-full sm:w-auto text-center backdrop-blur-sm"
-              >
-                Request a Demo
+                Book a Free Demo
               </Link>
               <a
                 href="https://wa.me/254727209720?text=Hi%2C%20I%27d%20like%20to%20speak%20to%20an%20expert%20about%20TallyPrime"

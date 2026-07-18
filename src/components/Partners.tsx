@@ -125,7 +125,7 @@ export default function Partners() {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-bold text-white hover:bg-red-500 shadow-md shadow-red-600/30 transition-colors shrink-0"
           >
-            Talk to Our Team <ArrowRight className="h-4 w-4" />
+            Book a Free Demo <ArrowRight className="h-4 w-4" />
           </Link>
         </div>
       </div>
