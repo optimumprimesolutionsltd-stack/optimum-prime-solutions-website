@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { SiteProvider } from './context/SiteContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { OfflineBanner } from './components/OfflineBanner';
@@ -165,6 +165,14 @@ function App() {
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(false);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+
+  // Browsers preserve scroll position across client-side route changes by
+  // default — only Navbar/Footer links worked around this per-link. This
+  // covers every navigation (industry cards, blog links, CTAs, etc.).
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
