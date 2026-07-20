@@ -45,6 +45,7 @@ const coreServices = [
 
 export default function Footer() {
   const { data } = useSite();
+  const [newsletterName, setNewsletterName] = useState('');
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
@@ -58,9 +59,11 @@ export default function Footer() {
       return;
     }
 
+    const name = newsletterName.trim();
     setSubscribing(true);
     const saved = await fbSet(`newsletter_subscribers/${Date.now()}`, {
       email: newsletterEmail,
+      ...(name ? { name } : {}),
       subscribedAt: new Date().toISOString(),
       status: 'active',
     });
@@ -76,10 +79,11 @@ export default function Footer() {
     fetch('https://optimum-prime-lead-notifier.onrender.com/newsletter-subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: newsletterEmail }),
+      body: JSON.stringify({ email: newsletterEmail, name }),
     }).catch(() => {});
 
     setSubmitted(true);
+    setNewsletterName('');
     setNewsletterEmail('');
   };
 
@@ -240,6 +244,17 @@ export default function Footer() {
               </div>
             ) : (
               <form onSubmit={handleNewsletterSubmit} className="flex flex-col gap-3" aria-label="Newsletter signup">
+                <label htmlFor="newsletter-name" className="sr-only">Your name (optional)</label>
+                <input
+                  id="newsletter-name"
+                  name="newsletter-name"
+                  type="text"
+                  value={newsletterName}
+                  onChange={(e) => setNewsletterName(e.target.value)}
+                  placeholder="Your name (optional)"
+                  aria-label="Your name (optional)"
+                  className="rounded-2xl border border-slate-200 bg-slate-100 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-slate-400 placeholder:text-slate-500"
+                />
                 <label htmlFor="newsletter-email" className="sr-only">Email address for newsletter</label>
                 <input
                   id="newsletter-email"

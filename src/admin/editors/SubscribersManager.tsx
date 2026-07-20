@@ -5,6 +5,7 @@ import { fbSubscribe, fbSet } from '../../firebase/config';
 interface Subscriber {
   id: string;
   email: string;
+  name?: string;
   status: 'active' | 'unsubscribed';
   subscribedAt: string;
 }
@@ -19,6 +20,7 @@ export default function SubscribersManager() {
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'active' | 'unsubscribed'>('active');
+  const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [addError, setAddError] = useState('');
 
@@ -86,12 +88,15 @@ export default function SubscribersManager() {
       return;
     }
     setAddError('');
+    const name = newName.trim();
     const id = Date.now().toString();
     fbSet(`newsletter_subscribers/${id}`, {
       email,
+      ...(name ? { name } : {}),
       status: 'active',
       subscribedAt: new Date().toISOString(),
     });
+    setNewName('');
     setNewEmail('');
   };
 
@@ -127,8 +132,8 @@ export default function SubscribersManager() {
   };
 
   const exportCSV = () => {
-    const headers = ['Email', 'Status', 'Subscribed At'];
-    const rows = deduped.map(s => [s.email, s.status, s.subscribedAt]);
+    const headers = ['Name', 'Email', 'Status', 'Subscribed At'];
+    const rows = deduped.map(s => [s.name || '', s.email, s.status, s.subscribedAt]);
     const csv = [headers, ...rows].map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -199,6 +204,13 @@ export default function SubscribersManager() {
       <div className="rounded-2xl border border-navy-200 bg-white p-4">
         <p className="text-xs font-bold text-navy-500 uppercase tracking-wider mb-2">Add subscriber manually</p>
         <div className="flex gap-2">
+          <input
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            onKeyDown={e => { if (e.key === 'Enter') addSubscriber(); }}
+            placeholder="Name (optional)"
+            className="w-40 shrink-0 rounded-lg border border-navy-200 px-3 py-2.5 text-sm outline-none focus:border-accent"
+          />
           <input
             value={newEmail}
             onChange={e => { setNewEmail(e.target.value); setAddError(''); }}
@@ -274,7 +286,13 @@ export default function SubscribersManager() {
                 <Mail className={`h-4 w-4 ${s.status === 'unsubscribed' ? 'text-navy-400' : 'text-green-600'}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-navy-900 truncate">{s.email}</p>
+                {s.name
+                  ? <>
+                      <p className="text-sm font-medium text-navy-900 truncate">{s.name}</p>
+                      <p className="text-xs text-navy-500 truncate">{s.email}</p>
+                    </>
+                  : <p className="text-sm font-medium text-navy-900 truncate">{s.email}</p>
+                }
                 <p className="text-[10px] text-navy-400">{new Date(s.subscribedAt).toLocaleDateString()}</p>
               </div>
               <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold whitespace-nowrap ${
