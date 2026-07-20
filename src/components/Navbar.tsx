@@ -147,46 +147,45 @@ export default function Navbar() {
                   )}
                 </Link>
 
-                {/* Dropdown */}
+                {/* Dropdown — always rendered in the DOM (not AnimatePresence-unmounted)
+                    so these links exist in the prerendered/crawled HTML; visually
+                    hidden via opacity/pointer-events when closed instead. */}
                 {link.children && (
-                  <AnimatePresence>
-                    {activeDropdown === link.label && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 8 }}
-                        transition={{ duration: 0.15 }}
-                        className={`absolute top-full left-0 mt-1 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-sm shadow-xl shadow-slate-200/40 overflow-hidden ${
-                          link.children.length > 6 ? 'w-[560px]' : 'w-64'
-                        }`}
-                        onMouseEnter={() => handleMouseEnter(link.label)}
-                        onMouseLeave={handleMouseLeave}
-                      >
-                        <div className={`p-2 ${link.children.length > 6 ? 'grid grid-cols-2 gap-1' : ''}`}>
-                          {link.children.map((child) => (
-                            <Link
-                              key={child.href}
-                              to={child.href}
-                              onClick={() => {
-                                setActiveDropdown(null);
-                                window.scrollTo({ top: 0, behavior: 'smooth' });
-                              }}
-                              className={`block rounded-xl px-3 py-2.5 transition-colors ${
-                                location.pathname === child.href
-                                  ? 'bg-slate-100 text-slate-950'
-                                  : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
-                              }`}
-                            >
-                              <div className="text-sm font-medium">{child.label}</div>
-                              {child.desc && (
-                                <div className="text-xs text-slate-500 mt-0.5">{child.desc}</div>
-                              )}
-                            </Link>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  <motion.div
+                    initial={false}
+                    animate={activeDropdown === link.label ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+                    transition={{ duration: 0.15 }}
+                    aria-hidden={activeDropdown !== link.label}
+                    className={`absolute top-full left-0 mt-1 rounded-2xl border border-slate-200 bg-white/95 backdrop-blur-sm shadow-xl shadow-slate-200/40 overflow-hidden ${
+                      link.children.length > 6 ? 'w-[560px]' : 'w-64'
+                    } ${activeDropdown === link.label ? '' : 'invisible pointer-events-none'}`}
+                    onMouseEnter={() => handleMouseEnter(link.label)}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <div className={`p-2 ${link.children.length > 6 ? 'grid grid-cols-2 gap-1' : ''}`}>
+                      {link.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          to={child.href}
+                          tabIndex={activeDropdown === link.label ? 0 : -1}
+                          onClick={() => {
+                            setActiveDropdown(null);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className={`block rounded-xl px-3 py-2.5 transition-colors ${
+                            location.pathname === child.href
+                              ? 'bg-slate-100 text-slate-950'
+                              : 'text-slate-700 hover:bg-slate-50 hover:text-slate-950'
+                          }`}
+                        >
+                          <div className="text-sm font-medium">{child.label}</div>
+                          {child.desc && (
+                            <div className="text-xs text-slate-500 mt-0.5">{child.desc}</div>
+                          )}
+                        </Link>
+                      ))}
+                    </div>
+                  </motion.div>
                 )}
               </div>
             ))}

@@ -27,6 +27,8 @@ const tallyPrimeLinks = [
   { l: 'Training', h: '/tallyprime/training' },
   { l: 'Support', h: '/tallyprime/support' },
   { l: 'Customization (TDL)', h: '/tallyprime/customization' },
+  { l: 'Data Migration', h: '/tallyprime/data-migration' },
+  { l: 'Business Consulting (EOS®)', h: '/tallyprime/consulting' },
 ];
 
 const upcomingEvents = [
