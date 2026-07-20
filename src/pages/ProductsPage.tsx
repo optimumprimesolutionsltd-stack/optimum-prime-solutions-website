@@ -51,7 +51,7 @@ breadcrumbs={[
                 <p className="text-sm uppercase tracking-[0.28em] text-slate-400">Certified TallyPrime Partner</p>
                 <h2 className="mt-4 text-2xl font-semibold text-white">Official TallyPrime reseller · Cloud · EOS®</h2>
                 <p className="mt-3 text-sm leading-6 text-slate-300">
-                  We are Kenya's certified TallyPrime partner and licensed EOS® implementer. Contact us for the right package for your business.
+                  We are Kenya's certified TallyPrime partner and EOS®-informed business consultant. Contact us for the right package for your business.
                 </p>
               </div>
             </div>

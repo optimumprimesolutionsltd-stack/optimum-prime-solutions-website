@@ -36,7 +36,7 @@ const whoIsItFor = [
 const faqs = [
   {
     q: 'What is EOS® and how does it work?',
-    a: 'EOS® (Entrepreneurial Operating System) is a complete business operating system developed by Gino Wickman and detailed in his bestselling book "Traction". It strengthens the Six Key Components of any business — Vision, People, Data, Issues, Process, and Traction — through a set of practical tools and a disciplined meeting cadence. As certified EOS Implementers, we guide your leadership team through the full EOS journey.',
+    a: 'EOS® (Entrepreneurial Operating System) is a complete business operating system developed by Gino Wickman and detailed in his bestselling book "Traction". It strengthens the Six Key Components of any business — Vision, People, Data, Issues, Process, and Traction — through a set of practical tools and a disciplined meeting cadence. Applying its tools and principles, we guide your leadership team through the full EOS journey.',
   },
   {
     q: 'How does EOS® work with TallyPrime?',
@@ -57,7 +57,7 @@ export default function ConsultingPage() {
     <main className="min-h-screen">
       <SEO
         title="EOS Business Consulting Kenya"
-        description="Certified EOS Implementers in Kenya. Help your leadership team get aligned, gain traction, and achieve your vision."
+        description="EOS®-informed business consulting in Kenya. Help your leadership team get aligned, gain traction, and achieve your vision."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Consulting solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/consulting"
 breadcrumbs={[
@@ -75,7 +75,7 @@ breadcrumbs={[
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-emerald-600/20 border border-emerald-500/30 px-4 py-1.5 text-sm font-semibold text-emerald-400 mb-6">
               <Target className="h-4 w-4" />
-              Certified EOS® Implementers — Kenya
+              EOS®-Informed Consulting — Kenya
             </span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
               Get Your Business<br />

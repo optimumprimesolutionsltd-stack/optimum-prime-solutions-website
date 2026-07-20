@@ -48,7 +48,7 @@ export default function About() {
               
               <div className="absolute bottom-0 left-0 right-0 p-8">
                 <div className="space-y-4">
-                  {[{icon:Target,title:'Our Mission',text:c.mission},{icon:Eye,title:'Our Vision',text:c.vision},{icon:Zap,title:'Why Choose Us',text:'Kenya\'s certified TallyPrime reseller, licensed EOS® implementer, and cloud hosting provider — with responsive support and solutions built for the Kenyan market.'}].map(({icon:Ic,title,text})=>(
+                  {[{icon:Target,title:'Our Mission',text:c.mission},{icon:Eye,title:'Our Vision',text:c.vision},{icon:Zap,title:'Why Choose Us',text:'Kenya\'s certified TallyPrime reseller, EOS®-informed business consultant, and cloud hosting provider — with responsive support and solutions built for the Kenyan market.'}].map(({icon:Ic,title,text})=>(
                     <div key={title} className="flex items-start gap-4 bg-slate-900/40 backdrop-blur-md rounded-2xl p-4 border border-white/5">
                       <div className="h-10 w-10 rounded-2xl bg-gradient-to-br from-sky-500 to-cyan-400 text-white flex items-center justify-center shrink-0 shadow-lg shadow-cyan-200/30"><Ic className="h-4 w-4"/></div>
                       <div><h4 className="text-sm font-bold text-white">{title}</h4><p className="mt-1 text-xs text-slate-300 leading-relaxed line-clamp-2">{text}</p></div>

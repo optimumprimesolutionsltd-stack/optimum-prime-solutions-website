@@ -19,8 +19,8 @@ const certifications = [
   },
   {
     icon: Target,
-    title: 'Licensed EOS\u00ae Implementer',
-    body: 'Certified to implement the Entrepreneurial Operating System (EOS\u00ae) by Gino Wickman — helping leadership teams get aligned and gain traction.',
+    title: 'EOS\u00ae Principles & Framework',
+    body: 'We apply the Entrepreneurial Operating System (EOS\u00ae) by Gino Wickman — using its tools and principles to help leadership teams get aligned and gain traction.',
     color: '#3182ce',
   },
   {
@@ -39,7 +39,7 @@ const certifications = [
 
 const values = [
   { icon: Users, title: 'Client-First', body: 'Every engagement starts with understanding your business — not selling software.' },
-  { icon: CheckCircle, title: 'Certified Expertise', body: 'Our team holds official certifications from Tally Solutions Africa and the EOS\u00ae Worldwide network.' },
+  { icon: CheckCircle, title: 'Certified Expertise', body: 'Our team holds official certification from Tally Solutions Africa and applies the EOS\u00ae framework in our consulting work.' },
   { icon: Clock, title: 'Responsive Support', body: 'Sub-1-hour support response during business hours. We are always reachable when you need us.' },
   { icon: Zap, title: 'Fast Delivery', body: 'Most implementations go live within 5 business days — minimal disruption, maximum impact.' },
 ];
