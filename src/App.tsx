@@ -130,12 +130,9 @@ function SiteRoutes() {
 
             {/* ── Knowledge Hub ── */}
             <Route path="/knowledge-hub" element={<KnowledgeHubPage />} />
-            <Route path="/knowledge-hub/guides" element={<ComingSoonPage />} />
-            <Route path="/knowledge-hub/case-studies" element={<ComingSoonPage />} />
             <Route path="/knowledge-hub/videos" element={<VideoTutorialsPage />} />
             <Route path="/webinar" element={<WebinarPage />} />
             <Route path="/workshop-rsvp" element={<WorkshopPage />} />
-            <Route path="/knowledge-hub/webinars" element={<ComingSoonPage />} />
 
             {/* ── Biz Analyst ── */}
             <Route path="/biz-analyst" element={<BizAnalystPage />} />

@@ -20,9 +20,6 @@ const pageTitles: Record<string, { title: string; desc: string; parent: string; 
   '/industries/ngos': { title: 'TallyPrime for NGOs', desc: 'Fund accounting, donor management, and grant tracking.', parent: 'Industries', parentHref: '/industries' },
   '/industries/schools': { title: 'TallyPrime for Schools', desc: 'Fee collection, payroll, and financial reporting for educational institutions.', parent: 'Industries', parentHref: '/industries' },
   '/industries/saccos': { title: 'TallyPrime for SACCOs', desc: 'Member accounts, loan tracking, and dividend calculations.', parent: 'Industries', parentHref: '/industries' },
-  '/knowledge-hub/guides': { title: 'TallyPrime Implementation Guides', desc: 'Step-by-step guides for TallyPrime setup and configuration.', parent: 'Knowledge Hub', parentHref: '/knowledge-hub' },
-  '/knowledge-hub/case-studies': { title: 'Case Studies', desc: 'Real stories from Kenyan businesses that transformed with TallyPrime.', parent: 'Knowledge Hub', parentHref: '/knowledge-hub' },
-  '/knowledge-hub/webinars': { title: 'Webinars', desc: 'Live and recorded webinars on TallyPrime and business management.', parent: 'Knowledge Hub', parentHref: '/knowledge-hub' },
   '/why-choose-us': { title: 'Why Choose Optimum Prime Solutions', desc: 'What makes us Kenya\'s most trusted TallyPrime partner.', parent: 'Home', parentHref: '/' },
   '/features': { title: 'TallyPrime Features', desc: 'Explore the full range of TallyPrime features for your business.', parent: 'TallyPrime Solutions', parentHref: '/tallyprime' },
 };

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, BookOpen, FileText, HelpCircle, PlayCircle, Users, BookMarked } from 'lucide-react';
+import { ArrowRight, BookOpen, HelpCircle, PlayCircle, BookMarked } from 'lucide-react';
 import SEO from '../components/SEO';
 import Breadcrumb from '../components/Breadcrumb';
 
@@ -14,15 +14,6 @@ const resources = [
     badge: 'Latest Articles',
   },
   {
-    icon: FileText,
-    title: 'Implementation Guides',
-    desc: 'Step-by-step guides for TallyPrime setup, configuration, KRA eTIMS integration, and cloud migration.',
-    href: '/knowledge-hub/guides',
-    cta: 'View Guides',
-    color: 'bg-blue-50 text-blue-600',
-    badge: 'Coming Soon',
-  },
-  {
     icon: HelpCircle,
     title: 'FAQ & Troubleshooting',
     desc: 'Answers to the most common TallyPrime, cloud hosting, KRA compliance, and EOS® questions.',
@@ -30,15 +21,6 @@ const resources = [
     cta: 'Browse FAQs',
     color: 'bg-orange-50 text-orange-600',
     badge: 'Live',
-  },
-  {
-    icon: Users,
-    title: 'Case Studies',
-    desc: 'Real stories from Kenyan businesses that transformed their operations with TallyPrime.',
-    href: '/knowledge-hub/case-studies',
-    cta: 'Read Case Studies',
-    color: 'bg-purple-50 text-purple-600',
-    badge: 'Coming Soon',
   },
   {
     icon: PlayCircle,
