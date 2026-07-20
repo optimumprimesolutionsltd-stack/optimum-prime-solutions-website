@@ -82,6 +82,31 @@ export default function BlogPostPage() {
   }
 
   const BASE_URL = 'https://www.optimumprimesolutions.co.ke';
+  const postUrl = `${BASE_URL}/blog/${getPostSlug(post)}`;
+
+  // Prefer the native share sheet (works reliably on mobile — lets the
+  // reader pick WhatsApp, Messages, Gmail, whatever they actually use).
+  // mailto: is the fallback for browsers/desktops without navigator.share,
+  // but only works if a default mail app is configured, which many
+  // desktop browsers don't have — hence trying Share first.
+  const handleShare = async () => {
+    const shareData = {
+      title: 'You might like this',
+      text: "I think you'd love this newsletter:",
+      url: postUrl,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch {
+        // user cancelled, or share failed — fall through to mailto
+      }
+    }
+    window.location.href = `mailto:?subject=${encodeURIComponent(shareData.title)}&body=${encodeURIComponent(
+      `I think you'd love this newsletter: ${postUrl}`
+    )}`;
+  };
 
   return (
     <main className="min-h-screen">
@@ -158,15 +183,14 @@ breadcrumbs={[
 
           {/* Share — shown after the article, not pushed on readers before they've read it */}
           <div className="mt-10 flex items-center justify-center">
-            <a
-              href={`mailto:?subject=${encodeURIComponent('You might like this')}&body=${encodeURIComponent(
-                `I think you'd love this newsletter: ${BASE_URL}/blog/${getPostSlug(post)}`
-              )}`}
-              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 hover:border-red-300 hover:text-red-600 transition"
+            <button
+              type="button"
+              onClick={handleShare}
+              className="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-red-600/20 hover:bg-red-700 transition-colors"
             >
               <Mail className="h-4 w-4" />
-              Enjoyed this? Share it with a friend
-            </a>
+              Enjoyed this? Share it with a friend!
+            </button>
           </div>
 
           {/* Related Resources */}
