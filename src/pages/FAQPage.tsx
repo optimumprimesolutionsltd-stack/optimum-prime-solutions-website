@@ -1,8 +1,10 @@
 import FAQ from '../components/FAQ';
 import AfricanLaptopShowcase from '../components/AfricanLaptopShowcase';
 import SEO from '../components/SEO';
+import { useSite } from '../context/SiteContext';
 
 export default function FAQPage() {
+  const { data } = useSite();
   return (
     <main className="min-h-screen bg-slate-900">
       <SEO
@@ -14,6 +16,7 @@ breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'FAQ', item: 'https://www.optimumprimesolutions.co.ke/faq/' },
         ]}
+        faqs={data.faqs.map(f => ({ q: f.q, a: f.a }))}
       />
       <AfricanLaptopShowcase
         tag="Frequently Asked Questions"

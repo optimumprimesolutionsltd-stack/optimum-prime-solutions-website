@@ -9,6 +9,7 @@ interface SEOProps {
   ogType?: string;
   noIndex?: boolean;
   breadcrumbs?: { name: string; item: string }[];
+  faqs?: { q: string; a: string }[];
 }
 
 const BASE_URL = 'https://www.optimumprimesolutions.co.ke';
@@ -23,6 +24,7 @@ export default function SEO({
   ogType = 'website',
   noIndex = false,
   breadcrumbs,
+  faqs,
 }: SEOProps) {
   const fullTitle = title.includes('Optimum Prime')
     ? title
@@ -44,6 +46,22 @@ export default function SEO({
           position: i + 1,
           name: crumb.name,
           item: crumb.item,
+        })),
+      }
+    : null;
+
+  // Generate FAQPage JSON-LD if provided
+  const faqJsonLd = faqs && faqs.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: f.a,
+          },
         })),
       }
     : null;
@@ -74,6 +92,13 @@ export default function SEO({
       {breadcrumbJsonLd && (
         <script type="application/ld+json">
           {JSON.stringify(breadcrumbJsonLd)}
+        </script>
+      )}
+
+      {/* FAQPage structured data */}
+      {faqJsonLd && (
+        <script type="application/ld+json">
+          {JSON.stringify(faqJsonLd)}
         </script>
       )}
     </Helmet>
