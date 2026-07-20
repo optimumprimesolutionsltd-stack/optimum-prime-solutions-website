@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
 import SEO from '../components/SEO';
 import ReactMarkdown from 'react-markdown';
-import { Calendar, Clock, ArrowLeft, User, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, User, ArrowRight, Mail } from 'lucide-react';
 import { getPostSlug } from '../utils/slugify';
 import NotFoundPage from './NotFoundPage';
 
@@ -82,6 +82,39 @@ export default function BlogPostPage() {
   }
 
   const BASE_URL = 'https://www.optimumprimesolutions.co.ke';
+  const postUrl = `${BASE_URL}/blog/${getPostSlug(post)}`;
+
+  // Prefer the native share sheet (works reliably on mobile — lets the
+  // reader pick WhatsApp, Messages, Gmail, whatever they actually use).
+  // mailto: is the fallback for browsers/desktops without navigator.share.
+  // Subject is deliberately left blank — the person sharing writes their
+  // own, rather than us pre-filling one for them.
+  const handleShare = async () => {
+    const shareData = {
+      title: '',
+      text: "I think you'd love this newsletter:",
+      url: postUrl,
+    };
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        return;
+      } catch {
+        // user cancelled, or share failed — fall through to mailto
+      }
+    }
+    window.location.href = `mailto:?body=${encodeURIComponent(
+      `I think you'd love this newsletter: ${postUrl}`
+    )}`;
+  };
+
+  // Up to 3 other posts (excluding this one), most recent first — the
+  // compact "more from the blog" links this page ends on instead of the
+  // full site footer.
+  const otherPosts = data.blogs
+    .filter((b) => getPostSlug(b) !== slug)
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 3);
 
   return (
     <main className="min-h-screen">
@@ -156,6 +189,18 @@ breadcrumbs={[
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </article>
 
+          {/* Share — shown after the article, not pushed on readers before they've read it */}
+          <div className="mt-10 flex items-center justify-center">
+            <button
+              type="button"
+              onClick={handleShare}
+              className="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-red-600/20 hover:bg-red-700 transition-colors"
+            >
+              <Mail className="h-4 w-4" />
+              Enjoyed this? Share it with a friend!
+            </button>
+          </div>
+
           {/* Related Resources */}
           {(() => {
             const resources = RELATED_RESOURCES[slug || ''];
@@ -201,6 +246,63 @@ breadcrumbs={[
                 More Articles
               </Link>
             </div>
+          </div>
+
+          {/* Compact ending — deliberately not the full site footer, so
+              landing here from a newsletter email doesn't dump readers
+              into the whole site's nav/newsletter-signup/promo banner. */}
+          <div className="mt-14 border-t border-slate-200 pt-10">
+            {otherPosts.length > 0 && (
+              <div className="mb-8">
+                <h3 className="text-sm font-bold uppercase tracking-wider text-slate-500 mb-4">More from the blog</h3>
+                <div className="grid sm:grid-cols-3 gap-4">
+                  {otherPosts.map((p) => (
+                    <Link
+                      key={getPostSlug(p)}
+                      to={`/blog/${getPostSlug(p)}`}
+                      className="group rounded-xl border border-slate-200 bg-white hover:border-red-300 p-4 transition"
+                    >
+                      <span className="text-sm font-semibold text-slate-900 group-hover:text-red-600 line-clamp-2">
+                        {p.title}
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-center gap-3">
+              <a
+                href="https://www.facebook.com/optimumprimesolutionsltd"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on Facebook"
+                className="flex items-center justify-center h-9 w-9 rounded-full bg-[#1877F2] text-white shadow-md hover:scale-110 transition-transform"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+              </a>
+              <a
+                href="https://www.instagram.com/optimumprimesolutionsltd"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on Instagram"
+                className="flex items-center justify-center h-9 w-9 rounded-full bg-gradient-to-tr from-[#FEDA75] via-[#D62976] to-[#4F5BD5] text-white shadow-md hover:scale-110 transition-transform"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+              </a>
+              <a
+                href="https://www.linkedin.com/company/optimumprimesolutionsltd"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Follow us on LinkedIn"
+                className="flex items-center justify-center h-9 w-9 rounded-full bg-[#0A66C2] text-white shadow-md hover:scale-110 transition-transform"
+              >
+                <svg className="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9 9h3.8v1.7h.05c.53-1 1.83-2.05 3.77-2.05 4.03 0 4.78 2.66 4.78 6.11V21h-4v-5.55c0-1.32-.02-3.02-1.84-3.02-1.84 0-2.12 1.44-2.12 2.93V21H9z"/></svg>
+              </a>
+            </div>
+            <p className="mt-4 text-center text-xs text-slate-400">
+              &copy; {new Date().getFullYear()} Optimum Prime Solutions Ltd
+            </p>
           </div>
         </div>
       </section>
