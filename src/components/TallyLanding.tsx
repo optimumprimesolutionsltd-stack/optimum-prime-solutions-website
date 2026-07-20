@@ -60,7 +60,7 @@ export default function TallyLanding() {
       {/* Background image */}
       <div
         className="absolute inset-0 bg-cover bg-center animate-videoZoom opacity-60"
-        style={{ backgroundImage: "url('/images/hero-erp-dashboard.webp')" }}
+        style={{ backgroundImage: "url('/images/hero-office-professional.webp')" }}
       />
       <div className="absolute inset-0 z-10 bg-slate-950/80 pointer-events-none" />
       <div className="absolute inset-x-0 bottom-0 h-48 z-30 bg-gradient-to-t from-slate-950/90 via-slate-950/30 to-transparent pointer-events-none" />
