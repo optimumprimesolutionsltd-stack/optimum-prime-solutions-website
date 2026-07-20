@@ -1,7 +1,7 @@
-import { Building2, Briefcase, ShoppingCart, Globe, HelpCircle, Users, FileText, Phone, Star, MessageCircle, CalendarDays } from 'lucide-react';
+import { Building2, Briefcase, ShoppingCart, Globe, HelpCircle, Users, FileText, Phone, Star, MessageCircle, CalendarDays, Mail } from 'lucide-react';
 import type { SiteData } from '../data/siteData';
 
-export type TabId = 'dashboard' | 'company' | 'services' | 'products' | 'industries' | 'faqs' | 'leads' | 'blogs' | 'contact' | 'testimonials' | 'bookdemo' | 'whatsapp' | 'workshop';
+export type TabId = 'dashboard' | 'company' | 'services' | 'products' | 'industries' | 'faqs' | 'leads' | 'blogs' | 'contact' | 'testimonials' | 'bookdemo' | 'whatsapp' | 'workshop' | 'subscribers';
 
 interface P { data: SiteData; onNav: (t: TabId) => void }
 
@@ -20,6 +20,7 @@ export default function DashboardHome({ data, onNav }: P) {
     { id: 'contact', label: 'Contact Info', icon: Phone, stat: `${data.contact.phones.length} phones`, desc: 'Edit phones, emails, WhatsApp' },
     { id: 'testimonials', label: 'Reviews & Testimonials', icon: Star, stat: `${data.testimonials.length}`, desc: 'Approve pending reviews, manage published testimonials' },
     { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle, stat: 'Live', desc: 'View and reply to WhatsApp conversations' },
+    { id: 'subscribers', label: 'Newsletter Subscribers', icon: Mail, stat: 'Live', desc: 'View subscribers, add manually, manage unsubscribes' },
   ];
 
   return (

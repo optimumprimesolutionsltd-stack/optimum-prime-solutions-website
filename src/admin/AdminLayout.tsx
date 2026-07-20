@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Building2, Briefcase, ShoppingCart, Globe,
   HelpCircle, Users, FileText, Phone, MessageCircle, CalendarDays,
-  LogOut, Menu, X, ExternalLink, RotateCcw
+  LogOut, Menu, X, ExternalLink, RotateCcw, Mail
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import { defaultData, type SiteData } from '../data/siteData';
@@ -19,6 +19,7 @@ import ContactEditor from './editors/ContactEditor';
 import TestimonialsEditor from './editors/TestimonialsEditor';
 import WhatsAppManager from './editors/WhatsAppManager';
 import WorkshopRegistrationsManager from './editors/WorkshopRegistrationsManager';
+import SubscribersManager from './editors/SubscribersManager';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -31,6 +32,7 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'workshop', label: 'Workshop RSVPs', icon: CalendarDays },
   { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
   { id: 'blogs', label: 'Blog Posts', icon: FileText },
+  { id: 'subscribers', label: 'Subscribers', icon: Mail },
   { id: 'contact', label: 'Contact Info', icon: Phone },
   { id: 'testimonials', label: 'Reviews & Testimonials', icon: Users },
   // Book a Demo is now embedded inside Demo Leads tab
@@ -78,6 +80,7 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'workshop': return <WorkshopRegistrationsManager />;
       case 'whatsapp': return <WhatsAppManager />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
+      case 'subscribers': return <SubscribersManager />;
       case 'contact': return <ContactEditor data={data} onSave={d => handleSave(d, 'Contact info saved!')} />;
       case 'testimonials': return <TestimonialsEditor data={data} onSave={d => handleSave(d, 'Testimonials saved!')} />;
       case 'bookdemo': return null; // merged into leads tab
