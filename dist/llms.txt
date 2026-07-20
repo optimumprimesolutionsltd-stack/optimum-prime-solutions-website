@@ -1,0 +1,36 @@
+# Optimum Prime Solutions Ltd
+
+> Certified TallyPrime partner in Kenya, providing TallyPrime licensing, implementation, training, cloud hosting, KRA eTIMS compliance, and EOS® (Entrepreneurial Operating System) business consulting. Based in Ruiru, serving businesses nationwide across Kenya.
+
+Optimum Prime Solutions Ltd is Kenya's certified reseller and implementation partner for TallyPrime — accounting, inventory, payroll and invoicing software used by over 2.5 million businesses worldwide. The company also provides secure cloud hosting for remote TallyPrime access, applies the EOS® leadership framework in its consulting work, and supports Biz Analyst, the official TallyPrime mobile companion app.
+
+## Services
+
+- [TallyPrime Implementation](https://www.optimumprimesolutions.co.ke/tallyprime/implementation): End-to-end setup, data migration and go-live support for TallyPrime Silver, Gold and Enterprise editions.
+- [TallyPrime Licensing](https://www.optimumprimesolutions.co.ke/tallyprime/licensing): Genuine TallyPrime licences (Silver, Gold, Enterprise editions) with local support.
+- [TallyPrime Cloud Hosting](https://www.optimumprimesolutions.co.ke/tallyprime/cloud-hosting): Secure, always-on remote access to TallyPrime data from any device.
+- [TallyPrime Training](https://www.optimumprimesolutions.co.ke/tallyprime/training): Hands-on user and admin training, delivered on-site or remotely.
+- [TallyPrime Support](https://www.optimumprimesolutions.co.ke/tallyprime/support): Ongoing technical support, average response time under 1 hour.
+- [Customization (TDL)](https://www.optimumprimesolutions.co.ke/tallyprime/customization): Custom TallyPrime development using Tally Definition Language.
+- [Industries Served](https://www.optimumprimesolutions.co.ke/industries): Tailored TallyPrime solutions for retail, wholesale/distribution, manufacturing, SACCOs & MFIs, hardware & construction, pharmacies, supermarkets, and education/NGOs.
+
+## Compliance
+
+- KRA eTIMS Compliance: TallyPrime is a KRA-approved eTIMS solution, compliant with Kenya's e-invoicing mandate (2026).
+
+## Company
+
+- [About Us](https://www.optimumprimesolutions.co.ke/about): Company background and team.
+- [Contact](https://www.optimumprimesolutions.co.ke/contact): Book a free demo, phone +254 116 246 074, email info@optimumprimesolutions.co.ke, based in Ruiru, Kenya.
+- [Pricing](https://www.optimumprimesolutions.co.ke/pricing): TallyPrime licence and service pricing.
+- [FAQ](https://www.optimumprimesolutions.co.ke/faq): Answers on TallyPrime pricing, licensing, KRA compliance, cloud hosting, and EOS®.
+- [Testimonials](https://www.optimumprimesolutions.co.ke/testimonials): Client reviews and case studies.
+
+## Resources
+
+- [Knowledge Hub](https://www.optimumprimesolutions.co.ke/knowledge-hub): Video tutorials and educational content.
+- [Blog](https://www.optimumprimesolutions.co.ke/blog): Articles on TallyPrime usage, KRA e-filing, and edition comparisons.
+
+## Optional
+
+- [Privacy Policy](https://www.optimumprimesolutions.co.ke/privacy-policy)
