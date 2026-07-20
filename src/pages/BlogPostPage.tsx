@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
 import SEO from '../components/SEO';
 import ReactMarkdown from 'react-markdown';
-import { Calendar, Clock, ArrowLeft, User, ArrowRight, Mail } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, User, ArrowRight } from 'lucide-react';
 import { getPostSlug } from '../utils/slugify';
 import NotFoundPage from './NotFoundPage';
 
@@ -82,31 +82,6 @@ export default function BlogPostPage() {
   }
 
   const BASE_URL = 'https://www.optimumprimesolutions.co.ke';
-  const postUrl = `${BASE_URL}/blog/${getPostSlug(post)}`;
-
-  // Prefer the native share sheet (works reliably on mobile — lets the
-  // reader pick WhatsApp, Messages, Gmail, whatever they actually use).
-  // mailto: is the fallback for browsers/desktops without navigator.share,
-  // but only works if a default mail app is configured, which many
-  // desktop browsers don't have — hence trying Share first.
-  const handleShare = async () => {
-    const shareData = {
-      title: 'You might like this',
-      text: "I think you'd love this newsletter:",
-      url: postUrl,
-    };
-    if (navigator.share) {
-      try {
-        await navigator.share(shareData);
-        return;
-      } catch {
-        // user cancelled, or share failed — fall through to mailto
-      }
-    }
-    window.location.href = `mailto:?subject=${encodeURIComponent(shareData.title)}&body=${encodeURIComponent(
-      `I think you'd love this newsletter: ${postUrl}`
-    )}`;
-  };
 
   return (
     <main className="min-h-screen">
@@ -180,18 +155,6 @@ breadcrumbs={[
             prose-blockquote:border-l-red-500 prose-blockquote:text-slate-600">
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </article>
-
-          {/* Share — shown after the article, not pushed on readers before they've read it */}
-          <div className="mt-10 flex items-center justify-center">
-            <button
-              type="button"
-              onClick={handleShare}
-              className="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-red-600/20 hover:bg-red-700 transition-colors"
-            >
-              <Mail className="h-4 w-4" />
-              Enjoyed this? Share it with a friend!
-            </button>
-          </div>
 
           {/* Related Resources */}
           {(() => {
