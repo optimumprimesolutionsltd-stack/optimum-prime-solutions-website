@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, Trash2, Mail, Download, Plus, UserCheck, UserX, Users as UsersIcon } from 'lucide-react';
+import { Search, Trash2, Mail, Download, Plus, UserCheck, UserX, Users as UsersIcon, Send, Loader, CheckCircle, AlertCircle, Megaphone } from 'lucide-react';
 import { fbSubscribe, fbSet } from '../../firebase/config';
 
 interface Subscriber {
@@ -10,6 +10,9 @@ interface Subscriber {
 }
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const BACKEND_URL = 'https://optimum-prime-lead-notifier.onrender.com';
+
+type SendState = 'idle' | 'sending' | 'sent' | 'error';
 
 export default function SubscribersManager() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
@@ -18,6 +21,13 @@ export default function SubscribersManager() {
   const [filter, setFilter] = useState<'all' | 'active' | 'unsubscribed'>('active');
   const [newEmail, setNewEmail] = useState('');
   const [addError, setAddError] = useState('');
+
+  // Send Broadcast panel
+  const [showBroadcast, setShowBroadcast] = useState(false);
+  const [bSubject, setBSubject] = useState('');
+  const [bBody, setBBody] = useState('');
+  const [bState, setBState] = useState<SendState>('idle');
+  const [bMessage, setBMessage] = useState('');
 
   useEffect(() => {
     const unsubscribe = fbSubscribe('newsletter_subscribers', (raw: Record<string, any> | null) => {
@@ -85,6 +95,37 @@ export default function SubscribersManager() {
     setNewEmail('');
   };
 
+  const sendBroadcast = async () => {
+    const subject = bSubject.trim();
+    const body = bBody.trim();
+    if (!subject) { setBState('error'); setBMessage('Add a subject line'); return; }
+    if (!body) { setBState('error'); setBMessage('Write the email body'); return; }
+    if (!confirm(`Send this to all ${activeCount} active subscriber${activeCount === 1 ? '' : 's'}? This can't be undone.`)) return;
+
+    setBState('sending');
+    setBMessage('');
+    try {
+      const res = await fetch(`${BACKEND_URL}/broadcast`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ subject, body }),
+      });
+      const result = await res.json();
+      if (res.ok && result.success !== false) {
+        setBState('sent');
+        setBMessage(`Sent to ${result.sent ?? 0} of ${result.total_subscribers ?? 0} subscribers`);
+        setBSubject('');
+        setBBody('');
+      } else {
+        setBState('error');
+        setBMessage(result.error || (result.errors && result.errors[0]) || 'Send failed');
+      }
+    } catch {
+      setBState('error');
+      setBMessage('Could not reach the notification service');
+    }
+  };
+
   const exportCSV = () => {
     const headers = ['Email', 'Status', 'Subscribed At'];
     const rows = deduped.map(s => [s.email, s.status, s.subscribedAt]);
@@ -102,11 +143,57 @@ export default function SubscribersManager() {
           <h2 className="text-xl font-bold text-navy-900">Newsletter Subscribers</h2>
           <p className="text-sm text-navy-500 mt-0.5">Everyone who gets "Notify Subscribers" blog emails via Resend</p>
         </div>
-        <button onClick={exportCSV} disabled={deduped.length === 0}
-          className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
-          <Download className="h-4 w-4" /> Export CSV
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setShowBroadcast(v => !v)}
+            className="flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-semibold text-white transition"
+            style={{ backgroundColor: '#C0392B' }}>
+            <Megaphone className="h-4 w-4" /> Send Broadcast
+          </button>
+          <button onClick={exportCSV} disabled={deduped.length === 0}
+            className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
+            <Download className="h-4 w-4" /> Export CSV
+          </button>
+        </div>
       </div>
+
+      {/* Send Broadcast panel */}
+      {showBroadcast && (
+        <div className="rounded-2xl border p-5 space-y-3" style={{ borderColor: '#C0392B4D', backgroundColor: '#C0392B0D' }}>
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-bold text-navy-900">Send a custom email to subscribers</p>
+            <span className="text-xs text-navy-500">{activeCount} active recipient{activeCount === 1 ? '' : 's'}</span>
+          </div>
+          <input
+            value={bSubject}
+            onChange={e => { setBSubject(e.target.value); if (bState === 'error') setBState('idle'); }}
+            placeholder="Subject line"
+            className="w-full rounded-lg border border-navy-200 px-3 py-2.5 text-sm outline-none focus:border-accent"
+          />
+          <textarea
+            value={bBody}
+            onChange={e => { setBBody(e.target.value); if (bState === 'error') setBState('idle'); }}
+            placeholder="Write your message... Leave a blank line between paragraphs."
+            rows={6}
+            className="w-full rounded-lg border border-navy-200 px-3 py-2.5 text-sm outline-none focus:border-accent resize-y"
+          />
+          <div className="flex items-center gap-3">
+            <button onClick={sendBroadcast} disabled={bState === 'sending' || activeCount === 0}
+              className="flex items-center gap-2 rounded-lg bg-navy-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-navy-800 transition disabled:opacity-50 disabled:cursor-not-allowed">
+              {bState === 'sending' ? <Loader className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              {bState === 'sending' ? 'Sending...' : `Send to ${activeCount} subscriber${activeCount === 1 ? '' : 's'}`}
+            </button>
+            {bState === 'sent' && (
+              <span className="flex items-center gap-1.5 text-xs text-green-700"><CheckCircle className="h-3.5 w-3.5" />{bMessage}</span>
+            )}
+            {bState === 'error' && (
+              <span className="flex items-center gap-1.5 text-xs text-red-600"><AlertCircle className="h-3.5 w-3.5" />{bMessage}</span>
+            )}
+          </div>
+          {activeCount === 0 && (
+            <p className="text-xs text-navy-500">No active subscribers to send to.</p>
+          )}
+        </div>
+      )}
 
       {/* Add subscriber */}
       <div className="rounded-2xl border border-navy-200 bg-white p-4">
