@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 import { useSite } from '../context/SiteContext';
 import SEO from '../components/SEO';
 import ReactMarkdown from 'react-markdown';
-import { Calendar, Clock, ArrowLeft, User, ArrowRight } from 'lucide-react';
+import { Calendar, Clock, ArrowLeft, User, ArrowRight, Mail } from 'lucide-react';
 import { getPostSlug } from '../utils/slugify';
 import NotFoundPage from './NotFoundPage';
 
@@ -155,6 +155,19 @@ breadcrumbs={[
             prose-blockquote:border-l-red-500 prose-blockquote:text-slate-600">
             <ReactMarkdown>{post.content}</ReactMarkdown>
           </article>
+
+          {/* Share — shown after the article, not pushed on readers before they've read it */}
+          <div className="mt-10 flex items-center justify-center">
+            <a
+              href={`mailto:?subject=${encodeURIComponent('You might like this')}&body=${encodeURIComponent(
+                `I think you'd love this newsletter: ${BASE_URL}/blog/${getPostSlug(post)}`
+              )}`}
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-600 hover:border-red-300 hover:text-red-600 transition"
+            >
+              <Mail className="h-4 w-4" />
+              Enjoyed this? Share it with a friend
+            </a>
+          </div>
 
           {/* Related Resources */}
           {(() => {

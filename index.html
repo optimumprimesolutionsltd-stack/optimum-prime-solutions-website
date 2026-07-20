@@ -11,6 +11,15 @@
       and every route's canonical pointed at "/"). See src/components/SEO.tsx.
     -->
     <meta name="theme-color" content="#0a1929" />
+    <!--
+      Without this, mobile browsers that force-invert pages for system dark
+      mode (Android Chrome/Samsung Internet's "dark theme for web content")
+      auto-darken this site's light-background pages themselves — the site
+      has no dark mode of its own, so that inversion produces broken-looking
+      contrast and layout (e.g. tiny, washed-out article text on the blog).
+      Declaring "light" opts the page out of that automatic inversion.
+    -->
+    <meta name="color-scheme" content="light" />
     <meta name="author" content="Optimum Prime Solutions" />
     <meta name="google-site-verification" content="kLipKSikUscauwTHz5zpXbuRSIsp3EiwlGSdMUXB4lc" />
     <!--
