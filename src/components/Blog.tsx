@@ -21,7 +21,13 @@ export default function Blog() {
 
   if (!data.blogs.length) return null;
 
-  const visibleBlogs = showAll ? data.blogs : data.blogs.slice(0, 3);
+  // Newest first — falls back to numeric id when two posts share a date, so
+  // ordering stays deterministic instead of depending on array position.
+  const sortedBlogs = [...data.blogs].sort((a, b) => {
+    const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
+    return dateDiff !== 0 ? dateDiff : Number(b.id) - Number(a.id);
+  });
+  const visibleBlogs = showAll ? sortedBlogs : sortedBlogs.slice(0, 3);
 
   return (
     <section id="blog" className="relative py-24 bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
