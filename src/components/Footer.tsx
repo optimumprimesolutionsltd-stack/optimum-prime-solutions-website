@@ -104,7 +104,7 @@ export default function Footer() {
                   loading="lazy"
                 />
               </div>
-              <Logo className="h-12 w-auto" />
+              <Logo className="h-12 w-auto" loading="lazy" />
               <span className="h-0.5 w-7 rounded-full bg-blue-600" aria-hidden="true" />
             </div>
             <p className="max-w-md text-sm leading-relaxed text-slate-500">
