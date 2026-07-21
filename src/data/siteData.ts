@@ -588,6 +588,70 @@ Converting to a limited company is a legal and tax event, not just a rebrand. Th
 This article is general guidance and not a substitute for advice from a licensed accountant or tax agent — speak to a professional about your specific figures and filing dates.
 
 Need help getting your books audit-ready during a company conversion? Our team can guide you through the transition.`},
+    {id:'9',title:'TallyPrime Reports Every Business Owner Should Know',slug:'tallyprime-reports-every-business-owner-should-know',excerpt:'From P&L to Funds Flow, here are the TallyPrime reports that separate business owners who catch problems early from those who find out too late.',date:'2026-07-21',category:'Tips',readTime:'6 min',content:`Most business owners open TallyPrime once a month — usually when the accountant needs a signature or the auditor wants a number. That's a missed opportunity. TallyPrime isn't just a data-entry tool for your bookkeeper; it's a reporting engine that can tell you, in real time, whether your business is healthy, where cash is leaking, and which product, customer, or branch is actually making you money.
+
+Here are the reports worth 20 minutes of your time every month.
+
+## 1. Profit & Loss Account — "Am I actually making money?"
+
+The P&L (Gateway of Tally → Profit & Loss A/c) shows your income, direct and indirect expenses, and net profit or loss for a period. It's the most-checked report for a reason — it answers the first question every owner asks.
+
+**What to actually look for:** Don't just check the bottom line. Compare this month against last month and against the same month last year (TallyPrime lets you view multiple periods side by side). A profit that looks fine on paper but is shrinking as a percentage of sales is an early warning sign that expenses are creeping.
+
+## 2. Balance Sheet — "What do I own, and what do I owe?"
+
+The Balance Sheet is a snapshot, not a story — it shows assets, liabilities, and capital as of a specific date. Where owners get into trouble is treating profit and cash as the same thing. A business can show a healthy P&L and still have a Balance Sheet loaded with unpaid receivables and shrinking cash — which is exactly why the next report matters more than most owners realize.
+
+## 3. Cash Flow Statement — "Where did the cash actually go?"
+
+Cash Flow (Gateway of Tally → Display More Reports → Cash Flow) tracks the actual movement of cash in and out of your bank and cash accounts, split into operating, investing, and financing activities. This is the report that catches the classic trap: profitable on paper, broke in the bank — usually because money is sitting in unpaid invoices, excess stock, or loan repayments that don't show up in the P&L at all.
+
+## 4. Funds Flow Statement — and how it's different from Cash Flow
+
+This is the one most owners mix up, so it's worth being precise about.
+
+- **Cash Flow** tracks movement of *cash* only — actual rupees/shillings in and out of cash and bank accounts, over a period.
+- **Funds Flow** tracks movement of *working capital* — it compares two Balance Sheet dates and shows where your **net working capital** (current assets minus current liabilities) came from and where it went, including non-cash items like a rise in receivables or a new long-term loan.
+
+In practice: Cash Flow tells you why your bank balance moved. Funds Flow tells you why your *financial position* moved — including changes that never touched the bank account, like stock building up or debtors not paying. Cash Flow is a short-term, operational lens; Funds Flow is a structural, medium-term lens. A business can have a "flat" cash flow quarter and still have a Funds Flow statement revealing that working capital is quietly being sucked into inventory or debtors — a problem Cash Flow alone won't show clearly.
+
+If cash flow is your monthly check-up, funds flow is closer to a structural X-ray — run it quarterly.
+
+## 5. Stock Summary — "What's actually sitting on my shelves?"
+
+Stock Summary (Gateway of Tally → Stock Summary) gives you real-time inventory value, quantity, and movement by item, group, or godown. Drill down into it for:
+
+- **Ageing analysis** — stock that hasn't moved in 90+ days is tied-up cash, not an asset.
+- **Fast vs. slow movers** — reallocate purchasing budget toward what's actually selling.
+- **Negative stock warnings** — a sign of billing errors or theft worth investigating immediately.
+
+## 6. Cost Centre / Cost Category Reports — "Which part of the business is earning its keep?"
+
+If you've set up Cost Centres (departments, projects, sales reps, product lines), TallyPrime can break P&L numbers down by each one. This turns a single blended profit number into a map: which sales rep is actually profitable, which project is bleeding money, which department is overstaffed relative to what it brings in. Most owners set up cost centres and then never look at the reports they generate — that's the expensive mistake, not the setup itself.
+
+## 7. Location / Godown-wise Reports — "Which branch is carrying the business?"
+
+For multi-branch or multi-warehouse businesses, Location/Godown-wise reports (stock, sales, and P&L split by location) reveal what a consolidated report hides: one branch subsidizing another, stock imbalances between locations, or a warehouse with disproportionate losses or shrinkage. If you operate more than one outlet and you're only looking at the combined P&L, you're flying blind on which location actually deserves the next investment.
+
+## 8. Budgets vs. Actuals — "Did we stick to the plan?"
+
+TallyPrime lets you set budgets against ledgers, cost centres, or groups, then run Budget vs. Actual comparisons. This flips reporting from reactive to proactive — instead of discovering an overspend in next month's P&L, you catch it mid-month while there's still time to correct course. Set budgets at the start of the year, review variance monthly, and use recurring overruns as a trigger to either fix a process or revise the budget itself.
+
+## 9. Outstanding Receivables & Payables (Bills Payable/Receivable)
+
+Easy to overlook, hard to overstate. The Outstanding reports (Gateway of Tally → Display More Reports → Statements of Accounts) show exactly who owes you money and how overdue it is, and what you owe suppliers and when it's due. Paired with an ageing analysis, this is often the single fastest way to improve cash position — chasing a 60-day-overdue invoice usually beats chasing a new sale.
+
+## The habit that actually matters
+
+None of these reports need to be read daily. What separates owners who use Tally well from owners who just use it to file returns is a simple monthly rhythm:
+
+1. P&L and Balance Sheet — health check
+2. Cash Flow and Funds Flow — where the money actually moved, and why
+3. Stock Summary and Outstanding reports — what's tying up cash
+4. Cost Centre / Location reports — what's actually profitable
+5. Budget vs. Actual — course-correct before the quarter closes
+
+Twenty minutes a month, same day every month, is enough to catch most problems while they're still cheap to fix.`},
   ],
   leads: [],
 };
