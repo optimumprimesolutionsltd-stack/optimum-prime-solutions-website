@@ -75,6 +75,13 @@ function PageLoader() {
 }
 
 function SiteRoutes() {
+  const location = useLocation();
+  // Individual blog post pages get a compact ending of their own (social
+  // links + a couple other posts, inside BlogPostPage) instead of the full
+  // site footer — landing from a newsletter email shouldn't dump readers
+  // into the entire site's nav/newsletter-signup/TallyPrime-banner footer.
+  const isBlogPost = /^\/blog\/[^/]+\/?$/.test(location.pathname);
+
   return (
     <div className="min-h-screen bg-slate-50 text-slate-950 flex flex-col pb-16 sm:pb-0">
       <Navbar />
@@ -151,7 +158,7 @@ function SiteRoutes() {
           </Routes>
         </Suspense>
       </main>
-      <Footer />
+      {!isBlogPost && <Footer />}
       <Chatbot />
       <MobileStickyCTA />
     </div>
