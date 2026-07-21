@@ -133,7 +133,10 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     // so the source node stays up to date
     d.leads.forEach((lead: Lead) => {
       if (lead.status && lead.status !== 'New') {
-        fbSet(`leads/${lead.id}`, {
+        // Realtime Database's set() rejects any undefined value in the object
+        // (unset optional Lead fields like scheduledDate/demoTime), so strip
+        // them via a JSON round-trip before writing.
+        fbSet(`leads/${lead.id}`, JSON.parse(JSON.stringify({
           name: lead.name,
           company: lead.company,
           phone: lead.phone,
@@ -152,7 +155,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
           demoLocation: lead.demoLocation,
           teamMemberName: lead.teamMemberName,
           meetSent: lead.meetSent,
-        }).catch(() => {});
+        }))).catch(() => {});
       }
     });
   }, []);
