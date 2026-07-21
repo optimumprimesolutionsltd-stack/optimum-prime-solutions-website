@@ -88,7 +88,12 @@ export default function Chatbot() {
   }, [msgs, open]);
 
   useEffect(() => {
-    if (open && msgs.length === 0) {
+    // Don't touch Firebase (or assign chat state) until the visitor actually
+    // opens the widget — otherwise every page load silently writes a
+    // visitor ID + lead profile for people who never engaged with chat.
+    if (!open) return;
+
+    if (msgs.length === 0) {
       setMsgs([
         {
           id: '0',
