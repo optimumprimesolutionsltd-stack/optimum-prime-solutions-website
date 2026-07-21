@@ -62,6 +62,11 @@ const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: str
     { label: 'TallyPrime Implementation', href: '/tallyprime/implementation', desc: 'Upgrade & migrate with zero downtime.' },
     { label: 'View Pricing', href: '/pricing', desc: 'See upgrade and new licence pricing.' },
   ],
+  'how-tallyprime-helps-distributors-in-kenya': [
+    { label: 'TallyPrime for Distribution', href: '/industries/distribution', desc: 'Multi-location inventory and order processing built for distributors.' },
+    { label: 'Biz Analyst — TallyPrime on Your Phone', href: '/biz-analyst', desc: 'GPS field sales tracking and profit-based commissions.' },
+    { label: 'Book a Free Demo', href: '/contact#demo-form', desc: 'See it running on your own data — no obligation.' },
+  ],
 };
 
 export default function BlogPostPage() {
