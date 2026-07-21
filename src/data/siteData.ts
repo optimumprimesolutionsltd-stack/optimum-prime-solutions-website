@@ -538,6 +538,56 @@ The Bottom Line
 For distributors, the real value of TallyPrime is not just bookkeeping — it is the ability to run a leaner, more visible, more compliant operation without hiring a large back-office team. Real-time stock data, automated VAT compliance, cost centre-level profitability, and field sales visibility through Biz Analyst translate directly into fewer errors, faster cash cycles, better-motivated sales teams, and smarter decisions.
 
 Ready to bring this to your distribution business? Talk to Kenya's certified TallyPrime partner today.`},
+    {id:'8',title:'Converting from Sole Proprietorship to a Limited Company: What KRA Expects',slug:'sole-proprietorship-to-limited-company-kenya-kra-stock-transfer',excerpt:'Registering the company and getting a new KRA PIN are the easy, visible steps. Here is the paper trail most Kenyan business owners forget — moving stock from a personal PIN to the company PIN.',date:'2026-07-21',category:'Compliance',readTime:'7 min',content:`Growing past a sole proprietorship into a limited company is one of the healthiest moves a business owner can make. It separates your personal liability from the business, makes you more credible to banks, suppliers, and tenders, and sets you up to bring in partners or investors later.
+
+Most owners get the visible parts right: registering the company at the Business Registration Service (BRS) via eCitizen, applying for a new KRA PIN, and opening a company bank account. What trips people up is everything that happens quietly in the background — especially what becomes of the stock, equipment, and assets that were bought and sold under your personal PIN for years before the company existed.
+
+Register the Company as a Separate Legal Entity
+
+A limited company is not "your business with a new name" — it is a completely new legal person under the Companies Act, 2015. Register it via eCitizen/BRS with its own memorandum, directors, and shareholding structure. Until this is done, nothing else in this process can happen, because there is no second entity for anything to be transferred to.
+
+Apply for a Brand-New Company KRA PIN
+
+The company gets its own PIN on iTax — entirely separate from your personal PIN, even though you may be the sole director and shareholder. This is the detail many owners misunderstand: to KRA, you (the individual) and the company are two different taxpayers from day one, even if the same person signs both.
+
+The Step Almost Everyone Forgets: Selling Your Stock from Personal PIN to Company PIN
+
+This is where most conversions quietly go wrong. If you simply keep trading the same stock under the new company name without any paper trail, KRA sees inventory appear in the company's hands with no purchase invoice behind it, and no corresponding sale recorded under your personal PIN.
+
+- Treat it as a genuine sale — because to KRA, it is one. Your sole proprietorship (personal PIN) sells the existing stock to the new company (company PIN) at a fair value, exactly as you would to any other buyer.
+- Issue a proper eTIMS invoice — the sale must be captured through eTIMS under your personal PIN, with the company as the buyer, so the transaction is visible on both sides of iTax.
+- Declare output VAT on your side, if VAT registered — the transfer is a taxable supply. Skipping this doesn't avoid the VAT; it just means KRA calculates it for you later, with penalties and interest attached.
+- Give the company a legitimate opening stock figure — the invoice becomes the company's purchase record and input VAT claim, and its documented starting inventory for future audits.
+
+Why it matters: without this trail, a VAT or income tax audit finds stock movement and bank deposits with no invoices to explain them. That reads as unexplained income or undeclared sales, and KRA will assess tax on the worst-case interpretation, not the true one.
+
+Transfer Other Business Assets the Same Way
+
+Vehicles, machinery, furniture, and equipment bought under the sole proprietorship need the same treatment as stock — a documented sale or capital contribution from you to the company, with a value assigned and, where applicable, VAT and capital gains implications considered. Log-books, asset registers, and insurance need updating to reflect the company as the new owner.
+
+Move Banking, Contracts, and Licenses Over
+
+Open a company bank account and route all business income and expenses through it — mixing personal and company funds after conversion is one of the fastest ways to lose the legal protection a limited company is supposed to give you. Supplier agreements, leases, trading licenses, and county permits should be re-issued or formally novated in the company's name, not left running on the old sole proprietorship.
+
+Transfer Staff, NSSF, and SHIF Registrations
+
+Employees technically move from being employed by you personally to being employed by the company. Update NSSF, SHIF (formerly NHIF), and PAYE registrations accordingly, and issue new employment contracts under the company's name so statutory deductions are remitted against the correct employer PIN.
+
+Close Out the Sole Proprietorship's Tax Obligations
+
+Don't let the old business name go quiet while unfiled. File final VAT and income tax returns for the sole proprietorship up to the point of transfer, settle any outstanding tax compliance certificate (TCC) requirements, and formally deregister or cease the business name registration where it's no longer trading, so it doesn't sit as a loose thread KRA later flags as non-compliance.
+
+Bring in an Accountant Before You Convert, Not After
+
+The valuation used for the stock and asset transfer, the VAT treatment, and the timing of the switch all have tax consequences that are far cheaper to plan for than to fix during an audit. A few hours with an accountant or tax agent before you flip the switch is far less costly than a KRA assessment after the fact.
+
+The Bottom Line
+
+Converting to a limited company is a legal and tax event, not just a rebrand. The registration and the new PIN are the easy, visible parts — the part that actually protects you from KRA is making sure the paper trail between your old personal PIN and your new company PIN is clean, especially for stock and assets. Get that documented properly at the point of conversion, and the switch strengthens your business. Skip it, and it becomes the exact gap an audit is designed to find.
+
+This article is general guidance and not a substitute for advice from a licensed accountant or tax agent — speak to a professional about your specific figures and filing dates.
+
+Need help getting your books audit-ready during a company conversion? Our team can guide you through the transition.`},
   ],
   leads: [],
 };
