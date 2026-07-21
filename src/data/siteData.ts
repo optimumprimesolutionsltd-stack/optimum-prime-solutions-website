@@ -3,7 +3,13 @@ export interface ProductItem { id:string; name:string; edition:string; price:str
 export interface TestimonialItem { id:string; name:string; role:string; company:string; text:string; rating:number }
 export interface FaqItem { id:string; q:string; a:string; cat:string }
 export interface IndustryItem { id:string; name:string; icon:string; desc:string }
-export interface BlogPost { id:string; title:string; slug?:string; excerpt:string; date:string; category:string; readTime:string; content:string; youtubeUrl?:string }
+export interface BlogPost {
+  id:string; title:string; slug?:string; excerpt:string; date:string; category:string; readTime:string; content:string; youtubeUrl?:string;
+  // Auto-send-to-subscribers scheduling — notifyAt is a UTC ISO string set
+  // from the admin's local time picker; notified flips true once the
+  // backend has actually sent it, so it's never sent twice.
+  notifyAt?: string; notified?: boolean;
+}
 export interface Lead {
   id:string; name:string; company:string; phone:string; email:string;
   businessType:string; demoDate:string; demoTime?:string; currentSoftware:string; message:string;

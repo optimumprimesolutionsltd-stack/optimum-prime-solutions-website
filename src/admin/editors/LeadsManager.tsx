@@ -139,6 +139,10 @@ export default function LeadsManager({ data, onSave }: P) {
   const [filterStatus, setFilterStatus] = useState('All');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
 
+  // Bulk selection
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkStatus, setBulkStatus]   = useState('Contacted');
+
   // Booking panel
   const [showBooking, setShowBooking] = useState(false);
   const [booking, setBooking]         = useState<BookingForm>(emptyBooking);
@@ -238,6 +242,43 @@ export default function LeadsManager({ data, onSave }: P) {
   const removeLead = (id: string) => {
     if (confirm('Delete this lead permanently?')) {
       onSave({ ...data, leads: data.leads.filter(l => l.id !== id) });
+    }
+  };
+
+  // ── Bulk selection helpers ───────────────────────────────────────────────
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const allFilteredSelected = filtered.length > 0 && filtered.every(l => selectedIds.has(l.id));
+
+  const toggleSelectAll = () => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (allFilteredSelected) filtered.forEach(l => next.delete(l.id));
+      else filtered.forEach(l => next.add(l.id));
+      return next;
+    });
+  };
+
+  const applyBulkStatus = () => {
+    if (selectedIds.size === 0) return;
+    onSave({
+      ...data,
+      leads: data.leads.map(l => selectedIds.has(l.id) ? { ...l, status: bulkStatus } : l),
+    });
+    setSelectedIds(new Set());
+  };
+
+  const bulkDelete = () => {
+    if (selectedIds.size === 0) return;
+    if (confirm(`Delete ${selectedIds.size} lead(s) permanently?`)) {
+      onSave({ ...data, leads: data.leads.filter(l => !selectedIds.has(l.id)) });
+      setSelectedIds(new Set());
     }
   };
 
@@ -810,6 +851,38 @@ export default function LeadsManager({ data, onSave }: P) {
         </div>
       )}
 
+      {/* ── Selection / Bulk Actions Bar ── */}
+      {filtered.length > 0 && (
+        <div className="flex items-center justify-between gap-3 flex-wrap">
+          <label className="flex items-center gap-2 text-xs font-medium text-navy-600 cursor-pointer select-none">
+            <input type="checkbox" checked={allFilteredSelected} onChange={toggleSelectAll}
+              className="h-4 w-4 rounded border-navy-300 text-accent focus:ring-accent" />
+            Select all ({filtered.length})
+          </label>
+          {selectedIds.size > 0 && (
+            <div className="flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/5 px-3 py-2 flex-wrap">
+              <span className="text-xs font-semibold text-navy-700">{selectedIds.size} selected</span>
+              <select value={bulkStatus} onChange={e => setBulkStatus(e.target.value)}
+                className="rounded-lg border border-navy-200 px-2 py-1.5 text-xs font-medium outline-none focus:border-accent bg-white">
+                {statuses.map(s => <option key={s}>{s}</option>)}
+              </select>
+              <button onClick={applyBulkStatus}
+                className="rounded-lg px-3 py-1.5 text-xs font-bold text-white transition" style={{ backgroundColor: '#e53e3e' }}>
+                Move to {bulkStatus}
+              </button>
+              <button onClick={bulkDelete}
+                className="rounded-lg px-2 py-1.5 text-xs font-semibold text-red-500 hover:bg-red-50 transition">
+                Delete
+              </button>
+              <button onClick={() => setSelectedIds(new Set())}
+                className="rounded-lg px-2 py-1.5 text-xs font-medium text-navy-500 hover:bg-navy-100 transition">
+                Clear
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* ── Leads List ── */}
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-navy-200 bg-white py-16 text-center">
@@ -835,6 +908,10 @@ export default function LeadsManager({ data, onSave }: P) {
               }`}>
               {/* Lead row */}
               <div className="flex items-center gap-4 p-4 cursor-pointer" onClick={() => setExpandedId(expandedId === l.id ? null : l.id)}>
+                <input type="checkbox" checked={selectedIds.has(l.id)}
+                  onClick={e => e.stopPropagation()}
+                  onChange={() => toggleSelect(l.id)}
+                  className="h-4 w-4 rounded border-navy-300 text-accent focus:ring-accent shrink-0" />
                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-navy-700 to-navy-900 flex items-center justify-center text-xs font-bold text-white shrink-0">
                   {l.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                 </div>

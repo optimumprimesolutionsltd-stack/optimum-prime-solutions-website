@@ -4,7 +4,7 @@ import { fbSet } from '../firebase/config';
 
 const WORKSHOP_DATE = 'Friday, 24th July 2026';
 const WORKSHOP_TIME = '7:00 AM (EAT)';
-const WORKSHOP_VENUE = 'Ruiru Rainbow Resort, Ruiru';
+const WORKSHOP_VENUE = 'Ndanga Hotel, Ruiru';
 const NOTIFIER_URL = 'https://optimum-prime-lead-notifier.onrender.com/new-lead';
 
 interface FormState {
@@ -74,8 +74,8 @@ export default function WorkshopPage() {
     <main className="min-h-screen bg-slate-900">
       <SEO
         title="Inventory Management Breakfast Workshop | Optimum Prime"
-        description="Join our free Inventory Management Breakfast Workshop on Fri 24th July 2026 at Ruiru Rainbow Resort, 7:00 AM."
-        socialDescription="Free breakfast workshop on inventory management — Optimum Prime Solutions, Ruiru Rainbow Resort."
+        description="Join our free Inventory Management Breakfast Workshop on Fri 24th July 2026 at Ndanga Hotel, 7:00 AM."
+        socialDescription="Free breakfast workshop on inventory management — Optimum Prime Solutions, Ndanga Hotel."
         canonical="/workshop-rsvp"
       />
 
