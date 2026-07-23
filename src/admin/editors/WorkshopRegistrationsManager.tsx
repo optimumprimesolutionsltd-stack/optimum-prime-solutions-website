@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, Trash2, Mail, Phone, Building2, Calendar, Download, Users as UsersIcon } from 'lucide-react';
+import { Search, Trash2, Mail, Phone, Building2, Calendar, Download, Users as UsersIcon, CheckCircle2, Circle } from 'lucide-react';
 import { fbSubscribe, fbSet } from '../../firebase/config';
 
 interface Registrant {
@@ -11,12 +11,15 @@ interface Registrant {
   message?: string;
   createdAt: string;
   status?: string;
+  attended?: boolean;
+  attendedAt?: string;
 }
 
 export default function WorkshopRegistrationsManager() {
   const [registrants, setRegistrants] = useState<Registrant[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState<'all' | 'attended' | 'pending'>('all');
 
   useEffect(() => {
     const unsubscribe = fbSubscribe('workshop_registrants', (raw: Record<string, any> | null) => {
@@ -30,16 +33,27 @@ export default function WorkshopRegistrationsManager() {
     return unsubscribe;
   }, []);
 
+  const attendedCount = useMemo(() => registrants.filter(r => r.attended).length, [registrants]);
+
   const filtered = useMemo(() => {
-    if (!search.trim()) return registrants;
+    let list = registrants;
+    if (filter === 'attended') list = list.filter(r => r.attended);
+    if (filter === 'pending') list = list.filter(r => !r.attended);
+    if (!search.trim()) return list;
     const q = search.toLowerCase();
-    return registrants.filter(r =>
+    return list.filter(r =>
       r.name.toLowerCase().includes(q)
       || r.email.toLowerCase().includes(q)
       || (r.company || '').toLowerCase().includes(q)
       || r.phone.includes(q)
     );
-  }, [registrants, search]);
+  }, [registrants, search, filter]);
+
+  const toggleAttendance = (r: Registrant) => {
+    const attended = !r.attended;
+    fbSet(`workshop_registrants/${r.id}/attended`, attended);
+    fbSet(`workshop_registrants/${r.id}/attendedAt`, attended ? new Date().toISOString() : null);
+  };
 
   const removeRegistrant = (id: string) => {
     if (confirm('Remove this registration permanently?')) {
@@ -48,8 +62,8 @@ export default function WorkshopRegistrationsManager() {
   };
 
   const exportCSV = () => {
-    const headers = ['Name', 'Email', 'Phone', 'Company', 'Registered At'];
-    const rows = registrants.map(r => [r.name, r.email, r.phone, r.company || '', r.createdAt]);
+    const headers = ['Name', 'Email', 'Phone', 'Company', 'Registered At', 'Attended', 'Checked In At'];
+    const rows = registrants.map(r => [r.name, r.email, r.phone, r.company || '', r.createdAt, r.attended ? 'Yes' : 'No', r.attendedAt || '']);
     const csv = [headers, ...rows].map(row => row.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -70,11 +84,30 @@ export default function WorkshopRegistrationsManager() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-3 gap-3">
         <div className="rounded-xl bg-navy-50 p-3 text-center">
           <p className="text-xl font-bold text-navy-700">{registrants.length}</p>
           <p className="text-[10px] font-medium text-navy-700">Total RSVPs</p>
         </div>
+        <div className="rounded-xl bg-green-50 p-3 text-center">
+          <p className="text-xl font-bold text-green-700">{attendedCount}</p>
+          <p className="text-[10px] font-medium text-green-700">Attended</p>
+        </div>
+        <div className="rounded-xl bg-amber-50 p-3 text-center">
+          <p className="text-xl font-bold text-amber-700">{registrants.length - attendedCount}</p>
+          <p className="text-[10px] font-medium text-amber-700">Not Arrived</p>
+        </div>
+      </div>
+
+      <div className="flex gap-2">
+        {([['all', 'All'], ['attended', 'Attended'], ['pending', 'Not Arrived']] as const).map(([key, label]) => (
+          <button key={key} onClick={() => setFilter(key)}
+            className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+              filter === key ? 'bg-navy-900 text-white' : 'bg-navy-50 text-navy-600 hover:bg-navy-100'
+            }`}>
+            {label}
+          </button>
+        ))}
       </div>
 
       <div className="relative">
@@ -103,13 +136,20 @@ export default function WorkshopRegistrationsManager() {
       ) : (
         <div className="space-y-3">
           {filtered.map(r => (
-            <div key={r.id} className="rounded-2xl border border-navy-200 bg-white p-4 space-y-2">
+            <div key={r.id} className={`rounded-2xl border p-4 space-y-2 ${r.attended ? 'border-green-300 bg-green-50/40' : 'border-navy-200 bg-white'}`}>
               <div className="flex items-center gap-4">
                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-teal-600 to-navy-900 flex items-center justify-center text-xs font-bold text-white shrink-0">
                   {r.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-navy-900 truncate">{r.name}</p>
+                  <p className="text-sm font-bold text-navy-900 truncate">
+                    {r.name}
+                    {r.attended && (
+                      <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700 align-middle">
+                        <CheckCircle2 className="h-3 w-3" /> Checked in
+                      </span>
+                    )}
+                  </p>
                   <p className="text-xs text-navy-500 truncate">{r.phone} · {r.company || 'No company'}</p>
                 </div>
                 <span className="text-[10px] text-navy-400 whitespace-nowrap">
@@ -131,7 +171,16 @@ export default function WorkshopRegistrationsManager() {
                   <Calendar className="h-3.5 w-3.5 text-navy-400 shrink-0" /><span className="truncate">Fri 24 Jul, 7:00 AM</span>
                 </div>
               </div>
-              <div className="pl-14 flex items-center gap-2 pt-1">
+              <div className="pl-14 flex items-center gap-2 pt-1 flex-wrap">
+                <button onClick={() => toggleAttendance(r)}
+                  className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                    r.attended
+                      ? 'bg-green-600 text-white hover:bg-green-700'
+                      : 'bg-navy-100 text-navy-700 hover:bg-navy-200'
+                  }`}>
+                  {r.attended ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Circle className="h-3.5 w-3.5" />}
+                  {r.attended ? 'Attended' : 'Mark Attended'}
+                </button>
                 {r.email && (
                   <a href={`mailto:${r.email}`}
                     className="rounded-lg bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-accent/20 transition">
