@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SEO from '../components/SEO';
-import { fbSet } from '../firebase/config';
+import { fbSet, fbSubscribe } from '../firebase/config';
+import {
+  DEFAULT_WORKSHOP, parseWorkshops, pickActiveWorkshop, type WorkshopEvent,
+} from '../data/workshopEvent';
 
-const WORKSHOP_DATE = 'Friday, 24th July 2026';
-const WORKSHOP_TIME = '7:00 AM (EAT)';
-const WORKSHOP_VENUE = 'Ndanga Hotel, Ruiru';
 const NOTIFIER_URL = 'https://optimum-prime-lead-notifier.onrender.com/new-lead';
 
 interface FormState {
@@ -19,6 +19,16 @@ export default function WorkshopPage() {
   const [errors, setErrors] = useState<Partial<FormState>>({});
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+
+  // Active workshop details come from Firebase (admin-editable); fall back to the
+  // built-in default so the page still renders before any event is configured.
+  const [workshop, setWorkshop] = useState<WorkshopEvent>(DEFAULT_WORKSHOP);
+  useEffect(() => {
+    const unsub = fbSubscribe('workshops', (raw: Record<string, any> | null) => {
+      setWorkshop(pickActiveWorkshop(parseWorkshops(raw)));
+    });
+    return unsub;
+  }, []);
 
   const validate = (): boolean => {
     const e: Partial<FormState> = {};
@@ -37,19 +47,20 @@ export default function WorkshopPage() {
       const id = `reg_${Date.now()}`;
       const confirmationMessage =
         `Hello ${form.name}! 🎉\n\n` +
-        `You're registered for our Inventory Management Breakfast Workshop!\n\n` +
-        `📅 *Date:* ${WORKSHOP_DATE}\n` +
-        `🕒 *Time:* ${WORKSHOP_TIME}\n` +
-        `📍 *Venue:* ${WORKSHOP_VENUE}\n\n` +
+        `You're registered for our ${workshop.title}!\n\n` +
+        `📅 *Date:* ${workshop.date}\n` +
+        `🕒 *Time:* ${workshop.time}\n` +
+        `📍 *Venue:* ${workshop.venue}\n\n` +
         `We look forward to seeing you there. Breakfast will be served — please arrive by 6:45 AM.\n\n` +
         `📞 *+254 116 246 074*\n` +
         `🌐 *www.optimumprimesolutions.co.ke*\n\n` +
         `_Optimum Prime Solutions — TallyPrime · Cloud · EOS® · Biz Analyst_`;
       const payload = {
         ...form,
-        interest: 'Workshop Registration — Inventory Management Breakfast Workshop',
+        eventId: workshop.id,
+        interest: `Workshop Registration — ${workshop.title}`,
         source: 'Workshop Registration Page',
-        message: `Registered for workshop on ${WORKSHOP_DATE} at ${WORKSHOP_TIME}, ${WORKSHOP_VENUE}`,
+        message: `Registered for ${workshop.title} on ${workshop.date} at ${workshop.time}, ${workshop.venue}`,
         confirmation_message: confirmationMessage,
         createdAt: new Date().toISOString(),
         status: 'registered',
@@ -94,15 +105,15 @@ export default function WorkshopPage() {
           <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-300 mb-2">
             <div className="flex items-center gap-2">
               <span className="text-teal-400 text-lg">📅</span>
-              <span><strong className="text-white">{WORKSHOP_DATE}</strong></span>
+              <span><strong className="text-white">{workshop.date}</strong></span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-teal-400 text-lg">🕒</span>
-              <span><strong className="text-white">{WORKSHOP_TIME}</strong></span>
+              <span><strong className="text-white">{workshop.time}</strong></span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-teal-400 text-lg">📍</span>
-              <span><strong className="text-white">{WORKSHOP_VENUE}</strong></span>
+              <span><strong className="text-white">{workshop.venue}</strong></span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-teal-400 text-lg">💰</span>
@@ -145,16 +156,18 @@ export default function WorkshopPage() {
               <div className="text-5xl mb-4">🎉</div>
               <h3 className="text-2xl font-bold text-white mb-2">You're All Set!</h3>
               <p className="text-slate-300 text-sm mb-4">
-                We've sent your confirmation to your WhatsApp. We look forward to seeing you on <strong className="text-teal-400">{WORKSHOP_DATE}</strong> at <strong className="text-teal-400">{WORKSHOP_VENUE}</strong>.
+                We've sent your confirmation to your WhatsApp. We look forward to seeing you on <strong className="text-teal-400">{workshop.date}</strong> at <strong className="text-teal-400">{workshop.venue}</strong>.
               </p>
-              <a
-                href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=Inventory+Management+Breakfast+Workshop&dates=20260724T040000Z/20260724T070000Z&details=Free+breakfast+workshop+by+Optimum+Prime+Solutions&location=${encodeURIComponent(WORKSHOP_VENUE)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-teal-500 hover:bg-teal-400 text-white font-semibold px-6 py-3 rounded-lg text-sm transition-colors"
-              >
-                🗓️ Save the Date on Google Calendar
-              </a>
+              {workshop.calendarStart && workshop.calendarEnd && (
+                <a
+                  href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(workshop.title)}&dates=${workshop.calendarStart}/${workshop.calendarEnd}&details=Free+breakfast+workshop+by+Optimum+Prime+Solutions&location=${encodeURIComponent(workshop.venue)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-teal-500 hover:bg-teal-400 text-white font-semibold px-6 py-3 rounded-lg text-sm transition-colors"
+                >
+                  🗓️ Save the Date on Google Calendar
+                </a>
+              )}
             </div>
           ) : (
             <>
