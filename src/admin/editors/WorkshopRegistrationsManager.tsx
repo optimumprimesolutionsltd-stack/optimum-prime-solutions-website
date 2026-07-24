@@ -24,6 +24,7 @@ interface Registrant {
   attendedAt?: string;
   workshopLeadId?: string; // set once this attendee is pushed into the follow-up pipeline
   eventId?: string;        // which workshop they registered for (legacy rows have none)
+  staff?: boolean;         // an internal team member, not a prospect
 }
 
 interface EventForm {
@@ -37,7 +38,7 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
   const [registrants, setRegistrants] = useState<Registrant[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState('');
-  const [filter, setFilter] = useState<'all' | 'attended' | 'pending'>('all');
+  const [filter, setFilter] = useState<'all' | 'attended' | 'pending' | 'staff'>('all');
 
   // ── Workshop events ────────────────────────────────────────────────────────
   const [events, setEvents] = useState<WorkshopEvent[]>([DEFAULT_WORKSHOP]);
@@ -90,10 +91,13 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
     [registrants, selectedEventId],
   );
 
-  const attendedCount = useMemo(() => eventRegistrants.filter(r => r.attended).length, [eventRegistrants]);
+  // Split staff (internal team) from genuine prospects — staff don't count.
+  const prospects = useMemo(() => eventRegistrants.filter(r => !r.staff), [eventRegistrants]);
+  const staffList = useMemo(() => eventRegistrants.filter(r => r.staff), [eventRegistrants]);
+  const attendedCount = useMemo(() => prospects.filter(r => r.attended).length, [prospects]);
 
   const filtered = useMemo(() => {
-    let list = eventRegistrants;
+    let list = filter === 'staff' ? staffList : prospects;
     if (filter === 'attended') list = list.filter(r => r.attended);
     if (filter === 'pending') list = list.filter(r => !r.attended);
     if (!search.trim()) return list;
@@ -104,7 +108,11 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
       || (r.company || '').toLowerCase().includes(q)
       || r.phone.includes(q)
     );
-  }, [eventRegistrants, search, filter]);
+  }, [prospects, staffList, search, filter]);
+
+  const setStaff = (r: Registrant, staff: boolean) => {
+    fbSet(`workshop_registrants/${r.id}/staff`, staff);
+  };
 
   const toggleAttendance = (r: Registrant) => {
     const attended = !r.attended;
@@ -216,8 +224,8 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
   };
 
   const exportCSV = () => {
-    const headers = ['Name', 'Email', 'Phone', 'Company', 'Registered At', 'Attended', 'Checked In At'];
-    const rows = eventRegistrants.map(r => [r.name, r.email, r.phone, r.company || '', r.createdAt, r.attended ? 'Yes' : 'No', r.attendedAt || '']);
+    const headers = ['Name', 'Email', 'Phone', 'Company', 'Type', 'Registered At', 'Attended', 'Checked In At'];
+    const rows = eventRegistrants.map(r => [r.name, r.email, r.phone, r.company || '', r.staff ? 'Staff' : 'Prospect', r.createdAt, r.attended ? 'Yes' : 'No', r.attendedAt || '']);
     const csv = [headers, ...rows].map(row => row.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -352,23 +360,27 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
         </div>
       )}
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="rounded-xl bg-navy-50 p-3 text-center">
-          <p className="text-xl font-bold text-navy-700">{eventRegistrants.length}</p>
-          <p className="text-[10px] font-medium text-navy-700">Total RSVPs</p>
+          <p className="text-xl font-bold text-navy-700">{prospects.length}</p>
+          <p className="text-[10px] font-medium text-navy-700">Prospect RSVPs</p>
         </div>
         <div className="rounded-xl bg-green-50 p-3 text-center">
           <p className="text-xl font-bold text-green-700">{attendedCount}</p>
           <p className="text-[10px] font-medium text-green-700">Attended</p>
         </div>
         <div className="rounded-xl bg-amber-50 p-3 text-center">
-          <p className="text-xl font-bold text-amber-700">{eventRegistrants.length - attendedCount}</p>
+          <p className="text-xl font-bold text-amber-700">{prospects.length - attendedCount}</p>
           <p className="text-[10px] font-medium text-amber-700">Not Arrived</p>
+        </div>
+        <div className="rounded-xl bg-slate-100 p-3 text-center">
+          <p className="text-xl font-bold text-slate-600">{staffList.length}</p>
+          <p className="text-[10px] font-medium text-slate-600">Staff</p>
         </div>
       </div>
 
-      <div className="flex gap-2">
-        {([['all', 'All'], ['attended', 'Attended'], ['pending', 'Not Arrived']] as const).map(([key, label]) => (
+      <div className="flex gap-2 flex-wrap">
+        {([['all', 'All'], ['attended', 'Attended'], ['pending', 'Not Arrived'], ['staff', 'Staff']] as const).map(([key, label]) => (
           <button key={key} onClick={() => setFilter(key)}
             className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
               filter === key ? 'bg-navy-900 text-white' : 'bg-navy-50 text-navy-600 hover:bg-navy-100'
@@ -412,6 +424,11 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-navy-900 truncate">
                     {r.name}
+                    {r.staff && (
+                      <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600 align-middle">
+                        Staff
+                      </span>
+                    )}
                     {r.attended && (
                       <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-semibold text-green-700 align-middle">
                         <CheckCircle2 className="h-3 w-3" /> Checked in
@@ -459,7 +476,17 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                   className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
                   <Phone className="h-3 w-3 inline mr-1" />WhatsApp
                 </a>
-                {isInPipeline(r) ? (
+                <select
+                  value={r.staff ? 'staff' : 'prospect'}
+                  onChange={e => setStaff(r, e.target.value === 'staff')}
+                  title="Is this attendee a prospect or your own staff? Staff are excluded from lead stats and exports."
+                  className="rounded-lg border border-navy-200 bg-white px-2 py-1.5 text-xs font-semibold text-navy-700 outline-none focus:border-accent cursor-pointer">
+                  <option value="prospect">Prospect</option>
+                  <option value="staff">Staff</option>
+                </select>
+                {r.staff ? (
+                  <span className="text-xs text-slate-400 italic">Internal — not a lead</span>
+                ) : isInPipeline(r) ? (
                   <span className="rounded-lg bg-navy-100 pl-3 pr-1.5 py-1 text-xs font-semibold text-navy-500 inline-flex items-center gap-1.5">
                     <CheckCircle2 className="h-3.5 w-3.5" />
                     In pipeline: {data.leads.find(l => l.workshopRegId === r.id)?.status || '—'}

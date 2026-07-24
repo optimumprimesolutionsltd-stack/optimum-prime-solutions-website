@@ -18,6 +18,7 @@ export interface WorkshopRegistrant {
   attended?: boolean;
   attendedAt?: string;
   workshopLeadId?: string; // set once converted into the follow-up pipeline
+  staff?: boolean;         // internal team member — excluded from prospect exports
 }
 
 const esc = (s: unknown) => String(s ?? '')
@@ -53,7 +54,7 @@ export function buildUnifiedCsv(leads: Lead[], registrants: WorkshopRegistrant[]
   // sees the full room, not just the ones already being worked.
   const convertedRegIds = new Set(leads.map(l => l.workshopRegId).filter(Boolean));
   const registrantRows = registrants
-    .filter(r => !convertedRegIds.has(r.id))
+    .filter(r => !convertedRegIds.has(r.id) && !r.staff)
     .map(r => [
       r.name, r.company || '', r.phone, r.email, '',
       'workshop',
@@ -80,7 +81,7 @@ export function buildCrmReportHtml(
   });
 
   const convertedRegIds = new Set(leads.map(l => l.workshopRegId).filter(Boolean));
-  const attendedTotal = registrants.filter(r => r.attended).length;
+  const attendedTotal = registrants.filter(r => r.attended && !r.staff).length;
   const workshopLeads = leads.filter(l => l.source === 'workshop').length;
   const won = leads.filter(l => l.status === 'Closed Won').length;
 
@@ -107,8 +108,8 @@ export function buildCrmReportHtml(
       </table>
     </section>`).join('');
 
-  // Workshop attendees still awaiting a follow-up decision.
-  const pendingReg = registrants.filter(r => !convertedRegIds.has(r.id));
+  // Workshop attendees still awaiting a follow-up decision (staff excluded).
+  const pendingReg = registrants.filter(r => !convertedRegIds.has(r.id) && !r.staff);
   const pendingSection = pendingReg.length === 0 ? '' : `
     <section class="stage">
       <h3><span class="dot" style="background:#94a3b8"></span>Workshop attendees — not yet in pipeline <span class="count">${pendingReg.length}</span></h3>
