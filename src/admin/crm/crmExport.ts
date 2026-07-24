@@ -81,9 +81,12 @@ export function buildCrmReportHtml(
   });
 
   const convertedRegIds = new Set(leads.map(l => l.workshopRegId).filter(Boolean));
-  const attendedTotal = registrants.filter(r => r.attended && !r.staff).length;
+  // Headcount of who was in the room — includes staff/employees who attended.
+  const attendedTotal = registrants.filter(r => r.attended).length;
   const workshopLeads = leads.filter(l => l.source === 'workshop').length;
   const won = leads.filter(l => l.status === 'Closed Won').length;
+  // Closed Lost only appears here when the export includes closed deals.
+  const lost = leads.filter(l => l.status === 'Closed Lost').length;
 
   // Group leads by pipeline stage in canonical order.
   const grouped = PIPELINE_ORDER
@@ -167,6 +170,7 @@ export function buildCrmReportHtml(
     <div class="kpi"><b>${attendedTotal}</b><span>Attended Breakfast</span></div>
     <div class="kpi"><b>${workshopLeads}</b><span>Workshop → Pipeline</span></div>
     <div class="kpi"><b>${won}</b><span>Closed Won</span></div>
+    ${lost > 0 ? `<div class="kpi"><b>${lost}</b><span>Closed Lost</span></div>` : ''}
   </div>
 
   ${stageSections || '<p style="color:#64748b">No leads in the pipeline yet.</p>'}
