@@ -1,8 +1,9 @@
 import { ArrowRight, ArrowUp, Calculator, FileCheck, Mail, MapPin, Package, Phone, Sparkles, Wallet } from 'lucide-react';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
-import { fbSet } from '../firebase/config';
+import { fbSet, fbSubscribe } from '../firebase/config';
+import { DEFAULT_WORKSHOP, parseWorkshops, pickActiveWorkshop, type WorkshopEvent } from '../data/workshopEvent';
 import { isValidEmail } from '../utils/validation';
 import Logo from './Logo';
 
@@ -31,9 +32,8 @@ const tallyPrimeLinks = [
   { l: 'Business Consulting (EOS®)', h: '/tallyprime/consulting' },
 ];
 
-const upcomingEvents = [
+const staticEvents = [
   { l: 'Free TallyPrime 7.1 Webinar', h: '/webinar', badge: 'Live — Wed 22 July' },
-  { l: 'Inventory Management Breakfast Workshop', h: '/workshop-rsvp', badge: 'Fri 24 July' },
 ];
 
 const coreServices = [
@@ -50,6 +50,19 @@ export default function Footer() {
   const [submitted, setSubmitted] = useState(false);
   const [subscribing, setSubscribing] = useState(false);
   const c = data.contact;
+
+  // Show the currently-active workshop in the footer's upcoming-events list.
+  const [workshop, setWorkshop] = useState<WorkshopEvent>(DEFAULT_WORKSHOP);
+  useEffect(() => {
+    const unsub = fbSubscribe('workshops', (raw: Record<string, any> | null) => {
+      setWorkshop(pickActiveWorkshop(parseWorkshops(raw)));
+    });
+    return unsub;
+  }, []);
+  const upcomingEvents = [
+    ...staticEvents,
+    { l: workshop.title, h: '/workshop-rsvp', badge: workshop.date },
+  ];
 
   const handleNewsletterSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();

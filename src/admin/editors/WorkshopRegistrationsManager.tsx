@@ -1,8 +1,15 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Search, Trash2, Mail, Phone, Building2, Calendar, Download, Users as UsersIcon, CheckCircle2, Circle, UserPlus, Undo2 } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  Search, Trash2, Mail, Phone, Building2, Calendar, Download, Users as UsersIcon,
+  CheckCircle2, Circle, UserPlus, Undo2, Plus, Pencil, X, Star,
+} from 'lucide-react';
 import { fbSubscribe, fbSet } from '../../firebase/config';
 import type { SiteData, Lead } from '../../data/siteData';
 import { PIPELINE_STAGES } from '../crm/pipeline';
+import {
+  DEFAULT_WORKSHOP, LEGACY_WORKSHOP_ID, parseWorkshops, pickActiveWorkshop,
+  regEventId, type WorkshopEvent,
+} from '../../data/workshopEvent';
 
 interface Registrant {
   id: string;
@@ -16,6 +23,12 @@ interface Registrant {
   attended?: boolean;
   attendedAt?: string;
   workshopLeadId?: string; // set once this attendee is pushed into the follow-up pipeline
+  eventId?: string;        // which workshop they registered for (legacy rows have none)
+}
+
+interface EventForm {
+  id: string; title: string; date: string; time: string; venue: string;
+  active: boolean; calendarStart: string; calendarEnd: string;
 }
 
 interface Props { data: SiteData; onSave: (d: SiteData) => void }
@@ -25,6 +38,37 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'attended' | 'pending'>('all');
+
+  // ── Workshop events ────────────────────────────────────────────────────────
+  const [events, setEvents] = useState<WorkshopEvent[]>([DEFAULT_WORKSHOP]);
+  const [selectedEventId, setSelectedEventId] = useState<string>(LEGACY_WORKSHOP_ID);
+  const [editing, setEditing] = useState<EventForm | null>(null);
+  const seededRef = useRef(false);
+
+  useEffect(() => {
+    const unsub = fbSubscribe('workshops', (raw: Record<string, any> | null) => {
+      const list = parseWorkshops(raw);
+      if (list.length === 0) {
+        // First run — seed the July workshop so existing RSVPs have a home.
+        setEvents([DEFAULT_WORKSHOP]);
+        if (!seededRef.current) {
+          seededRef.current = true;
+          const { id, ...rest } = DEFAULT_WORKSHOP;
+          fbSet(`workshops/${id}`, rest);
+        }
+      } else {
+        setEvents(list);
+      }
+    });
+    return unsub;
+  }, []);
+
+  // Keep the selected event valid; default to the active one.
+  useEffect(() => {
+    if (!events.some(e => e.id === selectedEventId)) {
+      setSelectedEventId(pickActiveWorkshop(events).id);
+    }
+  }, [events, selectedEventId]);
 
   useEffect(() => {
     const unsubscribe = fbSubscribe('workshop_registrants', (raw: Record<string, any> | null) => {
@@ -38,10 +82,18 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
     return unsubscribe;
   }, []);
 
-  const attendedCount = useMemo(() => registrants.filter(r => r.attended).length, [registrants]);
+  const selectedEvent = events.find(e => e.id === selectedEventId) || null;
+
+  // Registrants belonging to the selected workshop only.
+  const eventRegistrants = useMemo(
+    () => registrants.filter(r => regEventId(r) === selectedEventId),
+    [registrants, selectedEventId],
+  );
+
+  const attendedCount = useMemo(() => eventRegistrants.filter(r => r.attended).length, [eventRegistrants]);
 
   const filtered = useMemo(() => {
-    let list = registrants;
+    let list = eventRegistrants;
     if (filter === 'attended') list = list.filter(r => r.attended);
     if (filter === 'pending') list = list.filter(r => !r.attended);
     if (!search.trim()) return list;
@@ -52,7 +104,7 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
       || (r.company || '').toLowerCase().includes(q)
       || r.phone.includes(q)
     );
-  }, [registrants, search, filter]);
+  }, [eventRegistrants, search, filter]);
 
   const toggleAttendance = (r: Registrant) => {
     const attended = !r.attended;
@@ -66,17 +118,75 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
     }
   };
 
-  // A registrant is "in pipeline" if a lead still links back to it.
+  // ── Event editor ───────────────────────────────────────────────────────────
+  const openNewEvent = () => setEditing({
+    id: `ws_${Date.now()}`, title: 'Inventory Management Breakfast Workshop',
+    date: '', time: '7:00 AM (EAT)', venue: '', active: true, calendarStart: '', calendarEnd: '',
+  });
+  const openEditEvent = () => {
+    if (!selectedEvent) return;
+    setEditing({
+      id: selectedEvent.id, title: selectedEvent.title, date: selectedEvent.date,
+      time: selectedEvent.time, venue: selectedEvent.venue, active: !!selectedEvent.active,
+      calendarStart: selectedEvent.calendarStart || '', calendarEnd: selectedEvent.calendarEnd || '',
+    });
+  };
+  const setE = (f: keyof EventForm, v: string | boolean) =>
+    setEditing(prev => prev ? { ...prev, [f]: v } : prev);
+
+  const saveEvent = () => {
+    if (!editing) return;
+    if (!editing.title.trim() || !editing.date.trim() || !editing.venue.trim()) {
+      alert('Please fill in the title, date and venue.');
+      return;
+    }
+    const { id, active, calendarStart, calendarEnd, ...rest } = editing;
+    const existing = events.find(e => e.id === id);
+    const record: Omit<WorkshopEvent, 'id'> = {
+      ...rest,
+      active,
+      createdAt: existing?.createdAt || new Date().toISOString(),
+      ...(calendarStart.trim() ? { calendarStart: calendarStart.trim() } : {}),
+      ...(calendarEnd.trim() ? { calendarEnd: calendarEnd.trim() } : {}),
+    };
+    // Only one workshop can be active at a time.
+    if (active) {
+      events.filter(e => e.id !== id && e.active).forEach(e => fbSet(`workshops/${e.id}/active`, false));
+    }
+    fbSet(`workshops/${id}`, record);
+    setSelectedEventId(id);
+    setEditing(null);
+  };
+
+  const deleteEvent = () => {
+    if (!selectedEvent) return;
+    if (eventRegistrants.length > 0) {
+      alert(`This workshop has ${eventRegistrants.length} registration(s). Remove or reassign them before deleting the workshop.`);
+      return;
+    }
+    if (events.length <= 1) { alert('You need at least one workshop.'); return; }
+    if (!confirm(`Delete the workshop "${selectedEvent.title} — ${selectedEvent.date}"? It has no registrations.`)) return;
+    fbSet(`workshops/${selectedEvent.id}`, null);
+    setSelectedEventId(pickActiveWorkshop(events.filter(e => e.id !== selectedEvent.id)).id);
+  };
+
+  const makeActive = () => {
+    if (!selectedEvent || selectedEvent.active) return;
+    events.filter(e => e.active).forEach(e => fbSet(`workshops/${e.id}/active`, false));
+    fbSet(`workshops/${selectedEvent.id}/active`, true);
+  };
+
+  // ── Pipeline linking ───────────────────────────────────────────────────────
   const pipelineRegIds = useMemo(
     () => new Set(data.leads.map(l => l.workshopRegId).filter(Boolean) as string[]),
     [data.leads],
   );
   const isInPipeline = (r: Registrant) => pipelineRegIds.has(r.id);
 
-  // Create a follow-up lead from a workshop attendee, entering at the chosen stage.
   const addToPipeline = (r: Registrant, stage: string) => {
     if (isInPipeline(r) || !stage) return;
     const leadId = `wslead_${r.id}`;
+    const eventTitle = selectedEvent?.title || 'the workshop';
     const newLead: Lead = {
       id: leadId,
       name: r.name,
@@ -86,7 +196,7 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
       businessType: '',
       demoDate: '',
       currentSoftware: '',
-      message: r.message || `Attended Inventory Management Breakfast Workshop.`,
+      message: r.message || `Attended ${eventTitle}.`,
       createdAt: new Date().toISOString(),
       status: stage,
       source: 'workshop',
@@ -97,7 +207,6 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
     fbSet(`workshop_registrants/${r.id}/workshopLeadId`, leadId);
   };
 
-  // Undo an accidental add: remove the linked follow-up lead from the pipeline.
   const removeFromPipeline = (r: Registrant) => {
     const linked = data.leads.find(l => l.workshopRegId === r.id);
     const stageNote = linked ? ` (currently at "${linked.status}")` : '';
@@ -108,30 +217,144 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
 
   const exportCSV = () => {
     const headers = ['Name', 'Email', 'Phone', 'Company', 'Registered At', 'Attended', 'Checked In At'];
-    const rows = registrants.map(r => [r.name, r.email, r.phone, r.company || '', r.createdAt, r.attended ? 'Yes' : 'No', r.attendedAt || '']);
+    const rows = eventRegistrants.map(r => [r.name, r.email, r.phone, r.company || '', r.createdAt, r.attended ? 'Yes' : 'No', r.attendedAt || '']);
     const csv = [headers, ...rows].map(row => row.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'workshop-registrations.csv'; a.click();
+    const safe = (selectedEvent?.date || 'workshop').replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+    const a = document.createElement('a'); a.href = url; a.download = `workshop-${safe}.csv`; a.click();
     URL.revokeObjectURL(url);
   };
+
+  const cardDate = selectedEvent ? `${selectedEvent.date}${selectedEvent.time ? ` · ${selectedEvent.time}` : ''}` : '';
 
   return (
     <div className="mx-auto max-w-4xl space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-xl font-bold text-navy-900">Workshop RSVPs</h2>
-          <p className="text-sm text-navy-500 mt-0.5">Registrations from the Inventory Management Breakfast Workshop invite link</p>
+          <p className="text-sm text-navy-500 mt-0.5">Registrations per workshop — pick a workshop below</p>
         </div>
-        <button onClick={exportCSV} disabled={registrants.length === 0}
+        <button onClick={exportCSV} disabled={eventRegistrants.length === 0}
           className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
           <Download className="h-4 w-4" /> Export CSV
         </button>
       </div>
 
+      {/* ── Workshop selector ── */}
+      <div className="rounded-2xl border border-navy-200 bg-white p-4 space-y-3">
+        <div className="flex items-center gap-2 flex-wrap">
+          <label className="text-xs font-bold text-navy-500 uppercase tracking-wider">Workshop</label>
+          <select value={selectedEventId} onChange={e => setSelectedEventId(e.target.value)}
+            className="flex-1 min-w-[220px] rounded-lg border border-navy-200 bg-white px-3 py-2 text-sm font-medium text-navy-800 outline-none focus:border-accent">
+            {events.map(e => (
+              <option key={e.id} value={e.id}>
+                {e.title} — {e.date}{e.active ? '  (active)' : ''}
+              </option>
+            ))}
+          </select>
+          <button onClick={openEditEvent}
+            className="flex items-center gap-1.5 rounded-lg border border-navy-200 bg-white px-3 py-2 text-xs font-semibold text-navy-700 hover:bg-navy-50 transition">
+            <Pencil className="h-3.5 w-3.5" /> Edit details
+          </button>
+          <button onClick={openNewEvent}
+            className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-white hover:bg-accent/90 transition">
+            <Plus className="h-3.5 w-3.5" /> New workshop
+          </button>
+        </div>
+        {selectedEvent && (
+          <div className="flex items-center gap-3 flex-wrap text-xs text-navy-500">
+            <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{cardDate}</span>
+            <span className="inline-flex items-center gap-1"><Building2 className="h-3.5 w-3.5" />{selectedEvent.venue}</span>
+            {selectedEvent.active ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 font-semibold text-green-700">
+                <Star className="h-3 w-3" /> Live — open for RSVPs
+              </span>
+            ) : (
+              <button onClick={makeActive}
+                className="inline-flex items-center gap-1 rounded-full bg-navy-100 px-2 py-0.5 font-semibold text-navy-600 hover:bg-navy-200 transition">
+                <Star className="h-3 w-3" /> Make this the live workshop
+              </button>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ── Event editor ── */}
+      {editing && (
+        <div className="rounded-2xl border border-accent/30 bg-white shadow-lg p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="font-bold text-navy-900">
+              {events.some(e => e.id === editing.id) ? 'Edit workshop details' : 'New workshop'}
+            </h3>
+            <button onClick={() => setEditing(null)} className="rounded-lg p-1.5 hover:bg-navy-100 transition">
+              <X className="h-4 w-4 text-navy-500" />
+            </button>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-navy-600 mb-1">Title *</label>
+              <input value={editing.title} onChange={e => setE('title', e.target.value)}
+                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-navy-600 mb-1">Date * (as shown to visitors)</label>
+              <input value={editing.date} onChange={e => setE('date', e.target.value)}
+                placeholder="e.g. Friday, 30th October 2026"
+                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-navy-600 mb-1">Time</label>
+              <input value={editing.time} onChange={e => setE('time', e.target.value)}
+                placeholder="e.g. 7:00 AM (EAT)"
+                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-navy-600 mb-1">Venue *</label>
+              <input value={editing.venue} onChange={e => setE('venue', e.target.value)}
+                placeholder="e.g. Ndanga Hotel, Ruiru"
+                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-navy-600 mb-1">Calendar start (optional)</label>
+              <input value={editing.calendarStart} onChange={e => setE('calendarStart', e.target.value)}
+                placeholder="20261030T040000Z"
+                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-navy-600 mb-1">Calendar end (optional)</label>
+              <input value={editing.calendarEnd} onChange={e => setE('calendarEnd', e.target.value)}
+                placeholder="20261030T070000Z"
+                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+            </div>
+          </div>
+          <label className="flex items-center gap-2 text-sm text-navy-700 cursor-pointer">
+            <input type="checkbox" checked={editing.active} onChange={e => setE('active', e.target.checked)}
+              className="h-4 w-4 rounded border-navy-300 text-accent focus:ring-accent" />
+            Make this the live workshop shown on the public RSVP page
+          </label>
+          <div className="flex items-center gap-2">
+            <button onClick={saveEvent}
+              className="rounded-xl bg-accent px-4 py-2.5 text-sm font-bold text-white hover:bg-accent/90 transition">
+              Save workshop
+            </button>
+            <button onClick={() => setEditing(null)}
+              className="rounded-xl border border-navy-200 px-4 py-2.5 text-sm font-medium text-navy-600 hover:bg-navy-50 transition">
+              Cancel
+            </button>
+            {events.some(e => e.id === editing.id) && (
+              <button onClick={deleteEvent}
+                className="ml-auto rounded-xl px-3 py-2.5 text-sm font-semibold text-red-500 hover:bg-red-50 transition">
+                Delete workshop
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div className="grid grid-cols-3 gap-3">
         <div className="rounded-xl bg-navy-50 p-3 text-center">
-          <p className="text-xl font-bold text-navy-700">{registrants.length}</p>
+          <p className="text-xl font-bold text-navy-700">{eventRegistrants.length}</p>
           <p className="text-[10px] font-medium text-navy-700">Total RSVPs</p>
         </div>
         <div className="rounded-xl bg-green-50 p-3 text-center">
@@ -139,7 +362,7 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
           <p className="text-[10px] font-medium text-green-700">Attended</p>
         </div>
         <div className="rounded-xl bg-amber-50 p-3 text-center">
-          <p className="text-xl font-bold text-amber-700">{registrants.length - attendedCount}</p>
+          <p className="text-xl font-bold text-amber-700">{eventRegistrants.length - attendedCount}</p>
           <p className="text-[10px] font-medium text-amber-700">Not Arrived</p>
         </div>
       </div>
@@ -170,11 +393,11 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
         <div className="rounded-2xl border border-navy-200 bg-white py-16 text-center">
           <UsersIcon className="mx-auto h-10 w-10 text-navy-300" />
           <p className="mt-3 text-sm font-medium text-navy-500">
-            {registrants.length === 0 ? 'No registrations yet' : 'No registrations match your search'}
+            {eventRegistrants.length === 0 ? 'No registrations for this workshop yet' : 'No registrations match your search'}
           </p>
           <p className="mt-1 text-xs text-navy-400">
-            {registrants.length === 0
-              ? 'Share the invite link — signups will appear here.'
+            {eventRegistrants.length === 0
+              ? 'Make this workshop live and share the invite link — signups will appear here.'
               : 'Try a different search term.'}
           </p>
         </div>
@@ -213,7 +436,7 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                   <Building2 className="h-3.5 w-3.5 text-navy-400 shrink-0" /><span className="truncate">{r.company || '—'}</span>
                 </div>
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <Calendar className="h-3.5 w-3.5 text-navy-400 shrink-0" /><span className="truncate">Fri 24 Jul, 7:00 AM</span>
+                  <Calendar className="h-3.5 w-3.5 text-navy-400 shrink-0" /><span className="truncate">{cardDate}</span>
                 </div>
               </div>
               <div className="pl-14 flex items-center gap-2 pt-1 flex-wrap">
