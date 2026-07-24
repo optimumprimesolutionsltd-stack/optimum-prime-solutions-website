@@ -34,8 +34,9 @@ const fmtDate = (iso?: string) => {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
-// ── Unified CSV — leads plus any workshop attendees not yet in the pipeline ──
-export function buildUnifiedCsv(leads: Lead[], registrants: WorkshopRegistrant[]): string {
+// Shared tabular data — leads plus any workshop attendees not yet in the pipeline.
+// Used by both the CSV and Excel exports so the two stay identical.
+function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { headers: string[]; rows: string[][] } {
   const headers = [
     'Name', 'Company', 'Phone', 'Email', 'Industry',
     'Source', 'Attended Breakfast', 'Stage', 'Next Step',
@@ -63,9 +64,25 @@ export function buildUnifiedCsv(leads: Lead[], registrants: WorkshopRegistrant[]
       '', '', fmtDate(r.createdAt),
     ]);
 
-  return [headers, ...leadRows, ...registrantRows]
-    .map(row => row.map(csvCell).join(','))
-    .join('\n');
+  return { headers, rows: [...leadRows, ...registrantRows] };
+}
+
+// ── Unified CSV ─────────────────────────────────────────────────────────────
+export function buildUnifiedCsv(leads: Lead[], registrants: WorkshopRegistrant[]): string {
+  const { headers, rows } = unifiedRows(leads, registrants);
+  return [headers, ...rows].map(row => row.map(csvCell).join(',')).join('\n');
+}
+
+// ── Unified Excel (.xls via an HTML table Excel opens natively) ─────────────
+export function buildUnifiedXls(leads: Lead[], registrants: WorkshopRegistrant[]): string {
+  const { headers, rows } = unifiedRows(leads, registrants);
+  const thead = `<tr>${headers.map(h => `<th style="background:#1e3a5f;color:#fff;text-align:left">${esc(h)}</th>`).join('')}</tr>`;
+  const tbody = rows.map(r => `<tr>${r.map(c => `<td>${esc(c)}</td>`).join('')}</tr>`).join('');
+  return `<html xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="utf-8">
+<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet>
+<x:Name>CRM</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions>
+</x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->
+</head><body><table border="1">${thead}${tbody}</table></body></html>`;
 }
 
 // ── Shareable HTML report — a standalone, self-contained page ────────────────
@@ -167,6 +184,7 @@ export function buildCrmReportHtml(
 
   <div class="kpis">
     <div class="kpi"><b>${leads.length}</b><span>Total Leads</span></div>
+    <div class="kpi"><b>${registrants.length}</b><span>Workshop Registered</span></div>
     <div class="kpi"><b>${attendedTotal}</b><span>Attended Breakfast</span></div>
     <div class="kpi"><b>${workshopLeads}</b><span>Workshop → Pipeline</span></div>
     <div class="kpi"><b>${won}</b><span>Closed Won</span></div>
@@ -187,4 +205,15 @@ export function downloadFile(filename: string, contents: string, mime: string) {
   const a = document.createElement('a');
   a.href = url; a.download = filename; a.click();
   URL.revokeObjectURL(url);
+}
+
+// ── Open an HTML report in a new tab and trigger the print dialog ────────────
+// Lets the user "Save as PDF" without bundling a PDF library.
+export function printHtml(html: string) {
+  const w = window.open('', '_blank');
+  if (!w) { alert('Please allow pop-ups for this site to download the PDF.'); return; }
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400); // let the page render before printing
 }

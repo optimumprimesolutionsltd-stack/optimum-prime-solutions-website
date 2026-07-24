@@ -7,7 +7,7 @@ import {
 import type { SiteData, Lead } from '../../data/siteData';
 import { fbSubscribe } from '../../firebase/config';
 import {
-  buildCrmReportHtml, buildUnifiedCsv, downloadFile,
+  buildCrmReportHtml, buildUnifiedCsv, buildUnifiedXls, downloadFile, printHtml,
   type WorkshopRegistrant,
 } from '../crm/crmExport';
 import { PIPELINE_ORDER, stageColor, stageTint, defaultNextStep } from '../crm/pipeline';
@@ -166,12 +166,12 @@ export default function LeadsManager({ data, onSave }: P) {
     [registrants, exportFrom, exportTo],
   );
 
-  const exportCrmReport = () => {
-    const html = buildCrmReportHtml(exportLeads, exportRegistrants, { companyName, preparedFor: 'Tally Solutions' });
-    downloadFile('crm-status-report.html', html, 'text/html');
-  };
-  const exportUnifiedCsv = () => {
-    downloadFile('crm-unified-export.csv', buildUnifiedCsv(exportLeads, exportRegistrants), 'text/csv');
+  const reportHtml = () => buildCrmReportHtml(exportLeads, exportRegistrants, { companyName, preparedFor: 'Tally Solutions' });
+  const downloadReport = (format: string) => {
+    if (format === 'pdf') printHtml(reportHtml());
+    else if (format === 'excel') downloadFile('crm-report.xls', buildUnifiedXls(exportLeads, exportRegistrants), 'application/vnd.ms-excel');
+    else if (format === 'csv') downloadFile('crm-report.csv', buildUnifiedCsv(exportLeads, exportRegistrants), 'text/csv');
+    else if (format === 'html') downloadFile('crm-status-report.html', reportHtml(), 'text/html');
   };
 
   // Permanently remove all Closed Lost leads to declutter the pipeline.
@@ -625,13 +625,20 @@ export default function LeadsManager({ data, onSave }: P) {
           <p className="text-sm text-navy-500 mt-0.5">All demo requests — website and manually booked</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <button
-            onClick={exportCrmReport}
-            title="Download a shareable CRM status report (open in a browser, or print to PDF, to send to Tally Solutions)"
-            className="flex items-center gap-2 rounded-xl border border-navy-200 bg-white px-4 py-2.5 text-sm font-semibold text-navy-700 hover:bg-navy-50 transition"
-          >
-            <FileText className="h-4 w-4" /> CRM Report
-          </button>
+          <div className="flex items-center gap-1.5 rounded-xl border border-navy-200 bg-white px-3 py-2.5">
+            <FileText className="h-4 w-4 text-navy-500" />
+            <select
+              defaultValue=""
+              onChange={e => { const v = e.target.value; e.target.value = ''; if (v) downloadReport(v); }}
+              title="Download the CRM status report for Tally Solutions"
+              className="bg-transparent text-sm font-semibold text-navy-700 outline-none cursor-pointer">
+              <option value="" disabled>CRM Report…</option>
+              <option value="pdf">Download as PDF</option>
+              <option value="excel">Download as Excel</option>
+              <option value="csv">Download as CSV</option>
+              <option value="html">Download as Web page</option>
+            </select>
+          </div>
           <button
             onClick={() => { setShowBooking(true); setBookingError(''); setBooking(emptyBooking); }}
             className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
@@ -689,13 +696,9 @@ export default function LeadsManager({ data, onSave }: P) {
               className="w-full rounded-lg border border-navy-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
           </div>
           <button onClick={exportCSV} disabled={data.leads.length === 0}
+            title="Detailed leads-only spreadsheet (all lead columns)"
             className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
             <Download className="h-4 w-4" /> Leads CSV
-          </button>
-          <button onClick={exportUnifiedCsv}
-            title="Leads plus every workshop attendee, with stage & next-step columns"
-            className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition">
-            <Download className="h-4 w-4" /> Unified CSV
           </button>
         </div>
         {/* Export options: date range, closed-deal scope, cleanup */}
