@@ -416,7 +416,7 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
       ) : (
         <div className="space-y-3">
           {filtered.map(r => (
-            <div key={r.id} className={`rounded-2xl border p-4 space-y-2 ${r.attended ? 'border-green-300 bg-green-50/40' : 'border-navy-200 bg-white'}`}>
+            <div key={r.id} className={`rounded-2xl border p-4 space-y-2 ${r.staff ? 'border-slate-300 bg-slate-100' : r.attended ? 'border-green-300 bg-green-50/40' : 'border-navy-200 bg-white'}`}>
               <div className="flex items-center gap-4">
                 <div className="h-10 w-10 rounded-full bg-gradient-to-br from-teal-600 to-navy-900 flex items-center justify-center text-xs font-bold text-white shrink-0">
                   {r.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
@@ -440,11 +440,22 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                 <span className="text-[10px] text-navy-400 whitespace-nowrap">
                   {new Date(r.createdAt).toLocaleDateString()}
                 </span>
+                <select
+                  value={r.staff ? 'staff' : 'prospect'}
+                  onChange={e => setStaff(r, e.target.value === 'staff')}
+                  title="Is this attendee a prospect or your own staff? Staff are excluded from lead stats and exports."
+                  className={`rounded-lg border px-2 py-1.5 text-xs font-semibold outline-none cursor-pointer shrink-0 ${
+                    r.staff ? 'border-slate-400 bg-slate-200 text-slate-700' : 'border-navy-200 bg-white text-navy-700 focus:border-accent'
+                  }`}>
+                  <option value="prospect">Prospect</option>
+                  <option value="staff">Staff</option>
+                </select>
                 <button onClick={() => removeRegistrant(r.id)}
                   className="rounded-lg p-1.5 text-red-400 hover:bg-red-50 transition shrink-0">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
+              <div className={r.staff ? 'space-y-2 opacity-50 pointer-events-none select-none' : 'space-y-2'}>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pl-14 text-xs text-navy-600">
                 <div className="flex items-center gap-1.5 min-w-0">
                   <Mail className="h-3.5 w-3.5 text-navy-400 shrink-0" /><span className="truncate">{r.email || '—'}</span>
@@ -476,14 +487,6 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                   className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
                   <Phone className="h-3 w-3 inline mr-1" />WhatsApp
                 </a>
-                <select
-                  value={r.staff ? 'staff' : 'prospect'}
-                  onChange={e => setStaff(r, e.target.value === 'staff')}
-                  title="Is this attendee a prospect or your own staff? Staff are excluded from lead stats and exports."
-                  className="rounded-lg border border-navy-200 bg-white px-2 py-1.5 text-xs font-semibold text-navy-700 outline-none focus:border-accent cursor-pointer">
-                  <option value="prospect">Prospect</option>
-                  <option value="staff">Staff</option>
-                </select>
                 {r.staff ? (
                   <span className="text-xs text-slate-400 italic">Internal — not a lead</span>
                 ) : isInPipeline(r) ? (
@@ -510,6 +513,7 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                     </select>
                   </span>
                 )}
+              </div>
               </div>
             </div>
           ))}
