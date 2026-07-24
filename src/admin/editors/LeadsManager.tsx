@@ -1,10 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import {
   Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown,
   Download, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
-  User, Send, AlertCircle,
+  User, Send, AlertCircle, FileText,
 } from 'lucide-react';
 import type { SiteData, Lead } from '../../data/siteData';
+import { fbSubscribe } from '../../firebase/config';
+import {
+  buildCrmReportHtml, buildUnifiedCsv, downloadFile,
+  type WorkshopRegistrant,
+} from '../crm/crmExport';
 
 interface P { data: SiteData; onSave: (d: SiteData) => void }
 
@@ -90,6 +95,7 @@ const statusColors: Record<string, string> = {
   'Contacted':      '',
   'Qualified':      '',
   'Demo Scheduled': '',
+  'Demo Done':      '',
   'Closed Won':     '',
   'Closed Lost':    '',
 };
@@ -98,6 +104,7 @@ const statusBadgeStyle: Record<string, React.CSSProperties> = {
   'Contacted':      { backgroundColor: '#3b82f6', color: '#fff' },
   'Qualified':      { backgroundColor: '#8b5cf6', color: '#fff' },
   'Demo Scheduled': { backgroundColor: '#f59e0b', color: '#fff' },
+  'Demo Done':      { backgroundColor: '#0ea5e9', color: '#fff' },
   'Closed Won':     { backgroundColor: '#16a34a', color: '#fff' },
   'Closed Lost':    { backgroundColor: '#64748b', color: '#fff' },
 };
@@ -138,6 +145,28 @@ export default function LeadsManager({ data, onSave }: P) {
   const [search, setSearch]           = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
+
+  // Workshop attendees — pulled in for the unified CRM report / export
+  const [registrants, setRegistrants] = useState<WorkshopRegistrant[]>([]);
+  useEffect(() => {
+    const unsub = fbSubscribe('workshop_registrants', (raw: Record<string, any> | null) => {
+      setRegistrants(raw ? Object.entries(raw).map(([id, v]) => ({ id, ...(v as object) }) as WorkshopRegistrant) : []);
+    });
+    return unsub;
+  }, []);
+
+  const companyName = data.company?.name || 'Optimum Prime Solutions';
+
+  const exportCrmReport = () => {
+    const html = buildCrmReportHtml(data.leads, registrants, { companyName, preparedFor: 'Tally Solutions' });
+    downloadFile('crm-status-report.html', html, 'text/html');
+  };
+  const exportUnifiedCsv = () => {
+    downloadFile('crm-unified-export.csv', buildUnifiedCsv(data.leads, registrants), 'text/csv');
+  };
+  const setNextStep = (id: string, nextStep: string) => {
+    onSave({ ...data, leads: data.leads.map(l => l.id === id ? { ...l, nextStep } : l) });
+  };
 
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -286,12 +315,14 @@ export default function LeadsManager({ data, onSave }: P) {
   const exportCSV = () => {
     const headers = ['Name', 'Email', 'Phone', 'Company', 'Industry', 'Business Type',
       'Demo Date (Requested)', 'Scheduled Date', 'Scheduled Time', 'Demo Type',
-      'Location', 'Team Member', 'Current Software', 'Message', 'Status', 'Source', 'Date Submitted'];
+      'Location', 'Team Member', 'Current Software', 'Message', 'Status', 'Next Step',
+      'Source', 'Attended Breakfast', 'Date Submitted'];
     const rows = data.leads.map(l => [
       l.name, l.email, l.phone, l.company, l.industry || l.businessType, l.businessType,
       l.demoDate, l.scheduledDate || '', l.scheduledTime || '', l.demoType || '',
       l.demoLocation || '', l.teamMemberName || '', l.currentSoftware, l.message,
-      l.status, l.source || 'website', l.createdAt,
+      l.status, l.nextStep || '', l.source || 'website',
+      l.attendedWorkshop ? 'Yes' : (l.source === 'workshop' ? 'No' : ''), l.createdAt,
     ]);
     const csv = [headers, ...rows].map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -577,13 +608,22 @@ export default function LeadsManager({ data, onSave }: P) {
           <h2 className="text-xl font-bold text-navy-900">Demo Leads</h2>
           <p className="text-sm text-navy-500 mt-0.5">All demo requests — website and manually booked</p>
         </div>
-        <button
-          onClick={() => { setShowBooking(true); setBookingError(''); setBooking(emptyBooking); }}
-          className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
-          style={{ backgroundColor: '#e53e3e' }}
-        >
-          <Plus className="h-4 w-4" /> Book New Demo
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            onClick={exportCrmReport}
+            title="Download a shareable CRM status report (open in a browser, or print to PDF, to send to Tally Solutions)"
+            className="flex items-center gap-2 rounded-xl border border-navy-200 bg-white px-4 py-2.5 text-sm font-semibold text-navy-700 hover:bg-navy-50 transition"
+          >
+            <FileText className="h-4 w-4" /> CRM Report
+          </button>
+          <button
+            onClick={() => { setShowBooking(true); setBookingError(''); setBooking(emptyBooking); }}
+            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
+            style={{ backgroundColor: '#e53e3e' }}
+          >
+            <Plus className="h-4 w-4" /> Book New Demo
+          </button>
+        </div>
       </div>
 
       {/* ── Success banner ── */}
@@ -634,7 +674,12 @@ export default function LeadsManager({ data, onSave }: P) {
           </div>
           <button onClick={exportCSV} disabled={data.leads.length === 0}
             className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
-            <Download className="h-4 w-4" /> Export CSV
+            <Download className="h-4 w-4" /> Leads CSV
+          </button>
+          <button onClick={exportUnifiedCsv}
+            title="Leads plus every workshop attendee, with stage & next-step columns"
+            className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition">
+            <Download className="h-4 w-4" /> Unified CSV
           </button>
         </div>
         {/* Status filter tabs */}
@@ -648,17 +693,18 @@ export default function LeadsManager({ data, onSave }: P) {
               'Contacted':      { bg: '#3b82f6', text: '#fff',    border: '#3b82f6', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
               'Qualified':      { bg: '#8b5cf6', text: '#fff',    border: '#8b5cf6', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
               'Demo Scheduled': { bg: '#f59e0b', text: '#fff',    border: '#f59e0b', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
+              'Demo Done':      { bg: '#0ea5e9', text: '#fff',    border: '#0ea5e9', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
               'Closed Won':     { bg: '#16a34a', text: '#fff',    border: '#16a34a', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
               'Closed Lost':    { bg: '#64748b', text: '#fff',    border: '#64748b', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
             };
             const inactiveBg: Record<string, string> = {
               'All': '#f1f5f9', 'New': '#fef2f2', 'Contacted': '#eff6ff',
-              'Qualified': '#f5f3ff', 'Demo Scheduled': '#fffbeb',
+              'Qualified': '#f5f3ff', 'Demo Scheduled': '#fffbeb', 'Demo Done': '#f0f9ff',
               'Closed Won': '#f0fdf4', 'Closed Lost': '#f8fafc',
             };
             const inactiveText: Record<string, string> = {
               'All': '#475569', 'New': '#dc2626', 'Contacted': '#2563eb',
-              'Qualified': '#7c3aed', 'Demo Scheduled': '#b45309',
+              'Qualified': '#7c3aed', 'Demo Scheduled': '#b45309', 'Demo Done': '#0369a1',
               'Closed Won': '#15803d', 'Closed Lost': '#475569',
             };
             const isActive = filterStatus === s;
@@ -922,6 +968,12 @@ export default function LeadsManager({ data, onSave }: P) {
                     {l.source === 'manual' && (
                       <span className="rounded-full bg-navy-100 px-2 py-0.5 text-[9px] font-semibold text-navy-500">MANUAL</span>
                     )}
+                    {l.source === 'workshop' && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-semibold text-amber-700"
+                        title={l.attendedWorkshop ? 'Attended the breakfast workshop' : 'Registered for workshop — did not attend'}>
+                        🥐 WORKSHOP{l.attendedWorkshop ? ' ✓' : ''}
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-navy-500 truncate">{l.phone} · {l.company || 'No company'}</p>
                 </div>
@@ -1048,6 +1100,16 @@ export default function LeadsManager({ data, onSave }: P) {
                       )}
                     </div>
                   )}
+
+                  {/* Next step — drives the CRM report's "next steps" column */}
+                  <div>
+                    <label className="text-[10px] text-navy-500 font-medium mb-1 block">Next Step (shown in CRM report)</label>
+                    <input
+                      value={l.nextStep || ''}
+                      onChange={e => setNextStep(l.id, e.target.value)}
+                      placeholder="e.g. Send quote, schedule follow-up call, share proposal…"
+                      className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                  </div>
 
                   {/* Status + actions */}
                   <div className="flex items-center justify-between border-t border-navy-100 pt-4 flex-wrap gap-3">

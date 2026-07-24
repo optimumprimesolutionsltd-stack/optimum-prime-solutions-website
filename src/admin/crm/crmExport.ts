@@ -1,0 +1,209 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// CRM export helpers — builds a shareable HTML status report and a unified CSV
+// combining Demo Leads (siteData) with Workshop Breakfast attendees (Firebase).
+// Both outputs are pure functions returning strings, so they are easy to test
+// and are triggered from the admin panel as file downloads.
+// ─────────────────────────────────────────────────────────────────────────────
+import type { Lead } from '../../data/siteData';
+
+export interface WorkshopRegistrant {
+  id: string;
+  name: string;
+  company?: string;
+  phone: string;
+  email: string;
+  message?: string;
+  createdAt: string;
+  attended?: boolean;
+  attendedAt?: string;
+  workshopLeadId?: string; // set once converted into the follow-up pipeline
+}
+
+// Pipeline order used for grouping the report (matches LeadsManager statuses).
+export const PIPELINE_ORDER = [
+  'New', 'Contacted', 'Qualified', 'Demo Scheduled', 'Demo Done', 'Closed Won', 'Closed Lost',
+];
+
+const esc = (s: unknown) => String(s ?? '')
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;');
+
+const csvCell = (s: unknown) => `"${String(s ?? '').replace(/"/g, '""')}"`;
+
+const fmtDate = (iso?: string) => {
+  if (!iso) return '';
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
+
+// Suggests a sensible next step when the user hasn't written one in.
+function defaultNextStep(status: string): string {
+  switch (status) {
+    case 'New':            return 'Make first contact call';
+    case 'Contacted':      return 'Qualify need & budget';
+    case 'Qualified':      return 'Schedule product demo';
+    case 'Demo Scheduled': return 'Run the scheduled demo';
+    case 'Demo Done':      return 'Send proposal / follow up';
+    case 'Closed Won':     return 'Begin onboarding';
+    case 'Closed Lost':    return '—';
+    default:               return 'Follow up';
+  }
+}
+
+// ── Unified CSV — leads plus any workshop attendees not yet in the pipeline ──
+export function buildUnifiedCsv(leads: Lead[], registrants: WorkshopRegistrant[]): string {
+  const headers = [
+    'Name', 'Company', 'Phone', 'Email', 'Industry',
+    'Source', 'Attended Breakfast', 'Stage', 'Next Step',
+    'Scheduled Date', 'Scheduled Time', 'Date Added',
+  ];
+
+  const leadRows = leads.map(l => [
+    l.name, l.company, l.phone, l.email, l.industry || l.businessType || '',
+    l.source || 'website',
+    l.attendedWorkshop ? 'Yes' : (l.source === 'workshop' ? 'No' : ''),
+    l.status, l.nextStep || defaultNextStep(l.status),
+    l.scheduledDate || '', l.scheduledTime || '', fmtDate(l.createdAt),
+  ]);
+
+  // Workshop registrants who were NOT converted into a lead — so Tally Solutions
+  // sees the full room, not just the ones already being worked.
+  const convertedRegIds = new Set(leads.map(l => l.workshopRegId).filter(Boolean));
+  const registrantRows = registrants
+    .filter(r => !convertedRegIds.has(r.id))
+    .map(r => [
+      r.name, r.company || '', r.phone, r.email, '',
+      'workshop',
+      r.attended ? 'Yes' : 'No',
+      'Not in pipeline', 'Add to follow-up if qualified',
+      '', '', fmtDate(r.createdAt),
+    ]);
+
+  return [headers, ...leadRows, ...registrantRows]
+    .map(row => row.map(csvCell).join(','))
+    .join('\n');
+}
+
+// ── Shareable HTML report — a standalone, self-contained page ────────────────
+export function buildCrmReportHtml(
+  leads: Lead[],
+  registrants: WorkshopRegistrant[],
+  opts?: { companyName?: string; preparedFor?: string },
+): string {
+  const companyName = opts?.companyName || 'Optimum Prime Solutions';
+  const preparedFor = opts?.preparedFor || 'Tally Solutions';
+  const generated = new Date().toLocaleString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
+  });
+
+  const convertedRegIds = new Set(leads.map(l => l.workshopRegId).filter(Boolean));
+  const attendedTotal = registrants.filter(r => r.attended).length;
+  const workshopLeads = leads.filter(l => l.source === 'workshop').length;
+  const won = leads.filter(l => l.status === 'Closed Won').length;
+
+  const statusColor: Record<string, string> = {
+    'New': '#ef4444', 'Contacted': '#3b82f6', 'Qualified': '#8b5cf6',
+    'Demo Scheduled': '#f59e0b', 'Demo Done': '#0ea5e9',
+    'Closed Won': '#16a34a', 'Closed Lost': '#64748b',
+  };
+
+  // Group leads by pipeline stage in canonical order.
+  const grouped = PIPELINE_ORDER
+    .map(stage => ({ stage, items: leads.filter(l => l.status === stage) }))
+    .filter(g => g.items.length > 0);
+
+  const stageSections = grouped.map(g => `
+    <section class="stage">
+      <h3><span class="dot" style="background:${statusColor[g.stage] || '#94a3b8'}"></span>${esc(g.stage)} <span class="count">${g.items.length}</span></h3>
+      <table>
+        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Next Step</th></tr></thead>
+        <tbody>
+          ${g.items.map(l => `
+            <tr>
+              <td><strong>${esc(l.name)}</strong>${l.source === 'workshop' ? ' <span class="tag">🥐 workshop</span>' : ''}</td>
+              <td>${esc(l.company || '—')}</td>
+              <td>${esc(l.phone || '—')}</td>
+              <td>${l.attendedWorkshop ? '✅' : (l.source === 'workshop' ? '—' : '')}</td>
+              <td>${esc(l.nextStep || defaultNextStep(l.status))}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </section>`).join('');
+
+  // Workshop attendees still awaiting a follow-up decision.
+  const pendingReg = registrants.filter(r => !convertedRegIds.has(r.id));
+  const pendingSection = pendingReg.length === 0 ? '' : `
+    <section class="stage">
+      <h3><span class="dot" style="background:#94a3b8"></span>Workshop attendees — not yet in pipeline <span class="count">${pendingReg.length}</span></h3>
+      <table>
+        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Registered</th></tr></thead>
+        <tbody>
+          ${pendingReg.map(r => `
+            <tr>
+              <td><strong>${esc(r.name)}</strong></td>
+              <td>${esc(r.company || '—')}</td>
+              <td>${esc(r.phone || '—')}</td>
+              <td>${r.attended ? '✅' : '—'}</td>
+              <td>${esc(fmtDate(r.createdAt))}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </section>`;
+
+  return `<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CRM Status Report — ${esc(companyName)}</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; margin: 0; background: #f8fafc; }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 32px 20px 60px; }
+  header.rpt { border-bottom: 3px solid #1e3a5f; padding-bottom: 16px; margin-bottom: 24px; }
+  header.rpt h1 { margin: 0 0 4px; font-size: 22px; color: #1e3a5f; }
+  header.rpt p { margin: 2px 0; font-size: 13px; color: #64748b; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 12px; margin-bottom: 28px; }
+  .kpi { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; text-align: center; }
+  .kpi b { display: block; font-size: 24px; color: #1e3a5f; }
+  .kpi span { font-size: 11px; color: #64748b; text-transform: uppercase; letter-spacing: .04em; }
+  .stage { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px 18px; margin-bottom: 18px; }
+  .stage h3 { margin: 0 0 12px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .count { background: #f1f5f9; color: #475569; border-radius: 999px; padding: 1px 9px; font-size: 12px; font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; color: #94a3b8; font-weight: 600; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; padding: 6px 8px; border-bottom: 1px solid #e2e8f0; }
+  td { padding: 8px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+  .tag { font-size: 10px; background: #fef3c7; color: #92400e; border-radius: 6px; padding: 1px 6px; font-weight: 600; }
+  footer { margin-top: 30px; font-size: 11px; color: #94a3b8; text-align: center; }
+  @media print { body { background: #fff; } .stage, .kpi { break-inside: avoid; } }
+</style></head>
+<body><div class="wrap">
+  <header class="rpt">
+    <h1>CRM Status Report</h1>
+    <p><strong>${esc(companyName)}</strong> — sales pipeline &amp; workshop follow-up</p>
+    <p>Prepared for: ${esc(preparedFor)}</p>
+    <p>Generated: ${esc(generated)}</p>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><b>${leads.length}</b><span>Total Leads</span></div>
+    <div class="kpi"><b>${attendedTotal}</b><span>Attended Breakfast</span></div>
+    <div class="kpi"><b>${workshopLeads}</b><span>Workshop → Pipeline</span></div>
+    <div class="kpi"><b>${won}</b><span>Closed Won</span></div>
+  </div>
+
+  ${stageSections || '<p style="color:#64748b">No leads in the pipeline yet.</p>'}
+  ${pendingSection}
+
+  <footer>Confidential — generated by ${esc(companyName)} admin panel. Figures reflect data at time of export.</footer>
+</div></body></html>`;
+}
+
+// ── Trigger a browser download for a string payload ─────────────────────────
+export function downloadFile(filename: string, contents: string, mime: string) {
+  const blob = new Blob([contents], { type: mime });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename; a.click();
+  URL.revokeObjectURL(url);
+}

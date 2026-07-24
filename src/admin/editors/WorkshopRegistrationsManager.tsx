@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, Trash2, Mail, Phone, Building2, Calendar, Download, Users as UsersIcon, CheckCircle2, Circle } from 'lucide-react';
+import { Search, Trash2, Mail, Phone, Building2, Calendar, Download, Users as UsersIcon, CheckCircle2, Circle, UserPlus } from 'lucide-react';
 import { fbSubscribe, fbSet } from '../../firebase/config';
+import type { SiteData, Lead } from '../../data/siteData';
 
 interface Registrant {
   id: string;
@@ -13,9 +14,12 @@ interface Registrant {
   status?: string;
   attended?: boolean;
   attendedAt?: string;
+  workshopLeadId?: string; // set once this attendee is pushed into the follow-up pipeline
 }
 
-export default function WorkshopRegistrationsManager() {
+interface Props { data: SiteData; onSave: (d: SiteData) => void }
+
+export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
   const [registrants, setRegistrants] = useState<Registrant[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState('');
@@ -59,6 +63,38 @@ export default function WorkshopRegistrationsManager() {
     if (confirm('Remove this registration permanently?')) {
       fbSet(`workshop_registrants/${id}`, null);
     }
+  };
+
+  // A registrant is "in pipeline" if a lead still links back to it.
+  const pipelineRegIds = useMemo(
+    () => new Set(data.leads.map(l => l.workshopRegId).filter(Boolean) as string[]),
+    [data.leads],
+  );
+  const isInPipeline = (r: Registrant) => pipelineRegIds.has(r.id);
+
+  // One-click: create a follow-up lead from a workshop attendee.
+  const addToPipeline = (r: Registrant) => {
+    if (isInPipeline(r)) return;
+    const leadId = `wslead_${r.id}`;
+    const newLead: Lead = {
+      id: leadId,
+      name: r.name,
+      company: r.company || '',
+      phone: r.phone,
+      email: r.email || '',
+      businessType: '',
+      demoDate: '',
+      currentSoftware: '',
+      message: r.message || `Attended Inventory Management Breakfast Workshop.`,
+      createdAt: new Date().toISOString(),
+      status: 'Contacted',
+      source: 'workshop',
+      attendedWorkshop: !!r.attended,
+      workshopRegId: r.id,
+      nextStep: r.attended ? 'Qualify need & schedule demo' : 'Follow up — registered but did not attend',
+    };
+    onSave({ ...data, leads: [newLead, ...data.leads] });
+    fbSet(`workshop_registrants/${r.id}/workshopLeadId`, leadId);
   };
 
   const exportCSV = () => {
@@ -191,6 +227,16 @@ export default function WorkshopRegistrationsManager() {
                   className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
                   <Phone className="h-3 w-3 inline mr-1" />WhatsApp
                 </a>
+                {isInPipeline(r) ? (
+                  <span className="rounded-lg bg-navy-100 px-3 py-1.5 text-xs font-semibold text-navy-500 inline-flex items-center gap-1">
+                    <CheckCircle2 className="h-3.5 w-3.5" /> In follow-up pipeline
+                  </span>
+                ) : (
+                  <button onClick={() => addToPipeline(r)}
+                    className="rounded-lg bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-accent/20 transition inline-flex items-center gap-1">
+                    <UserPlus className="h-3.5 w-3.5" /> Add to Follow-up
+                  </button>
+                )}
               </div>
             </div>
           ))}

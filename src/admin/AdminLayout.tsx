@@ -77,7 +77,7 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'industries': return <IndustriesEditor data={data} onSave={d => handleSave(d, 'Industries saved!')} />;
       case 'faqs': return <FaqEditor data={data} onSave={d => handleSave(d, 'FAQs saved!')} />;
       case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')} />;
-      case 'workshop': return <WorkshopRegistrationsManager />;
+      case 'workshop': return <WorkshopRegistrationsManager data={data} onSave={d => handleSave(d, 'Workshop updated!')} />;
       case 'whatsapp': return <WhatsAppManager />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
       case 'subscribers': return <SubscribersManager />;

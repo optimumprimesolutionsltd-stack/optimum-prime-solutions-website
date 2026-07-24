@@ -19,9 +19,13 @@ export interface Lead {
   demoType?: 'online' | 'physical'; demoLocation?: string;
   teamMemberName?: string; teamMemberPhone?: string;
   meetLink?: string; meetSent?: boolean;
-  source?: 'website' | 'manual'; // where the lead came from
+  source?: 'website' | 'manual' | 'workshop'; // where the lead came from
   industry?: string; demoNotes?: string;
   requestType?: 'demo' | 'consultation' | 'bizanalyst'; // demo, consultation, or biz analyst enquiry
+  // CRM follow-up fields
+  nextStep?: string;              // free-text next action, shown in CRM report
+  attendedWorkshop?: boolean;     // true if this lead came from a breakfast-workshop attendee
+  workshopRegId?: string;         // links back to the workshop_registrants entry
 }
 export interface ContactInfo { location:string; phones:string[]; emails:string[]; workingHours:string[]; whatsapp:string; mapUrl:string }
 export interface CompanyInfo { name:string; tagline:string; mission:string; vision:string; about:string[]; stats:{label:string;value:string}[] }
