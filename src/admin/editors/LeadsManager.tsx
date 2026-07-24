@@ -142,12 +142,46 @@ export default function LeadsManager({ data, onSave }: P) {
 
   const companyName = data.company?.name || 'Optimum Prime Solutions';
 
+  // ── Export controls: date range + whether to include closed deals ──────────
+  const [exportFrom, setExportFrom]   = useState('');
+  const [exportTo, setExportTo]       = useState('');
+  const [includeClosed, setIncludeClosed] = useState(false);
+
+  const inDateRange = (iso: string) => {
+    const t = new Date(iso).getTime();
+    if (exportFrom && t < new Date(exportFrom + 'T00:00:00').getTime()) return false;
+    if (exportTo && t > new Date(exportTo + 'T23:59:59').getTime()) return false;
+    return true;
+  };
+
+  // Leads to export: open pipeline by default (New → Demo Done), optionally
+  // including Closed Won/Lost, and within the selected date range.
+  const exportLeads = useMemo(() => data.leads.filter(l => {
+    if (!includeClosed && (l.status === 'Closed Won' || l.status === 'Closed Lost')) return false;
+    return inDateRange(l.createdAt);
+  }), [data.leads, includeClosed, exportFrom, exportTo]);
+
+  const exportRegistrants = useMemo(
+    () => registrants.filter(r => inDateRange(r.createdAt)),
+    [registrants, exportFrom, exportTo],
+  );
+
   const exportCrmReport = () => {
-    const html = buildCrmReportHtml(data.leads, registrants, { companyName, preparedFor: 'Tally Solutions' });
+    const html = buildCrmReportHtml(exportLeads, exportRegistrants, { companyName, preparedFor: 'Tally Solutions' });
     downloadFile('crm-status-report.html', html, 'text/html');
   };
   const exportUnifiedCsv = () => {
-    downloadFile('crm-unified-export.csv', buildUnifiedCsv(data.leads, registrants), 'text/csv');
+    downloadFile('crm-unified-export.csv', buildUnifiedCsv(exportLeads, exportRegistrants), 'text/csv');
+  };
+
+  // Permanently remove all Closed Lost leads to declutter the pipeline.
+  const closedLostCount = useMemo(() => data.leads.filter(l => l.status === 'Closed Lost').length, [data.leads]);
+  const deleteClosedLost = () => {
+    if (closedLostCount === 0) return;
+    if (confirm(`Permanently delete all ${closedLostCount} "Closed Lost" lead(s)? This cannot be undone.`)) {
+      onSave({ ...data, leads: data.leads.filter(l => l.status !== 'Closed Lost') });
+      setSelectedIds(new Set());
+    }
   };
 
   // Bulk selection
@@ -299,7 +333,7 @@ export default function LeadsManager({ data, onSave }: P) {
       'Demo Date (Requested)', 'Scheduled Date', 'Scheduled Time', 'Demo Type',
       'Location', 'Team Member', 'Current Software', 'Message', 'Status', 'Next Step',
       'Source', 'Attended Breakfast', 'Date Submitted'];
-    const rows = data.leads.map(l => [
+    const rows = exportLeads.map(l => [
       l.name, l.email, l.phone, l.company, l.industry || l.businessType, l.businessType,
       l.demoDate, l.scheduledDate || '', l.scheduledTime || '', l.demoType || '',
       l.demoLocation || '', l.teamMemberName || '', l.currentSoftware, l.message,
@@ -663,6 +697,36 @@ export default function LeadsManager({ data, onSave }: P) {
             className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition">
             <Download className="h-4 w-4" /> Unified CSV
           </button>
+        </div>
+        {/* Export options: date range, closed-deal scope, cleanup */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-navy-100 bg-navy-50/50 px-3 py-2.5 text-xs">
+          <span className="font-semibold text-navy-500">Export scope:</span>
+          <label className="flex items-center gap-1.5 text-navy-600">
+            From
+            <input type="date" value={exportFrom} onChange={e => setExportFrom(e.target.value)}
+              className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs outline-none focus:border-accent" />
+          </label>
+          <label className="flex items-center gap-1.5 text-navy-600">
+            To
+            <input type="date" value={exportTo} onChange={e => setExportTo(e.target.value)}
+              className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs outline-none focus:border-accent" />
+          </label>
+          {(exportFrom || exportTo) && (
+            <button onClick={() => { setExportFrom(''); setExportTo(''); }}
+              className="text-navy-400 hover:text-navy-600 underline">clear dates</button>
+          )}
+          <label className="flex items-center gap-1.5 text-navy-600 cursor-pointer">
+            <input type="checkbox" checked={includeClosed} onChange={e => setIncludeClosed(e.target.checked)}
+              className="h-3.5 w-3.5 rounded border-navy-300 text-accent focus:ring-accent" />
+            Include Closed Won/Lost
+          </label>
+          <span className="text-navy-400">{exportLeads.length} lead{exportLeads.length === 1 ? '' : 's'} in export</span>
+          {closedLostCount > 0 && (
+            <button onClick={deleteClosedLost}
+              className="ml-auto flex items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1 font-semibold text-red-500 hover:bg-red-50 transition">
+              <Trash2 className="h-3.5 w-3.5" /> Delete Closed Lost ({closedLostCount})
+            </button>
+          )}
         </div>
         {/* Status filter tabs */}
         <div className="flex flex-wrap gap-2">
