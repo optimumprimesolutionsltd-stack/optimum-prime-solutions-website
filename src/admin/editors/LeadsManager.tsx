@@ -10,6 +10,7 @@ import {
   buildCrmReportHtml, buildUnifiedCsv, downloadFile,
   type WorkshopRegistrant,
 } from '../crm/crmExport';
+import { PIPELINE_ORDER, stageColor, stageTint, defaultNextStep } from '../crm/pipeline';
 
 interface P { data: SiteData; onSave: (d: SiteData) => void }
 
@@ -90,25 +91,9 @@ function generateTimeSlots(dateStr: string): { value: string; label: string; blo
 }
 
 // ── Status config ────────────────────────────────────────────────────────────
-const statusColors: Record<string, string> = {
-  'New':            '',
-  'Contacted':      '',
-  'Qualified':      '',
-  'Demo Scheduled': '',
-  'Demo Done':      '',
-  'Closed Won':     '',
-  'Closed Lost':    '',
-};
-const statusBadgeStyle: Record<string, React.CSSProperties> = {
-  'New':            { backgroundColor: '#ef4444', color: '#fff' },
-  'Contacted':      { backgroundColor: '#3b82f6', color: '#fff' },
-  'Qualified':      { backgroundColor: '#8b5cf6', color: '#fff' },
-  'Demo Scheduled': { backgroundColor: '#f59e0b', color: '#fff' },
-  'Demo Done':      { backgroundColor: '#0ea5e9', color: '#fff' },
-  'Closed Won':     { backgroundColor: '#16a34a', color: '#fff' },
-  'Closed Lost':    { backgroundColor: '#64748b', color: '#fff' },
-};
-const statuses = Object.keys(statusColors);
+// Stages come from the shared pipeline module so every surface stays in sync.
+const statuses = PIPELINE_ORDER;
+const statusBadgeStyle = (status: string) => ({ backgroundColor: stageColor(status), color: '#fff' });
 
 // ── Manual booking form ──────────────────────────────────────────────────────
 interface BookingForm {
@@ -163,9 +148,6 @@ export default function LeadsManager({ data, onSave }: P) {
   };
   const exportUnifiedCsv = () => {
     downloadFile('crm-unified-export.csv', buildUnifiedCsv(data.leads, registrants), 'text/csv');
-  };
-  const setNextStep = (id: string, nextStep: string) => {
-    onSave({ ...data, leads: data.leads.map(l => l.id === id ? { ...l, nextStep } : l) });
   };
 
   // Bulk selection
@@ -321,7 +303,7 @@ export default function LeadsManager({ data, onSave }: P) {
       l.name, l.email, l.phone, l.company, l.industry || l.businessType, l.businessType,
       l.demoDate, l.scheduledDate || '', l.scheduledTime || '', l.demoType || '',
       l.demoLocation || '', l.teamMemberName || '', l.currentSoftware, l.message,
-      l.status, l.nextStep || '', l.source || 'website',
+      l.status, defaultNextStep(l.status), l.source || 'website',
       l.attendedWorkshop ? 'Yes' : (l.source === 'workshop' ? 'No' : ''), l.createdAt,
     ]);
     const csv = [headers, ...rows].map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
@@ -685,46 +667,27 @@ export default function LeadsManager({ data, onSave }: P) {
         {/* Status filter tabs */}
         <div className="flex flex-wrap gap-2">
           {(['All', ...statuses] as string[]).map(s => {
-            // Inline styles bypass Tailwind purge for dynamic colours
-            type TabPalette = { bg: string; text: string; border: string; badgeBg: string; badgeText: string };
-            const palette: Record<string, TabPalette> = {
-              'All':            { bg: '#1e3a5f', text: '#fff',    border: '#1e3a5f', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'New':            { bg: '#ef4444', text: '#fff',    border: '#ef4444', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'Contacted':      { bg: '#3b82f6', text: '#fff',    border: '#3b82f6', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'Qualified':      { bg: '#8b5cf6', text: '#fff',    border: '#8b5cf6', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'Demo Scheduled': { bg: '#f59e0b', text: '#fff',    border: '#f59e0b', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'Demo Done':      { bg: '#0ea5e9', text: '#fff',    border: '#0ea5e9', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'Closed Won':     { bg: '#16a34a', text: '#fff',    border: '#16a34a', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'Closed Lost':    { bg: '#64748b', text: '#fff',    border: '#64748b', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-            };
-            const inactiveBg: Record<string, string> = {
-              'All': '#f1f5f9', 'New': '#fef2f2', 'Contacted': '#eff6ff',
-              'Qualified': '#f5f3ff', 'Demo Scheduled': '#fffbeb', 'Demo Done': '#f0f9ff',
-              'Closed Won': '#f0fdf4', 'Closed Lost': '#f8fafc',
-            };
-            const inactiveText: Record<string, string> = {
-              'All': '#475569', 'New': '#dc2626', 'Contacted': '#2563eb',
-              'Qualified': '#7c3aed', 'Demo Scheduled': '#b45309', 'Demo Done': '#0369a1',
-              'Closed Won': '#15803d', 'Closed Lost': '#475569',
-            };
+            // Colours are derived from the shared pipeline module (inline styles
+            // bypass Tailwind's purge for these dynamic values).
             const isActive = filterStatus === s;
-            const p = palette[s];
+            const color = s === 'All' ? '#1e3a5f' : stageColor(s);
+            const tint = s === 'All' ? '#f1f5f9' : stageTint(s);
             const count = s === 'All' ? data.leads.length : data.leads.filter(l => l.status === s).length;
             return (
               <button
                 key={s}
                 onClick={() => setFilterStatus(s)}
                 className="rounded-full border px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap flex items-center gap-1.5"
-                style={isActive && p
-                  ? { backgroundColor: p.bg, color: p.text, borderColor: p.border }
-                  : { backgroundColor: inactiveBg[s] || '#f8fafc', color: inactiveText[s] || '#475569', borderColor: 'transparent' }
+                style={isActive
+                  ? { backgroundColor: color, color: '#fff', borderColor: color }
+                  : { backgroundColor: tint, color, borderColor: 'transparent' }
                 }
               >
                 {s}
                 <span
                   className="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
-                  style={isActive && p
-                    ? { backgroundColor: p.badgeBg, color: p.badgeText }
+                  style={isActive
+                    ? { backgroundColor: 'rgba(255,255,255,0.25)', color: '#fff' }
                     : { backgroundColor: '#e2e8f0', color: '#475569' }
                   }
                 >{count}</span>
@@ -979,7 +942,7 @@ export default function LeadsManager({ data, onSave }: P) {
                 </div>
                 <span
                   className="rounded-full px-2.5 py-1 text-[10px] font-semibold whitespace-nowrap"
-                  style={statusBadgeStyle[l.status] || { backgroundColor: '#e2e8f0', color: '#475569' }}
+                  style={statusBadgeStyle(l.status)}
                 >
                   {l.status}
                 </span>
@@ -1101,14 +1064,11 @@ export default function LeadsManager({ data, onSave }: P) {
                     </div>
                   )}
 
-                  {/* Next step — drives the CRM report's "next steps" column */}
-                  <div>
-                    <label className="text-[10px] text-navy-500 font-medium mb-1 block">Next Step (shown in CRM report)</label>
-                    <input
-                      value={l.nextStep || ''}
-                      onChange={e => setNextStep(l.id, e.target.value)}
-                      placeholder="e.g. Send quote, schedule follow-up call, share proposal…"
-                      className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                  {/* Auto next step — derived from the stage, shown in the CRM report */}
+                  <div className="flex items-center gap-2 text-xs text-navy-500">
+                    <span className="font-semibold">Next step:</span>
+                    <span className="rounded-lg bg-navy-50 px-2.5 py-1 font-medium text-navy-700">{defaultNextStep(l.status)}</span>
+                    <span className="text-navy-400">— set automatically from the stage</span>
                   </div>
 
                   {/* Status + actions */}

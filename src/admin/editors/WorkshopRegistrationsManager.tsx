@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, Trash2, Mail, Phone, Building2, Calendar, Download, Users as UsersIcon, CheckCircle2, Circle, UserPlus } from 'lucide-react';
+import { Search, Trash2, Mail, Phone, Building2, Calendar, Download, Users as UsersIcon, CheckCircle2, Circle, UserPlus, Undo2 } from 'lucide-react';
 import { fbSubscribe, fbSet } from '../../firebase/config';
 import type { SiteData, Lead } from '../../data/siteData';
+import { PIPELINE_STAGES } from '../crm/pipeline';
 
 interface Registrant {
   id: string;
@@ -72,9 +73,9 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
   );
   const isInPipeline = (r: Registrant) => pipelineRegIds.has(r.id);
 
-  // One-click: create a follow-up lead from a workshop attendee.
-  const addToPipeline = (r: Registrant) => {
-    if (isInPipeline(r)) return;
+  // Create a follow-up lead from a workshop attendee, entering at the chosen stage.
+  const addToPipeline = (r: Registrant, stage: string) => {
+    if (isInPipeline(r) || !stage) return;
     const leadId = `wslead_${r.id}`;
     const newLead: Lead = {
       id: leadId,
@@ -87,14 +88,22 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
       currentSoftware: '',
       message: r.message || `Attended Inventory Management Breakfast Workshop.`,
       createdAt: new Date().toISOString(),
-      status: 'Contacted',
+      status: stage,
       source: 'workshop',
       attendedWorkshop: !!r.attended,
       workshopRegId: r.id,
-      nextStep: r.attended ? 'Qualify need & schedule demo' : 'Follow up — registered but did not attend',
     };
     onSave({ ...data, leads: [newLead, ...data.leads] });
     fbSet(`workshop_registrants/${r.id}/workshopLeadId`, leadId);
+  };
+
+  // Undo an accidental add: remove the linked follow-up lead from the pipeline.
+  const removeFromPipeline = (r: Registrant) => {
+    const linked = data.leads.find(l => l.workshopRegId === r.id);
+    const stageNote = linked ? ` (currently at "${linked.status}")` : '';
+    if (!confirm(`Remove ${r.name} from the follow-up pipeline${stageNote}? This deletes their lead from Demo Leads. You can add them again later.`)) return;
+    onSave({ ...data, leads: data.leads.filter(l => l.workshopRegId !== r.id) });
+    fbSet(`workshop_registrants/${r.id}/workshopLeadId`, null);
   };
 
   const exportCSV = () => {
@@ -228,14 +237,28 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                   <Phone className="h-3 w-3 inline mr-1" />WhatsApp
                 </a>
                 {isInPipeline(r) ? (
-                  <span className="rounded-lg bg-navy-100 px-3 py-1.5 text-xs font-semibold text-navy-500 inline-flex items-center gap-1">
-                    <CheckCircle2 className="h-3.5 w-3.5" /> In follow-up pipeline
+                  <span className="rounded-lg bg-navy-100 pl-3 pr-1.5 py-1 text-xs font-semibold text-navy-500 inline-flex items-center gap-1.5">
+                    <CheckCircle2 className="h-3.5 w-3.5" />
+                    In pipeline: {data.leads.find(l => l.workshopRegId === r.id)?.status || '—'}
+                    <button onClick={() => removeFromPipeline(r)} title="Remove from pipeline (added by mistake)"
+                      className="rounded p-1 text-red-400 hover:bg-red-100 hover:text-red-600 transition">
+                      <Undo2 className="h-3.5 w-3.5" />
+                    </button>
                   </span>
                 ) : (
-                  <button onClick={() => addToPipeline(r)}
-                    className="rounded-lg bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-accent/20 transition inline-flex items-center gap-1">
-                    <UserPlus className="h-3.5 w-3.5" /> Add to Follow-up
-                  </button>
+                  <span className="inline-flex items-center gap-1 rounded-lg bg-accent/10 pl-2.5 pr-1 py-1 text-xs font-semibold text-accent">
+                    <UserPlus className="h-3.5 w-3.5" />
+                    <select
+                      defaultValue=""
+                      onChange={e => { if (e.target.value) addToPipeline(r, e.target.value); }}
+                      title="Add to the follow-up pipeline at the stage this lead is really at"
+                      className="bg-transparent text-accent font-semibold text-xs outline-none cursor-pointer pr-1 py-0.5">
+                      <option value="" disabled>Add to follow-up as…</option>
+                      {PIPELINE_STAGES.map(s => (
+                        <option key={s.id} value={s.id} className="text-navy-900">{s.id} — {s.hint}</option>
+                      ))}
+                    </select>
+                  </span>
                 )}
               </div>
             </div>

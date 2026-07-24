@@ -5,6 +5,7 @@
 // and are triggered from the admin panel as file downloads.
 // ─────────────────────────────────────────────────────────────────────────────
 import type { Lead } from '../../data/siteData';
+import { PIPELINE_ORDER, defaultNextStep, stageColor } from './pipeline';
 
 export interface WorkshopRegistrant {
   id: string;
@@ -19,11 +20,6 @@ export interface WorkshopRegistrant {
   workshopLeadId?: string; // set once converted into the follow-up pipeline
 }
 
-// Pipeline order used for grouping the report (matches LeadsManager statuses).
-export const PIPELINE_ORDER = [
-  'New', 'Contacted', 'Qualified', 'Demo Scheduled', 'Demo Done', 'Closed Won', 'Closed Lost',
-];
-
 const esc = (s: unknown) => String(s ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;');
@@ -36,20 +32,6 @@ const fmtDate = (iso?: string) => {
   if (isNaN(d.getTime())) return iso;
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 };
-
-// Suggests a sensible next step when the user hasn't written one in.
-function defaultNextStep(status: string): string {
-  switch (status) {
-    case 'New':            return 'Make first contact call';
-    case 'Contacted':      return 'Qualify need & budget';
-    case 'Qualified':      return 'Schedule product demo';
-    case 'Demo Scheduled': return 'Run the scheduled demo';
-    case 'Demo Done':      return 'Send proposal / follow up';
-    case 'Closed Won':     return 'Begin onboarding';
-    case 'Closed Lost':    return '—';
-    default:               return 'Follow up';
-  }
-}
 
 // ── Unified CSV — leads plus any workshop attendees not yet in the pipeline ──
 export function buildUnifiedCsv(leads: Lead[], registrants: WorkshopRegistrant[]): string {
@@ -102,12 +84,6 @@ export function buildCrmReportHtml(
   const workshopLeads = leads.filter(l => l.source === 'workshop').length;
   const won = leads.filter(l => l.status === 'Closed Won').length;
 
-  const statusColor: Record<string, string> = {
-    'New': '#ef4444', 'Contacted': '#3b82f6', 'Qualified': '#8b5cf6',
-    'Demo Scheduled': '#f59e0b', 'Demo Done': '#0ea5e9',
-    'Closed Won': '#16a34a', 'Closed Lost': '#64748b',
-  };
-
   // Group leads by pipeline stage in canonical order.
   const grouped = PIPELINE_ORDER
     .map(stage => ({ stage, items: leads.filter(l => l.status === stage) }))
@@ -115,7 +91,7 @@ export function buildCrmReportHtml(
 
   const stageSections = grouped.map(g => `
     <section class="stage">
-      <h3><span class="dot" style="background:${statusColor[g.stage] || '#94a3b8'}"></span>${esc(g.stage)} <span class="count">${g.items.length}</span></h3>
+      <h3><span class="dot" style="background:${stageColor(g.stage)}"></span>${esc(g.stage)} <span class="count">${g.items.length}</span></h3>
       <table>
         <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Next Step</th></tr></thead>
         <tbody>
