@@ -91,13 +91,13 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
     [registrants, selectedEventId],
   );
 
-  // Split staff (internal team) from genuine prospects — staff don't count.
-  const prospects = useMemo(() => eventRegistrants.filter(r => !r.staff), [eventRegistrants]);
+  // Headcount view: totals include everyone (staff shown greyed); staff are
+  // still kept out of lead/pipeline metrics and exports elsewhere.
   const staffList = useMemo(() => eventRegistrants.filter(r => r.staff), [eventRegistrants]);
-  const attendedCount = useMemo(() => prospects.filter(r => r.attended).length, [prospects]);
+  const attendedCount = useMemo(() => eventRegistrants.filter(r => r.attended).length, [eventRegistrants]);
 
   const filtered = useMemo(() => {
-    let list = filter === 'staff' ? staffList : prospects;
+    let list = filter === 'staff' ? staffList : eventRegistrants;
     if (filter === 'attended') list = list.filter(r => r.attended);
     if (filter === 'pending') list = list.filter(r => !r.attended);
     if (!search.trim()) return list;
@@ -108,7 +108,7 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
       || (r.company || '').toLowerCase().includes(q)
       || r.phone.includes(q)
     );
-  }, [prospects, staffList, search, filter]);
+  }, [eventRegistrants, staffList, search, filter]);
 
   const setStaff = (r: Registrant, staff: boolean) => {
     fbSet(`workshop_registrants/${r.id}/staff`, staff);
@@ -362,15 +362,15 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         <div className="rounded-xl bg-navy-50 p-3 text-center">
-          <p className="text-xl font-bold text-navy-700">{prospects.length}</p>
-          <p className="text-[10px] font-medium text-navy-700">Prospect RSVPs</p>
+          <p className="text-xl font-bold text-navy-700">{eventRegistrants.length}</p>
+          <p className="text-[10px] font-medium text-navy-700">Total RSVPs</p>
         </div>
         <div className="rounded-xl bg-green-50 p-3 text-center">
           <p className="text-xl font-bold text-green-700">{attendedCount}</p>
           <p className="text-[10px] font-medium text-green-700">Attended</p>
         </div>
         <div className="rounded-xl bg-amber-50 p-3 text-center">
-          <p className="text-xl font-bold text-amber-700">{prospects.length - attendedCount}</p>
+          <p className="text-xl font-bold text-amber-700">{eventRegistrants.length - attendedCount}</p>
           <p className="text-[10px] font-medium text-amber-700">Not Arrived</p>
         </div>
         <div className="rounded-xl bg-slate-100 p-3 text-center">
