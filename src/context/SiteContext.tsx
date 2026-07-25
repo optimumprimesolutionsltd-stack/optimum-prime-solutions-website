@@ -31,11 +31,17 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<SiteData>(() => load());
   const [synced, setSynced] = useState(false);
 
-  // Merge leads from /leads (website form) and siteData.leads (admin bookings)
-  // /leads uses Firebase push keys or timestamp IDs; siteData.leads uses timestamp IDs
-  const mergeLeads = (siteleads: Lead[], rawLeads: Record<string, any> | null): Lead[] => {
+  // siteData.leads is the single source of truth for leads. The public contact
+  // form drops NEW leads into the /leads "inbox" node (it can't safely write the
+  // whole siteData). The admin ingests those, then clears them from /leads.
+  // This returns the combined list plus the ids that were newly ingested, so the
+  // caller can move them into siteData.leads and drain the inbox.
+  const ingestInbox = (
+    siteleads: Lead[],
+    rawLeads: Record<string, any> | null,
+  ): { leads: Lead[]; incomingIds: string[] } => {
     const existingIds = new Set(siteleads.map((l: Lead) => l.id));
-    const websiteLeads: Lead[] = rawLeads
+    const incoming: Lead[] = rawLeads
       ? Object.entries(rawLeads)
           .filter(([id]) => !existingIds.has(id))
           .map(([id, v]: [string, any]) => ({
@@ -55,7 +61,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
             industry: v.industry || v.businessType || '',
           } as Lead))
       : [];
-    return [...siteleads, ...websiteLeads];
+    return { leads: [...incoming, ...siteleads], incomingIds: incoming.map(l => l.id) };
   };
 
   useEffect(() => {
@@ -67,9 +73,28 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     const applyMerge = () => {
       if (!latestSiteData) return;
       const siteLeads: Lead[] = Array.isArray(latestSiteData.leads) ? latestSiteData.leads : [];
-      const merged = { ...defaultData, ...latestSiteData, leads: mergeLeads(siteLeads, latestRawLeads) };
+      const { leads, incomingIds } = ingestInbox(siteLeads, latestRawLeads);
+      const merged = { ...defaultData, ...latestSiteData, leads };
       setData(merged);
       save(merged);
+      // Drain the inbox: every inbox lead is now represented in siteData.leads
+      // (the single source of truth) — either ingested just now or already
+      // present — so clear the whole /leads inbox once it is safe. This means a
+      // lead can never be merged twice or resurrected after it is deleted.
+      // Admin-only: public pages never write siteData and don't read /leads.
+      if (isAdminRoute && latestRawLeads && Object.keys(latestRawLeads).length > 0) {
+        const inboxIds = Object.keys(latestRawLeads);
+        const clearInbox = () => inboxIds.forEach(id => fbSet(`leads/${id}`, null).catch(() => {}));
+        if (incomingIds.length > 0) {
+          latestSiteData = merged;
+          // Only clear the inbox AFTER the ingested leads are safely persisted,
+          // so a failed write can never lose a lead.
+          fbSet('siteData', merged).then(clearInbox).catch(() => {});
+        } else {
+          // Inbox holds only duplicates already in siteData.leads — safe to clear.
+          clearInbox();
+        }
+      }
     };
 
     // /leads holds every customer's name, phone, email and message — only the
@@ -129,35 +154,9 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     setData(d);
     save(d);
     fbSet('siteData', d).catch(() => {});
-    // Also sync status/schedule changes back to individual /leads entries
-    // so the source node stays up to date
-    d.leads.forEach((lead: Lead) => {
-      if (lead.status && lead.status !== 'New') {
-        // Realtime Database's set() rejects any undefined value in the object
-        // (unset optional Lead fields like scheduledDate/demoTime), so strip
-        // them via a JSON round-trip before writing.
-        fbSet(`leads/${lead.id}`, JSON.parse(JSON.stringify({
-          name: lead.name,
-          company: lead.company,
-          phone: lead.phone,
-          email: lead.email,
-          businessType: lead.businessType,
-          demoDate: lead.demoDate,
-          demoTime: lead.demoTime,
-          currentSoftware: lead.currentSoftware,
-          message: lead.message,
-          createdAt: lead.createdAt,
-          status: lead.status,
-          source: lead.source || 'website',
-          scheduledDate: lead.scheduledDate,
-          scheduledTime: lead.scheduledTime,
-          demoType: lead.demoType,
-          demoLocation: lead.demoLocation,
-          teamMemberName: lead.teamMemberName,
-          meetSent: lead.meetSent,
-        }))).catch(() => {});
-      }
-    });
+    // Note: we deliberately no longer mirror leads back into the /leads inbox.
+    // siteData.leads is the single source of truth; writing to /leads here used
+    // to resurrect deleted leads and make the two stores drift apart.
   }, []);
 
   return <C.Provider value={{ data, update, synced }}>{children}</C.Provider>;
