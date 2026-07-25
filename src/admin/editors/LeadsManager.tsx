@@ -1100,9 +1100,13 @@ export default function LeadsManager({ data, onSave }: P) {
                     placeholder="Location / address *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                 )}
 
-                <textarea value={booking.demoNotes} onChange={e => setB('demoNotes', e.target.value)}
-                  placeholder="Notes (optional)" rows={2}
-                  className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
+                <div>
+                  <label className="block text-xs font-semibold text-navy-600 mb-1">What's this about? <span className="font-normal text-navy-400">(purpose — optional)</span></label>
+                  <textarea value={booking.demoNotes} onChange={e => setB('demoNotes', e.target.value)}
+                    placeholder="e.g. Product demo · buying an add-on · paying for implementation · training / support"
+                    rows={2}
+                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
+                </div>
               </div>
             </div>
 
@@ -1528,9 +1532,9 @@ export default function LeadsManager({ data, onSave }: P) {
 
                         {/* Notes */}
                         <div className="sm:col-span-2">
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Notes (optional)</label>
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">What's this about? <span className="font-normal text-navy-400">(purpose)</span></label>
                           <textarea value={schedForm.demoNotes} onChange={e => setS('demoNotes', e.target.value)}
-                            placeholder="e.g. Focus on manufacturing module, client uses QuickBooks currently"
+                            placeholder="e.g. Product demo · buying an add-on · paying for implementation · training / support"
                             rows={2} className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 resize-none" />
                         </div>
                       </div>
@@ -1691,9 +1695,9 @@ export default function LeadsManager({ data, onSave }: P) {
 
                         {/* Notes */}
                         <div className="sm:col-span-2">
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Notes (optional)</label>
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">What's this about? <span className="font-normal text-navy-400">(purpose)</span></label>
                           <textarea value={schedForm.demoNotes} onChange={e => setS('demoNotes', e.target.value)}
-                            placeholder="e.g. Focus on manufacturing module, client uses QuickBooks currently"
+                            placeholder="e.g. Product demo · buying an add-on · paying for implementation · training / support"
                             rows={2} className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
                         </div>
                       </div>
