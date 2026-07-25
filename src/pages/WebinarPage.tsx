@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SEO from '../components/SEO';
-import { fbSet } from '../firebase/config';
+import { fbSet, fbSubscribe } from '../firebase/config';
+import {
+  DEFAULT_WEBINAR, parseWebinars, pickActiveWebinar, isRegistrationClosed,
+  type WebinarEvent,
+} from '../data/webinarEvent';
 
-const WEBINAR_DATE = 'Wednesday, 22nd July 2026';
-const WEBINAR_TIME = '3:00 PM – 4:00 PM (EAT)';
-const WEBINAR_MEET_LINK = 'https://meet.google.com/ded-fdcf-aac';
 const NOTIFIER_URL = 'https://optimum-prime-lead-notifier.onrender.com/new-lead';
 
 interface FormState {
@@ -20,6 +21,19 @@ export default function WebinarPage() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  // Active webinar details come from Firebase (admin-editable); fall back to the
+  // built-in default so the page still renders before any event is configured.
+  const [webinar, setWebinar] = useState<WebinarEvent>(DEFAULT_WEBINAR);
+  useEffect(() => {
+    const unsub = fbSubscribe('webinars', (raw: Record<string, any> | null) => {
+      setWebinar(pickActiveWebinar(parseWebinars(raw)));
+    });
+    return unsub;
+  }, []);
+
+  // Registration auto-closes at the end of the event day (Kenya time).
+  const registrationClosed = isRegistrationClosed(webinar);
+
   const validate = (): boolean => {
     const e: Partial<FormState> = {};
     if (!form.name.trim()) e.name = 'Full name is required';
@@ -32,40 +46,34 @@ export default function WebinarPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (registrationClosed) return; // guard: the event day has passed
     if (!validate()) return;
     setSubmitting(true);
     try {
-      const id = `reg_${Date.now()}`;
+      const id = `webreg_${Date.now()}`;
       const confirmationMessage =
         `Hello ${form.name}! 🎉\n\n` +
-        `You're registered for our free TallyPrime 7.1 webinar!\n\n` +
-        `📅 *Date:* ${WEBINAR_DATE}\n` +
-        `🕒 *Time:* ${WEBINAR_TIME}\n` +
-        `📍 *Venue:* Online via Google Meet\n\n` +
-        `*What We'll Cover:*\n` +
-        `✅ Auto Wrap Text\n` +
-        `✅ Professional Invoice Print Templates\n` +
-        `✅ Scheduled Auto Backup\n` +
-        `✅ Reuse Deleted Voucher Numbers\n` +
-        `✅ Live Q&A\n\n` +
-        `📹 *Google Meet Join Link:*\n` +
-        `${WEBINAR_MEET_LINK}\n` +
-        `_(Click to join at 3:00 PM EAT on 15th July)_\n\n` +
+        `You're registered for our ${webinar.title}!\n\n` +
+        `📅 *Date:* ${webinar.date}\n` +
+        `🕒 *Time:* ${webinar.time}\n` +
+        `📍 *Join:* ${webinar.venue}\n\n` +
+        `We'll send you a reminder before we go live. See you online!\n\n` +
         `📞 *+254 116 246 074*\n` +
         `🌐 *www.optimumprimesolutions.co.ke*\n\n` +
         `_Optimum Prime Solutions — TallyPrime · Cloud · EOS® · Biz Analyst_`;
       const payload = {
         ...form,
-        interest: 'Webinar Registration — TallyPrime 7.1',
+        eventId: webinar.id,
+        interest: `Webinar Registration — ${webinar.title}`,
         source: 'Webinar Registration Page',
-        message: `Registered for webinar on ${WEBINAR_DATE} at ${WEBINAR_TIME}`,
+        message: `Registered for ${webinar.title} on ${webinar.date} at ${webinar.time}`,
         confirmation_message: confirmationMessage,
         createdAt: new Date().toISOString(),
         status: 'registered',
       };
-      // Save to Firebase
+      // Save to Firebase — kept separate from Demo Leads
       await fbSet(`webinar_registrants/${id}`, payload);
-      // Trigger WhatsApp notification
+      // Trigger WhatsApp notification (to office + registrant confirmation)
       await fetch(NOTIFIER_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -82,36 +90,36 @@ export default function WebinarPage() {
   return (
     <main className="min-h-screen bg-slate-900">
       <SEO
-        title="Free Webinar — TallyPrime 7.1 | Optimum Prime"
-        description="Join our free webinar on Wed 22nd July 2026 and discover TallyPrime 7.1's new features — invoice templates, scheduled backup & more."
-        socialDescription="Join our free webinars on TallyPrime best practices, KRA compliance, and business growth in Kenya."
+        title={`${webinar.title} | Free Webinar — Optimum Prime`}
+        description="Join our free online TallyPrime webinar. Learn practical features and best practices live from certified experts, with a Q&A."
+        socialDescription="Join our free online webinars on TallyPrime best practices, KRA compliance, and business growth in Kenya."
         canonical="/webinar"
-/>
+      />
 
       {/* Hero */}
       <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-teal-900 py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <span className="inline-block bg-teal-500/20 text-teal-300 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-6 border border-teal-500/30">
-            Free Webinar
+            Free Online Webinar
           </span>
           <h1 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
-            What's New in <span className="text-teal-400">TallyPrime 7.1</span>
+            {webinar.title}
           </h1>
           <p className="text-slate-300 text-lg mb-8 max-w-2xl mx-auto">
-            Join our certified TallyPrime experts for a live walkthrough of the most powerful features in TallyPrime 7.1 — built to save you time and keep your business running smoothly.
+            Join our certified TallyPrime experts for a live, practical session built to save you time and keep your business running smoothly — all from the comfort of your desk.
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-sm text-slate-300 mb-2">
             <div className="flex items-center gap-2">
               <span className="text-teal-400 text-lg">📅</span>
-              <span><strong className="text-white">{WEBINAR_DATE}</strong></span>
+              <span><strong className="text-white">{webinar.date}</strong></span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-teal-400 text-lg">🕒</span>
-              <span><strong className="text-white">{WEBINAR_TIME}</strong></span>
+              <span><strong className="text-white">{webinar.time}</strong></span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-teal-400 text-lg">📍</span>
-              <span><strong className="text-white">Online via Google Meet</strong></span>
+              <span><strong className="text-white">{webinar.venue}</strong></span>
             </div>
             <div className="flex items-center gap-2">
               <span className="text-teal-400 text-lg">💰</span>
@@ -129,10 +137,10 @@ export default function WebinarPage() {
           <h2 className="text-2xl font-bold text-white mb-6">What We'll Cover</h2>
           <ul className="space-y-5">
             {[
-              { icon: '📝', title: 'Auto Wrap Text', desc: 'Long descriptions, narrations & names now display fully — no more truncation in reports and vouchers.' },
-              { icon: '🖨️', title: 'Professional Invoice Print Templates', desc: '8 ready-to-use, fully customisable invoice templates with your logo and branding.' },
-              { icon: '💾', title: 'Scheduled Auto Backup', desc: 'Set it once and your company data backs up automatically — never lose critical information again.' },
-              { icon: '🔢', title: 'Reuse Deleted Voucher Numbers', desc: 'Keep your numbering sequence clean and continuous by reusing deleted voucher numbers.' },
+              { icon: '🖥️', title: 'Live Product Walkthrough', desc: 'See the features in action on a real TallyPrime setup — not just slides.' },
+              { icon: '🧾', title: 'Invoicing & Reporting Tips', desc: 'Professional invoice templates, cleaner reports, and time-saving shortcuts.' },
+              { icon: '💾', title: 'Data Safety & Backup', desc: 'Scheduled auto-backup and best practices so you never lose critical data.' },
+              { icon: '📊', title: 'Reports That Drive Decisions', desc: 'The everyday reports every business owner should be running.' },
               { icon: '🙋', title: 'Live Q&A', desc: 'Ask our certified TallyPrime experts anything — get answers live.' },
             ].map((item) => (
               <li key={item.title} className="flex gap-4">
@@ -148,26 +156,42 @@ export default function WebinarPage() {
 
         {/* Registration Form */}
         <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-xl">
-          {success ? (
+          {registrationClosed && !success ? (
+            <div className="text-center py-6">
+              <div className="text-5xl mb-4">🔒</div>
+              <h3 className="text-2xl font-bold text-white mb-2">Registration Closed</h3>
+              <p className="text-slate-300 text-sm mb-4">
+                Registration for <strong className="text-teal-400">{webinar.title}</strong> ({webinar.date}) has now closed.
+                Thank you to everyone who joined!
+              </p>
+              <p className="text-slate-400 text-sm">
+                Want to be first to know about our next webinar? Reach us on WhatsApp at{' '}
+                <a href="https://wa.me/254116246074" target="_blank" rel="noopener noreferrer"
+                  className="text-teal-400 font-semibold hover:underline">+254 116 246 074</a>.
+              </p>
+            </div>
+          ) : success ? (
             <div className="text-center py-6">
               <div className="text-5xl mb-4">🎉</div>
               <h3 className="text-2xl font-bold text-white mb-2">You're All Set!</h3>
               <p className="text-slate-300 text-sm mb-4">
-                We've sent the Google Meet join link to your WhatsApp. We look forward to seeing you on <strong className="text-teal-400">{WEBINAR_DATE}</strong>.
+                We've sent your joining details to your WhatsApp. We look forward to seeing you on <strong className="text-teal-400">{webinar.date}</strong>.
               </p>
-              <a
-                href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=TallyPrime+7.1+Webinar&dates=20260722T120000Z/20260722T130000Z&details=Free+webinar+by+Optimum+Prime+Solutions&location=Google+Meet`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block bg-teal-500 hover:bg-teal-400 text-white font-semibold px-6 py-3 rounded-lg text-sm transition-colors"
-              >
-                🗓️ Save the Date on Google Calendar
-              </a>
+              {webinar.calendarStart && webinar.calendarEnd && (
+                <a
+                  href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(webinar.title)}&dates=${webinar.calendarStart}/${webinar.calendarEnd}&details=Free+online+webinar+by+Optimum+Prime+Solutions&location=${encodeURIComponent(webinar.venue)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block bg-teal-500 hover:bg-teal-400 text-white font-semibold px-6 py-3 rounded-lg text-sm transition-colors"
+                >
+                  🗓️ Save the Date on Google Calendar
+                </a>
+              )}
             </div>
           ) : (
             <>
               <h3 className="text-xl font-bold text-white mb-1">Reserve Your Spot</h3>
-              <p className="text-slate-400 text-sm mb-6">Takes less than a minute. Your Google Meet link will be sent to your WhatsApp.</p>
+              <p className="text-slate-400 text-sm mb-6">Takes less than a minute. Your joining link will be sent to your WhatsApp.</p>
               <form onSubmit={handleSubmit} className="space-y-4">
                 {/* Name */}
                 <div>
@@ -224,7 +248,7 @@ export default function WebinarPage() {
                   {submitting ? 'Registering…' : '✅ Register for Free Webinar'}
                 </button>
                 <p className="text-slate-500 text-xs text-center">
-                  Your Google Meet link will be sent to your WhatsApp immediately after registration.
+                  Your joining link will be sent to your WhatsApp immediately after registration.
                 </p>
               </form>
             </>

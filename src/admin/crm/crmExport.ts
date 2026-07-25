@@ -46,10 +46,13 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
 
   const leadRows = leads.map(l => [
     l.name, l.company, l.phone, l.email, l.industry || l.businessType || '',
-    // Name the specific workshop for workshop leads so different events are
-    // distinguishable in the export, not just lumped as "workshop".
-    l.source === 'workshop' ? (l.workshopTitle || 'workshop') : (l.source || 'website'),
-    l.attendedWorkshop ? 'Yes' : (l.source === 'workshop' ? 'No' : ''),
+    // Name the specific workshop / webinar so different events are
+    // distinguishable in the export, not just lumped as "workshop"/"webinar".
+    l.source === 'workshop' ? (l.workshopTitle || 'workshop')
+      : l.source === 'webinar' ? (l.webinarTitle || 'webinar')
+      : (l.source || 'website'),
+    (l.attendedWorkshop || l.attendedWebinar) ? 'Yes'
+      : (l.source === 'workshop' || l.source === 'webinar') ? 'No' : '',
     l.status, l.nextStep || defaultNextStep(l.status),
     l.scheduledDate || '', l.scheduledTime || '', fmtDate(l.createdAt),
   ]);

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Building2, Briefcase, ShoppingCart, Globe,
-  HelpCircle, Users, FileText, Phone, MessageCircle, CalendarDays,
+  HelpCircle, Users, FileText, Phone, MessageCircle, CalendarDays, Video,
   LogOut, Menu, X, ExternalLink, RotateCcw, Mail
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
@@ -19,6 +19,7 @@ import ContactEditor from './editors/ContactEditor';
 import TestimonialsEditor from './editors/TestimonialsEditor';
 import WhatsAppManager from './editors/WhatsAppManager';
 import WorkshopRegistrationsManager from './editors/WorkshopRegistrationsManager';
+import WebinarRegistrationsManager from './editors/WebinarRegistrationsManager';
 import SubscribersManager from './editors/SubscribersManager';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
@@ -30,6 +31,7 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'faqs', label: 'FAQ & Chatbot', icon: HelpCircle },
   { id: 'leads', label: 'Demo Leads', icon: Users },
   { id: 'workshop', label: 'Workshop RSVPs', icon: CalendarDays },
+  { id: 'webinar', label: 'Webinar RSVPs', icon: Video },
   { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
   { id: 'blogs', label: 'Blog Posts', icon: FileText },
   { id: 'subscribers', label: 'Subscribers', icon: Mail },
@@ -78,6 +80,7 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'faqs': return <FaqEditor data={data} onSave={d => handleSave(d, 'FAQs saved!')} />;
       case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')} />;
       case 'workshop': return <WorkshopRegistrationsManager data={data} onSave={d => handleSave(d, 'Workshop updated!')} />;
+      case 'webinar': return <WebinarRegistrationsManager data={data} onSave={d => handleSave(d, 'Webinar updated!')} />;
       case 'whatsapp': return <WhatsAppManager />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
       case 'subscribers': return <SubscribersManager />;
