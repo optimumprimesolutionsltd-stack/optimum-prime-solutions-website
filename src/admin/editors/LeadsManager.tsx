@@ -296,6 +296,17 @@ export default function LeadsManager({ data, onSave }: P) {
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   // ── Status update ────────────────────────────────────────────────────────
+  // Reclassify a mistakenly-added lead as internal staff: flag the linked
+  // workshop registrant as Staff (so it's sorted over in Workshop RSVPs) and
+  // remove the lead from the pipeline. For a non-workshop lead it just removes.
+  const markAsStaff = (lead: Lead) => {
+    const w = lead.workshopRegId ? ' and mark them Staff in Workshop RSVPs' : '';
+    if (!confirm(`Mark ${lead.name} as internal staff? This removes them from Demo Leads${w}.`)) return;
+    if (lead.workshopRegId) fbSet(`workshop_registrants/${lead.workshopRegId}/staff`, true);
+    fbSet(`leads/${lead.id}`, null);
+    onSave({ ...data, leads: data.leads.filter(l => l.id !== lead.id) });
+  };
+
   const updateStatus = (id: string, status: string) => {
     onSave({ ...data, leads: data.leads.map(l => l.id === id ? { ...l, status } : l) });
     if (status === 'Demo Scheduled') {
@@ -1189,9 +1200,10 @@ export default function LeadsManager({ data, onSave }: P) {
                   <div className="flex items-center justify-between border-t border-navy-100 pt-4 flex-wrap gap-3">
                     <div className="flex items-center gap-2">
                       <label className="text-xs font-semibold text-navy-600">Status:</label>
-                      <select value={l.status} onChange={e => updateStatus(l.id, e.target.value)}
+                      <select value={l.status} onChange={e => e.target.value === '__staff__' ? markAsStaff(l) : updateStatus(l.id, e.target.value)}
                         className="rounded-lg border border-navy-200 px-3 py-1.5 text-sm font-medium outline-none focus:border-accent">
                         {statuses.map(s => <option key={s}>{s}</option>)}
+                        <option value="__staff__">— Not a lead: mark as Staff —</option>
                       </select>
                     </div>
                     <div className="flex items-center gap-2">

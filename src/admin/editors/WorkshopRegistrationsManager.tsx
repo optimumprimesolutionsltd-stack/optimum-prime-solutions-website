@@ -39,6 +39,8 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'attended' | 'pending' | 'staff'>('all');
+  const [editRegId, setEditRegId] = useState<string | null>(null);
+  const [regForm, setRegForm] = useState({ name: '', company: '', phone: '', email: '' });
 
   // ── Workshop events ────────────────────────────────────────────────────────
   const [events, setEvents] = useState<WorkshopEvent[]>([DEFAULT_WORKSHOP]);
@@ -164,6 +166,20 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
     if (confirm('Remove this registration permanently?')) {
       fbSet(`workshop_registrants/${id}`, null);
     }
+  };
+
+  // Edit a registrant's details (fix a typo in the name, phone, etc.).
+  const startEditReg = (r: Registrant) => {
+    setEditRegId(r.id);
+    setRegForm({ name: r.name || '', company: r.company || '', phone: r.phone || '', email: r.email || '' });
+  };
+  const saveEditReg = (id: string) => {
+    if (!regForm.name.trim() || !regForm.phone.trim()) { alert('Name and phone are required.'); return; }
+    fbSet(`workshop_registrants/${id}/name`, regForm.name.trim());
+    fbSet(`workshop_registrants/${id}/company`, regForm.company.trim());
+    fbSet(`workshop_registrants/${id}/phone`, regForm.phone.trim());
+    fbSet(`workshop_registrants/${id}/email`, regForm.email.trim());
+    setEditRegId(null);
   };
 
   // ── Event editor ───────────────────────────────────────────────────────────
@@ -492,11 +508,35 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                   <option value="prospect">Prospect</option>
                   <option value="staff">Staff</option>
                 </select>
+                <button onClick={() => (editRegId === r.id ? setEditRegId(null) : startEditReg(r))}
+                  title="Edit details"
+                  className="rounded-lg p-1.5 text-navy-400 hover:bg-navy-50 transition shrink-0">
+                  <Pencil className="h-4 w-4" />
+                </button>
                 <button onClick={() => removeRegistrant(r.id)}
+                  title="Delete registration"
                   className="rounded-lg p-1.5 text-red-400 hover:bg-red-50 transition shrink-0">
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
+              {editRegId === r.id && (
+                <div className="pl-14 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <input value={regForm.name} onChange={e => setRegForm(f => ({ ...f, name: e.target.value }))}
+                    placeholder="Name" className="rounded-lg border border-navy-200 px-3 py-2 text-sm outline-none focus:border-accent" />
+                  <input value={regForm.phone} onChange={e => setRegForm(f => ({ ...f, phone: e.target.value }))}
+                    placeholder="Phone" className="rounded-lg border border-navy-200 px-3 py-2 text-sm outline-none focus:border-accent" />
+                  <input value={regForm.company} onChange={e => setRegForm(f => ({ ...f, company: e.target.value }))}
+                    placeholder="Company" className="rounded-lg border border-navy-200 px-3 py-2 text-sm outline-none focus:border-accent" />
+                  <input value={regForm.email} onChange={e => setRegForm(f => ({ ...f, email: e.target.value }))}
+                    placeholder="Email" className="rounded-lg border border-navy-200 px-3 py-2 text-sm outline-none focus:border-accent" />
+                  <div className="flex gap-2">
+                    <button onClick={() => saveEditReg(r.id)}
+                      className="rounded-lg bg-accent px-4 py-1.5 text-xs font-semibold text-white hover:bg-accent/90 transition">Save</button>
+                    <button onClick={() => setEditRegId(null)}
+                      className="rounded-lg border border-navy-200 px-4 py-1.5 text-xs font-semibold text-navy-600 hover:bg-navy-50 transition">Cancel</button>
+                  </div>
+                </div>
+              )}
               {/* Staff rows stay fully interactive — you still mark their
                   attendance for the head count. Only the pipeline action
                   below is hidden for staff (they are not prospects). */}
