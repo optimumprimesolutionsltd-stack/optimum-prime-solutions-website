@@ -232,8 +232,15 @@ export function downloadFile(filename: string, contents: string, mime: string) {
   const blob = new Blob([contents], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url; a.download = filename; a.click();
-  URL.revokeObjectURL(url);
+  a.href = url;
+  a.download = filename;
+  // The anchor must be in the DOM for the download to fire in some browsers
+  // (Firefox), and the object URL has to outlive the click — revoking it
+  // immediately (as before) aborted the save. Append, click, then revoke late.
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
 // ── Open an HTML report in a new tab and trigger the print dialog ────────────
