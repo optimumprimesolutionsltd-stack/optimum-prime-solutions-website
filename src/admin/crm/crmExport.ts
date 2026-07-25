@@ -153,6 +153,26 @@ export function buildCrmReportHtml(
       </table>
     </section>`;
 
+  // Staff / internal team roster — who was there to run the event. Shown near
+  // the top so the reader can separate the team from the prospects at a glance.
+  const staffRows = registrants.filter(r => r.staff);
+  const staffSection = staffRows.length === 0 ? '' : `
+    <section class="stage">
+      <h3><span class="dot" style="background:#64748b"></span>Staff / internal team <span class="count">${staffRows.length}</span></h3>
+      <table>
+        <thead><tr><th>Name</th><th>Company</th><th>Phone</th><th>Present</th></tr></thead>
+        <tbody>
+          ${staffRows.map(r => `
+            <tr>
+              <td><strong>${esc(r.name)}</strong></td>
+              <td>${esc(r.company || '—')}</td>
+              <td>${esc(r.phone || '—')}</td>
+              <td>${r.attended ? '✅' : '—'}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>
+    </section>`;
+
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -199,6 +219,7 @@ export function buildCrmReportHtml(
     ${lost > 0 ? `<div class="kpi"><b>${lost}</b><span>Closed Lost</span></div>` : ''}
   </div>
 
+  ${staffSection}
   ${stageSections || '<p style="color:#64748b">No leads in the pipeline yet.</p>'}
   ${pendingSection}
 
