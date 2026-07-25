@@ -6,17 +6,29 @@
 // any row without one is treated as belonging to LEGACY_WEBINAR_ID so nothing
 // has to be migrated.
 // ─────────────────────────────────────────────────────────────────────────────
+// Who a webinar is for. 'prospects' = new-client lead generation (attendees can
+// be converted into Demo Leads, like a workshop). 'clients' = a training session
+// for EXISTING clients — attendance is tracked but attendees are NOT treated as
+// sales leads. Missing/undefined is treated as 'prospects' for backward compat.
+export type WebinarAudience = 'prospects' | 'clients';
+
 export interface WebinarEvent {
   id: string;
   title: string;
   date: string;   // human-readable, e.g. 'Friday, 24th July 2026'
   time: string;   // e.g. '10:00 AM (EAT)'
   venue: string;  // online joining details, e.g. 'Online — Google Meet link sent on registration'
+  audience?: WebinarAudience; // new prospects vs existing-client training
   active?: boolean;      // the one currently open for RSVPs (only one at a time)
   createdAt: string;
   calendarStart?: string; // optional ISO for the "Add to Google Calendar" link
   calendarEnd?: string;
 }
+
+// A training webinar is run for existing clients, so its attendees are never
+// pushed into the sales pipeline as new leads.
+export const isTrainingWebinar = (w?: { audience?: WebinarAudience } | null): boolean =>
+  w?.audience === 'clients';
 
 // Registrants with no eventId map onto this fixed fallback id.
 export const LEGACY_WEBINAR_ID = 'web-legacy';
