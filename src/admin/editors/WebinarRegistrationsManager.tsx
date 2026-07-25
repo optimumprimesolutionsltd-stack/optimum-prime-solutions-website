@@ -8,7 +8,7 @@ import type { SiteData, Lead } from '../../data/siteData';
 import { PIPELINE_STAGES } from '../crm/pipeline';
 import {
   DEFAULT_WEBINAR, LEGACY_WEBINAR_ID, parseWebinars, pickActiveWebinar,
-  regEventId, type WebinarEvent,
+  regEventId, isTrainingWebinar, type WebinarEvent, type WebinarAudience,
 } from '../../data/webinarEvent';
 
 interface Registrant {
@@ -29,6 +29,7 @@ interface Registrant {
 
 interface EventForm {
   id: string; title: string; date: string; time: string; venue: string;
+  audience: WebinarAudience;
   active: boolean; calendarStart: string; calendarEnd: string;
 }
 
@@ -176,14 +177,16 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
 
   // ── Event editor ───────────────────────────────────────────────────────────
   const openNewEvent = () => setEditing({
-    id: `ws_${Date.now()}`, title: 'Inventory Management Breakfast Webinar',
-    date: '', time: '7:00 AM (EAT)', venue: '', active: true, calendarStart: '', calendarEnd: '',
+    id: `web_${Date.now()}`, title: 'TallyPrime Online Webinar',
+    date: '', time: '10:00 AM (EAT)', venue: 'Online — Google Meet link sent on registration',
+    audience: 'prospects', active: true, calendarStart: '', calendarEnd: '',
   });
   const openEditEvent = () => {
     if (!selectedEvent) return;
     setEditing({
       id: selectedEvent.id, title: selectedEvent.title, date: selectedEvent.date,
-      time: selectedEvent.time, venue: selectedEvent.venue, active: !!selectedEvent.active,
+      time: selectedEvent.time, venue: selectedEvent.venue,
+      audience: selectedEvent.audience || 'prospects', active: !!selectedEvent.active,
       calendarStart: selectedEvent.calendarStart || '', calendarEnd: selectedEvent.calendarEnd || '',
     });
   };
@@ -193,7 +196,7 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
   const saveEvent = () => {
     if (!editing) return;
     if (!editing.title.trim() || !editing.date.trim() || !editing.venue.trim()) {
-      alert('Please fill in the title, date and venue.');
+      alert('Please fill in the title, date and join details.');
       return;
     }
     const { id, active, calendarStart, calendarEnd, ...rest } = editing;
@@ -241,6 +244,9 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
 
   const addToPipeline = (r: Registrant, stage: string) => {
     if (isInPipeline(r) || !stage) return;
+    // Training webinars are for existing clients — never turn attendees into
+    // new sales leads.
+    if (isTrainingWebinar(selectedEvent)) return;
     const leadId = `weblead_${r.id}`;
     const eventTitle = selectedEvent?.title || 'the webinar';
     const newLead: Lead = {
@@ -344,6 +350,15 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
           <div className="flex items-center gap-3 flex-wrap text-xs text-navy-500">
             <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{cardDate}</span>
             <span className="inline-flex items-center gap-1"><Building2 className="h-3.5 w-3.5" />{selectedEvent.venue}</span>
+            {isTrainingWebinar(selectedEvent) ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 font-semibold text-purple-700">
+                🎓 Training — existing clients
+              </span>
+            ) : (
+              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">
+                🎯 New prospects
+              </span>
+            )}
             {selectedEvent.active ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 font-semibold text-green-700">
                 <Star className="h-3 w-3" /> Live — open for RSVPs
@@ -354,11 +369,15 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
                 <Star className="h-3 w-3" /> Make this the live webinar
               </button>
             )}
-            <button onClick={reflectOnWebinarDay}
-              title="Set every lead from this webinar to the webinar day, so early sign-ups group with everyone else on that date in Demo Leads"
-              className="inline-flex items-center gap-1 rounded-full border border-navy-200 bg-white px-2.5 py-0.5 font-semibold text-navy-600 hover:bg-navy-50 transition">
-              <Calendar className="h-3 w-3" /> Reflect all on webinar day
-            </button>
+            {/* Only prospect webinars produce leads, so the "reflect on the day"
+                tool is meaningless for training webinars. */}
+            {!isTrainingWebinar(selectedEvent) && (
+              <button onClick={reflectOnWebinarDay}
+                title="Set every lead from this webinar to the webinar day, so early sign-ups group with everyone else on that date in Demo Leads"
+                className="inline-flex items-center gap-1 rounded-full border border-navy-200 bg-white px-2.5 py-0.5 font-semibold text-navy-600 hover:bg-navy-50 transition">
+                <Calendar className="h-3 w-3" /> Reflect all on webinar day
+              </button>
+            )}
           </div>
         )}
       </div>
@@ -393,10 +412,28 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
                 className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-navy-600 mb-1">Venue *</label>
+              <label className="block text-xs font-semibold text-navy-600 mb-1">Join details / link *</label>
               <input value={editing.venue} onChange={e => setE('venue', e.target.value)}
-                placeholder="e.g. Ndanga Hotel, Ruiru"
+                placeholder="e.g. Online via Google Meet — https://meet.google.com/xxx-xxxx-xxx"
                 className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+            </div>
+            <div className="sm:col-span-2">
+              <label className="block text-xs font-semibold text-navy-600 mb-1">Who is this webinar for?</label>
+              <div className="flex rounded-xl overflow-hidden border border-navy-200">
+                <button type="button" onClick={() => setE('audience', 'prospects')}
+                  className={`flex-1 py-2.5 text-sm font-semibold transition ${editing.audience === 'prospects' ? 'bg-accent text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                  🎯 New prospects
+                </button>
+                <button type="button" onClick={() => setE('audience', 'clients')}
+                  className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-navy-200 ${editing.audience === 'clients' ? 'bg-navy-700 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                  🎓 Existing clients — training
+                </button>
+              </div>
+              <p className="mt-1 text-[11px] text-navy-400">
+                {editing.audience === 'clients'
+                  ? 'Training session — attendees are tracked for attendance only and are NOT added to Demo Leads.'
+                  : 'Lead-generation webinar — attendees can be converted into Demo Leads, just like a workshop.'}
+              </p>
             </div>
             <div>
               <label className="block text-xs font-semibold text-navy-600 mb-1">Calendar start (optional)</label>
@@ -576,6 +613,8 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
                       <Undo2 className="h-3.5 w-3.5" />
                     </button>
                   </span>
+                ) : isTrainingWebinar(selectedEvent) ? (
+                  <span className="text-xs text-slate-400 italic">Existing client — training (not a lead)</span>
                 ) : (
                   <span className="inline-flex items-center gap-1 rounded-lg bg-accent/10 pl-2.5 pr-1 py-1 text-xs font-semibold text-accent">
                     <UserPlus className="h-3.5 w-3.5" />
