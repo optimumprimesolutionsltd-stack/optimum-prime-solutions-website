@@ -1,55 +1,55 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// Workshop events — makes the breakfast workshop repeatable.
-// Event details (title, date, time, venue) live in Firebase under `workshops/`
-// and are edited from the admin panel, so a new workshop needs no code changes.
-// Registrants are tagged with `eventId`; existing July RSVPs that predate this
-// feature have no eventId and are treated as belonging to LEGACY_WORKSHOP_ID,
-// so nothing has to be migrated.
+// Webinar events — the online mirror of the workshop system.
+// Event details (title, date, time, "venue" = the online platform / join link)
+// live in Firebase under `webinars/` and are edited from the admin panel, so a
+// new webinar needs no code changes. Registrants are tagged with `eventId`;
+// any row without one is treated as belonging to LEGACY_WEBINAR_ID so nothing
+// has to be migrated.
 // ─────────────────────────────────────────────────────────────────────────────
-export interface WorkshopEvent {
+export interface WebinarEvent {
   id: string;
   title: string;
   date: string;   // human-readable, e.g. 'Friday, 24th July 2026'
-  time: string;   // e.g. '7:00 AM (EAT)'
-  venue: string;  // e.g. 'Ndanga Hotel, Ruiru'
+  time: string;   // e.g. '10:00 AM (EAT)'
+  venue: string;  // online joining details, e.g. 'Online — Google Meet link sent on registration'
   active?: boolean;      // the one currently open for RSVPs (only one at a time)
   createdAt: string;
   calendarStart?: string; // optional ISO for the "Add to Google Calendar" link
   calendarEnd?: string;
 }
 
-// The first workshop existed before events were configurable. Its registrants
-// have no eventId, so we map them onto this fixed id.
-export const LEGACY_WORKSHOP_ID = 'ws-jul-2026';
+// Registrants with no eventId map onto this fixed fallback id.
+export const LEGACY_WEBINAR_ID = 'web-legacy';
 
-export const DEFAULT_WORKSHOP: WorkshopEvent = {
-  id: LEGACY_WORKSHOP_ID,
-  title: 'Inventory Management Breakfast Workshop',
-  date: 'Friday, 24th July 2026',
-  time: '7:00 AM (EAT)',
-  venue: 'Ndanga Hotel, Ruiru',
+// Template for the first webinar (seeded when none exist). The admin edits the
+// title/date/time and adds the join link before making it live. No calendar
+// date is set yet, so registration stays open until a date is chosen.
+export const DEFAULT_WEBINAR: WebinarEvent = {
+  id: LEGACY_WEBINAR_ID,
+  title: 'TallyPrime Online Webinar',
+  date: 'Date to be announced',
+  time: '10:00 AM (EAT)',
+  venue: 'Online — Google Meet link sent on registration',
   active: true,
   createdAt: '2026-07-01T00:00:00.000Z',
-  calendarStart: '20260724T040000Z',
-  calendarEnd: '20260724T070000Z',
 };
 
-export function parseWorkshops(raw: Record<string, any> | null): WorkshopEvent[] {
+export function parseWebinars(raw: Record<string, any> | null): WebinarEvent[] {
   if (!raw) return [];
   return Object.entries(raw)
-    .map(([id, v]) => ({ id, ...(v as object) }) as WorkshopEvent)
+    .map(([id, v]) => ({ id, ...(v as object) }) as WebinarEvent)
     .sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 }
 
-// The workshop the public RSVP page should show: the active one, else the most
+// The webinar the public RSVP page should show: the active one, else the most
 // recently created, else the built-in default so the page is never blank.
-export function pickActiveWorkshop(list: WorkshopEvent[]): WorkshopEvent {
-  if (list.length === 0) return DEFAULT_WORKSHOP;
+export function pickActiveWebinar(list: WebinarEvent[]): WebinarEvent {
+  if (list.length === 0) return DEFAULT_WEBINAR;
   return list.find(w => w.active) || list[list.length - 1];
 }
 
 // Which event a registrant belongs to (legacy rows have no eventId).
-export const regEventId = (r: { eventId?: string }): string => r.eventId || LEGACY_WORKSHOP_ID;
+export const regEventId = (r: { eventId?: string }): string => r.eventId || LEGACY_WEBINAR_ID;
 
 // Parse the calendar day (YYYY-MM-DD parts) out of an event's compact ISO
 // calendarStart (e.g. '20260724T040000Z'). Null when no date is set.

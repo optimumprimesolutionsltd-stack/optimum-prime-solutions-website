@@ -2,7 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import {
   Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown,
   Download, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
-  User, Send, AlertCircle, FileText,
+  User, Send, AlertCircle, FileText, Video,
 } from 'lucide-react';
 import type { SiteData, Lead } from '../../data/siteData';
 import { fbSubscribe, fbSet } from '../../firebase/config';
@@ -14,6 +14,9 @@ import { PIPELINE_ORDER, stageColor, stageTint, defaultNextStep } from '../crm/p
 import {
   LEGACY_WORKSHOP_ID, parseWorkshops, regEventId, type WorkshopEvent,
 } from '../../data/workshopEvent';
+import {
+  LEGACY_WEBINAR_ID, parseWebinars, type WebinarEvent,
+} from '../../data/webinarEvent';
 
 interface P { data: SiteData; onSave: (d: SiteData) => void }
 
@@ -132,7 +135,7 @@ interface ScheduleForm {
 export default function LeadsManager({ data, onSave }: P) {
   const [search, setSearch]           = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
-  const [filterSource, setFilterSource] = useState<'All' | 'workshop' | 'online' | 'manual'>('All');
+  const [filterSource, setFilterSource] = useState<'All' | 'workshop' | 'webinar' | 'online' | 'manual'>('All');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
 
   // Workshop attendees — pulled in for the unified CRM report / export
@@ -182,6 +185,22 @@ export default function LeadsManager({ data, onSave }: P) {
     || LEGACY_WORKSHOP_ID;
   const workshopTitleById = (id: string) =>
     events.find(e => e.id === id)?.title || (id === LEGACY_WORKSHOP_ID ? 'Earlier workshop' : 'Workshop');
+
+  // Webinar EVENTS — the online mirror of the workshop grouping, so webinar
+  // leads can be told apart by which webinar they came from.
+  const [webinarEvents, setWebinarEvents] = useState<WebinarEvent[]>([]);
+  const [filterWebinar, setFilterWebinar] = useState<string>('all');
+  useEffect(() => {
+    const unsub = fbSubscribe('webinars', (raw: Record<string, any> | null) => {
+      setWebinarEvents(parseWebinars(raw));
+    });
+    return unsub;
+  }, []);
+  // Webinar leads carry webinarEventId directly at conversion; fall back to the
+  // legacy bucket for any that don't.
+  const leadWebinarId = (l: Lead): string => l.webinarEventId || LEGACY_WEBINAR_ID;
+  const webinarTitleById = (id: string) =>
+    webinarEvents.find(e => e.id === id)?.title || (id === LEGACY_WEBINAR_ID ? 'Earlier webinar' : 'Webinar');
 
   const companyName = data.company?.name || 'Optimum Prime Solutions';
 
@@ -342,9 +361,12 @@ export default function LeadsManager({ data, onSave }: P) {
     ), [data.leads, editingId]);
 
   // ── Filtered leads ───────────────────────────────────────────────────────
-  // Bucket a lead's raw source into the three the filter offers.
-  const sourceCategory = (l: Lead): 'workshop' | 'online' | 'manual' =>
-    l.source === 'workshop' ? 'workshop' : (l.source === 'website' ? 'online' : 'manual');
+  // Bucket a lead's raw source into the categories the filter offers.
+  const sourceCategory = (l: Lead): 'workshop' | 'webinar' | 'online' | 'manual' =>
+    l.source === 'workshop' ? 'workshop'
+    : l.source === 'webinar' ? 'webinar'
+    : l.source === 'website' ? 'online'
+    : 'manual';
 
   // The working list always shows every lead (subject to status / source /
   // search). The date range only scopes the report + CSV exports — it must
@@ -354,6 +376,8 @@ export default function LeadsManager({ data, onSave }: P) {
     .filter(l => filterSource === 'All' || sourceCategory(l) === filterSource)
     // When viewing Workshop leads, optionally narrow to one specific workshop.
     .filter(l => filterSource !== 'workshop' || filterWorkshop === 'all' || leadWorkshopId(l) === filterWorkshop)
+    // When viewing Webinar leads, optionally narrow to one specific webinar.
+    .filter(l => filterSource !== 'webinar' || filterWebinar === 'all' || leadWebinarId(l) === filterWebinar)
     .filter(l => {
       if (!search.trim()) return true;
       const q = search.toLowerCase();
@@ -853,14 +877,14 @@ export default function LeadsManager({ data, onSave }: P) {
             and Select-all only touch the source you're looking at. */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-navy-500 mr-1">Source:</span>
-          {([['All', 'All sources'], ['online', 'Online / Website'], ['workshop', 'Workshop'], ['manual', 'Manual']] as [typeof filterSource, string][]).map(([val, label]) => {
+          {([['All', 'All sources'], ['online', 'Online / Website'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['manual', 'Manual']] as [typeof filterSource, string][]).map(([val, label]) => {
             const isActive = filterSource === val;
             const count = val === 'All'
               ? data.leads.length
               : data.leads.filter(l => sourceCategory(l) === val).length;
             return (
               <button key={val}
-                onClick={() => { setFilterSource(val); if (val !== 'workshop') setFilterWorkshop('all'); }}
+                onClick={() => { setFilterSource(val); if (val !== 'workshop') setFilterWorkshop('all'); if (val !== 'webinar') setFilterWebinar('all'); }}
                 className="rounded-full border px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap"
                 style={isActive
                   ? { backgroundColor: '#1e3a5f', color: '#fff', borderColor: '#1e3a5f' }
@@ -900,6 +924,40 @@ export default function LeadsManager({ data, onSave }: P) {
                     )),
                     ...orphanIds.map(id => (
                       <option key={id} value={id}>{workshopTitleById(id)} ({counts.get(id)})</option>
+                    )),
+                  ];
+                })()}
+              </select>
+            </label>
+          )}
+          {/* Which webinar? Same idea as workshops — narrow to one online event. */}
+          {filterSource === 'webinar' && (
+            <label className="flex items-center gap-1.5 text-xs text-navy-600 ml-1">
+              <Video className="h-3.5 w-3.5 text-navy-400" />
+              <select
+                value={filterWebinar}
+                onChange={e => setFilterWebinar(e.target.value)}
+                title="Show leads from a specific webinar"
+                className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs font-semibold text-navy-700 outline-none focus:border-accent cursor-pointer">
+                <option value="all">
+                  All webinars ({data.leads.filter(l => sourceCategory(l) === 'webinar').length})
+                </option>
+                {(() => {
+                  const wbLeads = data.leads.filter(l => sourceCategory(l) === 'webinar');
+                  const counts = new Map<string, number>();
+                  wbLeads.forEach(l => {
+                    const id = leadWebinarId(l);
+                    counts.set(id, (counts.get(id) || 0) + 1);
+                  });
+                  const ordered = [...webinarEvents].reverse().filter(e => counts.has(e.id));
+                  const listedIds = new Set(ordered.map(e => e.id));
+                  const orphanIds = [...counts.keys()].filter(id => !listedIds.has(id));
+                  return [
+                    ...ordered.map(e => (
+                      <option key={e.id} value={e.id}>{e.title} ({counts.get(e.id)})</option>
+                    )),
+                    ...orphanIds.map(id => (
+                      <option key={id} value={id}>{webinarTitleById(id)} ({counts.get(id)})</option>
                     )),
                   ];
                 })()}

@@ -32,6 +32,7 @@ const PricingPage       = lazy(() => import('./pages/PricingPage'));
 const WebinarPage       = lazy(() => import('./pages/WebinarPage'));
 const WorkshopPage      = lazy(() => import('./pages/WorkshopPage'));
 const WorkshopAttendeesPage = lazy(() => import('./pages/WorkshopAttendeesPage'));
+const WebinarAttendeesPage = lazy(() => import('./pages/WebinarAttendeesPage'));
 const BizAnalystPage    = lazy(() => import('./pages/BizAnalystPage'));
 const KnowledgeHubPage  = lazy(() => import('./pages/KnowledgeHubPage'));
 const VideoTutorialsPage = lazy(() => import('./pages/VideoTutorialsPage'));
@@ -236,6 +237,7 @@ function App() {
       <SiteProvider>
         <Routes>
           <Route path="/workshop-attendees" element={<Suspense fallback={<PageLoader />}><WorkshopAttendeesPage /></Suspense>} />
+          <Route path="/webinar-attendees" element={<Suspense fallback={<PageLoader />}><WebinarAttendeesPage /></Suspense>} />
           <Route path="/admin" element={<Suspense fallback={<PageLoader />}><AdminLogin onLogin={handleLogin} /></Suspense>} />
           <Route
             path="/admin/*"

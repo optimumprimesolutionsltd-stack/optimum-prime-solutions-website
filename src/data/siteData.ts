@@ -19,7 +19,7 @@ export interface Lead {
   demoType?: 'online' | 'physical'; demoLocation?: string;
   teamMemberName?: string; teamMemberPhone?: string;
   meetLink?: string; meetSent?: boolean;
-  source?: 'website' | 'manual' | 'workshop'; // where the lead came from
+  source?: 'website' | 'manual' | 'workshop' | 'webinar'; // where the lead came from
   industry?: string; demoNotes?: string;
   requestType?: 'demo' | 'consultation' | 'bizanalyst'; // demo, consultation, or biz analyst enquiry
   // CRM follow-up fields
@@ -28,6 +28,10 @@ export interface Lead {
   workshopRegId?: string;         // links back to the workshop_registrants entry
   workshopEventId?: string;       // WHICH workshop event this lead came from (tells one workshop from another)
   workshopTitle?: string;         // snapshot of that workshop's title at conversion, for display/exports
+  attendedWebinar?: boolean;      // true if this lead came from an online-webinar attendee
+  webinarRegId?: string;          // links back to the webinar_registrants entry
+  webinarEventId?: string;        // WHICH webinar event this lead came from
+  webinarTitle?: string;          // snapshot of that webinar's title at conversion
 }
 export interface ContactInfo { location:string; phones:string[]; emails:string[]; workingHours:string[]; whatsapp:string; mapUrl:string }
 export interface CompanyInfo { name:string; tagline:string; mission:string; vision:string; about:string[]; stats:{label:string;value:string}[] }

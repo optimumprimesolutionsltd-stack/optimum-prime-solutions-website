@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import SEO from '../components/SEO';
 import { fbSet, fbSubscribe } from '../firebase/config';
 import {
-  DEFAULT_WORKSHOP, parseWorkshops, pickActiveWorkshop, type WorkshopEvent,
+  DEFAULT_WORKSHOP, parseWorkshops, pickActiveWorkshop, isRegistrationClosed,
+  type WorkshopEvent,
 } from '../data/workshopEvent';
 
 const NOTIFIER_URL = 'https://optimum-prime-lead-notifier.onrender.com/new-lead';
@@ -39,8 +40,12 @@ export default function WorkshopPage() {
     return Object.keys(e).length === 0;
   };
 
+  // Registration auto-closes at the end of the event day (Kenya time).
+  const registrationClosed = isRegistrationClosed(workshop);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (registrationClosed) return; // guard: the event day has passed
     if (!validate()) return;
     setSubmitting(true);
     try {
@@ -151,7 +156,21 @@ export default function WorkshopPage() {
 
         {/* Registration Form */}
         <div className="bg-slate-800 border border-slate-700 rounded-2xl p-8 shadow-xl">
-          {success ? (
+          {registrationClosed && !success ? (
+            <div className="text-center py-6">
+              <div className="text-5xl mb-4">🔒</div>
+              <h3 className="text-2xl font-bold text-white mb-2">Registration Closed</h3>
+              <p className="text-slate-300 text-sm mb-4">
+                Registration for <strong className="text-teal-400">{workshop.title}</strong> ({workshop.date}) has now closed.
+                Thank you to everyone who attended!
+              </p>
+              <p className="text-slate-400 text-sm">
+                Want to be first to know about our next event? Reach us on WhatsApp at{' '}
+                <a href="https://wa.me/254116246074" target="_blank" rel="noopener noreferrer"
+                  className="text-teal-400 font-semibold hover:underline">+254 116 246 074</a>.
+              </p>
+            </div>
+          ) : success ? (
             <div className="text-center py-6">
               <div className="text-5xl mb-4">🎉</div>
               <h3 className="text-2xl font-bold text-white mb-2">You're All Set!</h3>
