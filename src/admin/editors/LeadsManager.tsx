@@ -1497,12 +1497,21 @@ export default function LeadsManager({ data, onSave }: P) {
                     </div>
                   )}
 
-                  {/* ── Schedule Panel (shown when status = Schedule a Demo and not yet sent) ── */}
+                  {/* ── Schedule Demo pop-up (opens when status = Schedule a Demo, not yet sent) ── */}
                   {schedulingId === l.id && !l.meetSent && (
-                    <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 space-y-4">
-                      <div className="flex items-center gap-2">
-                        <CalendarDays className="h-5 w-5 text-amber-600" />
-                        <p className="font-bold text-amber-800">Schedule the Demo & Send Confirmation</p>
+                    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy-900/60 backdrop-blur-sm p-4 sm:p-6"
+                      onClick={() => setSchedulingId(null)}>
+                    <div onClick={e => e.stopPropagation()}
+                      className="my-6 w-full max-w-2xl rounded-2xl border border-amber-300 bg-amber-50 p-5 space-y-4 shadow-2xl">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays className="h-5 w-5 text-amber-600" />
+                          <p className="font-bold text-amber-800">Book a Demo — {l.name}</p>
+                        </div>
+                        <button onClick={() => setSchedulingId(null)} title="Close"
+                          className="rounded-lg p-1.5 text-amber-500 hover:bg-amber-100 transition">
+                          <X className="h-5 w-5" />
+                        </button>
                       </div>
                       <p className="text-xs text-amber-700">
                         Fill in the details below. The client will receive a WhatsApp confirmation
@@ -1644,6 +1653,7 @@ export default function LeadsManager({ data, onSave }: P) {
                           Cancel
                         </button>
                       </div>
+                    </div>
                     </div>
                   )}
 
