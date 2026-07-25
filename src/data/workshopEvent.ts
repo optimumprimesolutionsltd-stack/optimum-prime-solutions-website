@@ -50,3 +50,22 @@ export function pickActiveWorkshop(list: WorkshopEvent[]): WorkshopEvent {
 
 // Which event a registrant belongs to (legacy rows have no eventId).
 export const regEventId = (r: { eventId?: string }): string => r.eventId || LEGACY_WORKSHOP_ID;
+
+// Parse the calendar day (YYYY-MM-DD parts) out of an event's compact ISO
+// calendarStart (e.g. '20260724T040000Z'). Null when no date is set.
+export function eventDayParts(w: { calendarStart?: string }): { y: number; m: number; d: number } | null {
+  const match = w.calendarStart?.match(/^(\d{4})(\d{2})(\d{2})/);
+  return match ? { y: +match[1], m: +match[2], d: +match[3] } : null;
+}
+
+// Registration auto-closes at the END of the event day in Kenya time (EAT,
+// UTC+3). The public RSVP page stops taking sign-ups once the event has
+// happened. While no calendar date is set the link stays open, so a freshly
+// created event is never accidentally closed.
+export function isRegistrationClosed(w: { calendarStart?: string }, now: Date = new Date()): boolean {
+  const day = eventDayParts(w);
+  if (!day) return false;
+  // 23:59:59 EAT == 20:59:59 UTC (EAT is UTC+3).
+  const endOfEventDayUtcMs = Date.UTC(day.y, day.m - 1, day.d, 20, 59, 59);
+  return now.getTime() > endOfEventDayUtcMs;
+}
