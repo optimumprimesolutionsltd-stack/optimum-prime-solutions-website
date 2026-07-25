@@ -118,12 +118,31 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
 
   const setStaff = (r: Registrant, staff: boolean) => {
     fbSet(`workshop_registrants/${r.id}/staff`, staff);
+    // Staff are internal team members, not prospects. If this person was
+    // already pushed into the follow-up pipeline, withdraw their lead so
+    // Demo Leads and Workshop RSVPs stay consistent.
+    if (staff) {
+      const linked = data.leads.find(l => l.workshopRegId === r.id);
+      if (linked) {
+        onSave({ ...data, leads: data.leads.filter(l => l.workshopRegId !== r.id) });
+        fbSet(`workshop_registrants/${r.id}/workshopLeadId`, null);
+      }
+    }
   };
 
   const toggleAttendance = (r: Registrant) => {
     const attended = !r.attended;
     fbSet(`workshop_registrants/${r.id}/attended`, attended);
     fbSet(`workshop_registrants/${r.id}/attendedAt`, attended ? new Date().toISOString() : null);
+    // Keep the linked lead's attendance flag live instead of the stale
+    // snapshot captured when they were first added to the pipeline.
+    const linked = data.leads.find(l => l.workshopRegId === r.id);
+    if (linked && linked.attendedWorkshop !== attended) {
+      onSave({
+        ...data,
+        leads: data.leads.map(l => l.workshopRegId === r.id ? { ...l, attendedWorkshop: attended } : l),
+      });
+    }
   };
 
   const removeRegistrant = (id: string) => {
