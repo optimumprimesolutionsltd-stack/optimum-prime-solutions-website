@@ -243,13 +243,43 @@ export function downloadFile(filename: string, contents: string, mime: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
-// ── Open an HTML report in a new tab and trigger the print dialog ────────────
-// Lets the user "Save as PDF" without bundling a PDF library.
+// ── Render an HTML report to PDF via the browser's print dialog ──────────────
+// Produces a real PDF (user picks "Save as PDF" as the destination) without
+// bundling a heavy PDF library, and keeps the report's exact styling. Uses a
+// hidden iframe instead of window.open so pop-up blockers can't silently kill
+// it — the old pop-up approach was why "Download as PDF" appeared to do nothing.
 export function printHtml(html: string) {
-  const w = window.open('', '_blank');
-  if (!w) { alert('Please allow pop-ups for this site to download the PDF.'); return; }
-  w.document.write(html);
-  w.document.close();
-  w.focus();
-  setTimeout(() => w.print(), 400); // let the page render before printing
+  const iframe = document.createElement('iframe');
+  iframe.style.position = 'fixed';
+  iframe.style.right = '0';
+  iframe.style.bottom = '0';
+  iframe.style.width = '0';
+  iframe.style.height = '0';
+  iframe.style.border = '0';
+  document.body.appendChild(iframe);
+
+  const doc = iframe.contentWindow?.document;
+  if (!doc) { document.body.removeChild(iframe); alert('Could not open the print view.'); return; }
+  doc.open();
+  doc.write(html);
+  doc.close();
+
+  let printed = false;
+  const triggerPrint = () => {
+    if (printed) return; // onload and the fallback timer must not both fire
+    printed = true;
+    try {
+      iframe.contentWindow?.focus();
+      iframe.contentWindow?.print();
+    } catch { /* ignore */ }
+    // Leave the iframe long enough for the print dialog to grab its document,
+    // then clean it up.
+    setTimeout(() => { if (iframe.parentNode) document.body.removeChild(iframe); }, 60000);
+  };
+
+  // Wait for the iframe document (and its styles) to finish before printing.
+  if (iframe.contentWindow) {
+    iframe.contentWindow.onload = triggerPrint;
+  }
+  setTimeout(triggerPrint, 500); // fallback if onload doesn't fire
 }
