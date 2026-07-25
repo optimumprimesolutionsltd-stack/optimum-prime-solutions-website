@@ -288,7 +288,10 @@ export default function LeadsManager({ data, onSave }: P) {
   const sourceCategory = (l: Lead): 'workshop' | 'online' | 'manual' =>
     l.source === 'workshop' ? 'workshop' : (l.source === 'website' ? 'online' : 'manual');
 
-  const filtered = dateScopedLeads
+  // The working list always shows every lead (subject to status / source /
+  // search). The date range only scopes the report + CSV exports — it must
+  // never silently hide leads from the person working the pipeline.
+  const filtered = data.leads
     .filter(l => filterStatus === 'All' || l.status === filterStatus)
     .filter(l => filterSource === 'All' || sourceCategory(l) === filterSource)
     .filter(l => {
@@ -713,12 +716,12 @@ export default function LeadsManager({ data, onSave }: P) {
       {/* ── Stats Strip ── */}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
         {[
-          { label: 'Total',     value: dateScopedLeads.length,                                          color: 'bg-navy-50 text-navy-700' },
-          { label: 'New',       value: dateScopedLeads.filter(l => l.status === 'New').length,          color: 'bg-accent/10 text-accent' },
-          { label: 'Contacted', value: dateScopedLeads.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
-          { label: 'Qualified', value: dateScopedLeads.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
-          { label: 'Demo Set',  value: dateScopedLeads.filter(l => l.status === 'Demo Scheduled').length, color: 'bg-amber-50 text-amber-600' },
-          { label: 'Won',       value: dateScopedLeads.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
+          { label: 'Total',     value: data.leads.length,                                          color: 'bg-navy-50 text-navy-700' },
+          { label: 'New',       value: data.leads.filter(l => l.status === 'New').length,          color: 'bg-accent/10 text-accent' },
+          { label: 'Contacted', value: data.leads.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
+          { label: 'Qualified', value: data.leads.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
+          { label: 'Demo Set',  value: data.leads.filter(l => l.status === 'Demo Scheduled').length, color: 'bg-amber-50 text-amber-600' },
+          { label: 'Won',       value: data.leads.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
         ].map(s => (
           <div key={s.label} className={`rounded-xl p-3 text-center ${s.color}`}>
             <p className="text-xl font-bold">{s.value}</p>
@@ -743,9 +746,11 @@ export default function LeadsManager({ data, onSave }: P) {
             <Download className="h-4 w-4" /> Leads CSV
           </button>
         </div>
-        {/* Date filter (scopes the whole view + exports), closed-deal scope, cleanup */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-navy-100 bg-navy-50/50 px-3 py-2.5 text-xs">
-          <span className="font-semibold text-navy-500">Filter by date:</span>
+        {/* Report/export date range only — this NEVER hides leads from the list
+            above; it just scopes what the CRM Report and CSV downloads contain. */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-navy-100 bg-navy-50/50 px-3 py-2.5 text-xs"
+          title="This range only scopes the CRM Report and CSV downloads — your lead list above always shows everyone.">
+          <span className="font-semibold text-navy-500">Report date range:</span>
           <label className="flex items-center gap-1.5 text-navy-600">
             From
             <input type="date" value={exportFrom} onChange={e => setExportFrom(e.target.value)}
@@ -762,8 +767,8 @@ export default function LeadsManager({ data, onSave }: P) {
           )}
           <span className="text-navy-400">
             {(exportFrom || exportTo)
-              ? `Showing ${dateScopedLeads.length} lead${dateScopedLeads.length === 1 ? '' : 's'} in range`
-              : `${dateScopedLeads.length} leads (all dates)`}
+              ? `Report covers ${dateScopedLeads.length} lead${dateScopedLeads.length === 1 ? '' : 's'} in this range`
+              : `Report covers all ${dateScopedLeads.length} leads`}
           </span>
           <label className="flex items-center gap-1.5 text-navy-600 cursor-pointer" title="Only affects what the exports contain">
             <input type="checkbox" checked={includeClosed} onChange={e => setIncludeClosed(e.target.checked)}
