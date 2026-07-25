@@ -244,11 +244,21 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
 
   const addToPipeline = (r: Registrant, stage: string) => {
     if (isInPipeline(r) || !stage) return;
-    // Training webinars are for existing clients — never turn attendees into
-    // new sales leads.
-    if (isTrainingWebinar(selectedEvent)) return;
-    const leadId = `weblead_${r.id}`;
     const eventTitle = selectedEvent?.title || 'the webinar';
+    // Training webinars are for existing clients, so attendees are NOT cold
+    // prospects — we never bulk-convert them. But an existing client who raises
+    // a need during or after training IS a real opportunity, so we still let the
+    // rep log it, capturing exactly what they asked for.
+    const training = isTrainingWebinar(selectedEvent);
+    let need = '';
+    if (training) {
+      need = (window.prompt(
+        `${r.name} is an existing client (training webinar).\n\n`
+        + 'What did they request? e.g. buying an add-on, paying for implementation, '
+        + 'a new module, or more training. Leave blank to just log a follow-up.',
+      ) || '').trim();
+    }
+    const leadId = `weblead_${r.id}`;
     const newLead: Lead = {
       id: leadId,
       name: r.name,
@@ -258,7 +268,10 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
       businessType: '',
       demoDate: '',
       currentSoftware: '',
-      message: r.message || `Attended ${eventTitle}.`,
+      message: training
+        ? `Existing client — follow-up from training "${eventTitle}"${need ? `: ${need}` : ''}.`
+        : (r.message || `Attended ${eventTitle}.`),
+      ...(training && need ? { demoNotes: need } : {}),
       // Date the lead to the webinar DAY, so every attendee reflects on the
       // webinar day in Demo Leads regardless of when they registered. Falls
       // back to their registration date, then now.
@@ -431,7 +444,7 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
               </div>
               <p className="mt-1 text-[11px] text-navy-400">
                 {editing.audience === 'clients'
-                  ? 'Training session — attendees are tracked for attendance only and are NOT added to Demo Leads.'
+                  ? 'Training for existing clients — attendees aren’t treated as new leads. If a client requests something afterwards (add-on, implementation, training…), you can still log that follow-up per person.'
                   : 'Lead-generation webinar — attendees can be converted into Demo Leads, just like a workshop.'}
               </p>
             </div>
@@ -614,7 +627,19 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
                     </button>
                   </span>
                 ) : isTrainingWebinar(selectedEvent) ? (
-                  <span className="text-xs text-slate-400 italic">Existing client — training (not a lead)</span>
+                  <span className="inline-flex items-center gap-1 rounded-lg bg-purple-50 pl-2.5 pr-1 py-1 text-xs font-semibold text-purple-700">
+                    <UserPlus className="h-3.5 w-3.5" />
+                    <select
+                      defaultValue=""
+                      onChange={e => { if (e.target.value) addToPipeline(r, e.target.value); }}
+                      title="Existing client — if they requested something (add-on, implementation, training…), log it as a follow-up opportunity"
+                      className="bg-transparent text-purple-700 font-semibold text-xs outline-none cursor-pointer pr-1 py-0.5">
+                      <option value="" disabled>Requested something? Log follow-up →</option>
+                      {PIPELINE_STAGES.map(s => (
+                        <option key={s.id} value={s.id} className="text-navy-900">{s.id} — {s.hint}</option>
+                      ))}
+                    </select>
+                  </span>
                 ) : (
                   <span className="inline-flex items-center gap-1 rounded-lg bg-accent/10 pl-2.5 pr-1 py-1 text-xs font-semibold text-accent">
                     <UserPlus className="h-3.5 w-3.5" />
