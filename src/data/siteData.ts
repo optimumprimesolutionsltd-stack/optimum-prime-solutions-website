@@ -14,7 +14,7 @@ export interface Lead {
   id:string; name:string; company:string; phone:string; email:string;
   businessType:string; demoDate:string; demoTime?:string; currentSoftware:string; message:string;
   createdAt:string; status:string;
-  // Scheduling fields (set when status → Demo Scheduled)
+  // Scheduling fields (set when status → Schedule a Demo)
   scheduledDate?: string; scheduledTime?: string;
   demoType?: 'online' | 'physical'; demoLocation?: string;
   teamMemberName?: string; teamMemberPhone?: string;

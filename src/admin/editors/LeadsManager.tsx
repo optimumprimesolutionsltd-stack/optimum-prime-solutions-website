@@ -155,6 +155,19 @@ export default function LeadsManager({ data, onSave }: P) {
     return unsub;
   }, []);
 
+  // One-time migration: the "Demo Scheduled" stage was renamed to "Schedule a
+  // Demo". Move any lead still on the old status onto the new one so it never
+  // drops out of the pipeline (a rename alone would orphan it). Self-terminating
+  // — once migrated nothing matches, so it won't loop.
+  useEffect(() => {
+    const OLD = 'Demo Scheduled';
+    if (!data.leads.some(l => l.status === OLD)) return;
+    onSave({
+      ...data,
+      leads: data.leads.map(l => l.status === OLD ? { ...l, status: 'Schedule a Demo' } : l),
+    });
+  }, [data, onSave]);
+
   // Which workshop a lead belongs to. Newer leads carry workshopEventId directly;
   // older ones are resolved through their registrant (legacy July RSVPs have no
   // eventId and fall back to the legacy workshop id).
@@ -203,12 +216,28 @@ export default function LeadsManager({ data, onSave }: P) {
     [registrants, exportFrom, exportTo],
   );
 
-  const reportHtml = () => buildCrmReportHtml(exportLeads, exportRegistrants, { companyName, preparedFor: 'Tally Solutions' });
+  // When the report covers exactly one workshop, feature that event in the
+  // title and file names; otherwise it stays a generic CRM status report.
+  const reportWorkshop = useMemo(() => {
+    const ids = new Set<string>();
+    exportRegistrants.forEach(r => ids.add(regEventId(r as { eventId?: string })));
+    exportLeads.filter(l => l.source === 'workshop').forEach(l => ids.add(leadWorkshopId(l)));
+    if (ids.size !== 1) return undefined;
+    const e = events.find(ev => ev.id === [...ids][0]);
+    return e ? { title: e.title, date: e.date, venue: e.venue } : undefined;
+  }, [exportRegistrants, exportLeads, events, registrants]);
+
+  const slugify = (s: string) =>
+    s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'report';
+  const fileBase = reportWorkshop ? `crm-report-${slugify(reportWorkshop.title)}` : 'crm-report';
+
+  const reportHtml = () => buildCrmReportHtml(exportLeads, exportRegistrants,
+    { companyName, preparedFor: 'Tally Solutions', workshop: reportWorkshop });
   const downloadReport = (format: string) => {
     if (format === 'pdf') printHtml(reportHtml());
-    else if (format === 'excel') downloadFile('crm-report.xls', buildUnifiedXls(exportLeads, exportRegistrants), 'application/vnd.ms-excel');
-    else if (format === 'csv') downloadFile('crm-report.csv', buildUnifiedCsv(exportLeads, exportRegistrants), 'text/csv');
-    else if (format === 'html') downloadFile('crm-status-report.html', reportHtml(), 'text/html');
+    else if (format === 'excel') downloadFile(`${fileBase}.xls`, buildUnifiedXls(exportLeads, exportRegistrants), 'application/vnd.ms-excel');
+    else if (format === 'csv') downloadFile(`${fileBase}.csv`, buildUnifiedCsv(exportLeads, exportRegistrants), 'text/csv');
+    else if (format === 'html') downloadFile(`${fileBase}.html`, reportHtml(), 'text/html');
   };
 
   // Re-date already-converted workshop leads to their workshop registration date
@@ -308,7 +337,7 @@ export default function LeadsManager({ data, onSave }: P) {
   const bookedSlots = useMemo(() =>
     new Set(
       data.leads
-        .filter(l => l.status === 'Demo Scheduled' && l.scheduledDate && l.scheduledTime && l.id !== editingId)
+        .filter(l => l.status === 'Schedule a Demo' && l.scheduledDate && l.scheduledTime && l.id !== editingId)
         .map(l => `${l.scheduledDate}|${l.scheduledTime}`)
     ), [data.leads, editingId]);
 
@@ -338,7 +367,7 @@ export default function LeadsManager({ data, onSave }: P) {
   // ── Status update ────────────────────────────────────────────────────────
   const updateStatus = (id: string, status: string) => {
     onSave({ ...data, leads: data.leads.map(l => l.id === id ? { ...l, status } : l) });
-    if (status === 'Demo Scheduled') {
+    if (status === 'Schedule a Demo') {
       setSchedulingId(id);
       const lead = data.leads.find(l => l.id === id);
       setSchedForm({
@@ -459,7 +488,7 @@ export default function LeadsManager({ data, onSave }: P) {
         currentSoftware: '',
         message: booking.demoNotes,
         createdAt: new Date().toISOString(),
-        status: 'Demo Scheduled',
+        status: 'Schedule a Demo',
         source: 'manual',
         scheduledDate: booking.demoDate,
         scheduledTime: booking.demoTime,
@@ -513,7 +542,7 @@ export default function LeadsManager({ data, onSave }: P) {
     }
   };
 
-  // ── Schedule a lead (status → Demo Scheduled) ────────────────────────────
+  // ── Schedule a lead (status → Schedule a Demo) ───────────────────────────
   const validateSched = () => {
     if (!schedForm.scheduledDate) return 'Please select a date';
     if (!schedForm.scheduledTime) return 'Please select a time';
@@ -534,7 +563,7 @@ export default function LeadsManager({ data, onSave }: P) {
       // Update lead record with schedule details
       const updated: Lead = {
         ...lead,
-        status: 'Demo Scheduled',
+        status: 'Schedule a Demo',
         scheduledDate: schedForm.scheduledDate,
         scheduledTime: schedForm.scheduledTime,
         demoType: schedForm.demoType,
@@ -751,7 +780,7 @@ export default function LeadsManager({ data, onSave }: P) {
           { label: 'New',       value: data.leads.filter(l => l.status === 'New').length,          color: 'bg-accent/10 text-accent' },
           { label: 'Contacted', value: data.leads.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
           { label: 'Qualified', value: data.leads.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
-          { label: 'Demo Set',  value: data.leads.filter(l => l.status === 'Demo Scheduled').length, color: 'bg-amber-50 text-amber-600' },
+          { label: 'Demo Set',  value: data.leads.filter(l => l.status === 'Schedule a Demo').length, color: 'bg-amber-50 text-amber-600' },
           { label: 'Won',       value: data.leads.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
         ].map(s => (
           <div key={s.label} className={`rounded-xl p-3 text-center ${s.color}`}>
@@ -1249,10 +1278,10 @@ export default function LeadsManager({ data, onSave }: P) {
                   )}
 
                   {/* Scheduled demo info (if already scheduled) */}
-                  {l.status === 'Demo Scheduled' && l.scheduledDate && l.meetSent && editingId !== l.id && (
+                  {l.status === 'Schedule a Demo' && l.scheduledDate && l.meetSent && editingId !== l.id && (
                     <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 space-y-2">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs font-bold text-amber-700">📅 Demo Scheduled</p>
+                        <p className="text-xs font-bold text-amber-700">📅 Demo booked</p>
                         <button
                           onClick={() => openEdit(l)}
                           className="flex items-center gap-1 rounded-lg bg-amber-100 hover:bg-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-800 transition">
@@ -1468,7 +1497,7 @@ export default function LeadsManager({ data, onSave }: P) {
                     </div>
                   )}
 
-                  {/* ── Schedule Panel (shown when status = Demo Scheduled and not yet sent) ── */}
+                  {/* ── Schedule Panel (shown when status = Schedule a Demo and not yet sent) ── */}
                   {schedulingId === l.id && !l.meetSent && (
                     <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 space-y-4">
                       <div className="flex items-center gap-2">

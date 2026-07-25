@@ -19,6 +19,7 @@ export interface WorkshopRegistrant {
   attendedAt?: string;
   workshopLeadId?: string; // set once converted into the follow-up pipeline
   staff?: boolean;         // internal team member — excluded from prospect exports
+  eventId?: string;        // which workshop event they registered for
 }
 
 const esc = (s: unknown) => String(s ?? '')
@@ -91,10 +92,17 @@ export function buildUnifiedXls(leads: Lead[], registrants: WorkshopRegistrant[]
 export function buildCrmReportHtml(
   leads: Lead[],
   registrants: WorkshopRegistrant[],
-  opts?: { companyName?: string; preparedFor?: string },
+  opts?: {
+    companyName?: string;
+    preparedFor?: string;
+    // When the report covers a single workshop, its details title the report.
+    workshop?: { title: string; date?: string; venue?: string };
+  },
 ): string {
   const companyName = opts?.companyName || 'Optimum Prime Solutions';
   const preparedFor = opts?.preparedFor || 'Tally Solutions';
+  const workshop = opts?.workshop;
+  const reportTitle = workshop ? workshop.title : 'CRM Status Report';
   const generated = new Date().toLocaleString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
   });
@@ -178,7 +186,7 @@ export function buildCrmReportHtml(
   return `<!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CRM Status Report — ${esc(companyName)}</title>
+<title>${esc(reportTitle)} — ${esc(companyName)}</title>
 <style>
   * { box-sizing: border-box; }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #0f172a; margin: 0; background: #f8fafc; }
@@ -203,8 +211,11 @@ export function buildCrmReportHtml(
 </style></head>
 <body><div class="wrap">
   <header class="rpt">
-    <h1>CRM Status Report</h1>
-    <p><strong>${esc(companyName)}</strong> — sales pipeline &amp; workshop follow-up</p>
+    <h1>${esc(reportTitle)}</h1>
+    <p><strong>${esc(companyName)}</strong> — ${workshop ? 'workshop follow-up &amp; sales pipeline' : 'sales pipeline &amp; workshop follow-up'}</p>
+    ${workshop && (workshop.date || workshop.venue)
+      ? `<p>${esc([workshop.date, workshop.venue].filter(Boolean).join(' · '))}</p>`
+      : ''}
     <p>Prepared for: ${esc(preparedFor)}</p>
     <p>Generated: ${esc(generated)}</p>
   </header>
