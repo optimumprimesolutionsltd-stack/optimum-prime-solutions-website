@@ -5,7 +5,7 @@ import {
   User, Send, AlertCircle, FileText,
 } from 'lucide-react';
 import type { SiteData, Lead } from '../../data/siteData';
-import { fbSubscribe } from '../../firebase/config';
+import { fbSubscribe, fbSet } from '../../firebase/config';
 import {
   buildCrmReportHtml, buildUnifiedCsv, buildUnifiedXls, downloadFile, printHtml,
   type WorkshopRegistrant,
@@ -211,6 +211,9 @@ export default function LeadsManager({ data, onSave }: P) {
   const deleteClosedLost = () => {
     if (closedLostCount === 0) return;
     if (confirm(`Permanently delete all ${closedLostCount} "Closed Lost" lead(s)? This cannot be undone.`)) {
+      // Also clear them from the /leads node, otherwise the live sync
+      // re-merges them back in and the delete appears not to work.
+      data.leads.filter(l => l.status === 'Closed Lost').forEach(l => fbSet(`leads/${l.id}`, null));
       onSave({ ...data, leads: data.leads.filter(l => l.status !== 'Closed Lost') });
       setSelectedIds(new Set());
     }
@@ -318,6 +321,7 @@ export default function LeadsManager({ data, onSave }: P) {
 
   const removeLead = (id: string) => {
     if (confirm('Delete this lead permanently?')) {
+      fbSet(`leads/${id}`, null); // remove from the /leads node too, or the sync re-adds it
       onSave({ ...data, leads: data.leads.filter(l => l.id !== id) });
     }
   };
@@ -354,6 +358,7 @@ export default function LeadsManager({ data, onSave }: P) {
   const bulkDelete = () => {
     if (selectedIds.size === 0) return;
     if (confirm(`Delete ${selectedIds.size} lead(s) permanently?`)) {
+      selectedIds.forEach(id => fbSet(`leads/${id}`, null)); // also clear from the /leads node
       onSave({ ...data, leads: data.leads.filter(l => !selectedIds.has(l.id)) });
       setSelectedIds(new Set());
     }
