@@ -129,6 +129,7 @@ interface ScheduleForm {
 export default function LeadsManager({ data, onSave }: P) {
   const [search, setSearch]           = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
+  const [filterSource, setFilterSource] = useState<'All' | 'workshop' | 'online' | 'manual'>('All');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
 
   // Workshop attendees — pulled in for the unified CRM report / export
@@ -283,8 +284,13 @@ export default function LeadsManager({ data, onSave }: P) {
     ), [data.leads, editingId]);
 
   // ── Filtered leads ───────────────────────────────────────────────────────
+  // Bucket a lead's raw source into the three the filter offers.
+  const sourceCategory = (l: Lead): 'workshop' | 'online' | 'manual' =>
+    l.source === 'workshop' ? 'workshop' : (l.source === 'website' ? 'online' : 'manual');
+
   const filtered = dateScopedLeads
     .filter(l => filterStatus === 'All' || l.status === filterStatus)
+    .filter(l => filterSource === 'All' || sourceCategory(l) === filterSource)
     .filter(l => {
       if (!search.trim()) return true;
       const q = search.toLowerCase();
@@ -778,6 +784,27 @@ export default function LeadsManager({ data, onSave }: P) {
             </button>
           )}
         </div>
+        {/* Source filter — separate online / workshop / manual so bulk actions
+            and Select-all only touch the source you're looking at. */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-navy-500 mr-1">Source:</span>
+          {([['All', 'All sources'], ['online', 'Online / Website'], ['workshop', 'Workshop'], ['manual', 'Manual']] as [typeof filterSource, string][]).map(([val, label]) => {
+            const isActive = filterSource === val;
+            const count = val === 'All'
+              ? dateScopedLeads.length
+              : dateScopedLeads.filter(l => sourceCategory(l) === val).length;
+            return (
+              <button key={val} onClick={() => setFilterSource(val)}
+                className="rounded-full border px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap"
+                style={isActive
+                  ? { backgroundColor: '#1e3a5f', color: '#fff', borderColor: '#1e3a5f' }
+                  : { backgroundColor: '#fff', color: '#475569', borderColor: '#e2e8f0' }}>
+                {label} <span style={{ opacity: 0.7 }}>({count})</span>
+              </button>
+            );
+          })}
+        </div>
+
         {/* Status filter tabs */}
         <div className="flex flex-wrap gap-2">
           {(['All', ...statuses] as string[]).map(s => {
