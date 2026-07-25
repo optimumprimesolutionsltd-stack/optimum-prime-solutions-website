@@ -85,6 +85,14 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
 
   const selectedEvent = events.find(e => e.id === selectedEventId) || null;
 
+  // The workshop's actual calendar day (parsed from the event's calendarStart
+  // ISO). Used so every attendee reflects on the workshop day regardless of
+  // when they signed up. null if the event has no calendar date set yet.
+  const eventDayISO = useMemo(() => {
+    const m = selectedEvent?.calendarStart?.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/);
+    return m ? `${m[1]}-${m[2]}-${m[3]}T${m[4]}:${m[5]}:${m[6]}Z` : null;
+  }, [selectedEvent]);
+
   // Registrants belonging to the selected workshop only.
   const eventRegistrants = useMemo(
     () => registrants.filter(r => regEventId(r) === selectedEventId),
@@ -245,9 +253,10 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
       demoDate: '',
       currentSoftware: '',
       message: r.message || `Attended ${eventTitle}.`,
-      // Date the lead to when they registered for the workshop, not to now, so
-      // date filters in Demo Leads line up with the workshop.
-      createdAt: r.createdAt || new Date().toISOString(),
+      // Date the lead to the workshop DAY, so every attendee reflects on the
+      // workshop day in Demo Leads regardless of when they registered. Falls
+      // back to their registration date, then now.
+      createdAt: eventDayISO || r.createdAt || new Date().toISOString(),
       status: stage,
       source: 'workshop',
       attendedWorkshop: !!r.attended,
@@ -263,6 +272,21 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
     if (!confirm(`Remove ${r.name} from the follow-up pipeline${stageNote}? This deletes their lead from Demo Leads. You can add them again later.`)) return;
     onSave({ ...data, leads: data.leads.filter(l => l.workshopRegId !== r.id) });
     fbSet(`workshop_registrants/${r.id}/workshopLeadId`, null);
+  };
+
+  // Re-date every existing lead for this workshop to the workshop DAY, so early
+  // sign-ups reflect on the workshop day in Demo Leads alongside everyone else.
+  const reflectOnWorkshopDay = () => {
+    if (!eventDayISO) {
+      alert('Set this workshop’s calendar date first (Edit details → Calendar start), then try again.');
+      return;
+    }
+    const regIds = new Set(eventRegistrants.map(r => r.id));
+    const affected = data.leads.filter(l => l.workshopRegId && regIds.has(l.workshopRegId) && l.createdAt !== eventDayISO);
+    if (affected.length === 0) { alert('All leads for this workshop already reflect the workshop day.'); return; }
+    if (!confirm(`Set ${affected.length} lead(s) to the workshop day (${selectedEvent?.date})? They’ll all show together on that date in Demo Leads.`)) return;
+    const ids = new Set(affected.map(l => l.id));
+    onSave({ ...data, leads: data.leads.map(l => ids.has(l.id) ? { ...l, createdAt: eventDayISO } : l) });
   };
 
   const exportCSV = () => {
@@ -308,8 +332,8 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
             <Pencil className="h-3.5 w-3.5" /> Edit details
           </button>
           <button onClick={openNewEvent}
-            className="flex items-center gap-1.5 rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-white hover:bg-accent/90 transition">
-            <Plus className="h-3.5 w-3.5" /> New workshop
+            className="flex items-center gap-2 rounded-lg bg-accent px-5 py-2.5 text-sm font-bold text-white shadow-md shadow-accent/25 hover:bg-accent/90 hover:shadow-lg transition">
+            <Plus className="h-4 w-4" /> New Workshop
           </button>
         </div>
         {selectedEvent && (
@@ -326,6 +350,11 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                 <Star className="h-3 w-3" /> Make this the live workshop
               </button>
             )}
+            <button onClick={reflectOnWorkshopDay}
+              title="Set every lead from this workshop to the workshop day, so early sign-ups group with everyone else on that date in Demo Leads"
+              className="inline-flex items-center gap-1 rounded-full border border-navy-200 bg-white px-2.5 py-0.5 font-semibold text-navy-600 hover:bg-navy-50 transition">
+              <Calendar className="h-3 w-3" /> Reflect all on workshop day
+            </button>
           </div>
         )}
       </div>
