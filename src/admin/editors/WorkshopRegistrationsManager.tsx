@@ -205,7 +205,9 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
       demoDate: '',
       currentSoftware: '',
       message: r.message || `Attended ${eventTitle}.`,
-      createdAt: new Date().toISOString(),
+      // Date the lead to when they registered for the workshop, not to now, so
+      // date filters in Demo Leads line up with the workshop.
+      createdAt: r.createdAt || new Date().toISOString(),
       status: stage,
       source: 'workshop',
       attendedWorkshop: !!r.attended,
