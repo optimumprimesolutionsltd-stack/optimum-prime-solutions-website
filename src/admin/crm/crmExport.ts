@@ -98,8 +98,13 @@ export function buildCrmReportHtml(
   });
 
   const convertedRegIds = new Set(leads.map(l => l.workshopRegId).filter(Boolean));
-  // Headcount of who was in the room — includes staff/employees who attended.
-  const attendedTotal = registrants.filter(r => r.attended).length;
+  // Attendance broken out so internal staff are never mixed into the prospect
+  // numbers. "Attended" and "Not Attended" count prospects only; staff are
+  // reported on their own line; head count is everyone actually in the room.
+  const prospectsAttended = registrants.filter(r => r.attended && !r.staff).length;
+  const prospectsNoShow   = registrants.filter(r => !r.attended && !r.staff).length;
+  const staffPresent      = registrants.filter(r => r.attended && r.staff).length;
+  const headCount         = registrants.filter(r => r.attended).length; // prospects + staff in the room
   const workshopLeads = leads.filter(l => l.source === 'workshop').length;
   const won = leads.filter(l => l.status === 'Closed Won').length;
   // Closed Lost only appears here when the export includes closed deals.
@@ -185,7 +190,10 @@ export function buildCrmReportHtml(
   <div class="kpis">
     <div class="kpi"><b>${leads.length}</b><span>Total Leads</span></div>
     <div class="kpi"><b>${registrants.length}</b><span>Workshop Registered</span></div>
-    <div class="kpi"><b>${attendedTotal}</b><span>Attended Breakfast</span></div>
+    <div class="kpi"><b>${prospectsAttended}</b><span>Attended (Prospects)</span></div>
+    <div class="kpi"><b>${prospectsNoShow}</b><span>Not Attended</span></div>
+    <div class="kpi"><b>${staffPresent}</b><span>Staff Present</span></div>
+    <div class="kpi"><b>${headCount}</b><span>Total Head Count</span></div>
     <div class="kpi"><b>${workshopLeads}</b><span>Workshop → Pipeline</span></div>
     <div class="kpi"><b>${won}</b><span>Closed Won</span></div>
     ${lost > 0 ? `<div class="kpi"><b>${lost}</b><span>Closed Lost</span></div>` : ''}

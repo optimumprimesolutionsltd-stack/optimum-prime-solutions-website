@@ -95,6 +95,12 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
   // still kept out of lead/pipeline metrics and exports elsewhere.
   const staffList = useMemo(() => eventRegistrants.filter(r => r.staff), [eventRegistrants]);
   const attendedCount = useMemo(() => eventRegistrants.filter(r => r.attended).length, [eventRegistrants]);
+  // Attendance split so internal staff are never mixed into the prospect
+  // numbers. Head count = everyone actually in the room (attended prospects
+  // + staff present) = attendedCount.
+  const prospectsAttended = useMemo(() => eventRegistrants.filter(r => r.attended && !r.staff).length, [eventRegistrants]);
+  const prospectsNoShow   = useMemo(() => eventRegistrants.filter(r => !r.attended && !r.staff).length, [eventRegistrants]);
+  const staffPresent      = useMemo(() => eventRegistrants.filter(r => r.attended && r.staff).length, [eventRegistrants]);
 
   const filtered = useMemo(() => {
     let list = filter === 'staff' ? staffList : eventRegistrants;
@@ -112,12 +118,31 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
 
   const setStaff = (r: Registrant, staff: boolean) => {
     fbSet(`workshop_registrants/${r.id}/staff`, staff);
+    // Staff are internal team members, not prospects. If this person was
+    // already pushed into the follow-up pipeline, withdraw their lead so
+    // Demo Leads and Workshop RSVPs stay consistent.
+    if (staff) {
+      const linked = data.leads.find(l => l.workshopRegId === r.id);
+      if (linked) {
+        onSave({ ...data, leads: data.leads.filter(l => l.workshopRegId !== r.id) });
+        fbSet(`workshop_registrants/${r.id}/workshopLeadId`, null);
+      }
+    }
   };
 
   const toggleAttendance = (r: Registrant) => {
     const attended = !r.attended;
     fbSet(`workshop_registrants/${r.id}/attended`, attended);
     fbSet(`workshop_registrants/${r.id}/attendedAt`, attended ? new Date().toISOString() : null);
+    // Keep the linked lead's attendance flag live instead of the stale
+    // snapshot captured when they were first added to the pipeline.
+    const linked = data.leads.find(l => l.workshopRegId === r.id);
+    if (linked && linked.attendedWorkshop !== attended) {
+      onSave({
+        ...data,
+        leads: data.leads.map(l => l.workshopRegId === r.id ? { ...l, attendedWorkshop: attended } : l),
+      });
+    }
   };
 
   const removeRegistrant = (id: string) => {
@@ -361,21 +386,21 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
       )}
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="rounded-xl bg-navy-50 p-3 text-center">
-          <p className="text-xl font-bold text-navy-700">{eventRegistrants.length}</p>
-          <p className="text-[10px] font-medium text-navy-700">Total RSVPs</p>
-        </div>
         <div className="rounded-xl bg-green-50 p-3 text-center">
-          <p className="text-xl font-bold text-green-700">{attendedCount}</p>
-          <p className="text-[10px] font-medium text-green-700">Attended</p>
+          <p className="text-xl font-bold text-green-700">{prospectsAttended}</p>
+          <p className="text-[10px] font-medium text-green-700">Attended (Prospects)</p>
         </div>
         <div className="rounded-xl bg-amber-50 p-3 text-center">
-          <p className="text-xl font-bold text-amber-700">{eventRegistrants.length - attendedCount}</p>
-          <p className="text-[10px] font-medium text-amber-700">Not Arrived</p>
+          <p className="text-xl font-bold text-amber-700">{prospectsNoShow}</p>
+          <p className="text-[10px] font-medium text-amber-700">Not Attended</p>
         </div>
         <div className="rounded-xl bg-slate-100 p-3 text-center">
-          <p className="text-xl font-bold text-slate-600">{staffList.length}</p>
-          <p className="text-[10px] font-medium text-slate-600">Staff</p>
+          <p className="text-xl font-bold text-slate-600">{staffPresent}</p>
+          <p className="text-[10px] font-medium text-slate-600">Staff Present</p>
+        </div>
+        <div className="rounded-xl bg-navy-50 p-3 text-center">
+          <p className="text-xl font-bold text-navy-700">{attendedCount}</p>
+          <p className="text-[10px] font-medium text-navy-700">Total Head Count</p>
         </div>
       </div>
 
@@ -455,7 +480,10 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
-              <div className={r.staff ? 'space-y-2 opacity-50 pointer-events-none select-none' : 'space-y-2'}>
+              {/* Staff rows stay fully interactive — you still mark their
+                  attendance for the head count. Only the pipeline action
+                  below is hidden for staff (they are not prospects). */}
+              <div className="space-y-2">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pl-14 text-xs text-navy-600">
                 <div className="flex items-center gap-1.5 min-w-0">
                   <Mail className="h-3.5 w-3.5 text-navy-400 shrink-0" /><span className="truncate">{r.email || '—'}</span>

@@ -16,8 +16,8 @@ export const PIPELINE_STAGES: PipelineStage[] = [
   { id: 'Contacted',      color: '#3b82f6', nextStep: 'Qualify need & budget',     hint: 'Reached out, awaiting response' },
   { id: 'Qualified',      color: '#8b5cf6', nextStep: 'Schedule a product demo',   hint: 'Genuine need & budget confirmed' },
   { id: 'Demo Scheduled', color: '#f59e0b', nextStep: 'Run the scheduled demo',    hint: 'Demo booked in' },
-  { id: 'Demo Done',      color: '#0ea5e9', nextStep: 'Send quote / invoice',      hint: 'Demo delivered' },
-  { id: 'Invoice Sent',   color: '#d946ef', nextStep: 'Follow up on payment',      hint: 'Client needs / has an invoice' },
+  { id: 'Demo Done',      color: '#0ea5e9', nextStep: 'Send a quote',              hint: 'Demo delivered' },
+  { id: 'Quote Sent',     color: '#d946ef', nextStep: 'Follow up to close',        hint: 'Client has received a quote' },
   { id: 'Closed Won',     color: '#16a34a', nextStep: 'Begin onboarding',          hint: 'Deal won 🎉' },
   { id: 'Closed Lost',    color: '#64748b', nextStep: '—',                          hint: 'Not proceeding' },
 ];
