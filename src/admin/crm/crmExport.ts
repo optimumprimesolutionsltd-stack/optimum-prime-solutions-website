@@ -255,13 +255,33 @@ export function downloadFile(filename: string, contents: string, mime: string) {
 // from a click (a user gesture), the new tab is allowed; and since the print
 // dialog belongs to the report tab, cancelling it never disturbs the admin app.
 export function printHtml(html: string) {
-  // Auto-open the print dialog once the report has rendered. Injected only here,
-  // so the "Download as Web page" HTML export stays free of this script.
-  const withAutoPrint = html.replace(
-    '</body>',
-    `<script>window.addEventListener('load',function(){setTimeout(function(){window.print();},350);});</script></body>`,
-  );
-  const blob = new Blob([withAutoPrint], { type: 'text/html' });
+  // A fixed "Save as PDF" bar so the user doesn't have to know the Ctrl+P /
+  // "change destination to Save as PDF" trick. It sits above the report, is
+  // hidden when the page actually prints (so it never appears in the saved
+  // PDF), and is injected only here — the "Download as Web page" export stays
+  // clean. The hint reminds them to pick "Save as PDF" as the destination,
+  // which is the one step the button itself can't do for them.
+  const printBar = `
+<style>
+  .op-print-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 99999;
+    display: flex; align-items: center; justify-content: center; gap: 14px;
+    background: #1e3a5f; padding: 10px 16px; box-shadow: 0 2px 10px rgba(0,0,0,.25);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  .op-print-bar button { border: 0; border-radius: 8px; padding: 10px 20px;
+    font-size: 14px; font-weight: 700; cursor: pointer; }
+  .op-save { background: #e53e3e; color: #fff; }
+  .op-close { background: rgba(255,255,255,.15); color: #fff; }
+  .op-hint { color: #cbd5e1; font-size: 12px; }
+  body { padding-top: 60px; }
+  @media print { .op-print-bar { display: none !important; } body { padding-top: 0 !important; } }
+</style>
+<div class="op-print-bar">
+  <button class="op-save" onclick="window.print()">⬇ Save as PDF</button>
+  <span class="op-hint">In the dialog, set <b>Destination</b> to <b>“Save as PDF”</b>, then Save.</span>
+  <button class="op-close" onclick="window.close()">Close</button>
+</div>`;
+  const withBar = html.replace('<body>', `<body>${printBar}`);
+  const blob = new Blob([withBar], { type: 'text/html' });
   const url = URL.createObjectURL(blob);
   const w = window.open(url, '_blank');
   if (!w) {
