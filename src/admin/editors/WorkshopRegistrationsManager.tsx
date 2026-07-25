@@ -455,7 +455,10 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                   <Trash2 className="h-4 w-4" />
                 </button>
               </div>
-              <div className={r.staff ? 'space-y-2 opacity-50 pointer-events-none select-none' : 'space-y-2'}>
+              {/* Staff rows stay fully interactive — you still mark their
+                  attendance for the head count. Only the pipeline action
+                  below is hidden for staff (they are not prospects). */}
+              <div className="space-y-2">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pl-14 text-xs text-navy-600">
                 <div className="flex items-center gap-1.5 min-w-0">
                   <Mail className="h-3.5 w-3.5 text-navy-400 shrink-0" /><span className="truncate">{r.email || '—'}</span>
