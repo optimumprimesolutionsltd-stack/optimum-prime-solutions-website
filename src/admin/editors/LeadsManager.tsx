@@ -11,6 +11,9 @@ import {
   type WorkshopRegistrant,
 } from '../crm/crmExport';
 import { PIPELINE_ORDER, stageColor, stageTint, defaultNextStep } from '../crm/pipeline';
+import {
+  LEGACY_WORKSHOP_ID, parseWorkshops, regEventId, type WorkshopEvent,
+} from '../../data/workshopEvent';
 
 interface P { data: SiteData; onSave: (d: SiteData) => void }
 
@@ -140,6 +143,32 @@ export default function LeadsManager({ data, onSave }: P) {
     });
     return unsub;
   }, []);
+
+  // Workshop EVENTS — so we can tell one workshop apart from the next when
+  // filtering leads (a workshop is a group event, unlike a one-off online demo).
+  const [events, setEvents] = useState<WorkshopEvent[]>([]);
+  const [filterWorkshop, setFilterWorkshop] = useState<string>('all');
+  useEffect(() => {
+    const unsub = fbSubscribe('workshops', (raw: Record<string, any> | null) => {
+      setEvents(parseWorkshops(raw));
+    });
+    return unsub;
+  }, []);
+
+  // Which workshop a lead belongs to. Newer leads carry workshopEventId directly;
+  // older ones are resolved through their registrant (legacy July RSVPs have no
+  // eventId and fall back to the legacy workshop id).
+  const regEventById = useMemo(() => {
+    const m = new Map<string, string>();
+    registrants.forEach(r => m.set(r.id, regEventId(r as { eventId?: string })));
+    return m;
+  }, [registrants]);
+  const leadWorkshopId = (l: Lead): string =>
+    l.workshopEventId
+    || (l.workshopRegId ? regEventById.get(l.workshopRegId) : undefined)
+    || LEGACY_WORKSHOP_ID;
+  const workshopTitleById = (id: string) =>
+    events.find(e => e.id === id)?.title || (id === LEGACY_WORKSHOP_ID ? 'Earlier workshop' : 'Workshop');
 
   const companyName = data.company?.name || 'Optimum Prime Solutions';
 
@@ -294,6 +323,8 @@ export default function LeadsManager({ data, onSave }: P) {
   const filtered = data.leads
     .filter(l => filterStatus === 'All' || l.status === filterStatus)
     .filter(l => filterSource === 'All' || sourceCategory(l) === filterSource)
+    // When viewing Workshop leads, optionally narrow to one specific workshop.
+    .filter(l => filterSource !== 'workshop' || filterWorkshop === 'all' || leadWorkshopId(l) === filterWorkshop)
     .filter(l => {
       if (!search.trim()) return true;
       const q = search.toLowerCase();
@@ -796,10 +827,11 @@ export default function LeadsManager({ data, onSave }: P) {
           {([['All', 'All sources'], ['online', 'Online / Website'], ['workshop', 'Workshop'], ['manual', 'Manual']] as [typeof filterSource, string][]).map(([val, label]) => {
             const isActive = filterSource === val;
             const count = val === 'All'
-              ? dateScopedLeads.length
-              : dateScopedLeads.filter(l => sourceCategory(l) === val).length;
+              ? data.leads.length
+              : data.leads.filter(l => sourceCategory(l) === val).length;
             return (
-              <button key={val} onClick={() => setFilterSource(val)}
+              <button key={val}
+                onClick={() => { setFilterSource(val); if (val !== 'workshop') setFilterWorkshop('all'); }}
                 className="rounded-full border px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap"
                 style={isActive
                   ? { backgroundColor: '#1e3a5f', color: '#fff', borderColor: '#1e3a5f' }
@@ -808,6 +840,43 @@ export default function LeadsManager({ data, onSave }: P) {
               </button>
             );
           })}
+          {/* Which workshop? A workshop is a group event, so once you're looking
+              at Workshop leads you can narrow to one specific event. */}
+          {filterSource === 'workshop' && (
+            <label className="flex items-center gap-1.5 text-xs text-navy-600 ml-1">
+              <Calendar className="h-3.5 w-3.5 text-navy-400" />
+              <select
+                value={filterWorkshop}
+                onChange={e => setFilterWorkshop(e.target.value)}
+                title="Show leads from a specific workshop"
+                className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs font-semibold text-navy-700 outline-none focus:border-accent cursor-pointer">
+                <option value="all">
+                  All workshops ({data.leads.filter(l => sourceCategory(l) === 'workshop').length})
+                </option>
+                {(() => {
+                  // List every workshop that actually has leads, most recent first,
+                  // plus a catch-all for legacy leads with no resolvable event.
+                  const wsLeads = data.leads.filter(l => sourceCategory(l) === 'workshop');
+                  const counts = new Map<string, number>();
+                  wsLeads.forEach(l => {
+                    const id = leadWorkshopId(l);
+                    counts.set(id, (counts.get(id) || 0) + 1);
+                  });
+                  const ordered = [...events].reverse().filter(e => counts.has(e.id));
+                  const listedIds = new Set(ordered.map(e => e.id));
+                  const orphanIds = [...counts.keys()].filter(id => !listedIds.has(id));
+                  return [
+                    ...ordered.map(e => (
+                      <option key={e.id} value={e.id}>{e.title} ({counts.get(e.id)})</option>
+                    )),
+                    ...orphanIds.map(id => (
+                      <option key={id} value={id}>{workshopTitleById(id)} ({counts.get(id)})</option>
+                    )),
+                  ];
+                })()}
+              </select>
+            </label>
+          )}
         </div>
 
         {/* Status filter tabs */}
@@ -818,7 +887,7 @@ export default function LeadsManager({ data, onSave }: P) {
             const isActive = filterStatus === s;
             const color = s === 'All' ? '#1e3a5f' : stageColor(s);
             const tint = s === 'All' ? '#f1f5f9' : stageTint(s);
-            const count = s === 'All' ? dateScopedLeads.length : dateScopedLeads.filter(l => l.status === s).length;
+            const count = s === 'All' ? data.leads.length : data.leads.filter(l => l.status === s).length;
             return (
               <button
                 key={s}
