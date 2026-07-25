@@ -116,6 +116,21 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
     );
   }, [eventRegistrants, staffList, search, filter]);
 
+  // Staff are internal team members, never leads. If anyone is flagged staff
+  // but still has a lead in the pipeline — e.g. they were flagged before this
+  // rule existed, or pushed to follow-up first — withdraw that lead so staff
+  // never appear in Demo Leads. Runs whenever registrants/leads change and is a
+  // no-op once clean, so it also covers any future edge cases automatically.
+  useEffect(() => {
+    if (!loaded) return;
+    const staffIds = new Set(registrants.filter(r => r.staff).map(r => r.id));
+    const strays = data.leads.filter(l => l.workshopRegId && staffIds.has(l.workshopRegId));
+    if (strays.length === 0) return;
+    const strayIds = new Set(strays.map(l => l.id));
+    onSave({ ...data, leads: data.leads.filter(l => !strayIds.has(l.id)) });
+    strays.forEach(l => l.workshopRegId && fbSet(`workshop_registrants/${l.workshopRegId}/workshopLeadId`, null));
+  }, [loaded, registrants, data, onSave]);
+
   const setStaff = (r: Registrant, staff: boolean) => {
     fbSet(`workshop_registrants/${r.id}/staff`, staff);
     // Staff are internal team members, not prospects. If this person was
