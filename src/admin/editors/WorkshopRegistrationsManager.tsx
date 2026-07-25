@@ -261,6 +261,10 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
       source: 'workshop',
       attendedWorkshop: !!r.attended,
       workshopRegId: r.id,
+      // Record which workshop this lead came from so Demo Leads and the CRM
+      // report can tell one workshop apart from the next.
+      workshopEventId: regEventId(r),
+      workshopTitle: selectedEvent?.title || '',
     };
     onSave({ ...data, leads: [newLead, ...data.leads] });
     fbSet(`workshop_registrants/${r.id}/workshopLeadId`, leadId);

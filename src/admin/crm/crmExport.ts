@@ -45,7 +45,9 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
 
   const leadRows = leads.map(l => [
     l.name, l.company, l.phone, l.email, l.industry || l.businessType || '',
-    l.source || 'website',
+    // Name the specific workshop for workshop leads so different events are
+    // distinguishable in the export, not just lumped as "workshop".
+    l.source === 'workshop' ? (l.workshopTitle || 'workshop') : (l.source || 'website'),
     l.attendedWorkshop ? 'Yes' : (l.source === 'workshop' ? 'No' : ''),
     l.status, l.nextStep || defaultNextStep(l.status),
     l.scheduledDate || '', l.scheduledTime || '', fmtDate(l.createdAt),
@@ -245,41 +247,29 @@ export function downloadFile(filename: string, contents: string, mime: string) {
 
 // ── Render an HTML report to PDF via the browser's print dialog ──────────────
 // Produces a real PDF (user picks "Save as PDF" as the destination) without
-// bundling a heavy PDF library, and keeps the report's exact styling. Uses a
-// hidden iframe instead of window.open so pop-up blockers can't silently kill
-// it — the old pop-up approach was why "Download as PDF" appeared to do nothing.
+// bundling a heavy PDF library, and keeps the report's exact styling.
+//
+// The report opens in its OWN browser tab and prints from there. This is
+// deliberate: printing a hidden iframe could blank the admin page when the
+// print dialog was cancelled, and a plain pop-up got blocked. Because this runs
+// from a click (a user gesture), the new tab is allowed; and since the print
+// dialog belongs to the report tab, cancelling it never disturbs the admin app.
 export function printHtml(html: string) {
-  const iframe = document.createElement('iframe');
-  iframe.style.position = 'fixed';
-  iframe.style.right = '0';
-  iframe.style.bottom = '0';
-  iframe.style.width = '0';
-  iframe.style.height = '0';
-  iframe.style.border = '0';
-  document.body.appendChild(iframe);
-
-  const doc = iframe.contentWindow?.document;
-  if (!doc) { document.body.removeChild(iframe); alert('Could not open the print view.'); return; }
-  doc.open();
-  doc.write(html);
-  doc.close();
-
-  let printed = false;
-  const triggerPrint = () => {
-    if (printed) return; // onload and the fallback timer must not both fire
-    printed = true;
-    try {
-      iframe.contentWindow?.focus();
-      iframe.contentWindow?.print();
-    } catch { /* ignore */ }
-    // Leave the iframe long enough for the print dialog to grab its document,
-    // then clean it up.
-    setTimeout(() => { if (iframe.parentNode) document.body.removeChild(iframe); }, 60000);
-  };
-
-  // Wait for the iframe document (and its styles) to finish before printing.
-  if (iframe.contentWindow) {
-    iframe.contentWindow.onload = triggerPrint;
+  // Auto-open the print dialog once the report has rendered. Injected only here,
+  // so the "Download as Web page" HTML export stays free of this script.
+  const withAutoPrint = html.replace(
+    '</body>',
+    `<script>window.addEventListener('load',function(){setTimeout(function(){window.print();},350);});</script></body>`,
+  );
+  const blob = new Blob([withAutoPrint], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
+  if (!w) {
+    URL.revokeObjectURL(url);
+    alert('Please allow pop-ups for this site, then choose "Download as PDF" again. '
+      + 'The report opens in a new tab where you can Save as PDF.');
+    return;
   }
-  setTimeout(triggerPrint, 500); // fallback if onload doesn't fire
+  // Give the new tab time to load the blob before releasing the URL.
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
 }
