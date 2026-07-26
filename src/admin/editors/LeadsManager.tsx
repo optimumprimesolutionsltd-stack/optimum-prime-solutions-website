@@ -1275,6 +1275,16 @@ export default function LeadsManager({ data, onSave }: P) {
                 <span className="text-[10px] text-navy-400 hidden sm:block whitespace-nowrap">
                   {new Date(l.createdAt).toLocaleDateString()}
                 </span>
+                {/* One-click Book-a-Demo: opens the scheduling pop-up for this
+                    lead without hunting through the status dropdown. */}
+                {!l.meetSent && (
+                  <button
+                    onClick={e => { e.stopPropagation(); setExpandedId(l.id); updateStatus(l.id, 'Schedule a Demo'); }}
+                    title="Book / schedule a demo for this lead"
+                    className="inline-flex items-center gap-1 rounded-lg bg-accent/10 px-2.5 py-1 text-[11px] font-bold text-accent hover:bg-accent/20 transition whitespace-nowrap shrink-0">
+                    <CalendarDays className="h-3.5 w-3.5" /> Book demo
+                  </button>
+                )}
                 <ChevronDown className={`h-4 w-4 text-navy-400 transition-transform shrink-0 ${expandedId === l.id ? 'rotate-180' : ''}`} />
               </div>
 
