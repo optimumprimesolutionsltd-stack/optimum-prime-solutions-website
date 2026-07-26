@@ -32,9 +32,18 @@ interface EventForm {
   active: boolean; calendarStart: string; calendarEnd: string;
 }
 
-interface Props { data: SiteData; onSave: (d: SiteData) => void }
+interface Props {
+  data: SiteData;
+  onSave: (d: SiteData) => void;
+  // Ask the parent to open the Book-a-Demo pop-up (in Demo Leads) for a lead.
+  onBookDemo?: (leadId: string) => void;
+}
 
-export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
+// Short date for a scheduled demo, e.g. "1 Aug". Noon avoids TZ date-shift.
+const fmtShort = (d?: string) =>
+  d ? new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
+
+export default function WorkshopRegistrationsManager({ data, onSave, onBookDemo }: Props) {
   const [registrants, setRegistrants] = useState<Registrant[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState('');
@@ -268,6 +277,9 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
     };
     onSave({ ...data, leads: [newLead, ...data.leads] });
     fbSet(`workshop_registrants/${r.id}/workshopLeadId`, leadId);
+    // Booking a demo: jump into the Book-a-Demo pop-up in Demo Leads for this
+    // new lead (date / time / team). Same pop-up used everywhere.
+    if (stage === 'Schedule a Demo') onBookDemo?.(leadId);
   };
 
   const removeFromPipeline = (r: Registrant) => {
@@ -565,18 +577,39 @@ export default function WorkshopRegistrationsManager({ data, onSave }: Props) {
                   className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
                   <Phone className="h-3 w-3 inline mr-1" />WhatsApp
                 </a>
+                {/* Book a demo straight from a workshop attendee — opens the same
+                    Book-a-Demo pop-up over in Demo Leads. */}
+                {!r.staff && !isInPipeline(r) && (
+                  <button onClick={() => addToPipeline(r, 'Schedule a Demo')}
+                    title="Book a demo for this attendee (opens the scheduling pop-up)"
+                    className="inline-flex items-center gap-1 rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-white hover:bg-accent/90 transition">
+                    <Calendar className="h-3.5 w-3.5" /> Book demo
+                  </button>
+                )}
                 {r.staff ? (
                   <span className="text-xs text-slate-400 italic">Internal — not a lead</span>
-                ) : isInPipeline(r) ? (
-                  <span className="rounded-lg bg-navy-100 pl-3 pr-1.5 py-1 text-xs font-semibold text-navy-500 inline-flex items-center gap-1.5">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    In pipeline: {data.leads.find(l => l.workshopRegId === r.id)?.status || '—'}
-                    <button onClick={() => removeFromPipeline(r)} title="Remove from pipeline (added by mistake)"
-                      className="rounded p-1 text-red-400 hover:bg-red-100 hover:text-red-600 transition">
-                      <Undo2 className="h-3.5 w-3.5" />
-                    </button>
-                  </span>
-                ) : (
+                ) : isInPipeline(r) ? (() => {
+                  const lead = data.leads.find(l => l.workshopRegId === r.id);
+                  return (
+                    <span className="rounded-lg bg-navy-100 pl-3 pr-1.5 py-1 text-xs font-semibold text-navy-500 inline-flex items-center gap-1.5">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      {lead?.scheduledDate
+                        ? <span className="text-amber-700">📅 {fmtShort(lead.scheduledDate)}{lead.scheduledTime ? ` · ${lead.scheduledTime}` : ''}</span>
+                        : <>In pipeline: {lead?.status || '—'}</>}
+                      {lead && (
+                        <button onClick={() => onBookDemo?.(lead.id)}
+                          title={lead.scheduledDate ? 'Edit this booked demo' : 'Book a demo (date & time)'}
+                          className="rounded p-1 text-accent hover:bg-accent/10 transition">
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                      <button onClick={() => removeFromPipeline(r)} title="Remove from pipeline (added by mistake)"
+                        className="rounded p-1 text-red-400 hover:bg-red-100 hover:text-red-600 transition">
+                        <Undo2 className="h-3.5 w-3.5" />
+                      </button>
+                    </span>
+                  );
+                })() : (
                   <span className="inline-flex items-center gap-1 rounded-lg bg-accent/10 pl-2.5 pr-1 py-1 text-xs font-semibold text-accent">
                     <UserPlus className="h-3.5 w-3.5" />
                     <select

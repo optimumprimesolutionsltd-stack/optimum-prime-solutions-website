@@ -83,7 +83,8 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'faqs': return <FaqEditor data={data} onSave={d => handleSave(d, 'FAQs saved!')} />;
       case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')}
         openScheduleLeadId={scheduleLeadId} onScheduleConsumed={() => setScheduleLeadId(null)} />;
-      case 'workshop': return <WorkshopRegistrationsManager data={data} onSave={d => handleSave(d, 'Workshop updated!')} />;
+      case 'workshop': return <WorkshopRegistrationsManager data={data} onSave={d => handleSave(d, 'Workshop updated!')}
+        onBookDemo={leadId => { setScheduleLeadId(leadId); setTab('leads'); }} />;
       case 'webinar': return <WebinarRegistrationsManager data={data} onSave={d => handleSave(d, 'Webinar updated!')}
         onBookDemo={leadId => { setScheduleLeadId(leadId); setTab('leads'); }} />;
       case 'whatsapp': return <WhatsAppManager />;
