@@ -11,6 +11,10 @@ import {
   regEventId, isTrainingWebinar, type WebinarEvent, type WebinarAudience,
 } from '../../data/webinarEvent';
 
+// Short date for a scheduled demo, e.g. "1 Aug". Noon avoids TZ date-shift.
+const fmtShort = (d?: string) =>
+  d ? new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
+
 interface Registrant {
   id: string;
   name: string;
@@ -638,16 +642,28 @@ export default function WebinarRegistrationsManager({ data, onSave, onBookDemo }
                 )}
                 {r.staff ? (
                   <span className="text-xs text-slate-400 italic">Internal — not a lead</span>
-                ) : isInPipeline(r) ? (
-                  <span className="rounded-lg bg-navy-100 pl-3 pr-1.5 py-1 text-xs font-semibold text-navy-500 inline-flex items-center gap-1.5">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    In pipeline: {data.leads.find(l => l.webinarRegId === r.id)?.status || '—'}
-                    <button onClick={() => removeFromPipeline(r)} title="Remove from pipeline (added by mistake)"
-                      className="rounded p-1 text-red-400 hover:bg-red-100 hover:text-red-600 transition">
-                      <Undo2 className="h-3.5 w-3.5" />
-                    </button>
-                  </span>
-                ) : isTrainingWebinar(selectedEvent) ? (
+                ) : isInPipeline(r) ? (() => {
+                  const lead = data.leads.find(l => l.webinarRegId === r.id);
+                  return (
+                    <span className="rounded-lg bg-navy-100 pl-3 pr-1.5 py-1 text-xs font-semibold text-navy-500 inline-flex items-center gap-1.5">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      {lead?.scheduledDate
+                        ? <span className="text-amber-700">📅 {fmtShort(lead.scheduledDate)}{lead.scheduledTime ? ` · ${lead.scheduledTime}` : ''}</span>
+                        : <>In pipeline: {lead?.status || '—'}</>}
+                      {lead && (
+                        <button onClick={() => onBookDemo?.(lead.id)}
+                          title={lead.scheduledDate ? 'Edit this booked demo' : 'Book a demo (date & time)'}
+                          className="rounded p-1 text-accent hover:bg-accent/10 transition">
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                      <button onClick={() => removeFromPipeline(r)} title="Remove from pipeline (added by mistake)"
+                        className="rounded p-1 text-red-400 hover:bg-red-100 hover:text-red-600 transition">
+                        <Undo2 className="h-3.5 w-3.5" />
+                      </button>
+                    </span>
+                  );
+                })() : isTrainingWebinar(selectedEvent) ? (
                   <span className="inline-flex items-center gap-1 rounded-lg bg-purple-50 pl-2.5 pr-1 py-1 text-xs font-semibold text-purple-700">
                     <UserPlus className="h-3.5 w-3.5" />
                     <select

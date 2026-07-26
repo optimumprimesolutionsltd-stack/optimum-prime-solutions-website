@@ -355,21 +355,24 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     }
   };
 
-  // Handoff from another tab (Webinar RSVPs): when asked to book a demo for a
-  // lead, clear filters so it's visible, expand it, and open the pop-up — the
-  // exact same flow as choosing "Schedule a Demo" here. The ref guards against
-  // re-processing the same id when data.leads updates.
+  // Handoff from another tab (Workshop / Webinar RSVPs): when asked to book a
+  // demo for a lead, clear filters so it's visible and expand it. If the demo is
+  // already booked, open the EDIT flow (so an existing booking is edited, never
+  // duplicated); otherwise open the scheduling pop-up. Same flows as here. The
+  // ref guards against re-processing the same id when data.leads updates.
   const handledScheduleRef = useRef<string | null>(null);
   useEffect(() => {
     if (!openScheduleLeadId) { handledScheduleRef.current = null; return; }
     if (handledScheduleRef.current === openScheduleLeadId) return;
-    if (!data.leads.some(l => l.id === openScheduleLeadId)) return; // wait for the lead to arrive
+    const lead = data.leads.find(l => l.id === openScheduleLeadId);
+    if (!lead) return; // wait for the lead to arrive
     handledScheduleRef.current = openScheduleLeadId;
     setFilterStatus('All');
     setFilterSource('All');
     setSearch('');
     setExpandedId(openScheduleLeadId);
-    updateStatus(openScheduleLeadId, 'Schedule a Demo');
+    if (lead.meetSent) openEdit(lead);
+    else updateStatus(openScheduleLeadId, 'Schedule a Demo');
     onScheduleConsumed?.();
   }, [openScheduleLeadId, data.leads]);
 
