@@ -1539,14 +1539,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   )}
 
                   {/* ── Schedule Demo pop-up (opens when status = Schedule a Demo, not yet sent) ── */}
-                  {/* Close only when a press STARTS on the backdrop itself.
-                      onClick closed the modal instantly, because the same
-                      click/tap that opened it (status dropdown or Book-demo
-                      button) landed on the freshly rendered backdrop. Using
-                      mousedown + a target check avoids that. */}
+                  {/* The backdrop deliberately has NO click-to-close: a stray
+                      click outside must never discard a half-filled booking.
+                      Close only via the X or Cancel button (or on submit). */}
                   {schedulingId === l.id && !l.meetSent && (
-                    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy-900/60 backdrop-blur-sm p-4 sm:p-6"
-                      onMouseDown={e => { if (e.target === e.currentTarget) setSchedulingId(null); }}>
+                    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy-900/60 backdrop-blur-sm p-4 sm:p-6">
                     <div
                       className="my-6 w-full max-w-2xl rounded-2xl border border-amber-300 bg-amber-50 p-5 space-y-4 shadow-2xl">
                       <div className="flex items-center justify-between gap-2">
