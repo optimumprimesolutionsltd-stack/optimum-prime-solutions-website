@@ -1300,9 +1300,17 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                 <span className="text-[10px] text-navy-400 hidden sm:block whitespace-nowrap">
                   {new Date(l.createdAt).toLocaleDateString()}
                 </span>
-                {/* One-click Book-a-Demo: opens the scheduling pop-up for this
-                    lead without hunting through the status dropdown. */}
-                {!l.meetSent && (
+                {/* One-click demo action. If a demo is already booked, this
+                    edits the existing one (never creates a duplicate); otherwise
+                    it opens the scheduling pop-up. */}
+                {l.meetSent ? (
+                  <button
+                    onClick={e => { e.stopPropagation(); setExpandedId(l.id); openEdit(l); }}
+                    title="Edit this booked demo (date, time, team)"
+                    className="inline-flex items-center gap-1 rounded-lg bg-amber-100 px-2.5 py-1 text-[11px] font-bold text-amber-700 hover:bg-amber-200 transition whitespace-nowrap shrink-0">
+                    <CalendarDays className="h-3.5 w-3.5" /> Edit demo
+                  </button>
+                ) : (
                   <button
                     onClick={e => { e.stopPropagation(); setExpandedId(l.id); updateStatus(l.id, 'Schedule a Demo'); }}
                     title="Book / schedule a demo for this lead"
