@@ -3,7 +3,8 @@ import { FormEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSite } from '../context/SiteContext';
 import { fbSet, fbSubscribe } from '../firebase/config';
-import { DEFAULT_WORKSHOP, parseWorkshops, pickActiveWorkshop, type WorkshopEvent } from '../data/workshopEvent';
+import { DEFAULT_WORKSHOP, parseWorkshops, pickActiveWorkshop, isRegistrationClosed as isWorkshopOver, type WorkshopEvent } from '../data/workshopEvent';
+import { DEFAULT_WEBINAR, parseWebinars, pickActiveWebinar, isRegistrationClosed as isWebinarOver, type WebinarEvent } from '../data/webinarEvent';
 import { isValidEmail } from '../utils/validation';
 import Logo from './Logo';
 
@@ -32,10 +33,6 @@ const tallyPrimeLinks = [
   { l: 'Business Consulting (EOS®)', h: '/tallyprime/consulting' },
 ];
 
-const staticEvents = [
-  { l: 'Free TallyPrime 7.1 Webinar', h: '/webinar', badge: 'Live — Wed 22 July' },
-];
-
 const coreServices = [
   { icon: Calculator, label: 'Accounting & Bookkeeping' },
   { icon: Package, label: 'Inventory Management' },
@@ -51,17 +48,26 @@ export default function Footer() {
   const [subscribing, setSubscribing] = useState(false);
   const c = data.contact;
 
-  // Show the currently-active workshop in the footer's upcoming-events list.
+  // Show the currently-active workshop and webinar in the footer, but only if
+  // they are genuinely UPCOMING — an event with a date that hasn't passed.
+  // Past events (and undated placeholders) auto-archive, so we never advertise
+  // something that already happened.
   const [workshop, setWorkshop] = useState<WorkshopEvent>(DEFAULT_WORKSHOP);
+  const [webinar, setWebinar] = useState<WebinarEvent>(DEFAULT_WEBINAR);
   useEffect(() => {
-    const unsub = fbSubscribe('workshops', (raw: Record<string, any> | null) => {
+    const unsubW = fbSubscribe('workshops', (raw: Record<string, any> | null) => {
       setWorkshop(pickActiveWorkshop(parseWorkshops(raw)));
     });
-    return unsub;
+    const unsubWeb = fbSubscribe('webinars', (raw: Record<string, any> | null) => {
+      setWebinar(pickActiveWebinar(parseWebinars(raw)));
+    });
+    return () => { unsubW(); unsubWeb(); };
   }, []);
   const upcomingEvents = [
-    ...staticEvents,
-    { l: workshop.title, h: '/workshop-rsvp', badge: workshop.date },
+    ...(webinar.calendarStart && !isWebinarOver(webinar)
+      ? [{ l: webinar.title, h: '/webinar', badge: webinar.date }] : []),
+    ...(workshop.calendarStart && !isWorkshopOver(workshop)
+      ? [{ l: workshop.title, h: '/workshop-rsvp', badge: workshop.date }] : []),
   ];
 
   const handleNewsletterSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -218,6 +224,11 @@ export default function Footer() {
             <div className="rounded-3xl bg-slate-50 p-6">
               <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-4">Upcoming Events</h3>
               <ul className="space-y-2 text-sm">
+                {upcomingEvents.length === 0 && (
+                  <li className="px-3 py-2 text-sm text-slate-500">
+                    No upcoming events right now — check back soon.
+                  </li>
+                )}
                 {upcomingEvents.map((event) => (
                   <li key={event.h}>
                     <Link
