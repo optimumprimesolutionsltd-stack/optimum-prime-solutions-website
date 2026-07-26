@@ -5,7 +5,7 @@
 // and are triggered from the admin panel as file downloads.
 // ─────────────────────────────────────────────────────────────────────────────
 import type { Lead } from '../../data/siteData';
-import { PIPELINE_ORDER, defaultNextStep, stageColor } from './pipeline';
+import { PIPELINE_ORDER, defaultNextStep, stageColor, stageReportLabel } from './pipeline';
 
 export interface WorkshopRegistrant {
   id: string;
@@ -53,7 +53,7 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
       : (l.source || 'website'),
     (l.attendedWorkshop || l.attendedWebinar) ? 'Yes'
       : (l.source === 'workshop' || l.source === 'webinar') ? 'No' : '',
-    l.status, l.nextStep || defaultNextStep(l.status),
+    stageReportLabel(l.status), l.nextStep || defaultNextStep(l.status),
     l.scheduledDate || '', l.scheduledTime || '', fmtDate(l.createdAt),
   ]);
 
@@ -130,7 +130,7 @@ export function buildCrmReportHtml(
 
   const stageSections = grouped.map(g => `
     <section class="stage">
-      <h3><span class="dot" style="background:${stageColor(g.stage)}"></span>${esc(g.stage)} <span class="count">${g.items.length}</span></h3>
+      <h3><span class="dot" style="background:${stageColor(g.stage)}"></span>${esc(stageReportLabel(g.stage))} <span class="count">${g.items.length}</span></h3>
       <table>
         <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Next Step</th></tr></thead>
         <tbody>
