@@ -363,15 +363,19 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
           <div className="flex items-center gap-3 flex-wrap text-xs text-navy-500">
             <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{cardDate}</span>
             <span className="inline-flex items-center gap-1"><Building2 className="h-3.5 w-3.5" />{selectedEvent.venue}</span>
-            {isTrainingWebinar(selectedEvent) ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 font-semibold text-purple-700">
-                🎓 Training — existing clients
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">
-                🎯 New prospects
-              </span>
-            )}
+            {/* Audience is settable right here on the main view — no need to
+                open "Edit details". Writes straight to Firebase. */}
+            <label className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold ${isTrainingWebinar(selectedEvent) ? 'bg-purple-100 text-purple-700' : 'bg-amber-100 text-amber-700'}`}>
+              <span className="opacity-70">For:</span>
+              <select
+                value={selectedEvent.audience || 'prospects'}
+                onChange={e => fbSet(`webinars/${selectedEvent.id}/audience`, e.target.value)}
+                title="Who is this webinar for?"
+                className="bg-transparent font-semibold outline-none cursor-pointer">
+                <option value="prospects">🎯 New prospects</option>
+                <option value="clients">🎓 Existing clients — training</option>
+              </select>
+            </label>
             {selectedEvent.active ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 font-semibold text-green-700">
                 <Star className="h-3 w-3" /> Live — open for RSVPs
