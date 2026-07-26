@@ -64,11 +64,17 @@ export default function AdminLayout({ onLogout }: Props) {
   
   const handleSave = (d: SiteData, msg: string) => { update(d); notify(msg); };
   
-  const handleReset = () => { 
-    if (confirm('Reset ALL content to factory defaults? This cannot be undone.')) { 
-      update(defaultData); 
-      notify('All content reset to defaults'); 
-    } 
+  const handleReset = () => {
+    // Deliberately high-friction: this wipes ALL content, so require the user to
+    // type the word out — a plain OK/Cancel is too easy to hit by mistake.
+    const answer = prompt(
+      'DANGER: this ERASES all website content and restores factory defaults. It cannot be undone.\n\n' +
+      'Type RESET (capitals) to confirm, or Cancel to keep everything.',
+    );
+    if (answer !== null && answer.trim() === 'RESET') {
+      update(defaultData);
+      notify('All content reset to defaults');
+    }
   };
 
   const newLeads = data.leads.filter(l => l.status === 'New').length;
@@ -142,8 +148,9 @@ export default function AdminLayout({ onLogout }: Props) {
           <a href="/" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-navy-600 hover:bg-navy-50 transition">
             <ExternalLink className="h-4 w-4" />View Website
           </a>
-          <button onClick={handleReset} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-orange-600 hover:bg-orange-50 transition">
-            <RotateCcw className="h-4 w-4" />Reset to Defaults
+          <button onClick={handleReset} title="Erases ALL content — requires typing RESET to confirm"
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-navy-300 hover:text-orange-600 hover:bg-orange-50/60 transition">
+            <RotateCcw className="h-3 w-3" />Reset to defaults
           </button>
           <button onClick={onLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition">
             <LogOut className="h-4 w-4" />Sign Out
@@ -170,8 +177,9 @@ export default function AdminLayout({ onLogout }: Props) {
             </div>
             <SidebarNav mobile />
             <div className="border-t border-navy-100 p-3 space-y-0.5 shrink-0">
-              <button onClick={handleReset} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-orange-600 hover:bg-orange-50">
-                <RotateCcw className="h-4 w-4" />Reset
+              <button onClick={handleReset} title="Erases ALL content — requires typing RESET to confirm"
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-navy-300 hover:text-orange-600 hover:bg-orange-50/60">
+                <RotateCcw className="h-3 w-3" />Reset to defaults
               </button>
               <button onClick={onLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50">
                 <LogOut className="h-4 w-4" />Sign Out
