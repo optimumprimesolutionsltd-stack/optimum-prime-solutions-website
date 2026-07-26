@@ -8,6 +8,7 @@ import { useOnlineStatus } from './OfflineBanner';
 import { validateForm, getFieldError, type FormData, type ValidationError } from '../utils/validation';
 import { fbSet } from '../firebase/config';
 import type { Lead } from '../data/siteData';
+import { isDateBlocked, isSaturday, WEEKDAY_HOUR_RANGES, SATURDAY_HOUR_RANGES } from '../data/demoTimings';
 
 export default function Contact() {
   const { data, update } = useSite();
@@ -43,64 +44,11 @@ export default function Contact() {
 
   const set = (k: string, v: string) => setForm({ ...form, [k]: v });
 
-  // Kenya public holidays (YYYY-MM-DD)
-  const KENYA_HOLIDAYS = new Set([
-    // 2026
-    '2026-01-01', // New Year's Day
-    '2026-04-03', // Good Friday
-    '2026-04-06', // Easter Monday
-    '2026-05-01', // Labour Day
-    '2026-06-01', // Madaraka Day
-    '2026-10-10', // Huduma Day
-    '2026-10-20', // Mashujaa Day
-    '2026-12-12', // Jamhuri Day
-    '2026-12-25', // Christmas Day
-    '2026-12-26', // Boxing Day
-    // 2027
-    '2027-01-01',
-    '2027-03-26', // Good Friday
-    '2027-03-29', // Easter Monday
-    '2027-05-01',
-    '2027-06-01',
-    '2027-10-10',
-    '2027-10-20',
-    '2027-12-12',
-    '2027-12-25',
-    '2027-12-26',
-  ]);
-
-  const isBlockedDate = (dateStr: string): boolean => {
-    if (!dateStr) return false;
-    const d = new Date(dateStr + 'T00:00:00');
-    const day = d.getDay(); // 0=Sun, 6=Sat
-    if (day === 0) return true; // Block all Sundays
-    if (KENYA_HOLIDAYS.has(dateStr)) return true; // Block holidays
-    return false;
-  };
-
-  const isSaturday = (dateStr: string): boolean => {
-    if (!dateStr) return false;
-    return new Date(dateStr + 'T00:00:00').getDay() === 6;
-  };
-
-  // Time slots — full week vs Saturday (before 2PM only)
-  const ALL_TIME_SLOTS = [
-    '8:00 AM – 9:00 AM',
-    '9:00 AM – 10:00 AM',
-    '10:00 AM – 11:00 AM',
-    '11:00 AM – 12:00 PM',
-    '12:00 PM – 1:00 PM',
-    '2:00 PM – 3:00 PM',
-    '3:00 PM – 4:00 PM',
-    '4:00 PM – 5:00 PM',
-  ];
-  const SATURDAY_TIME_SLOTS = [
-    '8:00 AM – 9:00 AM',
-    '9:00 AM – 10:00 AM',
-    '10:00 AM – 11:00 AM',
-    '11:00 AM – 12:00 PM',
-    '12:00 PM – 1:00 PM',
-  ];
+  // Booking-day / time-slot rules come from the shared timings module, so the
+  // public form and the admin booking pop-up always offer the same days & hours.
+  const isBlockedDate = isDateBlocked;
+  const ALL_TIME_SLOTS = WEEKDAY_HOUR_RANGES;
+  const SATURDAY_TIME_SLOTS = SATURDAY_HOUR_RANGES;
   const availableTimeSlots = isSaturday(form.demoDate) ? SATURDAY_TIME_SLOTS : ALL_TIME_SLOTS;
 
   const submit = async (e: FormEvent<HTMLFormElement>) => {

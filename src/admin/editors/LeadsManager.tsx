@@ -17,6 +17,7 @@ import {
 import {
   LEGACY_WEBINAR_ID, parseWebinars, type WebinarEvent,
 } from '../../data/webinarEvent';
+import { getDayOfWeek, isDateBlocked, generateTimeSlots } from '../../data/demoTimings';
 
 interface P { data: SiteData; onSave: (d: SiteData) => void }
 
@@ -28,73 +29,8 @@ const INDUSTRIES = [
   'SACCO / Cooperative', 'Professional Services', 'Other',
 ];
 
-// ── Kenya Public Holidays (recurring annual dates as MM-DD) ──────────────────
-const KE_HOLIDAYS_RECURRING = new Set([
-  '01-01', // New Year's Day
-  '05-01', // Labour Day
-  '06-01', // Madaraka Day
-  '10-10', // Huduma Day
-  '10-20', // Mashujaa Day
-  '12-12', // Jamhuri Day
-  '12-25', // Christmas Day
-  '12-26', // Boxing Day
-]);
-// One-off holidays (YYYY-MM-DD) — add upcoming ones as needed
-const KE_HOLIDAYS_ONEOFF = new Set([
-  '2026-04-03', // Good Friday 2026
-  '2026-04-06', // Easter Monday 2026
-  '2027-03-26', // Good Friday 2027
-  '2027-03-29', // Easter Monday 2027
-]);
-
-function isKenyaHoliday(dateStr: string): boolean {
-  if (!dateStr) return false;
-  const mmdd = dateStr.slice(5); // "MM-DD"
-  return KE_HOLIDAYS_RECURRING.has(mmdd) || KE_HOLIDAYS_ONEOFF.has(dateStr);
-}
-
-function getDayOfWeek(dateStr: string): number {
-  // Returns 0=Sun, 1=Mon ... 6=Sat
-  if (!dateStr) return -1;
-  return new Date(dateStr + 'T12:00:00').getDay();
-}
-
-function isDateBlocked(dateStr: string): boolean {
-  if (!dateStr) return false;
-  const dow = getDayOfWeek(dateStr);
-  if (dow === 0) return true; // Sunday
-  if (isKenyaHoliday(dateStr)) return true;
-  return false;
-}
-
-// ── Working hours per day ────────────────────────────────────────────────────
-// Weekday: 8:00–17:00, Saturday: 8:00–12:00
-function getAvailableHours(dateStr: string): { start: number; end: number } | null {
-  if (!dateStr) return null;
-  if (isDateBlocked(dateStr)) return null;
-  const dow = getDayOfWeek(dateStr);
-  if (dow === 6) return { start: 8, end: 12 }; // Saturday
-  return { start: 8, end: 17 }; // Mon–Fri
-}
-
-// ── Generate time slots (30-min intervals) ───────────────────────────────────
-function generateTimeSlots(dateStr: string): { value: string; label: string; blocked: boolean }[] {
-  const hours = getAvailableHours(dateStr);
-  if (!hours) return [];
-  const slots: { value: string; label: string; blocked: boolean }[] = [];
-  for (let h = hours.start; h < hours.end; h++) {
-    for (const m of [0, 30]) {
-      const hh = String(h).padStart(2, '0');
-      const mm = String(m).padStart(2, '0');
-      const value = `${hh}:${mm}`;
-      const ampm = h < 12 ? 'AM' : 'PM';
-      const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
-      const label = `${h12}:${mm} ${ampm}`;
-      slots.push({ value, label, blocked: false });
-    }
-  }
-  return slots;
-}
+// Booking-day / time-slot rules live in one shared module so the admin pop-up
+// and the public request form always offer the same days and hours.
 
 // ── Status config ────────────────────────────────────────────────────────────
 // Stages come from the shared pipeline module so every surface stays in sync.
@@ -1066,7 +1002,7 @@ export default function LeadsManager({ data, onSave }: P) {
                     <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(booking.demoDate) === 0 ? 'Sundays are not available' : 'This is a public holiday'} — please choose another date.</p>
                   )}
                   {booking.demoDate && getDayOfWeek(booking.demoDate) === 6 && !isDateBlocked(booking.demoDate) && (
-                    <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — available slots: 8:00 AM – 12:00 PM only.</p>
+                    <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — available slots: 8:00 AM – 1:00 PM only.</p>
                   )}
                 </div>
 
@@ -1451,7 +1387,7 @@ export default function LeadsManager({ data, onSave }: P) {
                             <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(schedForm.scheduledDate) === 0 ? 'Sundays not available' : 'Public holiday'} — choose another date.</p>
                           )}
                           {schedForm.scheduledDate && getDayOfWeek(schedForm.scheduledDate) === 6 && !isDateBlocked(schedForm.scheduledDate) && (
-                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–12:00 PM only.</p>
+                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–1:00 PM only.</p>
                           )}
                         </div>
 
@@ -1612,7 +1548,7 @@ export default function LeadsManager({ data, onSave }: P) {
                             <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(schedForm.scheduledDate) === 0 ? 'Sundays not available' : 'Public holiday'} — choose another date.</p>
                           )}
                           {schedForm.scheduledDate && getDayOfWeek(schedForm.scheduledDate) === 6 && !isDateBlocked(schedForm.scheduledDate) && (
-                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–12:00 PM only.</p>
+                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–1:00 PM only.</p>
                           )}
                         </div>
 
