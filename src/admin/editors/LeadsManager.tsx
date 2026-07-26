@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown,
   Download, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
@@ -18,7 +18,14 @@ import {
   LEGACY_WEBINAR_ID, parseWebinars, type WebinarEvent,
 } from '../../data/webinarEvent';
 
-interface P { data: SiteData; onSave: (d: SiteData) => void }
+interface P {
+  data: SiteData;
+  onSave: (d: SiteData) => void;
+  // When another tab (e.g. Webinar RSVPs) asks to book a demo for a lead, this
+  // is that lead's id; LeadsManager auto-opens its Book-a-Demo pop-up.
+  openScheduleLeadId?: string | null;
+  onScheduleConsumed?: () => void;
+}
 
 const BACKEND_URL = 'https://optimum-prime-lead-notifier.onrender.com';
 
@@ -132,7 +139,7 @@ interface ScheduleForm {
   demoNotes: string;
 }
 
-export default function LeadsManager({ data, onSave }: P) {
+export default function LeadsManager({ data, onSave, openScheduleLeadId, onScheduleConsumed }: P) {
   const [search, setSearch]           = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
   const [filterSource, setFilterSource] = useState<'All' | 'workshop' | 'webinar' | 'online' | 'manual'>('All');
@@ -411,6 +418,24 @@ export default function LeadsManager({ data, onSave }: P) {
       if (schedulingId === id) setSchedulingId(null);
     }
   };
+
+  // Handoff from another tab (Webinar RSVPs): when asked to book a demo for a
+  // lead, clear filters so it's visible, expand it, and open the pop-up — the
+  // exact same flow as choosing "Schedule a Demo" here. The ref guards against
+  // re-processing the same id when data.leads updates.
+  const handledScheduleRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!openScheduleLeadId) { handledScheduleRef.current = null; return; }
+    if (handledScheduleRef.current === openScheduleLeadId) return;
+    if (!data.leads.some(l => l.id === openScheduleLeadId)) return; // wait for the lead to arrive
+    handledScheduleRef.current = openScheduleLeadId;
+    setFilterStatus('All');
+    setFilterSource('All');
+    setSearch('');
+    setExpandedId(openScheduleLeadId);
+    updateStatus(openScheduleLeadId, 'Schedule a Demo');
+    onScheduleConsumed?.();
+  }, [openScheduleLeadId, data.leads]);
 
   const removeLead = (id: string) => {
     if (confirm('Delete this lead permanently?')) {
@@ -1570,10 +1595,15 @@ export default function LeadsManager({ data, onSave }: P) {
                   )}
 
                   {/* ── Schedule Demo pop-up (opens when status = Schedule a Demo, not yet sent) ── */}
+                  {/* Close only when a press STARTS on the backdrop itself.
+                      onClick closed the modal instantly, because the same
+                      click/tap that opened it (status dropdown or Book-demo
+                      button) landed on the freshly rendered backdrop. Using
+                      mousedown + a target check avoids that. */}
                   {schedulingId === l.id && !l.meetSent && (
                     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy-900/60 backdrop-blur-sm p-4 sm:p-6"
-                      onClick={() => setSchedulingId(null)}>
-                    <div onClick={e => e.stopPropagation()}
+                      onMouseDown={e => { if (e.target === e.currentTarget) setSchedulingId(null); }}>
+                    <div
                       className="my-6 w-full max-w-2xl rounded-2xl border border-amber-300 bg-amber-50 p-5 space-y-4 shadow-2xl">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">

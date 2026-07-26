@@ -45,6 +45,9 @@ interface Props { onLogout: () => void }
 export default function AdminLayout({ onLogout }: Props) {
   const { data, update } = useSite();
   const [tab, setTab] = useState<TabId>('dashboard');
+  // A lead id handed from Webinar RSVPs when the user wants to book a demo for
+  // an attendee — the Demo Leads tab opens that lead's booking pop-up.
+  const [scheduleLeadId, setScheduleLeadId] = useState<string | null>(null);
   const [sidebar, setSidebar] = useState(false);
   const [toast, setToast] = useState('');
   const [unreadWa, setUnreadWa] = useState(0);
@@ -78,9 +81,11 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'products': return <ProductsEditor data={data} onSave={d => handleSave(d, 'Products & pricing saved!')} />;
       case 'industries': return <IndustriesEditor data={data} onSave={d => handleSave(d, 'Industries saved!')} />;
       case 'faqs': return <FaqEditor data={data} onSave={d => handleSave(d, 'FAQs saved!')} />;
-      case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')} />;
+      case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')}
+        openScheduleLeadId={scheduleLeadId} onScheduleConsumed={() => setScheduleLeadId(null)} />;
       case 'workshop': return <WorkshopRegistrationsManager data={data} onSave={d => handleSave(d, 'Workshop updated!')} />;
-      case 'webinar': return <WebinarRegistrationsManager data={data} onSave={d => handleSave(d, 'Webinar updated!')} />;
+      case 'webinar': return <WebinarRegistrationsManager data={data} onSave={d => handleSave(d, 'Webinar updated!')}
+        onBookDemo={leadId => { setScheduleLeadId(leadId); setTab('leads'); }} />;
       case 'whatsapp': return <WhatsAppManager />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
       case 'subscribers': return <SubscribersManager />;

@@ -33,9 +33,14 @@ interface EventForm {
   active: boolean; calendarStart: string; calendarEnd: string;
 }
 
-interface Props { data: SiteData; onSave: (d: SiteData) => void }
+interface Props {
+  data: SiteData;
+  onSave: (d: SiteData) => void;
+  // Ask the parent to open the Book-a-Demo pop-up (in Demo Leads) for a lead.
+  onBookDemo?: (leadId: string) => void;
+}
 
-export default function WebinarRegistrationsManager({ data, onSave }: Props) {
+export default function WebinarRegistrationsManager({ data, onSave, onBookDemo }: Props) {
   const [registrants, setRegistrants] = useState<Registrant[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState('');
@@ -287,6 +292,9 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
     };
     onSave({ ...data, leads: [newLead, ...data.leads] });
     fbSet(`webinar_registrants/${r.id}/webinarLeadId`, leadId);
+    // Booking a demo: jump straight into the Book-a-Demo pop-up in Demo Leads
+    // for this new lead (date / time / team). Same pop-up used everywhere.
+    if (stage === 'Schedule a Demo') onBookDemo?.(leadId);
   };
 
   const removeFromPipeline = (r: Registrant) => {
@@ -619,6 +627,15 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
                   className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
                   <Phone className="h-3 w-3 inline mr-1" />WhatsApp
                 </a>
+                {/* Book a demo straight from a webinar attendee — opens the same
+                    Book-a-Demo pop-up over in Demo Leads. */}
+                {!r.staff && !isInPipeline(r) && (
+                  <button onClick={() => addToPipeline(r, 'Schedule a Demo')}
+                    title="Book a demo for this attendee (opens the scheduling pop-up)"
+                    className="inline-flex items-center gap-1 rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-white hover:bg-accent/90 transition">
+                    <Calendar className="h-3.5 w-3.5" /> Book demo
+                  </button>
+                )}
                 {r.staff ? (
                   <span className="text-xs text-slate-400 italic">Internal — not a lead</span>
                 ) : isInPipeline(r) ? (
