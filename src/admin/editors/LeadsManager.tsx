@@ -1,12 +1,32 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown,
   Download, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
-  User, Send, AlertCircle,
+  User, Send, AlertCircle, FileText, Video,
 } from 'lucide-react';
 import type { SiteData, Lead } from '../../data/siteData';
+import { fbSubscribe, fbSet } from '../../firebase/config';
+import {
+  buildCrmReportHtml, buildUnifiedCsv, buildUnifiedXls, downloadFile, printHtml,
+  type WorkshopRegistrant,
+} from '../crm/crmExport';
+import { PIPELINE_ORDER, stageColor, stageTint, defaultNextStep } from '../crm/pipeline';
+import {
+  LEGACY_WORKSHOP_ID, parseWorkshops, regEventId, type WorkshopEvent,
+} from '../../data/workshopEvent';
+import {
+  LEGACY_WEBINAR_ID, parseWebinars, type WebinarEvent,
+} from '../../data/webinarEvent';
+import { getDayOfWeek, isDateBlocked, generateTimeSlots } from '../../data/demoTimings';
 
-interface P { data: SiteData; onSave: (d: SiteData) => void }
+interface P {
+  data: SiteData;
+  onSave: (d: SiteData) => void;
+  // When another tab (e.g. Webinar RSVPs) asks to book a demo for a lead, this
+  // is that lead's id; LeadsManager auto-opens its Book-a-Demo pop-up.
+  openScheduleLeadId?: string | null;
+  onScheduleConsumed?: () => void;
+}
 
 const BACKEND_URL = 'https://optimum-prime-lead-notifier.onrender.com';
 
@@ -16,92 +36,13 @@ const INDUSTRIES = [
   'SACCO / Cooperative', 'Professional Services', 'Other',
 ];
 
-// ── Kenya Public Holidays (recurring annual dates as MM-DD) ──────────────────
-const KE_HOLIDAYS_RECURRING = new Set([
-  '01-01', // New Year's Day
-  '05-01', // Labour Day
-  '06-01', // Madaraka Day
-  '10-10', // Huduma Day
-  '10-20', // Mashujaa Day
-  '12-12', // Jamhuri Day
-  '12-25', // Christmas Day
-  '12-26', // Boxing Day
-]);
-// One-off holidays (YYYY-MM-DD) — add upcoming ones as needed
-const KE_HOLIDAYS_ONEOFF = new Set([
-  '2026-04-03', // Good Friday 2026
-  '2026-04-06', // Easter Monday 2026
-  '2027-03-26', // Good Friday 2027
-  '2027-03-29', // Easter Monday 2027
-]);
-
-function isKenyaHoliday(dateStr: string): boolean {
-  if (!dateStr) return false;
-  const mmdd = dateStr.slice(5); // "MM-DD"
-  return KE_HOLIDAYS_RECURRING.has(mmdd) || KE_HOLIDAYS_ONEOFF.has(dateStr);
-}
-
-function getDayOfWeek(dateStr: string): number {
-  // Returns 0=Sun, 1=Mon ... 6=Sat
-  if (!dateStr) return -1;
-  return new Date(dateStr + 'T12:00:00').getDay();
-}
-
-function isDateBlocked(dateStr: string): boolean {
-  if (!dateStr) return false;
-  const dow = getDayOfWeek(dateStr);
-  if (dow === 0) return true; // Sunday
-  if (isKenyaHoliday(dateStr)) return true;
-  return false;
-}
-
-// ── Working hours per day ────────────────────────────────────────────────────
-// Weekday: 8:00–17:00, Saturday: 8:00–12:00
-function getAvailableHours(dateStr: string): { start: number; end: number } | null {
-  if (!dateStr) return null;
-  if (isDateBlocked(dateStr)) return null;
-  const dow = getDayOfWeek(dateStr);
-  if (dow === 6) return { start: 8, end: 12 }; // Saturday
-  return { start: 8, end: 17 }; // Mon–Fri
-}
-
-// ── Generate time slots (30-min intervals) ───────────────────────────────────
-function generateTimeSlots(dateStr: string): { value: string; label: string; blocked: boolean }[] {
-  const hours = getAvailableHours(dateStr);
-  if (!hours) return [];
-  const slots: { value: string; label: string; blocked: boolean }[] = [];
-  for (let h = hours.start; h < hours.end; h++) {
-    for (const m of [0, 30]) {
-      const hh = String(h).padStart(2, '0');
-      const mm = String(m).padStart(2, '0');
-      const value = `${hh}:${mm}`;
-      const ampm = h < 12 ? 'AM' : 'PM';
-      const h12 = h > 12 ? h - 12 : h === 0 ? 12 : h;
-      const label = `${h12}:${mm} ${ampm}`;
-      slots.push({ value, label, blocked: false });
-    }
-  }
-  return slots;
-}
+// Booking-day / time-slot rules live in one shared module so the admin pop-up
+// and the public request form always offer the same days and hours.
 
 // ── Status config ────────────────────────────────────────────────────────────
-const statusColors: Record<string, string> = {
-  'New':            '',
-  'Contacted':      '',
-  'Qualified':      '',
-  'Demo Scheduled': '',
-  'Closed Won':     '',
-  'Closed Lost':    '',
-};
-const statusBadgeStyle: Record<string, React.CSSProperties> = {
-  'New':            { backgroundColor: '#ef4444', color: '#fff' },
-  'Contacted':      { backgroundColor: '#3b82f6', color: '#fff' },
-  'Qualified':      { backgroundColor: '#8b5cf6', color: '#fff' },
-  'Demo Scheduled': { backgroundColor: '#f59e0b', color: '#fff' },
-  'Closed Won':     { backgroundColor: '#16a34a', color: '#fff' },
-  'Closed Lost':    { backgroundColor: '#64748b', color: '#fff' },
-};
-const statuses = Object.keys(statusColors);
+// Stages come from the shared pipeline module so every surface stays in sync.
+const statuses = PIPELINE_ORDER;
+const statusBadgeStyle = (status: string) => ({ backgroundColor: stageColor(status), color: '#fff' });
 
 // ── Manual booking form ──────────────────────────────────────────────────────
 interface BookingForm {
@@ -134,10 +75,170 @@ interface ScheduleForm {
   demoNotes: string;
 }
 
-export default function LeadsManager({ data, onSave }: P) {
+export default function LeadsManager({ data, onSave, openScheduleLeadId, onScheduleConsumed }: P) {
   const [search, setSearch]           = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
+  const [filterSource, setFilterSource] = useState<'All' | 'workshop' | 'webinar' | 'online' | 'manual'>('All');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
+
+  // Workshop attendees — pulled in for the unified CRM report / export
+  const [registrants, setRegistrants] = useState<WorkshopRegistrant[]>([]);
+  useEffect(() => {
+    const unsub = fbSubscribe('workshop_registrants', (raw: Record<string, any> | null) => {
+      setRegistrants(raw ? Object.entries(raw).map(([id, v]) => ({ id, ...(v as object) }) as WorkshopRegistrant) : []);
+    });
+    return unsub;
+  }, []);
+
+  // Workshop EVENTS — so we can tell one workshop apart from the next when
+  // filtering leads (a workshop is a group event, unlike a one-off online demo).
+  const [events, setEvents] = useState<WorkshopEvent[]>([]);
+  const [filterWorkshop, setFilterWorkshop] = useState<string>('all');
+  useEffect(() => {
+    const unsub = fbSubscribe('workshops', (raw: Record<string, any> | null) => {
+      setEvents(parseWorkshops(raw));
+    });
+    return unsub;
+  }, []);
+
+  // One-time migration: the "Demo Scheduled" stage was renamed to "Schedule a
+  // Demo". Move any lead still on the old status onto the new one so it never
+  // drops out of the pipeline (a rename alone would orphan it). Self-terminating
+  // — once migrated nothing matches, so it won't loop.
+  useEffect(() => {
+    const OLD = 'Demo Scheduled';
+    if (!data.leads.some(l => l.status === OLD)) return;
+    onSave({
+      ...data,
+      leads: data.leads.map(l => l.status === OLD ? { ...l, status: 'Schedule a Demo' } : l),
+    });
+  }, [data, onSave]);
+
+  // Which workshop a lead belongs to. Newer leads carry workshopEventId directly;
+  // older ones are resolved through their registrant (legacy July RSVPs have no
+  // eventId and fall back to the legacy workshop id).
+  const regEventById = useMemo(() => {
+    const m = new Map<string, string>();
+    registrants.forEach(r => m.set(r.id, regEventId(r as { eventId?: string })));
+    return m;
+  }, [registrants]);
+  const leadWorkshopId = (l: Lead): string =>
+    l.workshopEventId
+    || (l.workshopRegId ? regEventById.get(l.workshopRegId) : undefined)
+    || LEGACY_WORKSHOP_ID;
+  const workshopTitleById = (id: string) =>
+    events.find(e => e.id === id)?.title || (id === LEGACY_WORKSHOP_ID ? 'Earlier workshop' : 'Workshop');
+
+  // Webinar EVENTS — the online mirror of the workshop grouping, so webinar
+  // leads can be told apart by which webinar they came from.
+  const [webinarEvents, setWebinarEvents] = useState<WebinarEvent[]>([]);
+  const [filterWebinar, setFilterWebinar] = useState<string>('all');
+  useEffect(() => {
+    const unsub = fbSubscribe('webinars', (raw: Record<string, any> | null) => {
+      setWebinarEvents(parseWebinars(raw));
+    });
+    return unsub;
+  }, []);
+  // Webinar leads carry webinarEventId directly at conversion; fall back to the
+  // legacy bucket for any that don't.
+  const leadWebinarId = (l: Lead): string => l.webinarEventId || LEGACY_WEBINAR_ID;
+  const webinarTitleById = (id: string) =>
+    webinarEvents.find(e => e.id === id)?.title || (id === LEGACY_WEBINAR_ID ? 'Earlier webinar' : 'Webinar');
+
+  const companyName = data.company?.name || 'Optimum Prime Solutions';
+
+  // ── Export controls: date range + whether to include closed deals ──────────
+  const [exportFrom, setExportFrom]   = useState('');
+  const [exportTo, setExportTo]       = useState('');
+  const [includeClosed, setIncludeClosed] = useState(false);
+
+  const inDateRange = (iso: string) => {
+    const t = new Date(iso).getTime();
+    if (exportFrom && t < new Date(exportFrom + 'T00:00:00').getTime()) return false;
+    if (exportTo && t > new Date(exportTo + 'T23:59:59').getTime()) return false;
+    return true;
+  };
+
+  // The date range scopes the whole Demo Leads view — stats, tab counts and the
+  // list — so the numbers always match the chosen period.
+  const dateScopedLeads = useMemo(
+    () => data.leads.filter(l => inDateRange(l.createdAt)),
+    [data.leads, exportFrom, exportTo],
+  );
+
+  // Leads to export: the date-scoped set, open pipeline by default (New → Demo
+  // Done) unless the user opts to include Closed Won/Lost.
+  const exportLeads = useMemo(
+    () => dateScopedLeads.filter(l => includeClosed || (l.status !== 'Closed Won' && l.status !== 'Closed Lost')),
+    [dateScopedLeads, includeClosed],
+  );
+
+  const exportRegistrants = useMemo(
+    () => registrants.filter(r => inDateRange(r.createdAt)),
+    [registrants, exportFrom, exportTo],
+  );
+
+  // When the report covers exactly one workshop, feature that event in the
+  // title and file names; otherwise it stays a generic CRM status report.
+  const reportWorkshop = useMemo(() => {
+    const ids = new Set<string>();
+    exportRegistrants.forEach(r => ids.add(regEventId(r as { eventId?: string })));
+    exportLeads.filter(l => l.source === 'workshop').forEach(l => ids.add(leadWorkshopId(l)));
+    if (ids.size !== 1) return undefined;
+    const e = events.find(ev => ev.id === [...ids][0]);
+    return e ? { title: e.title, date: e.date, venue: e.venue } : undefined;
+  }, [exportRegistrants, exportLeads, events, registrants]);
+
+  const slugify = (s: string) =>
+    s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'report';
+  const fileBase = reportWorkshop ? `crm-report-${slugify(reportWorkshop.title)}` : 'crm-report';
+
+  const reportHtml = () => buildCrmReportHtml(exportLeads, exportRegistrants,
+    { companyName, preparedFor: 'Tally Solutions', workshop: reportWorkshop });
+  const downloadReport = (format: string) => {
+    if (format === 'pdf') printHtml(reportHtml());
+    else if (format === 'excel') downloadFile(`${fileBase}.xls`, buildUnifiedXls(exportLeads, exportRegistrants), 'application/vnd.ms-excel');
+    else if (format === 'csv') downloadFile(`${fileBase}.csv`, buildUnifiedCsv(exportLeads, exportRegistrants), 'text/csv');
+    else if (format === 'html') downloadFile(`${fileBase}.html`, reportHtml(), 'text/html');
+  };
+
+  // Re-date already-converted workshop leads to their workshop registration date
+  // (older ones carry the conversion date). Runs only on user click, so it acts
+  // on fully-loaded data — never a silent rewrite.
+  const regCreatedById = useMemo(() => {
+    const m = new Map<string, string>();
+    registrants.forEach(r => { if (r.createdAt) m.set(r.id, r.createdAt); });
+    return m;
+  }, [registrants]);
+  const workshopDateFixCount = useMemo(() => data.leads.filter(l =>
+    l.source === 'workshop' && l.workshopRegId
+    && regCreatedById.has(l.workshopRegId)
+    && regCreatedById.get(l.workshopRegId) !== l.createdAt
+  ).length, [data.leads, regCreatedById]);
+  const fixWorkshopDates = () => {
+    if (workshopDateFixCount === 0) return;
+    if (!confirm(`Set the date of ${workshopDateFixCount} workshop lead(s) to their workshop registration date, so date filters line up with the workshop?`)) return;
+    onSave({ ...data, leads: data.leads.map(l => {
+      if (l.source === 'workshop' && l.workshopRegId) {
+        const c = regCreatedById.get(l.workshopRegId);
+        if (c && c !== l.createdAt) return { ...l, createdAt: c };
+      }
+      return l;
+    }) });
+  };
+
+  // Permanently remove all Closed Lost leads to declutter the pipeline.
+  const closedLostCount = useMemo(() => data.leads.filter(l => l.status === 'Closed Lost').length, [data.leads]);
+  const deleteClosedLost = () => {
+    if (closedLostCount === 0) return;
+    if (confirm(`Permanently delete all ${closedLostCount} "Closed Lost" lead(s)? This cannot be undone.`)) {
+      // Also clear them from the /leads node, otherwise the live sync
+      // re-merges them back in and the delete appears not to work.
+      data.leads.filter(l => l.status === 'Closed Lost').forEach(l => fbSet(`leads/${l.id}`, null));
+      onSave({ ...data, leads: data.leads.filter(l => l.status !== 'Closed Lost') });
+      setSelectedIds(new Set());
+    }
+  };
 
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -198,13 +299,28 @@ export default function LeadsManager({ data, onSave }: P) {
   const bookedSlots = useMemo(() =>
     new Set(
       data.leads
-        .filter(l => l.status === 'Demo Scheduled' && l.scheduledDate && l.scheduledTime && l.id !== editingId)
+        .filter(l => l.status === 'Schedule a Demo' && l.scheduledDate && l.scheduledTime && l.id !== editingId)
         .map(l => `${l.scheduledDate}|${l.scheduledTime}`)
     ), [data.leads, editingId]);
 
   // ── Filtered leads ───────────────────────────────────────────────────────
+  // Bucket a lead's raw source into the categories the filter offers.
+  const sourceCategory = (l: Lead): 'workshop' | 'webinar' | 'online' | 'manual' =>
+    l.source === 'workshop' ? 'workshop'
+    : l.source === 'webinar' ? 'webinar'
+    : l.source === 'website' ? 'online'
+    : 'manual';
+
+  // The working list always shows every lead (subject to status / source /
+  // search). The date range only scopes the report + CSV exports — it must
+  // never silently hide leads from the person working the pipeline.
   const filtered = data.leads
     .filter(l => filterStatus === 'All' || l.status === filterStatus)
+    .filter(l => filterSource === 'All' || sourceCategory(l) === filterSource)
+    // When viewing Workshop leads, optionally narrow to one specific workshop.
+    .filter(l => filterSource !== 'workshop' || filterWorkshop === 'all' || leadWorkshopId(l) === filterWorkshop)
+    // When viewing Webinar leads, optionally narrow to one specific webinar.
+    .filter(l => filterSource !== 'webinar' || filterWebinar === 'all' || leadWebinarId(l) === filterWebinar)
     .filter(l => {
       if (!search.trim()) return true;
       const q = search.toLowerCase();
@@ -218,7 +334,7 @@ export default function LeadsManager({ data, onSave }: P) {
   // ── Status update ────────────────────────────────────────────────────────
   const updateStatus = (id: string, status: string) => {
     onSave({ ...data, leads: data.leads.map(l => l.id === id ? { ...l, status } : l) });
-    if (status === 'Demo Scheduled') {
+    if (status === 'Schedule a Demo') {
       setSchedulingId(id);
       const lead = data.leads.find(l => l.id === id);
       setSchedForm({
@@ -239,8 +355,30 @@ export default function LeadsManager({ data, onSave }: P) {
     }
   };
 
+  // Handoff from another tab (Workshop / Webinar RSVPs): when asked to book a
+  // demo for a lead, clear filters so it's visible and expand it. If the demo is
+  // already booked, open the EDIT flow (so an existing booking is edited, never
+  // duplicated); otherwise open the scheduling pop-up. Same flows as here. The
+  // ref guards against re-processing the same id when data.leads updates.
+  const handledScheduleRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!openScheduleLeadId) { handledScheduleRef.current = null; return; }
+    if (handledScheduleRef.current === openScheduleLeadId) return;
+    const lead = data.leads.find(l => l.id === openScheduleLeadId);
+    if (!lead) return; // wait for the lead to arrive
+    handledScheduleRef.current = openScheduleLeadId;
+    setFilterStatus('All');
+    setFilterSource('All');
+    setSearch('');
+    setExpandedId(openScheduleLeadId);
+    if (lead.meetSent) openEdit(lead);
+    else updateStatus(openScheduleLeadId, 'Schedule a Demo');
+    onScheduleConsumed?.();
+  }, [openScheduleLeadId, data.leads]);
+
   const removeLead = (id: string) => {
     if (confirm('Delete this lead permanently?')) {
+      fbSet(`leads/${id}`, null); // remove from the /leads node too, or the sync re-adds it
       onSave({ ...data, leads: data.leads.filter(l => l.id !== id) });
     }
   };
@@ -277,6 +415,7 @@ export default function LeadsManager({ data, onSave }: P) {
   const bulkDelete = () => {
     if (selectedIds.size === 0) return;
     if (confirm(`Delete ${selectedIds.size} lead(s) permanently?`)) {
+      selectedIds.forEach(id => fbSet(`leads/${id}`, null)); // also clear from the /leads node
       onSave({ ...data, leads: data.leads.filter(l => !selectedIds.has(l.id)) });
       setSelectedIds(new Set());
     }
@@ -286,12 +425,14 @@ export default function LeadsManager({ data, onSave }: P) {
   const exportCSV = () => {
     const headers = ['Name', 'Email', 'Phone', 'Company', 'Industry', 'Business Type',
       'Demo Date (Requested)', 'Scheduled Date', 'Scheduled Time', 'Demo Type',
-      'Location', 'Team Member', 'Current Software', 'Message', 'Status', 'Source', 'Date Submitted'];
-    const rows = data.leads.map(l => [
+      'Location', 'Team Member', 'Current Software', 'Message', 'Status', 'Next Step',
+      'Source', 'Attended Breakfast', 'Date Submitted'];
+    const rows = exportLeads.map(l => [
       l.name, l.email, l.phone, l.company, l.industry || l.businessType, l.businessType,
       l.demoDate, l.scheduledDate || '', l.scheduledTime || '', l.demoType || '',
       l.demoLocation || '', l.teamMemberName || '', l.currentSoftware, l.message,
-      l.status, l.source || 'website', l.createdAt,
+      l.status, defaultNextStep(l.status), l.source || 'website',
+      l.attendedWorkshop ? 'Yes' : (l.source === 'workshop' ? 'No' : ''), l.createdAt,
     ]);
     const csv = [headers, ...rows].map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -335,7 +476,7 @@ export default function LeadsManager({ data, onSave }: P) {
         currentSoftware: '',
         message: booking.demoNotes,
         createdAt: new Date().toISOString(),
-        status: 'Demo Scheduled',
+        status: 'Schedule a Demo',
         source: 'manual',
         scheduledDate: booking.demoDate,
         scheduledTime: booking.demoTime,
@@ -389,7 +530,7 @@ export default function LeadsManager({ data, onSave }: P) {
     }
   };
 
-  // ── Schedule a lead (status → Demo Scheduled) ────────────────────────────
+  // ── Schedule a lead (status → Schedule a Demo) ───────────────────────────
   const validateSched = () => {
     if (!schedForm.scheduledDate) return 'Please select a date';
     if (!schedForm.scheduledTime) return 'Please select a time';
@@ -410,7 +551,7 @@ export default function LeadsManager({ data, onSave }: P) {
       // Update lead record with schedule details
       const updated: Lead = {
         ...lead,
-        status: 'Demo Scheduled',
+        status: 'Schedule a Demo',
         scheduledDate: schedForm.scheduledDate,
         scheduledTime: schedForm.scheduledTime,
         demoType: schedForm.demoType,
@@ -463,7 +604,6 @@ export default function LeadsManager({ data, onSave }: P) {
     }
   };
 
-  const newCount = data.leads.filter(l => l.status === 'New').length;
 
   // ── Edit an already-scheduled demo ────────────────────────────────────────
   const openEdit = (lead: Lead) => {
@@ -577,13 +717,29 @@ export default function LeadsManager({ data, onSave }: P) {
           <h2 className="text-xl font-bold text-navy-900">Demo Leads</h2>
           <p className="text-sm text-navy-500 mt-0.5">All demo requests — website and manually booked</p>
         </div>
-        <button
-          onClick={() => { setShowBooking(true); setBookingError(''); setBooking(emptyBooking); }}
-          className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
-          style={{ backgroundColor: '#e53e3e' }}
-        >
-          <Plus className="h-4 w-4" /> Book New Demo
-        </button>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 rounded-xl border border-navy-200 bg-white px-3 py-2.5">
+            <FileText className="h-4 w-4 text-navy-500" />
+            <select
+              defaultValue=""
+              onChange={e => { const v = e.target.value; e.target.value = ''; if (v) downloadReport(v); }}
+              title="Download the CRM status report for Tally Solutions"
+              className="bg-transparent text-sm font-semibold text-navy-700 outline-none cursor-pointer">
+              <option value="" disabled>CRM Report…</option>
+              <option value="pdf">Download as PDF</option>
+              <option value="excel">Download as Excel</option>
+              <option value="csv">Download as CSV</option>
+              <option value="html">Download as Web page</option>
+            </select>
+          </div>
+          <button
+            onClick={() => { setShowBooking(true); setBookingError(''); setBooking(emptyBooking); }}
+            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
+            style={{ backgroundColor: '#e53e3e' }}
+          >
+            <Plus className="h-4 w-4" /> Book New Demo
+          </button>
+        </div>
       </div>
 
       {/* ── Success banner ── */}
@@ -609,10 +765,10 @@ export default function LeadsManager({ data, onSave }: P) {
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
         {[
           { label: 'Total',     value: data.leads.length,                                          color: 'bg-navy-50 text-navy-700' },
-          { label: 'New',       value: newCount,                                                    color: 'bg-accent/10 text-accent' },
+          { label: 'New',       value: data.leads.filter(l => l.status === 'New').length,          color: 'bg-accent/10 text-accent' },
           { label: 'Contacted', value: data.leads.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
           { label: 'Qualified', value: data.leads.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
-          { label: 'Demo Set',  value: data.leads.filter(l => l.status === 'Demo Scheduled').length, color: 'bg-amber-50 text-amber-600' },
+          { label: 'Demo Set',  value: data.leads.filter(l => l.status === 'Schedule a Demo').length, color: 'bg-amber-50 text-amber-600' },
           { label: 'Won',       value: data.leads.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
         ].map(s => (
           <div key={s.label} className={`rounded-xl p-3 text-center ${s.color}`}>
@@ -633,52 +789,171 @@ export default function LeadsManager({ data, onSave }: P) {
               className="w-full rounded-lg border border-navy-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
           </div>
           <button onClick={exportCSV} disabled={data.leads.length === 0}
+            title="Detailed leads-only spreadsheet (all lead columns)"
             className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
-            <Download className="h-4 w-4" /> Export CSV
+            <Download className="h-4 w-4" /> Leads CSV
           </button>
         </div>
+        {/* Report/export date range only — this NEVER hides leads from the list
+            above; it just scopes what the CRM Report and CSV downloads contain. */}
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-navy-100 bg-navy-50/50 px-3 py-2.5 text-xs"
+          title="This range only scopes the CRM Report and CSV downloads — your lead list above always shows everyone.">
+          <span className="font-semibold text-navy-500">Report date range:</span>
+          <label className="flex items-center gap-1.5 text-navy-600">
+            From
+            <input type="date" value={exportFrom} onChange={e => setExportFrom(e.target.value)}
+              className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs outline-none focus:border-accent" />
+          </label>
+          <label className="flex items-center gap-1.5 text-navy-600">
+            To
+            <input type="date" value={exportTo} onChange={e => setExportTo(e.target.value)}
+              className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs outline-none focus:border-accent" />
+          </label>
+          {(exportFrom || exportTo) && (
+            <button onClick={() => { setExportFrom(''); setExportTo(''); }}
+              className="text-navy-400 hover:text-navy-600 underline">clear dates</button>
+          )}
+          <span className="text-navy-400">
+            {(exportFrom || exportTo)
+              ? `Report covers ${dateScopedLeads.length} lead${dateScopedLeads.length === 1 ? '' : 's'} in this range`
+              : `Report covers all ${dateScopedLeads.length} leads`}
+          </span>
+          <label className="flex items-center gap-1.5 text-navy-600 cursor-pointer" title="Only affects what the exports contain">
+            <input type="checkbox" checked={includeClosed} onChange={e => setIncludeClosed(e.target.checked)}
+              className="h-3.5 w-3.5 rounded border-navy-300 text-accent focus:ring-accent" />
+            Include Closed in exports
+          </label>
+          {workshopDateFixCount > 0 && (
+            <button onClick={fixWorkshopDates}
+              title="Older workshop leads carry the date you converted them. Click to re-date them to their workshop registration date."
+              className="ml-auto flex items-center gap-1 rounded-lg border border-accent/30 bg-white px-2.5 py-1 font-semibold text-accent hover:bg-accent/10 transition">
+              <Calendar className="h-3.5 w-3.5" /> Fix workshop dates ({workshopDateFixCount})
+            </button>
+          )}
+          {closedLostCount > 0 && (
+            <button onClick={deleteClosedLost}
+              className="ml-auto flex items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1 font-semibold text-red-500 hover:bg-red-50 transition">
+              <Trash2 className="h-3.5 w-3.5" /> Delete Closed Lost ({closedLostCount})
+            </button>
+          )}
+        </div>
+        {/* Source filter — separate online / workshop / manual so bulk actions
+            and Select-all only touch the source you're looking at. */}
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-navy-500 mr-1">Source:</span>
+          {([['All', 'All sources'], ['online', 'Online / Website'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['manual', 'Manual']] as [typeof filterSource, string][]).map(([val, label]) => {
+            const isActive = filterSource === val;
+            const count = val === 'All'
+              ? data.leads.length
+              : data.leads.filter(l => sourceCategory(l) === val).length;
+            return (
+              <button key={val}
+                onClick={() => { setFilterSource(val); if (val !== 'workshop') setFilterWorkshop('all'); if (val !== 'webinar') setFilterWebinar('all'); }}
+                className="rounded-full border px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap"
+                style={isActive
+                  ? { backgroundColor: '#1e3a5f', color: '#fff', borderColor: '#1e3a5f' }
+                  : { backgroundColor: '#fff', color: '#475569', borderColor: '#e2e8f0' }}>
+                {label} <span style={{ opacity: 0.7 }}>({count})</span>
+              </button>
+            );
+          })}
+          {/* Which workshop? A workshop is a group event, so once you're looking
+              at Workshop leads you can narrow to one specific event. */}
+          {filterSource === 'workshop' && (
+            <label className="flex items-center gap-1.5 text-xs text-navy-600 ml-1">
+              <Calendar className="h-3.5 w-3.5 text-navy-400" />
+              <select
+                value={filterWorkshop}
+                onChange={e => setFilterWorkshop(e.target.value)}
+                title="Show leads from a specific workshop"
+                className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs font-semibold text-navy-700 outline-none focus:border-accent cursor-pointer">
+                <option value="all">
+                  All workshops ({data.leads.filter(l => sourceCategory(l) === 'workshop').length})
+                </option>
+                {(() => {
+                  // List every workshop that actually has leads, most recent first,
+                  // plus a catch-all for legacy leads with no resolvable event.
+                  const wsLeads = data.leads.filter(l => sourceCategory(l) === 'workshop');
+                  const counts = new Map<string, number>();
+                  wsLeads.forEach(l => {
+                    const id = leadWorkshopId(l);
+                    counts.set(id, (counts.get(id) || 0) + 1);
+                  });
+                  const ordered = [...events].reverse().filter(e => counts.has(e.id));
+                  const listedIds = new Set(ordered.map(e => e.id));
+                  const orphanIds = [...counts.keys()].filter(id => !listedIds.has(id));
+                  return [
+                    ...ordered.map(e => (
+                      <option key={e.id} value={e.id}>{e.title} ({counts.get(e.id)})</option>
+                    )),
+                    ...orphanIds.map(id => (
+                      <option key={id} value={id}>{workshopTitleById(id)} ({counts.get(id)})</option>
+                    )),
+                  ];
+                })()}
+              </select>
+            </label>
+          )}
+          {/* Which webinar? Same idea as workshops — narrow to one online event. */}
+          {filterSource === 'webinar' && (
+            <label className="flex items-center gap-1.5 text-xs text-navy-600 ml-1">
+              <Video className="h-3.5 w-3.5 text-navy-400" />
+              <select
+                value={filterWebinar}
+                onChange={e => setFilterWebinar(e.target.value)}
+                title="Show leads from a specific webinar"
+                className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs font-semibold text-navy-700 outline-none focus:border-accent cursor-pointer">
+                <option value="all">
+                  All webinars ({data.leads.filter(l => sourceCategory(l) === 'webinar').length})
+                </option>
+                {(() => {
+                  const wbLeads = data.leads.filter(l => sourceCategory(l) === 'webinar');
+                  const counts = new Map<string, number>();
+                  wbLeads.forEach(l => {
+                    const id = leadWebinarId(l);
+                    counts.set(id, (counts.get(id) || 0) + 1);
+                  });
+                  const ordered = [...webinarEvents].reverse().filter(e => counts.has(e.id));
+                  const listedIds = new Set(ordered.map(e => e.id));
+                  const orphanIds = [...counts.keys()].filter(id => !listedIds.has(id));
+                  return [
+                    ...ordered.map(e => (
+                      <option key={e.id} value={e.id}>{e.title} ({counts.get(e.id)})</option>
+                    )),
+                    ...orphanIds.map(id => (
+                      <option key={id} value={id}>{webinarTitleById(id)} ({counts.get(id)})</option>
+                    )),
+                  ];
+                })()}
+              </select>
+            </label>
+          )}
+        </div>
+
         {/* Status filter tabs */}
         <div className="flex flex-wrap gap-2">
           {(['All', ...statuses] as string[]).map(s => {
-            // Inline styles bypass Tailwind purge for dynamic colours
-            type TabPalette = { bg: string; text: string; border: string; badgeBg: string; badgeText: string };
-            const palette: Record<string, TabPalette> = {
-              'All':            { bg: '#1e3a5f', text: '#fff',    border: '#1e3a5f', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'New':            { bg: '#ef4444', text: '#fff',    border: '#ef4444', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'Contacted':      { bg: '#3b82f6', text: '#fff',    border: '#3b82f6', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'Qualified':      { bg: '#8b5cf6', text: '#fff',    border: '#8b5cf6', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'Demo Scheduled': { bg: '#f59e0b', text: '#fff',    border: '#f59e0b', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'Closed Won':     { bg: '#16a34a', text: '#fff',    border: '#16a34a', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-              'Closed Lost':    { bg: '#64748b', text: '#fff',    border: '#64748b', badgeBg: 'rgba(255,255,255,0.25)', badgeText: '#fff' },
-            };
-            const inactiveBg: Record<string, string> = {
-              'All': '#f1f5f9', 'New': '#fef2f2', 'Contacted': '#eff6ff',
-              'Qualified': '#f5f3ff', 'Demo Scheduled': '#fffbeb',
-              'Closed Won': '#f0fdf4', 'Closed Lost': '#f8fafc',
-            };
-            const inactiveText: Record<string, string> = {
-              'All': '#475569', 'New': '#dc2626', 'Contacted': '#2563eb',
-              'Qualified': '#7c3aed', 'Demo Scheduled': '#b45309',
-              'Closed Won': '#15803d', 'Closed Lost': '#475569',
-            };
+            // Colours are derived from the shared pipeline module (inline styles
+            // bypass Tailwind's purge for these dynamic values).
             const isActive = filterStatus === s;
-            const p = palette[s];
+            const color = s === 'All' ? '#1e3a5f' : stageColor(s);
+            const tint = s === 'All' ? '#f1f5f9' : stageTint(s);
             const count = s === 'All' ? data.leads.length : data.leads.filter(l => l.status === s).length;
             return (
               <button
                 key={s}
                 onClick={() => setFilterStatus(s)}
                 className="rounded-full border px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap flex items-center gap-1.5"
-                style={isActive && p
-                  ? { backgroundColor: p.bg, color: p.text, borderColor: p.border }
-                  : { backgroundColor: inactiveBg[s] || '#f8fafc', color: inactiveText[s] || '#475569', borderColor: 'transparent' }
+                style={isActive
+                  ? { backgroundColor: color, color: '#fff', borderColor: color }
+                  : { backgroundColor: tint, color, borderColor: 'transparent' }
                 }
               >
                 {s}
                 <span
                   className="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
-                  style={isActive && p
-                    ? { backgroundColor: p.badgeBg, color: p.badgeText }
+                  style={isActive
+                    ? { backgroundColor: 'rgba(255,255,255,0.25)', color: '#fff' }
                     : { backgroundColor: '#e2e8f0', color: '#475569' }
                   }
                 >{count}</span>
@@ -755,7 +1030,7 @@ export default function LeadsManager({ data, onSave }: P) {
                     <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(booking.demoDate) === 0 ? 'Sundays are not available' : 'This is a public holiday'} — please choose another date.</p>
                   )}
                   {booking.demoDate && getDayOfWeek(booking.demoDate) === 6 && !isDateBlocked(booking.demoDate) && (
-                    <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — available slots: 8:00 AM – 12:00 PM only.</p>
+                    <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — available slots: 8:00 AM – 1:00 PM only.</p>
                   )}
                 </div>
 
@@ -789,9 +1064,13 @@ export default function LeadsManager({ data, onSave }: P) {
                     placeholder="Location / address *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                 )}
 
-                <textarea value={booking.demoNotes} onChange={e => setB('demoNotes', e.target.value)}
-                  placeholder="Notes (optional)" rows={2}
-                  className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
+                <div>
+                  <label className="block text-xs font-semibold text-navy-600 mb-1">What's this about? <span className="font-normal text-navy-400">(purpose — optional)</span></label>
+                  <textarea value={booking.demoNotes} onChange={e => setB('demoNotes', e.target.value)}
+                    placeholder="e.g. Product demo · buying an add-on · paying for implementation · training / support"
+                    rows={2}
+                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
+                </div>
               </div>
             </div>
 
@@ -922,12 +1201,18 @@ export default function LeadsManager({ data, onSave }: P) {
                     {l.source === 'manual' && (
                       <span className="rounded-full bg-navy-100 px-2 py-0.5 text-[9px] font-semibold text-navy-500">MANUAL</span>
                     )}
+                    {l.source === 'workshop' && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-semibold text-amber-700"
+                        title={l.attendedWorkshop ? 'Attended the breakfast workshop' : 'Registered for workshop — did not attend'}>
+                        🥐 WORKSHOP{l.attendedWorkshop ? ' ✓' : ''}
+                      </span>
+                    )}
                   </div>
                   <p className="text-xs text-navy-500 truncate">{l.phone} · {l.company || 'No company'}</p>
                 </div>
                 <span
                   className="rounded-full px-2.5 py-1 text-[10px] font-semibold whitespace-nowrap"
-                  style={statusBadgeStyle[l.status] || { backgroundColor: '#e2e8f0', color: '#475569' }}
+                  style={statusBadgeStyle(l.status)}
                 >
                   {l.status}
                 </span>
@@ -954,6 +1239,24 @@ export default function LeadsManager({ data, onSave }: P) {
                 <span className="text-[10px] text-navy-400 hidden sm:block whitespace-nowrap">
                   {new Date(l.createdAt).toLocaleDateString()}
                 </span>
+                {/* One-click demo action. If a demo is already booked, this
+                    edits the existing one (never creates a duplicate); otherwise
+                    it opens the scheduling pop-up. */}
+                {l.meetSent ? (
+                  <button
+                    onClick={e => { e.stopPropagation(); setExpandedId(l.id); openEdit(l); }}
+                    title="Edit this booked demo (date, time, team)"
+                    className="inline-flex items-center gap-1 rounded-lg bg-amber-100 px-2.5 py-1 text-[11px] font-bold text-amber-700 hover:bg-amber-200 transition whitespace-nowrap shrink-0">
+                    <CalendarDays className="h-3.5 w-3.5" /> Edit demo
+                  </button>
+                ) : (
+                  <button
+                    onClick={e => { e.stopPropagation(); setExpandedId(l.id); updateStatus(l.id, 'Schedule a Demo'); }}
+                    title="Book / schedule a demo for this lead"
+                    className="inline-flex items-center gap-1 rounded-lg bg-accent/10 px-2.5 py-1 text-[11px] font-bold text-accent hover:bg-accent/20 transition whitespace-nowrap shrink-0">
+                    <CalendarDays className="h-3.5 w-3.5" /> Book demo
+                  </button>
+                )}
                 <ChevronDown className={`h-4 w-4 text-navy-400 transition-transform shrink-0 ${expandedId === l.id ? 'rotate-180' : ''}`} />
               </div>
 
@@ -1019,10 +1322,10 @@ export default function LeadsManager({ data, onSave }: P) {
                   )}
 
                   {/* Scheduled demo info (if already scheduled) */}
-                  {l.status === 'Demo Scheduled' && l.scheduledDate && l.meetSent && editingId !== l.id && (
+                  {l.status === 'Schedule a Demo' && l.scheduledDate && l.meetSent && editingId !== l.id && (
                     <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 space-y-2">
                       <div className="flex items-center justify-between">
-                        <p className="text-xs font-bold text-amber-700">📅 Demo Scheduled</p>
+                        <p className="text-xs font-bold text-amber-700">📅 Demo booked</p>
                         <button
                           onClick={() => openEdit(l)}
                           className="flex items-center gap-1 rounded-lg bg-amber-100 hover:bg-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-800 transition">
@@ -1048,6 +1351,13 @@ export default function LeadsManager({ data, onSave }: P) {
                       )}
                     </div>
                   )}
+
+                  {/* Auto next step — derived from the stage, shown in the CRM report */}
+                  <div className="flex items-center gap-2 text-xs text-navy-500">
+                    <span className="font-semibold">Next step:</span>
+                    <span className="rounded-lg bg-navy-50 px-2.5 py-1 font-medium text-navy-700">{defaultNextStep(l.status)}</span>
+                    <span className="text-navy-400">— set automatically from the stage</span>
+                  </div>
 
                   {/* Status + actions */}
                   <div className="flex items-center justify-between border-t border-navy-100 pt-4 flex-wrap gap-3">
@@ -1123,7 +1433,7 @@ export default function LeadsManager({ data, onSave }: P) {
                             <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(schedForm.scheduledDate) === 0 ? 'Sundays not available' : 'Public holiday'} — choose another date.</p>
                           )}
                           {schedForm.scheduledDate && getDayOfWeek(schedForm.scheduledDate) === 6 && !isDateBlocked(schedForm.scheduledDate) && (
-                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–12:00 PM only.</p>
+                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–1:00 PM only.</p>
                           )}
                         </div>
 
@@ -1204,9 +1514,9 @@ export default function LeadsManager({ data, onSave }: P) {
 
                         {/* Notes */}
                         <div className="sm:col-span-2">
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Notes (optional)</label>
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">What's this about? <span className="font-normal text-navy-400">(purpose)</span></label>
                           <textarea value={schedForm.demoNotes} onChange={e => setS('demoNotes', e.target.value)}
-                            placeholder="e.g. Focus on manufacturing module, client uses QuickBooks currently"
+                            placeholder="e.g. Product demo · buying an add-on · paying for implementation · training / support"
                             rows={2} className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 resize-none" />
                         </div>
                       </div>
@@ -1231,12 +1541,23 @@ export default function LeadsManager({ data, onSave }: P) {
                     </div>
                   )}
 
-                  {/* ── Schedule Panel (shown when status = Demo Scheduled and not yet sent) ── */}
+                  {/* ── Schedule Demo pop-up (opens when status = Schedule a Demo, not yet sent) ── */}
+                  {/* The backdrop deliberately has NO click-to-close: a stray
+                      click outside must never discard a half-filled booking.
+                      Close only via the X or Cancel button (or on submit). */}
                   {schedulingId === l.id && !l.meetSent && (
-                    <div className="rounded-2xl border border-amber-300 bg-amber-50 p-5 space-y-4">
-                      <div className="flex items-center gap-2">
-                        <CalendarDays className="h-5 w-5 text-amber-600" />
-                        <p className="font-bold text-amber-800">Schedule the Demo & Send Confirmation</p>
+                    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy-900/60 backdrop-blur-sm p-4 sm:p-6">
+                    <div
+                      className="my-6 w-full max-w-2xl rounded-2xl border border-amber-300 bg-amber-50 p-5 space-y-4 shadow-2xl">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <CalendarDays className="h-5 w-5 text-amber-600" />
+                          <p className="font-bold text-amber-800">Book a Demo — {l.name}</p>
+                        </div>
+                        <button onClick={() => setSchedulingId(null)} title="Close"
+                          className="rounded-lg p-1.5 text-amber-500 hover:bg-amber-100 transition">
+                          <X className="h-5 w-5" />
+                        </button>
                       </div>
                       <p className="text-xs text-amber-700">
                         Fill in the details below. The client will receive a WhatsApp confirmation
@@ -1275,7 +1596,7 @@ export default function LeadsManager({ data, onSave }: P) {
                             <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(schedForm.scheduledDate) === 0 ? 'Sundays not available' : 'Public holiday'} — choose another date.</p>
                           )}
                           {schedForm.scheduledDate && getDayOfWeek(schedForm.scheduledDate) === 6 && !isDateBlocked(schedForm.scheduledDate) && (
-                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–12:00 PM only.</p>
+                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–1:00 PM only.</p>
                           )}
                         </div>
 
@@ -1358,9 +1679,9 @@ export default function LeadsManager({ data, onSave }: P) {
 
                         {/* Notes */}
                         <div className="sm:col-span-2">
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Notes (optional)</label>
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">What's this about? <span className="font-normal text-navy-400">(purpose)</span></label>
                           <textarea value={schedForm.demoNotes} onChange={e => setS('demoNotes', e.target.value)}
-                            placeholder="e.g. Focus on manufacturing module, client uses QuickBooks currently"
+                            placeholder="e.g. Product demo · buying an add-on · paying for implementation · training / support"
                             rows={2} className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
                         </div>
                       </div>
@@ -1378,6 +1699,7 @@ export default function LeadsManager({ data, onSave }: P) {
                           Cancel
                         </button>
                       </div>
+                    </div>
                     </div>
                   )}
 

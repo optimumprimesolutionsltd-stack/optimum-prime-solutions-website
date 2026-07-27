@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Building2, Briefcase, ShoppingCart, Globe,
-  HelpCircle, Users, FileText, Phone, MessageCircle, CalendarDays,
+  HelpCircle, Users, FileText, Phone, MessageCircle, CalendarDays, Video,
   LogOut, Menu, X, ExternalLink, RotateCcw, Mail
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
@@ -19,6 +19,7 @@ import ContactEditor from './editors/ContactEditor';
 import TestimonialsEditor from './editors/TestimonialsEditor';
 import WhatsAppManager from './editors/WhatsAppManager';
 import WorkshopRegistrationsManager from './editors/WorkshopRegistrationsManager';
+import WebinarRegistrationsManager from './editors/WebinarRegistrationsManager';
 import SubscribersManager from './editors/SubscribersManager';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
@@ -30,6 +31,7 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'faqs', label: 'FAQ & Chatbot', icon: HelpCircle },
   { id: 'leads', label: 'Demo Leads', icon: Users },
   { id: 'workshop', label: 'Workshop RSVPs', icon: CalendarDays },
+  { id: 'webinar', label: 'Webinar RSVPs', icon: Video },
   { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
   { id: 'blogs', label: 'Blog Posts', icon: FileText },
   { id: 'subscribers', label: 'Subscribers', icon: Mail },
@@ -43,6 +45,9 @@ interface Props { onLogout: () => void }
 export default function AdminLayout({ onLogout }: Props) {
   const { data, update } = useSite();
   const [tab, setTab] = useState<TabId>('dashboard');
+  // A lead id handed from Webinar RSVPs when the user wants to book a demo for
+  // an attendee — the Demo Leads tab opens that lead's booking pop-up.
+  const [scheduleLeadId, setScheduleLeadId] = useState<string | null>(null);
   const [sidebar, setSidebar] = useState(false);
   const [toast, setToast] = useState('');
   const [unreadWa, setUnreadWa] = useState(0);
@@ -59,11 +64,17 @@ export default function AdminLayout({ onLogout }: Props) {
   
   const handleSave = (d: SiteData, msg: string) => { update(d); notify(msg); };
   
-  const handleReset = () => { 
-    if (confirm('Reset ALL content to factory defaults? This cannot be undone.')) { 
-      update(defaultData); 
-      notify('All content reset to defaults'); 
-    } 
+  const handleReset = () => {
+    // Deliberately high-friction: this wipes ALL content, so require the user to
+    // type the word out — a plain OK/Cancel is too easy to hit by mistake.
+    const answer = prompt(
+      'DANGER: this ERASES all website content and restores factory defaults. It cannot be undone.\n\n' +
+      'Type RESET (capitals) to confirm, or Cancel to keep everything.',
+    );
+    if (answer !== null && answer.trim() === 'RESET') {
+      update(defaultData);
+      notify('All content reset to defaults');
+    }
   };
 
   const newLeads = data.leads.filter(l => l.status === 'New').length;
@@ -76,8 +87,12 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'products': return <ProductsEditor data={data} onSave={d => handleSave(d, 'Products & pricing saved!')} />;
       case 'industries': return <IndustriesEditor data={data} onSave={d => handleSave(d, 'Industries saved!')} />;
       case 'faqs': return <FaqEditor data={data} onSave={d => handleSave(d, 'FAQs saved!')} />;
-      case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')} />;
-      case 'workshop': return <WorkshopRegistrationsManager />;
+      case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')}
+        openScheduleLeadId={scheduleLeadId} onScheduleConsumed={() => setScheduleLeadId(null)} />;
+      case 'workshop': return <WorkshopRegistrationsManager data={data} onSave={d => handleSave(d, 'Workshop updated!')}
+        onBookDemo={leadId => { setScheduleLeadId(leadId); setTab('leads'); }} />;
+      case 'webinar': return <WebinarRegistrationsManager data={data} onSave={d => handleSave(d, 'Webinar updated!')}
+        onBookDemo={leadId => { setScheduleLeadId(leadId); setTab('leads'); }} />;
       case 'whatsapp': return <WhatsAppManager />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
       case 'subscribers': return <SubscribersManager />;
@@ -134,8 +149,9 @@ export default function AdminLayout({ onLogout }: Props) {
           <a href="/" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-navy-600 hover:bg-navy-50 transition">
             <ExternalLink className="h-4 w-4" />View Website
           </a>
-          <button onClick={handleReset} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-orange-600 hover:bg-orange-50 transition">
-            <RotateCcw className="h-4 w-4" />Reset to Defaults
+          <button onClick={handleReset} title="Erases ALL content — requires typing RESET to confirm"
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-navy-300 hover:text-orange-600 hover:bg-orange-50/60 transition">
+            <RotateCcw className="h-3 w-3" />Reset to defaults
           </button>
           <button onClick={onLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition">
             <LogOut className="h-4 w-4" />Sign Out
@@ -162,8 +178,9 @@ export default function AdminLayout({ onLogout }: Props) {
             </div>
             <SidebarNav mobile />
             <div className="border-t border-navy-100 p-3 space-y-0.5 shrink-0">
-              <button onClick={handleReset} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-orange-600 hover:bg-orange-50">
-                <RotateCcw className="h-4 w-4" />Reset
+              <button onClick={handleReset} title="Erases ALL content — requires typing RESET to confirm"
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-navy-300 hover:text-orange-600 hover:bg-orange-50/60">
+                <RotateCcw className="h-3 w-3" />Reset to defaults
               </button>
               <button onClick={onLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50">
                 <LogOut className="h-4 w-4" />Sign Out

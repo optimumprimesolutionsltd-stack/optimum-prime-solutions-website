@@ -1,7 +1,7 @@
-import { Building2, Briefcase, ShoppingCart, Globe, HelpCircle, Users, FileText, Phone, Star, MessageCircle, CalendarDays, Mail } from 'lucide-react';
+import { Building2, Briefcase, ShoppingCart, Globe, HelpCircle, Users, FileText, Phone, Star, MessageCircle, CalendarDays, Video, Mail } from 'lucide-react';
 import type { SiteData } from '../data/siteData';
 
-export type TabId = 'dashboard' | 'company' | 'services' | 'products' | 'industries' | 'faqs' | 'leads' | 'blogs' | 'contact' | 'testimonials' | 'bookdemo' | 'whatsapp' | 'workshop' | 'subscribers';
+export type TabId = 'dashboard' | 'company' | 'services' | 'products' | 'industries' | 'faqs' | 'leads' | 'blogs' | 'contact' | 'testimonials' | 'bookdemo' | 'whatsapp' | 'workshop' | 'webinar' | 'subscribers';
 
 interface P { data: SiteData; onNav: (t: TabId) => void }
 
@@ -16,6 +16,7 @@ export default function DashboardHome({ data, onNav }: P) {
     { id: 'faqs', label: 'FAQ & Chatbot', icon: HelpCircle, stat: `${data.faqs.length}`, desc: 'FAQs also power the chatbot' },
     { id: 'leads', label: 'Demo Requests', icon: Users, stat: `${data.leads.length}`, desc: 'View & manage submitted leads', alert: newLeads > 0 },
     { id: 'workshop', label: 'Workshop RSVPs', icon: CalendarDays, stat: 'Live', desc: 'Inventory Management Breakfast Workshop signups' },
+    { id: 'webinar', label: 'Webinar RSVPs', icon: Video, stat: 'Live', desc: 'Online webinar registrations & attendance' },
     { id: 'blogs', label: 'Blog Posts', icon: FileText, stat: `${data.blogs.length}`, desc: 'Create & manage blog articles' },
     { id: 'contact', label: 'Contact Info', icon: Phone, stat: `${data.contact.phones.length} phones`, desc: 'Edit phones, emails, WhatsApp' },
     { id: 'testimonials', label: 'Reviews & Testimonials', icon: Star, stat: `${data.testimonials.length}`, desc: 'Approve pending reviews, manage published testimonials' },
