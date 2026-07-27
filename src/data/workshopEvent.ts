@@ -69,3 +69,19 @@ export function isRegistrationClosed(w: { calendarStart?: string }, now: Date = 
   const endOfEventDayUtcMs = Date.UTC(day.y, day.m - 1, day.d, 20, 59, 59);
   return now.getTime() > endOfEventDayUtcMs;
 }
+
+// Check if an event has ended (past the end of its day in EAT)
+export function isEventPast(w: { calendarStart?: string }, now: Date = new Date()): boolean {
+  return isRegistrationClosed(w, now);
+}
+
+// Get the next upcoming event after a given one (or the soonest upcoming overall)
+export function getNextUpcomingEvent(events: WorkshopEvent[], afterEvent?: WorkshopEvent, now: Date = new Date()): WorkshopEvent | null {
+  const futureEvents = events.filter(e => !isEventPast(e, now));
+  if (afterEvent && futureEvents.length > 0) {
+    // Find events that come after the given event
+    const afterIdx = events.findIndex(e => e.id === afterEvent.id);
+    return futureEvents.find((e, i) => events.indexOf(e) > afterIdx) || futureEvents[0];
+  }
+  return futureEvents.length > 0 ? futureEvents[0] : null;
+}
