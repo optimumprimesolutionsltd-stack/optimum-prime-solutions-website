@@ -991,16 +991,17 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
       {/* ── Manual Booking Panel (slide-in) ── */}
       {showBooking && (
-        <div className="rounded-2xl border border-accent/30 bg-white shadow-lg overflow-hidden">
-          <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100 bg-navy-50">
-            <div className="flex items-center gap-2">
-              <CalendarDays className="h-5 w-5 text-accent" />
-              <h3 className="font-bold text-navy-900">Book a New Demo</h3>
+        <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy-900/60 backdrop-blur-sm p-4 sm:p-6">
+          <div className="rounded-2xl border border-accent/30 bg-white shadow-lg overflow-hidden w-full max-w-2xl my-8">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100 bg-navy-50">
+              <div className="flex items-center gap-2">
+                <CalendarDays className="h-5 w-5 text-accent" />
+                <h3 className="font-bold text-navy-900">Book a New Demo</h3>
+              </div>
+              <button onClick={() => setShowBooking(false)} className="rounded-lg p-1.5 hover:bg-navy-200 transition">
+                <X className="h-4 w-4 text-navy-500" />
+              </button>
             </div>
-            <button onClick={() => setShowBooking(false)} className="rounded-lg p-1.5 hover:bg-navy-200 transition">
-              <X className="h-4 w-4 text-navy-500" />
-            </button>
-          </div>
 
           <div className="p-6 space-y-5">
             {bookingError && (
@@ -1152,6 +1153,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                 ? <><Loader2 className="h-4 w-4 animate-spin" /> Booking & Notifying...</>
                 : <><Send className="h-4 w-4" /> Book Demo & Notify All</>}
             </button>
+          </div>
           </div>
         </div>
       )}
