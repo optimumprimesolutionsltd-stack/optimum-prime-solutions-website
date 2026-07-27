@@ -650,37 +650,63 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       onSave({ ...data, leads: data.leads.map(l => l.id === lead.id ? updated : l) });
 
       if (resendToClient) {
-        await fetch(`${BACKEND_URL}/book-demo`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            clientName: lead.name,
-            clientPhone: lead.phone,
-            clientEmail: lead.email,
-            clientCompany: lead.company,
-            clientIndustry: lead.industry || lead.businessType,
-            demoDate: schedForm.scheduledDate,
-            demoTime: schedForm.scheduledTime,
-            demoType: schedForm.demoType,
-            demoLocation: schedForm.demoLocation,
-            demoNotes: schedForm.demoNotes,
-            teamMemberName: allTeam[0]?.name || '',
-            teamMemberPhone: allTeam[0]?.phone || '',
-            teamMember2Name: allTeam[1]?.name || '',
-            teamMember2Phone: allTeam[1]?.phone || '',
-            teamMember3Name: allTeam[2]?.name || '',
-            teamMember3Phone: allTeam[2]?.phone || '',
-            notifyClient: true,
-            source: 'reschedule',
-          }),
-        });
-        setEditSuccess('Demo updated and new confirmation sent to client.');
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        try {
+          const res = await fetch(`${BACKEND_URL}/book-demo`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clientName: lead.name,
+              clientPhone: lead.phone,
+              clientEmail: lead.email,
+              clientCompany: lead.company,
+              clientIndustry: lead.industry || lead.businessType,
+              demoDate: schedForm.scheduledDate,
+              demoTime: schedForm.scheduledTime,
+              demoType: schedForm.demoType,
+              demoLocation: schedForm.demoLocation,
+              demoNotes: schedForm.demoNotes,
+              teamMemberName: allTeam[0]?.name || '',
+              teamMemberPhone: allTeam[0]?.phone || '',
+              teamMember2Name: allTeam[1]?.name || '',
+              teamMember2Phone: allTeam[1]?.phone || '',
+              teamMember3Name: allTeam[2]?.name || '',
+              teamMember3Phone: allTeam[2]?.phone || '',
+              notifyClient: true,
+              source: 'reschedule',
+            }),
+            signal: controller.signal,
+          });
+          clearTimeout(timeoutId);
+          if (res.ok) {
+            try {
+              const data = await res.json();
+              if (data.success || data.message || res.status === 200) {
+                setEditSuccess('✓ Demo updated and confirmation sent to WhatsApp & email.');
+              } else {
+                setEditSuccess('✓ Demo updated. Message delivery status unclear — client may not have received it.');
+              }
+            } catch {
+              setEditSuccess('✓ Demo updated. Confirmation likely sent (delivery status unclear).');
+            }
+          } else {
+            setEditError(`Failed to send confirmation (${res.status}). Demo was saved locally. Please try resending manually.`);
+          }
+        } catch (err) {
+          clearTimeout(timeoutId);
+          if ((err as Error).name === 'AbortError') {
+            setEditSuccess('✓ Demo updated, but confirmation is still sending (backend is slow). Check shortly.');
+          } else {
+            setEditError('Failed to send confirmation. Demo was saved locally. Please try resending manually.');
+          }
+        }
       } else {
-        setEditSuccess('Demo details updated. No message sent to client.');
+        setEditSuccess('✓ Demo details updated. No message sent to client.');
       }
       setEditingId(null);
-      setTimeout(() => setEditSuccess(null), 5000);
-    } catch {
+      setTimeout(() => setEditSuccess(null), 6000);
+    } catch (err) {
       setEditError('Failed to save changes. Please try again.');
     } finally {
       setEditSubmitting(false);
