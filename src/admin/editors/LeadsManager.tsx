@@ -203,23 +203,50 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     [registrants, exportFrom, exportTo, filterSource, filterWorkshop],
   );
 
-  // When the report covers exactly one workshop, feature that event in the
-  // title and file names; otherwise it stays a generic CRM status report.
-  const reportWorkshop = useMemo(() => {
-    const ids = new Set<string>();
-    exportRegistrants.forEach(r => ids.add(regEventId(r as { eventId?: string })));
-    exportLeads.filter(l => l.source === 'workshop').forEach(l => ids.add(leadWorkshopId(l)));
-    if (ids.size !== 1) return undefined;
-    const e = events.find(ev => ev.id === [...ids][0]);
-    return e ? { title: e.title, date: e.date, venue: e.venue } : undefined;
-  }, [exportRegistrants, exportLeads, events, registrants]);
+  // When the report covers exactly one event (workshop/webinar/online/manual),
+  // feature that event in the title and file names.
+  const reportEvent = useMemo(() => {
+    if (filterSource === 'workshop' && filterWorkshop !== 'all') {
+      const e = events.find(ev => ev.id === filterWorkshop);
+      return e ? { type: 'workshop' as const, title: e.title, date: e.date, venue: e.venue } : undefined;
+    }
+    if (filterSource === 'webinar' && filterWebinar !== 'all') {
+      const e = webinarEvents.find(ev => ev.id === filterWebinar);
+      return e ? { type: 'webinar' as const, title: e.title, date: e.date } : undefined;
+    }
+    if (filterSource === 'online') {
+      return { type: 'online' as const, title: 'Online Demos' };
+    }
+    if (filterSource === 'manual') {
+      return { type: 'manual' as const, title: 'Manual Leads' };
+    }
+    return undefined;
+  }, [filterSource, filterWorkshop, filterWebinar, events, webinarEvents]);
 
   const slugify = (s: string) =>
     s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'report';
-  const fileBase = reportWorkshop ? `crm-report-${slugify(reportWorkshop.title)}` : 'crm-report';
+  const fileBase = reportEvent ? `crm-report-${slugify(reportEvent.title)}` : 'crm-report';
 
-  const reportHtml = () => buildCrmReportHtml(exportLeads, exportRegistrants,
-    { companyName, preparedFor: 'Tally Solutions', workshop: reportWorkshop });
+  const reportHtml = () => {
+    const opts = { companyName, preparedFor: 'Tally Solutions' };
+    if (reportEvent?.type === 'workshop') {
+      return buildCrmReportHtml(exportLeads, exportRegistrants,
+        { ...opts, workshop: { title: reportEvent.title, date: reportEvent.date, venue: reportEvent.venue } });
+    }
+    if (reportEvent?.type === 'webinar') {
+      return buildCrmReportHtml(exportLeads, exportRegistrants,
+        { ...opts, webinar: { title: reportEvent.title, date: reportEvent.date } });
+    }
+    if (reportEvent?.type === 'online') {
+      return buildCrmReportHtml(exportLeads, exportRegistrants,
+        { ...opts, online: { title: reportEvent.title } });
+    }
+    if (reportEvent?.type === 'manual') {
+      return buildCrmReportHtml(exportLeads, exportRegistrants,
+        { ...opts, manual: { title: reportEvent.title } });
+    }
+    return buildCrmReportHtml(exportLeads, exportRegistrants, opts);
+  };
   const downloadReport = (format: string) => {
     if (format === 'pdf') printHtml(reportHtml());
     else if (format === 'excel') downloadFile(`${fileBase}.xls`, buildUnifiedXls(exportLeads, exportRegistrants), 'application/vnd.ms-excel');

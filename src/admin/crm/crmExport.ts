@@ -116,14 +116,21 @@ export function buildCrmReportHtml(
   opts?: {
     companyName?: string;
     preparedFor?: string;
-    // When the report covers a single workshop, its details title the report.
+    // When the report covers a single event, its details title the report.
     workshop?: { title: string; date?: string; venue?: string };
+    webinar?: { title: string; date?: string };
+    online?: { title: string };
+    manual?: { title: string };
   },
 ): string {
   const companyName = opts?.companyName || 'Optimum Prime Solutions';
   const preparedFor = opts?.preparedFor || 'Tally Solutions';
   const workshop = opts?.workshop;
-  const reportTitle = workshop ? workshop.title : 'CRM Status Report';
+  const webinar = opts?.webinar;
+  const online = opts?.online;
+  const manual = opts?.manual;
+  const event = workshop || webinar || online || manual;
+  const reportTitle = event ? event.title : 'CRM Status Report';
   const generated = new Date().toLocaleString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
   });
@@ -137,6 +144,9 @@ export function buildCrmReportHtml(
   const staffPresent      = registrants.filter(r => r.attended && r.staff).length;
   const headCount         = registrants.filter(r => r.attended).length; // prospects + staff in the room
   const workshopLeads = leads.filter(l => l.source === 'workshop').length;
+  const webinarLeads = leads.filter(l => l.source === 'webinar').length;
+  const onlineLeads = leads.filter(l => l.source === 'website').length;
+  const manualLeads = leads.filter(l => l.source === 'manual').length;
   const won = leads.filter(l => l.status === 'Closed Won').length;
   // Closed Lost only appears here when the export includes closed deals.
   const lost = leads.filter(l => l.status === 'Closed Lost').length;
@@ -235,9 +245,17 @@ export function buildCrmReportHtml(
 <body><div class="wrap">
   <header class="rpt">
     <h1>${esc(reportTitle)}</h1>
-    <p><strong>${esc(companyName)}</strong> — ${workshop ? 'workshop follow-up &amp; sales pipeline' : 'sales pipeline &amp; workshop follow-up'}</p>
+    <p><strong>${esc(companyName)}</strong> — ${
+      workshop ? 'workshop follow-up &amp; sales pipeline'
+      : webinar ? 'webinar follow-up &amp; sales pipeline'
+      : online ? 'online demo pipeline'
+      : manual ? 'manual lead pipeline'
+      : 'sales pipeline'
+    }</p>
     ${workshop && (workshop.date || workshop.venue)
       ? `<p>${esc([workshop.date, workshop.venue].filter(Boolean).join(' · '))}</p>`
+      : webinar && webinar.date
+      ? `<p>${esc(webinar.date)}</p>`
       : ''}
     <p>Prepared for: ${esc(preparedFor)}</p>
     <p>Generated: ${esc(generated)}</p>
@@ -245,12 +263,17 @@ export function buildCrmReportHtml(
 
   <div class="kpis">
     <div class="kpi"><b>${leads.length}</b><span>Total Leads</span></div>
-    <div class="kpi"><b>${registrants.length}</b><span>Workshop Registered</span></div>
-    <div class="kpi"><b>${prospectsAttended}</b><span>Attended (Prospects)</span></div>
-    <div class="kpi"><b>${prospectsNoShow}</b><span>Not Attended</span></div>
-    <div class="kpi"><b>${staffPresent}</b><span>Staff Present</span></div>
-    <div class="kpi"><b>${headCount}</b><span>Total Head Count</span></div>
-    <div class="kpi"><b>${workshopLeads}</b><span>Workshop → Pipeline</span></div>
+    ${registrants.length > 0 ? `
+      <div class="kpi"><b>${registrants.length}</b><span>Workshop Registered</span></div>
+      <div class="kpi"><b>${prospectsAttended}</b><span>Attended (Prospects)</span></div>
+      <div class="kpi"><b>${prospectsNoShow}</b><span>Not Attended</span></div>
+      <div class="kpi"><b>${staffPresent}</b><span>Staff Present</span></div>
+      <div class="kpi"><b>${headCount}</b><span>Total Head Count</span></div>
+    ` : ''}
+    ${workshopLeads > 0 ? `<div class="kpi"><b>${workshopLeads}</b><span>Workshop → Pipeline</span></div>` : ''}
+    ${webinarLeads > 0 ? `<div class="kpi"><b>${webinarLeads}</b><span>Webinar → Pipeline</span></div>` : ''}
+    ${onlineLeads > 0 ? `<div class="kpi"><b>${onlineLeads}</b><span>Online → Pipeline</span></div>` : ''}
+    ${manualLeads > 0 ? `<div class="kpi"><b>${manualLeads}</b><span>Manual → Pipeline</span></div>` : ''}
     <div class="kpi"><b>${won}</b><span>Closed Won</span></div>
     ${lost > 0 ? `<div class="kpi"><b>${lost}</b><span>Closed Lost</span></div>` : ''}
   </div>
