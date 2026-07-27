@@ -180,8 +180,20 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   );
 
   const exportRegistrants = useMemo(
-    () => registrants.filter(r => inDateRange(r.createdAt)),
-    [registrants, exportFrom, exportTo],
+    () => {
+      let regs = registrants.filter(r => inDateRange(r.createdAt));
+      if (filterSource !== 'All') {
+        if (filterSource === 'workshop') {
+          regs = regs.filter(r => (r as any).eventType === 'workshop');
+          if (filterWorkshop !== 'all') regs = regs.filter(r => (r as any).eventId === filterWorkshop);
+        } else if (filterSource === 'webinar') {
+          regs = regs.filter(r => (r as any).eventType === 'webinar');
+          if (filterWebinar !== 'all') regs = regs.filter(r => (r as any).eventId === filterWebinar);
+        }
+      }
+      return regs;
+    },
+    [registrants, exportFrom, exportTo, filterSource, filterWorkshop, filterWebinar],
   );
 
   // When the report covers exactly one workshop, feature that event in the
