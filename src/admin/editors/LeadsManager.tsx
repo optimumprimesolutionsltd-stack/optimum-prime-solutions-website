@@ -170,18 +170,21 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   // Done) unless the user opts to include Closed Won/Lost.
   const exportLeads = useMemo(
     () => {
-      let leads = dateScopedLeads.filter(l => includeClosed || (l.status !== 'Closed Won' && l.status !== 'Closed Lost'));
+      // When a specific source/workshop is filtered, ignore date range and show all leads from that source
+      const baseLeads = filterSource !== 'All' ? data.leads : dateScopedLeads;
+      let leads = baseLeads.filter(l => includeClosed || (l.status !== 'Closed Won' && l.status !== 'Closed Lost'));
       if (filterSource !== 'All') leads = leads.filter(l => sourceCategory(l) === filterSource);
       if (filterSource === 'workshop' && filterWorkshop !== 'all') leads = leads.filter(l => leadWorkshopId(l) === filterWorkshop);
       if (filterSource === 'webinar' && filterWebinar !== 'all') leads = leads.filter(l => leadWebinarId(l) === filterWebinar);
       return leads;
     },
-    [dateScopedLeads, includeClosed, filterSource, filterWorkshop, filterWebinar],
+    [data.leads, dateScopedLeads, includeClosed, filterSource, filterWorkshop, filterWebinar],
   );
 
   const exportRegistrants = useMemo(
     () => {
-      let regs = registrants.filter(r => inDateRange(r.createdAt));
+      // When a specific workshop is filtered, show all registrants from that workshop, ignoring date range
+      let regs = filterSource === 'workshop' ? registrants : registrants.filter(r => inDateRange(r.createdAt));
       // Registrants are only for workshops, not webinars or online leads
       if (filterSource !== 'All' && filterSource !== 'workshop') {
         return [];
