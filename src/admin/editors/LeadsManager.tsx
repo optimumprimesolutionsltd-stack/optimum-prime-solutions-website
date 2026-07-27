@@ -36,6 +36,14 @@ const INDUSTRIES = [
   'SACCO / Cooperative', 'Professional Services', 'Other',
 ];
 
+const OPTIMUM_STAFF = [
+  { name: 'Mr. Frederick Chege', phone: '+254 758449475', email: 'chege@optimumprimesolutions.co.ke' },
+  { name: 'Mr. Kenneth Wamiatu', phone: '+254 736 711057', email: 'ken@optimumprimesolutions.co.ke' },
+  { name: 'Mr. John Mark Kiruki', phone: '+254 701 146343', email: 'john@optimumprimesolutions.co.ke' },
+  { name: 'Ms. Joan Wairimu', phone: '+254 796 808316', email: 'joan@optimumprimesolutions.co.ke' },
+  { name: 'Ms. Jane Njoki', phone: '+254 726 006085', email: 'jane@optimumprimesolutions.co.ke' },
+];
+
 // Booking-day / time-slot rules live in one shared module so the admin pop-up
 // and the public request form always offer the same days and hours.
 
@@ -71,6 +79,7 @@ interface ScheduleForm {
   scheduledDate: string; scheduledTime: string;
   demoType: 'online' | 'physical'; demoLocation: string;
   teamMemberName: string; teamMemberPhone: string;
+  tallyStaff1: string; tallyStaff2: string;
   extraTeam: TeamMember[];
   demoNotes: string;
 }
@@ -308,6 +317,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const [schedForm, setSchedForm]       = useState<ScheduleForm>({
     scheduledDate: '', scheduledTime: '', demoType: 'online',
     demoLocation: '', teamMemberName: '', teamMemberPhone: '',
+    tallyStaff1: '', tallyStaff2: '',
     extraTeam: [], demoNotes: '',
   });
   const [schedSubmitting, setSchedSubmitting] = useState(false);
@@ -1709,45 +1719,33 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                           </div>
                         )}
 
-                        {/* Team members */}
-                        <div className="sm:col-span-2 space-y-3">
-                          <div className="flex items-center justify-between">
-                            <label className="text-xs font-bold text-navy-600 uppercase tracking-wider">
-                              <User className="h-3 w-3 inline mr-1" />Team Members *
-                            </label>
-                            {schedForm.extraTeam.length < 2 && (
-                              <button type="button" onClick={addExtraTeam}
-                                className="text-xs text-accent font-semibold hover:underline flex items-center gap-1">
-                                <Plus className="h-3 w-3" /> Add member
-                              </button>
-                            )}
-                          </div>
-                          {/* Primary team member */}
-                          <div className="grid grid-cols-2 gap-2">
-                            <input value={schedForm.teamMemberName} onChange={e => setS('teamMemberName', e.target.value)}
-                              placeholder="Name *"
-                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
-                            <input value={schedForm.teamMemberPhone} onChange={e => setS('teamMemberPhone', e.target.value)}
-                              placeholder="+254 7XX XXX XXX"
-                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
-                          </div>
-                          {/* Extra team members */}
-                          {schedForm.extraTeam.map((m, i) => (
-                            <div key={i} className="grid grid-cols-2 gap-2 items-center">
-                              <input value={m.name} onChange={e => setExtraTeam(i, 'name', e.target.value)}
-                                placeholder={`Member ${i + 2} name`}
-                                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
-                              <div className="flex gap-1">
-                                <input value={m.phone} onChange={e => setExtraTeam(i, 'phone', e.target.value)}
-                                  placeholder="+254 7XX XXX XXX"
-                                  className="flex-1 rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
-                                <button type="button" onClick={() => removeExtraTeam(i)}
-                                  className="rounded-lg p-2 text-red-400 hover:bg-red-50 transition shrink-0">
-                                  <X className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
+                        {/* Optimum staff member (required) */}
+                        <div className="sm:col-span-2">
+                          <label className="block text-xs font-semibold text-navy-600 mb-1.5"><User className="h-3 w-3 inline mr-1" />Optimum Staff *</label>
+                          <select value={schedForm.teamMemberName} onChange={e => {
+                            const selected = OPTIMUM_STAFF.find(s => s.name === e.target.value);
+                            if (selected) {
+                              setS('teamMemberName', selected.name);
+                              setS('teamMemberPhone', selected.phone);
+                            }
+                          }}
+                            className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent">
+                            <option value="">Select a staff member</option>
+                            {OPTIMUM_STAFF.map(s => (
+                              <option key={s.email} value={s.name}>{s.name} • {s.phone}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* Optional Tally Solutions staff */}
+                        <div className="sm:col-span-2 space-y-2">
+                          <label className="block text-xs font-semibold text-navy-600">Tally Solutions Staff (optional, max 2)</label>
+                          <input value={schedForm.tallyStaff1} onChange={e => setS('tallyStaff1', e.target.value)}
+                            placeholder="Name or contact (optional)"
+                            className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                          <input value={schedForm.tallyStaff2} onChange={e => setS('tallyStaff2', e.target.value)}
+                            placeholder="Name or contact (optional)"
+                            className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                         </div>
 
                         {/* Notes */}
