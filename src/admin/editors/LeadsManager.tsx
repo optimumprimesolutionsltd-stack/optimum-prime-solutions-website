@@ -159,6 +159,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     return true;
   };
 
+  const sourceCategory = (l: Lead): 'workshop' | 'webinar' | 'online' | 'manual' =>
+    l.source === 'workshop' ? 'workshop'
+    : l.source === 'webinar' ? 'webinar'
+    : l.source === 'website' ? 'online'
+    : 'manual';
+
   // The date range scopes the whole Demo Leads view — stats, tab counts and the
   // list — so the numbers always match the chosen period.
   const dateScopedLeads = useMemo(
@@ -323,13 +329,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     ), [data.leads, editingId]);
 
   // ── Filtered leads ───────────────────────────────────────────────────────
-  // Bucket a lead's raw source into the categories the filter offers.
-  const sourceCategory = (l: Lead): 'workshop' | 'webinar' | 'online' | 'manual' =>
-    l.source === 'workshop' ? 'workshop'
-    : l.source === 'webinar' ? 'webinar'
-    : l.source === 'website' ? 'online'
-    : 'manual';
-
   // The working list always shows every lead (subject to status / source /
   // search). The date range only scopes the report + CSV exports — it must
   // never silently hide leads from the person working the pipeline.
