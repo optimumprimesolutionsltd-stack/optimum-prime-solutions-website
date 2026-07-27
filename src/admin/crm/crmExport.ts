@@ -48,7 +48,7 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
   const headers = [
     'Name', 'Company', 'Phone', 'Email', 'Industry',
     'Source', 'Event', 'Attended', 'Stage', 'Next Step',
-    'Scheduled Demo (EAT)', 'Date Added (EAT)',
+    'Demo Contact Person', 'Demo Contact Phone', 'Scheduled Demo (EAT)', 'Date Added (EAT)',
   ];
 
   const leadRows = leads.map(l => {
@@ -67,6 +67,8 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
       (l.attendedWorkshop || l.attendedWebinar) ? 'Yes'
         : (l.source === 'workshop' || l.source === 'webinar') ? 'No' : '',
       stageReportLabel(l.status), l.nextStep || defaultNextStep(l.status),
+      // Demo contact person (assigned team member)
+      l.teamMemberName || '', l.teamMemberPhone || '',
       fmtDateTime(l.scheduledDate, l.scheduledTime), fmtDateTime(l.createdAt),
     ];
   });
@@ -82,6 +84,7 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
       '', // Event name (not tracked at registrant level)
       r.attended ? 'Yes' : 'No',
       'Not in pipeline', 'Add to follow-up if qualified',
+      '', '', // Demo contact person columns (not yet assigned)
       '', fmtDateTime(r.createdAt),
     ]);
 
@@ -147,7 +150,7 @@ export function buildCrmReportHtml(
     <section class="stage">
       <h3><span class="dot" style="background:${stageColor(g.stage)}"></span>${esc(stageReportLabel(g.stage))} <span class="count">${g.items.length}</span></h3>
       <table>
-        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Scheduled Demo (EAT)</th><th>Next Step</th></tr></thead>
+        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Demo Contact</th><th>Scheduled Demo (EAT)</th><th>Next Step</th></tr></thead>
         <tbody>
           ${g.items.map(l => `
             <tr>
@@ -155,6 +158,7 @@ export function buildCrmReportHtml(
               <td>${esc(l.company || '—')}</td>
               <td>${esc(l.phone || '—')}</td>
               <td>${l.attendedWorkshop ? '✅' : (l.source === 'workshop' ? '—' : '')}</td>
+              <td><small>${esc(l.teamMemberName || '—')}<br>${esc(l.teamMemberPhone || '')}</small></td>
               <td><small>${esc(fmtDateTime(l.scheduledDate, l.scheduledTime) || '—')}</small></td>
               <td>${esc(l.nextStep || defaultNextStep(l.status))}</td>
             </tr>`).join('')}
