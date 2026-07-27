@@ -47,22 +47,29 @@ const fmtDateTime = (iso?: string, time?: string) => {
 function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { headers: string[]; rows: string[][] } {
   const headers = [
     'Name', 'Company', 'Phone', 'Email', 'Industry',
-    'Source', 'Attended Breakfast', 'Stage', 'Next Step',
+    'Source', 'Event', 'Attended', 'Stage', 'Next Step',
     'Scheduled Demo (EAT)', 'Date Added (EAT)',
   ];
 
-  const leadRows = leads.map(l => [
-    l.name, l.company, l.phone, l.email, l.industry || l.businessType || '',
-    // Name the specific workshop / webinar so different events are
-    // distinguishable in the export, not just lumped as "workshop"/"webinar".
-    l.source === 'workshop' ? (l.workshopTitle || 'workshop')
-      : l.source === 'webinar' ? (l.webinarTitle || 'webinar')
-      : (l.source || 'website'),
-    (l.attendedWorkshop || l.attendedWebinar) ? 'Yes'
-      : (l.source === 'workshop' || l.source === 'webinar') ? 'No' : '',
-    stageReportLabel(l.status), l.nextStep || defaultNextStep(l.status),
-    fmtDateTime(l.scheduledDate, l.scheduledTime), fmtDateTime(l.createdAt),
-  ]);
+  const leadRows = leads.map(l => {
+    const eventName = l.source === 'workshop' ? (l.workshopTitle || '')
+      : l.source === 'webinar' ? (l.webinarTitle || '')
+      : '';
+    return [
+      l.name, l.company, l.phone, l.email, l.industry || l.businessType || '',
+      // Source is just the channel (website, workshop, webinar), not the event name
+      l.source === 'workshop' ? 'Workshop'
+        : l.source === 'webinar' ? 'Webinar'
+        : 'Website',
+      // Event name goes in its own column
+      eventName,
+      // Attended indicates if they actually showed up
+      (l.attendedWorkshop || l.attendedWebinar) ? 'Yes'
+        : (l.source === 'workshop' || l.source === 'webinar') ? 'No' : '',
+      stageReportLabel(l.status), l.nextStep || defaultNextStep(l.status),
+      fmtDateTime(l.scheduledDate, l.scheduledTime), fmtDateTime(l.createdAt),
+    ];
+  });
 
   // Workshop registrants who were NOT converted into a lead — so Tally Solutions
   // sees the full room, not just the ones already being worked.
@@ -71,7 +78,8 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
     .filter(r => !convertedRegIds.has(r.id) && !r.staff)
     .map(r => [
       r.name, r.company || '', r.phone, r.email, '',
-      'workshop',
+      'Workshop',
+      '', // Event name (not tracked at registrant level)
       r.attended ? 'Yes' : 'No',
       'Not in pipeline', 'Add to follow-up if qualified',
       '', fmtDateTime(r.createdAt),
