@@ -21,7 +21,7 @@ import WhatsAppManager from './editors/WhatsAppManager';
 import WorkshopRegistrationsManager from './editors/WorkshopRegistrationsManager';
 import WebinarRegistrationsManager from './editors/WebinarRegistrationsManager';
 import SubscribersManager from './editors/SubscribersManager';
-import ContactsDirectory from './editors/ContactsDirectory';
+// import ContactsDirectory from './editors/ContactsDirectory';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -36,7 +36,7 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
   { id: 'blogs', label: 'Blog Posts', icon: FileText },
   { id: 'subscribers', label: 'Subscribers', icon: Mail },
-  { id: 'contacts', label: 'Unified Directory', icon: Users },
+  // { id: 'contacts', label: 'Unified Directory', icon: Users },
   { id: 'contact', label: 'Contact Info', icon: Phone },
   { id: 'testimonials', label: 'Reviews & Testimonials', icon: Users },
   // Book a Demo is now embedded inside Demo Leads tab
@@ -98,7 +98,7 @@ export default function AdminLayout({ onLogout }: Props) {
       case 'whatsapp': return <WhatsAppManager />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
       case 'subscribers': return <SubscribersManager />;
-      case 'contacts': return <ContactsDirectory leads={data.leads} subscribers={[]} whatsappContacts={[]} />;
+      // case 'contacts': return <ContactsDirectory leads={data.leads} subscribers={[]} whatsappContacts={[]} />;
       case 'contact': return <ContactEditor data={data} onSave={d => handleSave(d, 'Contact info saved!')} />;
       case 'testimonials': return <TestimonialsEditor data={data} onSave={d => handleSave(d, 'Testimonials saved!')} />;
       case 'bookdemo': return null; // merged into leads tab
