@@ -169,8 +169,14 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   // Leads to export: the date-scoped set, open pipeline by default (New → Demo
   // Done) unless the user opts to include Closed Won/Lost.
   const exportLeads = useMemo(
-    () => dateScopedLeads.filter(l => includeClosed || (l.status !== 'Closed Won' && l.status !== 'Closed Lost')),
-    [dateScopedLeads, includeClosed],
+    () => {
+      let leads = dateScopedLeads.filter(l => includeClosed || (l.status !== 'Closed Won' && l.status !== 'Closed Lost'));
+      if (filterSource !== 'All') leads = leads.filter(l => sourceCategory(l) === filterSource);
+      if (filterSource === 'workshop' && filterWorkshop !== 'all') leads = leads.filter(l => leadWorkshopId(l) === filterWorkshop);
+      if (filterSource === 'webinar' && filterWebinar !== 'all') leads = leads.filter(l => leadWebinarId(l) === filterWebinar);
+      return leads;
+    },
+    [dateScopedLeads, includeClosed, filterSource, filterWorkshop, filterWebinar],
   );
 
   const exportRegistrants = useMemo(
@@ -790,12 +796,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       {/* ── Stats Strip ── */}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
         {[
-          { label: 'Total',     value: data.leads.length,                                          color: 'bg-navy-50 text-navy-700' },
-          { label: 'New',       value: data.leads.filter(l => l.status === 'New').length,          color: 'bg-accent/10 text-accent' },
-          { label: 'Contacted', value: data.leads.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
-          { label: 'Qualified', value: data.leads.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
-          { label: 'Demo Set',  value: data.leads.filter(l => l.status === 'Schedule a Demo').length, color: 'bg-amber-50 text-amber-600' },
-          { label: 'Won',       value: data.leads.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
+          { label: 'Total',     value: filtered.length,                                          color: 'bg-navy-50 text-navy-700' },
+          { label: 'New',       value: filtered.filter(l => l.status === 'New').length,          color: 'bg-accent/10 text-accent' },
+          { label: 'Contacted', value: filtered.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
+          { label: 'Qualified', value: filtered.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
+          { label: 'Demo Set',  value: filtered.filter(l => l.status === 'Schedule a Demo').length, color: 'bg-amber-50 text-amber-600' },
+          { label: 'Won',       value: filtered.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
         ].map(s => (
           <div key={s.label} className={`rounded-xl p-3 text-center ${s.color}`}>
             <p className="text-xl font-bold">{s.value}</p>
@@ -841,8 +847,8 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           )}
           <span className="text-navy-400">
             {(exportFrom || exportTo)
-              ? `Report covers ${dateScopedLeads.length} lead${dateScopedLeads.length === 1 ? '' : 's'} in this range`
-              : `Report covers all ${dateScopedLeads.length} leads`}
+              ? `Report covers ${exportLeads.length} lead${exportLeads.length === 1 ? '' : 's'} in this range`
+              : `Report covers all ${exportLeads.length} leads`}
           </span>
           <label className="flex items-center gap-1.5 text-navy-600 cursor-pointer" title="Only affects what the exports contain">
             <input type="checkbox" checked={includeClosed} onChange={e => setIncludeClosed(e.target.checked)}
