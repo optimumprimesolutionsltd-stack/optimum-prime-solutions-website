@@ -1,12 +1,11 @@
 import { motion } from 'framer-motion';
 import { useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { CheckCircle, Award, Cloud, BookOpen, Wrench } from 'lucide-react';
 
 export default function TallyLanding() {
   const confettiRoot = useRef<HTMLDivElement | null>(null);
   const logoRef = useRef<HTMLDivElement | null>(null);
-  const navigate = useNavigate();
 
   const services = [
     { icon: Award, label: 'Official Tally Partner Kenya', desc: 'Certified by Tally Solutions Africa — authorised to sell, implement and support TallyPrime across Kenya.' },
@@ -113,13 +112,13 @@ export default function TallyLanding() {
 
           {/* CTA buttons */}
           <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-            <button
-              type="button"
-              onClick={() => { navigate('/contact#demo-form'); setTimeout(() => { const el = document.getElementById('demo-form'); if (el) el.scrollIntoView({ behavior: 'smooth' }); }, 300); }}
-              className="w-full rounded-full bg-red-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-red-600/20 transition-all hover:scale-105 hover:bg-red-500 hover:shadow-red-600/40 active:scale-95 sm:w-auto"
+            <Link
+              to="/contact#demo-form"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="w-full rounded-full bg-red-600 px-8 py-4 text-sm font-bold text-white shadow-lg shadow-red-600/20 transition-all hover:scale-105 hover:bg-red-500 hover:shadow-red-600/40 active:scale-95 sm:w-auto inline-flex items-center justify-center"
             >
               Book a Free Demo
-            </button>
+            </Link>
             <Link
               to="/tallyprime"
               onClick={() => window.scrollTo({ top: 0, behavior: 'instant' })}
