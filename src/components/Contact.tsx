@@ -393,9 +393,10 @@ export default function Contact() {
                           }}
                           required
                           min={new Date().toISOString().split('T')[0]}
-                          className={`w-full rounded-3xl border pl-10 pr-4 py-3 text-sm outline-none transition ${
+                          className={`w-full rounded-3xl border pl-10 pr-4 py-3 text-sm outline-none transition cursor-pointer hover:border-accent/50 focus:border-accent focus:ring-2 focus:ring-accent/20 ${
                             getFieldError(errors, 'demoDate') ? 'border-red-500/70 bg-slate-900 text-white' : 'border-white/10 bg-slate-900 text-white'
                           }`}
+                          style={{ colorScheme: 'dark' }}
                         />
                       </div>
                       {getFieldError(errors, 'demoDate') && <p className="mt-2 text-xs text-red-400">{getFieldError(errors, 'demoDate')}</p>}
