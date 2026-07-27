@@ -35,13 +35,20 @@ const fmtDate = (iso?: string) => {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
+const fmtDateTime = (iso?: string, time?: string) => {
+  if (!iso) return '';
+  const date = fmtDate(iso);
+  if (!time) return date;
+  return `${date} · ${time} EAT`;
+};
+
 // Shared tabular data — leads plus any workshop attendees not yet in the pipeline.
 // Used by both the CSV and Excel exports so the two stay identical.
 function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { headers: string[]; rows: string[][] } {
   const headers = [
     'Name', 'Company', 'Phone', 'Email', 'Industry',
     'Source', 'Attended Breakfast', 'Stage', 'Next Step',
-    'Scheduled Date', 'Scheduled Time', 'Date Added',
+    'Scheduled Demo (EAT)', 'Date Added (EAT)',
   ];
 
   const leadRows = leads.map(l => [
@@ -54,7 +61,7 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
     (l.attendedWorkshop || l.attendedWebinar) ? 'Yes'
       : (l.source === 'workshop' || l.source === 'webinar') ? 'No' : '',
     stageReportLabel(l.status), l.nextStep || defaultNextStep(l.status),
-    l.scheduledDate || '', l.scheduledTime || '', fmtDate(l.createdAt),
+    fmtDateTime(l.scheduledDate, l.scheduledTime), fmtDateTime(l.createdAt),
   ]);
 
   // Workshop registrants who were NOT converted into a lead — so Tally Solutions
@@ -67,7 +74,7 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
       'workshop',
       r.attended ? 'Yes' : 'No',
       'Not in pipeline', 'Add to follow-up if qualified',
-      '', '', fmtDate(r.createdAt),
+      '', fmtDateTime(r.createdAt),
     ]);
 
   return { headers, rows: [...leadRows, ...registrantRows] };
@@ -132,7 +139,7 @@ export function buildCrmReportHtml(
     <section class="stage">
       <h3><span class="dot" style="background:${stageColor(g.stage)}"></span>${esc(stageReportLabel(g.stage))} <span class="count">${g.items.length}</span></h3>
       <table>
-        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Next Step</th></tr></thead>
+        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Scheduled Demo (EAT)</th><th>Next Step</th></tr></thead>
         <tbody>
           ${g.items.map(l => `
             <tr>
@@ -140,6 +147,7 @@ export function buildCrmReportHtml(
               <td>${esc(l.company || '—')}</td>
               <td>${esc(l.phone || '—')}</td>
               <td>${l.attendedWorkshop ? '✅' : (l.source === 'workshop' ? '—' : '')}</td>
+              <td><small>${esc(fmtDateTime(l.scheduledDate, l.scheduledTime) || '—')}</small></td>
               <td>${esc(l.nextStep || defaultNextStep(l.status))}</td>
             </tr>`).join('')}
         </tbody>
@@ -152,7 +160,7 @@ export function buildCrmReportHtml(
     <section class="stage">
       <h3><span class="dot" style="background:#94a3b8"></span>Workshop attendees — not yet in pipeline <span class="count">${pendingReg.length}</span></h3>
       <table>
-        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Registered</th></tr></thead>
+        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Registered (EAT)</th></tr></thead>
         <tbody>
           ${pendingReg.map(r => `
             <tr>
@@ -160,7 +168,7 @@ export function buildCrmReportHtml(
               <td>${esc(r.company || '—')}</td>
               <td>${esc(r.phone || '—')}</td>
               <td>${r.attended ? '✅' : '—'}</td>
-              <td>${esc(fmtDate(r.createdAt))}</td>
+              <td><small>${esc(fmtDateTime(r.createdAt))}</small></td>
             </tr>`).join('')}
         </tbody>
       </table>
