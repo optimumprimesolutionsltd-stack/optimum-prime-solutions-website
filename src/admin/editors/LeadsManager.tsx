@@ -1010,8 +1010,8 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
       {/* ── Manual Booking Panel (slide-in) ── */}
       {showBooking && (
-        <div className="fixed inset-0 z-50 flex justify-center bg-navy-900/60 backdrop-blur-sm p-4 sm:p-6 overflow-y-auto">
-          <div className="rounded-2xl border border-accent/30 bg-white shadow-lg overflow-hidden w-full max-w-2xl my-auto">
+        <div className="fixed inset-0 z-50 flex justify-center bg-navy-900/60 backdrop-blur-sm p-4 sm:p-6 overflow-y-auto pt-20">
+          <div className="rounded-2xl border border-accent/30 bg-white shadow-lg overflow-hidden w-full max-w-2xl">
             <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100 bg-navy-50">
               <div className="flex items-center gap-2">
                 <CalendarDays className="h-5 w-5 text-accent" />
