@@ -1329,15 +1329,15 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   <button
                     onClick={e => { e.stopPropagation(); setExpandedId(l.id); openEdit(l); }}
                     title="Edit this booked demo (date, time, team)"
-                    className="inline-flex items-center gap-1 rounded-lg bg-amber-100 px-2.5 py-1 text-[11px] font-bold text-amber-700 hover:bg-amber-200 transition whitespace-nowrap shrink-0">
-                    <CalendarDays className="h-3.5 w-3.5" /> Edit demo
+                    className="inline-flex items-center gap-1 rounded-lg bg-amber-500 hover:bg-amber-600 px-3 py-1.5 text-xs font-bold text-white shadow-md hover:shadow-lg transition whitespace-nowrap shrink-0">
+                    ✏️ Edit
                   </button>
                 ) : (
                   <button
-                    onClick={e => { e.stopPropagation(); setExpandedId(l.id); updateStatus(l.id, 'Schedule a Demo'); }}
+                    onClick={e => { e.stopPropagation(); setExpandedId(l.id); updateStatus(l.id, 'Schedule a Demo'); setSchedulingId(l.id); }}
                     title="Book / schedule a demo for this lead"
-                    className="inline-flex items-center gap-1 rounded-lg bg-accent/10 px-2.5 py-1 text-[11px] font-bold text-accent hover:bg-accent/20 transition whitespace-nowrap shrink-0">
-                    <CalendarDays className="h-3.5 w-3.5" /> Book demo
+                    className="inline-flex items-center gap-2 rounded-lg bg-accent hover:bg-accent/90 px-3 py-1.5 text-xs font-bold text-white shadow-md hover:shadow-lg transition whitespace-nowrap shrink-0">
+                    📅 Book
                   </button>
                 )}
                 <ChevronDown className={`h-4 w-4 text-navy-400 transition-transform shrink-0 ${expandedId === l.id ? 'rotate-180' : ''}`} />
@@ -1406,32 +1406,69 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
                   {/* Scheduled demo info (if already scheduled) */}
                   {l.status === 'Schedule a Demo' && l.scheduledDate && l.meetSent && editingId !== l.id && (
-                    <div className="rounded-xl bg-amber-50 border border-amber-200 p-4 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <p className="text-xs font-bold text-amber-700">📅 Demo booked</p>
+                    <div className="rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 p-5 space-y-3 shadow-sm">
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        <div className="flex items-center gap-2">
+                          <div className="h-8 w-8 rounded-full bg-amber-200 flex items-center justify-center text-lg">📅</div>
+                          <div>
+                            <p className="text-xs font-bold uppercase tracking-wide text-amber-700">Demo Booked & Confirmed</p>
+                            <p className="text-[11px] text-amber-600">Ready for presentation</p>
+                          </div>
+                        </div>
                         <button
                           onClick={() => openEdit(l)}
-                          className="flex items-center gap-1 rounded-lg bg-amber-100 hover:bg-amber-200 px-3 py-1.5 text-xs font-semibold text-amber-800 transition">
-                          ✏️ Edit Demo
+                          className="flex items-center gap-2 rounded-lg bg-amber-500 hover:bg-amber-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:shadow-lg transition">
+                          ✏️ Edit
                         </button>
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs text-amber-800">
-                        <div><span className="font-semibold">Date:</span> {new Date(l.scheduledDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</div>
-                        <div><span className="font-semibold">Time:</span> {l.scheduledTime} EAT</div>
-                        <div><span className="font-semibold">Type:</span> {l.demoType === 'online' ? '💻 Online' : '📍 Physical'}</div>
-                        {l.teamMemberName && <div><span className="font-semibold">Team:</span> {l.teamMemberName}{(l as any).extraTeam?.length > 0 ? ` +${(l as any).extraTeam.length}` : ''}</div>}
+                      <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
+                        <div className="bg-white rounded-lg p-3 border border-amber-200">
+                          <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Date</p>
+                          <p className="text-base font-bold text-amber-900">{new Date(l.scheduledDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border border-amber-200">
+                          <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Time</p>
+                          <p className="text-base font-bold text-amber-900">{l.scheduledTime} EAT</p>
+                        </div>
+                        <div className="bg-white rounded-lg p-3 border border-amber-200">
+                          <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Type</p>
+                          <p className="text-base font-bold text-amber-900">{l.demoType === 'online' ? '💻 Online' : '📍 Physical'}</p>
+                        </div>
+                        {l.teamMemberName && <div className="bg-white rounded-lg p-3 border border-amber-200">
+                          <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Staff</p>
+                          <p className="text-base font-bold text-amber-900 truncate">{l.teamMemberName}{(l as any).extraTeam?.length > 0 ? ` +${(l as any).extraTeam.length}` : ''}</p>
+                        </div>}
                       </div>
                       {l.demoType === 'physical' && l.demoLocation && (
-                        <div className="text-xs text-amber-800 flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />{l.demoLocation}
+                        <div className="bg-white rounded-lg p-3 border border-amber-200 flex items-start gap-2">
+                          <MapPin className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+                          <div className="min-w-0">
+                            <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Location</p>
+                            <p className="text-sm font-semibold text-amber-900 break-words">{l.demoLocation}</p>
+                          </div>
                         </div>
                       )}
                       {l.meetLink && (
                         <a href={l.meetLink} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-xs text-blue-600 hover:underline">
-                          📹 {l.meetLink}
+                          className="block bg-white rounded-lg p-3 border border-blue-300 hover:bg-blue-50 transition">
+                          <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide mb-1">Google Meet Link</p>
+                          <p className="text-sm font-semibold text-blue-700 break-all hover:underline">📹 {l.meetLink}</p>
                         </a>
                       )}
+                    </div>
+                  )}
+
+                  {/* Show edit button even for non-scheduled demos in Schedule a Demo status */}
+                  {l.status === 'Schedule a Demo' && (!l.scheduledDate || !l.meetSent) && editingId !== l.id && (
+                    <div className="rounded-xl bg-blue-50 border border-blue-200 p-4">
+                      <button
+                        onClick={() => {
+                          openEdit(l);
+                          setSchedulingId(null);
+                        }}
+                        className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 hover:bg-blue-700 px-4 py-3 text-sm font-bold text-white shadow-md hover:shadow-lg transition">
+                        📅 Open Booking Form
+                      </button>
                     </div>
                   )}
 
@@ -1451,7 +1488,13 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                         {statuses.map(s => <option key={s}>{s}</option>)}
                       </select>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {l.status === 'Schedule a Demo' && (l.scheduledDate || !l.meetSent) && (
+                        <button onClick={() => openEdit(l)}
+                          className="rounded-lg bg-blue-600 hover:bg-blue-700 px-3 py-1.5 text-xs font-bold text-white shadow-md hover:shadow-lg transition">
+                          📝 Edit Demo
+                        </button>
+                      )}
                       {l.email && (
                         <a href={`mailto:${l.email}`}
                           className="rounded-lg bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-accent/20 transition">
