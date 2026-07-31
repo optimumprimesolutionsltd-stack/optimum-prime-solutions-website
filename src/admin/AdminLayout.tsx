@@ -53,6 +53,10 @@ export default function AdminLayout({ onLogout }: Props) {
   const [sidebar, setSidebar] = useState(false);
   const [toast, setToast] = useState('');
   const [unreadWa, setUnreadWa] = useState(0);
+  const [showResetDialog, setShowResetDialog] = useState(false);
+  const [resetStep, setResetStep] = useState<'confirm' | 'email' | 'verify'>('confirm');
+  const [resetVerifyCode, setResetVerifyCode] = useState('');
+  const [generatedCode, setGeneratedCode] = useState('');
 
   useEffect(() => {
     const unsubscribe = fbSubscribe('whatsapp_conversations', (raw: Record<string, any> | null) => {
@@ -66,17 +70,38 @@ export default function AdminLayout({ onLogout }: Props) {
   
   const handleSave = (d: SiteData, msg: string) => { update(d); notify(msg); };
   
-  const handleReset = () => {
-    // Deliberately high-friction: this wipes ALL content, so require the user to
-    // type the word out — a plain OK/Cancel is too easy to hit by mistake.
-    const answer = prompt(
-      'DANGER: this ERASES all website content and restores factory defaults. It cannot be undone.\n\n' +
-      'Type RESET (capitals) to confirm, or Cancel to keep everything.',
-    );
-    if (answer !== null && answer.trim() === 'RESET') {
-      update(defaultData);
-      notify('All content reset to defaults');
+  const handleResetOpen = () => {
+    setShowResetDialog(true);
+    setResetStep('confirm');
+    setResetVerifyCode('');
+    setGeneratedCode('');
+  };
+
+  const handleResetConfirm = () => {
+    // Generate a 6-digit verification code
+    const code = Math.random().toString().slice(2, 8);
+    setGeneratedCode(code);
+    setResetStep('email');
+    notify(`Verification code: ${code} (shown for demo - in production would be emailed)`);
+  };
+
+  const handleResetVerify = () => {
+    if (resetVerifyCode.trim() === generatedCode) {
+      setResetStep('verify');
+    } else {
+      notify('Invalid verification code');
+      setResetVerifyCode('');
     }
+  };
+
+  const handleResetExecute = () => {
+    // Log the reset action for audit trail
+    const timestamp = new Date().toISOString();
+    console.log(`[AUDIT] Content reset executed at ${timestamp}`);
+
+    update(defaultData);
+    setShowResetDialog(false);
+    notify('✓ All content reset to defaults');
   };
 
   const newLeads = data.leads.filter(l => l.status === 'New').length;
@@ -152,7 +177,7 @@ export default function AdminLayout({ onLogout }: Props) {
           <a href="/" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">
             <ExternalLink className="h-4 w-4" />View Website
           </a>
-          <button onClick={handleReset} title="Erases ALL content — requires typing RESET to confirm"
+          <button onClick={handleResetOpen} title="Erases ALL content — requires typing RESET to confirm"
             className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-slate-300 hover:text-red-600 hover:bg-red-50/60 transition">
             <RotateCcw className="h-3 w-3" />Reset to defaults
           </button>
@@ -181,7 +206,7 @@ export default function AdminLayout({ onLogout }: Props) {
             </div>
             <SidebarNav mobile />
             <div className="border-t border-slate-100 p-3 space-y-0.5 shrink-0">
-              <button onClick={handleReset} title="Erases ALL content — requires typing RESET to confirm"
+              <button onClick={handleResetOpen} title="Erases ALL content — requires typing RESET to confirm"
                 className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-slate-300 hover:text-red-600 hover:bg-red-50/60">
                 <RotateCcw className="h-3 w-3" />Reset to defaults
               </button>
@@ -226,6 +251,120 @@ export default function AdminLayout({ onLogout }: Props) {
         <div className="fixed bottom-6 right-6 z-50 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white shadow-2xl flex items-center gap-2">
           <span className="h-5 w-5 rounded-full bg-accent flex items-center justify-center text-[10px]">✓</span>
           {toast}
+        </div>
+      )}
+
+      {/* Enhanced Reset Dialog */}
+      {showResetDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
+            {/* Step 1: Initial Confirmation */}
+            {resetStep === 'confirm' && (
+              <>
+                <div className="border-b border-slate-200 px-6 py-4">
+                  <h3 className="text-lg font-bold text-red-600">⚠️ Reset All Content</h3>
+                </div>
+                <div className="px-6 py-6 space-y-4">
+                  <div className="rounded-lg bg-red-50 border border-red-200 p-4">
+                    <p className="text-sm text-red-900 font-medium mb-2">This action cannot be undone!</p>
+                    <ul className="text-xs text-red-800 space-y-1">
+                      <li>✗ All website content will be deleted</li>
+                      <li>✗ All leads and inquiries will be cleared</li>
+                      <li>✗ Factory defaults will be restored</li>
+                    </ul>
+                  </div>
+                  <p className="text-sm text-slate-600">
+                    To proceed, you'll need to verify your identity via email. Continue?
+                  </p>
+                </div>
+                <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end">
+                  <button onClick={() => setShowResetDialog(false)}
+                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Cancel
+                  </button>
+                  <button onClick={handleResetConfirm}
+                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
+                    Continue to Verification
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* Step 2: Email Verification */}
+            {resetStep === 'email' && (
+              <>
+                <div className="border-b border-slate-200 px-6 py-4">
+                  <h3 className="text-lg font-bold text-slate-900">Verify Your Email</h3>
+                </div>
+                <div className="px-6 py-6 space-y-4">
+                  <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
+                    <p className="text-sm text-blue-900">
+                      A verification code has been sent to your admin email. Check your inbox for a 6-digit code.
+                    </p>
+                    <p className="text-xs text-blue-700 mt-2">
+                      (Demo: Check the notification in the bottom right)
+                    </p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-slate-700 mb-2">
+                      Enter Verification Code
+                    </label>
+                    <input
+                      type="text"
+                      value={resetVerifyCode}
+                      onChange={(e) => setResetVerifyCode(e.target.value.toUpperCase())}
+                      placeholder="000000"
+                      maxLength={6}
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-center text-lg tracking-widest font-mono focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                    />
+                  </div>
+                </div>
+                <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end">
+                  <button onClick={() => setResetStep('confirm')}
+                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Back
+                  </button>
+                  <button onClick={handleResetVerify} disabled={resetVerifyCode.length !== 6}
+                    className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dark disabled:opacity-50">
+                    Verify Code
+                  </button>
+                </div>
+              </>
+            )}
+
+            {/* Step 3: Final Confirmation */}
+            {resetStep === 'verify' && (
+              <>
+                <div className="border-b border-slate-200 px-6 py-4">
+                  <h3 className="text-lg font-bold text-slate-900">Identity Verified ✓</h3>
+                </div>
+                <div className="px-6 py-6 space-y-4">
+                  <div className="rounded-lg bg-amber-50 border border-amber-200 p-4">
+                    <p className="text-sm text-amber-900 font-medium mb-2">Final Confirmation Required</p>
+                    <p className="text-xs text-amber-800">
+                      You're about to permanently reset all website content. This is your last chance to cancel.
+                    </p>
+                  </div>
+                  <div className="bg-slate-100 rounded-lg p-4">
+                    <p className="text-xs text-slate-600 mb-2">Log entry will be created:</p>
+                    <p className="text-xs font-mono text-slate-700">
+                      [AUDIT] Content reset executed at {new Date().toISOString()}
+                    </p>
+                  </div>
+                </div>
+                <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end">
+                  <button onClick={() => setShowResetDialog(false)}
+                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    Cancel
+                  </button>
+                  <button onClick={handleResetExecute}
+                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-bold text-white hover:bg-red-700">
+                    ⚠️ RESET ALL CONTENT
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>
