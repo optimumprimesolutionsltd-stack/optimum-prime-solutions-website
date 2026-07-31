@@ -138,7 +138,7 @@ export const defaultData: SiteData = {
     {id:'8',name:'Education & NGOs',icon:'GraduationCap',desc:'Fee management, donor tracking, and grant accounting.'},
   ],
   blogs: [
-    {id:'1',title:'Why Every Kenyan Business Needs TallyPrime Today',slug:'why-every-kenyan-business-needs-tally-prime-in-2025',excerpt:'Discover how Tally Prime is transforming business operations across Kenya with automated accounting, KRA compliance, and real-time reporting.',date:'2025-01-15',category:'Insights',readTime:'5 min',content:`Tally Prime has become the backbone of business operations across Kenya. Whether you're a small retail shop, a manufacturing facility, or a growing services company, the need for accurate financial management and KRA compliance is non-negotiable.
+    {id:'1',title:'Why Every Kenyan Business Needs TallyPrime Today',slug:'why-every-kenyan-business-needs-tally-prime-in-2025',excerpt:'Discover how Tally Prime is transforming business operations across Kenya with automated accounting, KRA compliance, and real-time reporting.',date:'2025-01-15',category:'Insights',readTime:'5 min',content:`Tally Prime has become the backbone of business operations across Kenya. Whether you're a small retail shop, a manufacturing facility, or a growing services company, the need for accurate financial management and KRA compliance is non-negotiable. As a [certified TallyPrime partner in Kenya](/), we've helped hundreds of businesses streamline their accounting and stay KRA-compliant.
 
 Why should your business invest in TallyPrime today?
 
@@ -182,7 +182,7 @@ The Bottom Line
 Today, manual accounting is not just inefficient—it's risky. Tally Prime eliminates operational friction, ensures compliance, and gives you the visibility needed to scale confidently.
 
 Ready to transform your business? The businesses that embrace TallyPrime today will be the ones leading their industries tomorrow.`},
-    {id:'2',title:'Complete Guide to KRA e-Filing with Tally Prime',slug:'complete-guide-to-kra-e-filing-with-tally-prime',excerpt:'Step-by-step guide to setting up and filing your KRA returns directly from Tally Prime. Save time and avoid penalties.',date:'2025-02-01',category:'Tutorial',readTime:'8 min',content:`KRA compliance can be intimidating, but with Tally Prime, it's surprisingly straightforward. This guide walks you through the entire e-filing process.
+    {id:'2',title:'Complete Guide to KRA e-Filing with Tally Prime',slug:'complete-guide-to-kra-e-filing-with-tally-prime',excerpt:'Step-by-step guide to setting up and filing your KRA returns directly from Tally Prime. Save time and avoid penalties.',date:'2025-02-01',category:'Tutorial',readTime:'8 min',content:`KRA compliance can be intimidating, but with Tally Prime, it's surprisingly straightforward. This guide walks you through the entire e-filing process. If you need expert setup, [we offer hands-on TallyPrime training and compliance support in Ruiru and across Kenya](/)
 
 What You Need Before Starting
 ✓ Active KRA PIN
@@ -508,7 +508,7 @@ How to Get TallyPrime 7.1
 Contact us to book an upgrade consultation. We will assess your current setup, plan the upgrade, and ensure everything runs smoothly from day one.
 
 Ready to upgrade? Get in touch with our team today.`},
-    {id:'7',title:'How TallyPrime Helps Distributors in Kenya Run a Leaner Business',slug:'how-tallyprime-helps-distributors-in-kenya',excerpt:'Discover how TallyPrime helps Kenyan distributors manage multi-location inventory, automate VAT and eTIMS compliance, and track field sales performance with the Biz Analyst app.',date:'2026-07-21',category:'Insights',readTime:'7 min',content:`Distributors sit at one of the toughest points in the supply chain — juggling inventory across multiple warehouses, invoicing hundreds of retailers, chasing outstanding payments, and staying compliant with KRA's eTIMS requirements. A single spreadsheet error or a delayed invoice can ripple through an entire distribution network. This is exactly where TallyPrime has become a go-to solution for distributors of all sizes — not just as accounting software, but as a complete business management tool.
+    {id:'7',title:'How TallyPrime Helps Distributors in Kenya Run a Leaner Business',slug:'how-tallyprime-helps-distributors-in-kenya',excerpt:'Discover how TallyPrime helps Kenyan distributors manage multi-location inventory, automate VAT and eTIMS compliance, and track field sales performance with the Biz Analyst app.',date:'2026-07-21',category:'Insights',readTime:'7 min',content:`Distributors sit at one of the toughest points in the supply chain — juggling inventory across multiple warehouses, invoicing hundreds of retailers, chasing outstanding payments, and staying compliant with KRA's eTIMS requirements. A single spreadsheet error or a delayed invoice can ripple through an entire distribution network. This is exactly where TallyPrime has become a go-to solution for distributors of all sizes — not just as accounting software, but as a complete business management tool. Our [TallyPrime implementation and support team in Kenya](/), has worked with over 50 distributors to solve exactly these challenges.
 
 As Kenya's certified TallyPrime partner, Optimum Prime Solutions is the go-to team distributors turn to for getting this right — from licensing and implementation through to ongoing support. Here is what changes when a distributor runs on TallyPrime.
 
@@ -597,7 +597,7 @@ Converting to a limited company is a legal and tax event, not just a rebrand. Th
 
 This article is general guidance and not a substitute for advice from a licensed accountant or tax agent — speak to a professional about your specific figures and filing dates.
 
-Need help getting your books audit-ready during a company conversion? Our team can guide you through the transition.`},
+Ready to upgrade to a limited company structure? Our [certified TallyPrime implementation team in Kenya](/), can help you migrate your accounting records, ensure KRA compliance throughout the transition, and train your team on the new system. [Book a free consultation with our experts](/contact#demo-form)—no obligation.`},
     {id:'9',title:'TallyPrime Reports Every Business Owner Should Know',slug:'tallyprime-reports-every-business-owner-should-know',excerpt:'From P&L to Funds Flow, here are the TallyPrime reports that separate business owners who catch problems early from those who find out too late.',date:'2026-07-21',category:'Tips',readTime:'6 min',content:`Most business owners open TallyPrime once a month — usually when the accountant needs a signature or the auditor wants a number. That's a missed opportunity. TallyPrime isn't just a data-entry tool for your bookkeeper; it's a reporting engine that can tell you, in real time, whether your business is healthy, where cash is leaking, and which product, customer, or branch is actually making you money.
 
 Here are the reports worth 20 minutes of your time every month.
