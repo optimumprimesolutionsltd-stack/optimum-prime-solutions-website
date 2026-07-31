@@ -160,6 +160,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const [exportFrom, setExportFrom]   = useState('');
   const [exportTo, setExportTo]       = useState('');
   const [includeClosed, setIncludeClosed] = useState(false);
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [exportFormat, setExportFormat] = useState<'csv' | 'excel'>('csv');
+  const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set([
+    'name', 'email', 'phone', 'company', 'industry', 'status', 'demoDate', 'scheduledDate', 'createdAt'
+  ]));
 
   const inDateRange = (iso: string) => {
     const t = new Date(iso).getTime();
@@ -476,24 +481,72 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     }
   };
 
-  // ── Export CSV ───────────────────────────────────────────────────────────
-  const exportCSV = () => {
-    const headers = ['Name', 'Email', 'Phone', 'Company', 'Industry', 'Business Type',
-      'Demo Date (Requested)', 'Scheduled Date', 'Scheduled Time', 'Demo Type',
-      'Location', 'Team Member', 'Current Software', 'Message', 'Status', 'Next Step',
-      'Source', 'Attended Breakfast', 'Date Submitted'];
-    const rows = exportLeads.map(l => [
-      l.name, l.email, l.phone, l.company, l.industry || l.businessType, l.businessType,
-      l.demoDate, l.scheduledDate || '', l.scheduledTime || '', l.demoType || '',
-      l.demoLocation || '', l.teamMemberName || '', l.currentSoftware, l.message,
-      l.status, defaultNextStep(l.status), l.source || 'website',
-      l.attendedWorkshop ? 'Yes' : (l.source === 'workshop' ? 'No' : ''), l.createdAt,
-    ]);
-    const csv = [headers, ...rows].map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = 'demo-leads.csv'; a.click();
-    URL.revokeObjectURL(url);
+  // ── Available export fields ──────────────────────────────────────────────
+  const allFields = [
+    { key: 'name', label: 'Name' },
+    { key: 'email', label: 'Email' },
+    { key: 'phone', label: 'Phone' },
+    { key: 'company', label: 'Company' },
+    { key: 'industry', label: 'Industry' },
+    { key: 'demoDate', label: 'Demo Date (Requested)' },
+    { key: 'scheduledDate', label: 'Scheduled Date' },
+    { key: 'scheduledTime', label: 'Scheduled Time' },
+    { key: 'demoType', label: 'Demo Type' },
+    { key: 'demoLocation', label: 'Location' },
+    { key: 'teamMemberName', label: 'Team Member' },
+    { key: 'status', label: 'Status' },
+    { key: 'source', label: 'Source' },
+    { key: 'message', label: 'Message' },
+    { key: 'currentSoftware', label: 'Current Software' },
+    { key: 'createdAt', label: 'Date Submitted' },
+  ];
+
+  const toggleField = (key: string) => {
+    const newSet = new Set(selectedFields);
+    if (newSet.has(key)) newSet.delete(key);
+    else newSet.add(key);
+    setSelectedFields(newSet);
+  };
+
+  // ── Export with selected format and fields ──────────────────────────────
+  const performExport = () => {
+    const visibleFields = allFields.filter(f => selectedFields.has(f.key));
+    const headers = visibleFields.map(f => f.label);
+
+    const rows = exportLeads.map(l => visibleFields.map(f => {
+      switch(f.key) {
+        case 'name': return l.name;
+        case 'email': return l.email;
+        case 'phone': return l.phone;
+        case 'company': return l.company;
+        case 'industry': return l.industry || l.businessType || '';
+        case 'demoDate': return l.demoDate;
+        case 'scheduledDate': return l.scheduledDate || '';
+        case 'scheduledTime': return l.scheduledTime || '';
+        case 'demoType': return l.demoType || '';
+        case 'demoLocation': return l.demoLocation || '';
+        case 'teamMemberName': return l.teamMemberName || '';
+        case 'status': return l.status;
+        case 'source': return l.source || 'website';
+        case 'message': return l.message;
+        case 'currentSoftware': return l.currentSoftware;
+        case 'createdAt': return l.createdAt;
+        default: return '';
+      }
+    }));
+
+    if (exportFormat === 'csv') {
+      const csv = [headers, ...rows].map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `demo-leads-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    setShowExportDialog(false);
   };
 
   // ── Manual booking submit ────────────────────────────────────────────────
@@ -869,8 +922,8 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               placeholder="Search by name, email, phone, company..."
               className="w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
           </div>
-          <button onClick={exportCSV} disabled={data.leads.length === 0}
-            title="Detailed leads-only spreadsheet (all lead columns)"
+          <button onClick={() => setShowExportDialog(true)} disabled={exportLeads.length === 0}
+            title={exportLeads.length === 0 ? "No leads to export" : "Export leads with custom fields"}
             className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-40">
             <Download className="h-4 w-4" /> Leads CSV
           </button>
@@ -1822,6 +1875,92 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Export Dialog */}
+      {showExportDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-2xl rounded-xl bg-white shadow-2xl">
+            <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-900">Export Leads</h3>
+              <button onClick={() => setShowExportDialog(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="px-6 py-4 space-y-5 max-h-[70vh] overflow-y-auto">
+              {/* Summary */}
+              <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3">
+                <p className="text-sm text-blue-900">
+                  <span className="font-semibold">{exportLeads.length} leads</span> will be exported
+                  {(exportFrom || exportTo) && ` (${exportFrom ? 'from ' + exportFrom : ''} ${exportTo ? 'to ' + exportTo : ''})`.trim()}
+                </p>
+              </div>
+
+              {/* Format Selection */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-900 mb-2">Format</label>
+                <div className="flex gap-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" checked={exportFormat === 'csv'} onChange={() => setExportFormat('csv')}
+                      className="h-4 w-4 text-accent border-slate-300" />
+                    <span className="text-sm text-slate-700">CSV (for CRM import)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" checked={exportFormat === 'excel'} onChange={() => setExportFormat('excel')}
+                      className="h-4 w-4 text-accent border-slate-300" disabled />
+                    <span className="text-sm text-slate-500">Excel (coming soon)</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Field Selection */}
+              <div>
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-sm font-semibold text-slate-900">Select Fields</label>
+                  <div className="flex gap-2 text-xs">
+                    <button onClick={() => setSelectedFields(new Set(allFields.map(f => f.key)))}
+                      className="text-accent hover:underline">Select all</button>
+                    <button onClick={() => setSelectedFields(new Set())}
+                      className="text-slate-400 hover:text-slate-600">Clear</button>
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {allFields.map(field => (
+                    <label key={field.key} className="flex items-center gap-2 cursor-pointer">
+                      <input type="checkbox" checked={selectedFields.has(field.key)}
+                        onChange={() => toggleField(field.key)}
+                        className="h-4 w-4 text-accent rounded border-slate-300" />
+                      <span className="text-sm text-slate-700">{field.label}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Data Quality */}
+              <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3">
+                <p className="text-xs font-semibold text-amber-900 mb-1">Data Quality</p>
+                <ul className="text-xs text-amber-800 space-y-1">
+                  <li>✓ {exportLeads.length} valid records</li>
+                  <li>✓ {exportLeads.filter(l => !l.email).length} missing email</li>
+                  <li>✓ {exportLeads.filter(l => !l.scheduledDate).length} unscheduled demos</li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end">
+              <button onClick={() => setShowExportDialog(false)}
+                className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
+                Cancel
+              </button>
+              <button onClick={performExport} disabled={selectedFields.size === 0}
+                className="flex items-center gap-2 rounded-lg bg-accent px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-dark transition disabled:opacity-50">
+                <Download className="h-4 w-4" />
+                Export {selectedFields.size > 0 ? `(${selectedFields.size} fields)` : 'No fields selected'}
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
