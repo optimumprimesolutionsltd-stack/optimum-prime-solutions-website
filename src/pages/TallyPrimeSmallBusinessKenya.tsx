@@ -1,8 +1,8 @@
 import { Link } from 'react-router-dom';
 import { ArrowRight, CheckCircle2, BookOpen, Users, Monitor, Award, Phone, MessageSquare, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
-import SEO from '../../components/SEO';
-import Breadcrumb from '../../components/Breadcrumb';
+import SEO from '../components/SEO';
+import Breadcrumb from '../components/Breadcrumb';
 
 const programs = [
   {
