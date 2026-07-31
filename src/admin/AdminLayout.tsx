@@ -166,7 +166,7 @@ export default function AdminLayout({ onLogout }: Props) {
   };
 
   const SidebarNav = ({ mobile }: { mobile?: boolean }) => (
-    <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-0.5">
+    <nav className="flex-1 overflow-y-auto px-2.5 py-4 space-y-1">
       {tabs.map(t => {
         const Icon = t.icon;
         const isActive = tab === t.id;
@@ -183,12 +183,12 @@ export default function AdminLayout({ onLogout }: Props) {
             }}
             disabled={isRestricted}
             title={isRestricted ? `Restricted. Click to request access to "${t.label}"` : t.label}
-            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
               isRestricted
                 ? 'opacity-40 cursor-not-allowed text-slate-400'
                 : isActive
-                ? 'bg-red-600 text-white shadow-lg shadow-red-600/20'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-md shadow-red-600/25'
+                : 'text-slate-600 hover:bg-red-50 hover:text-slate-900'
             }`}
           >
             <Icon className="h-4 w-4 shrink-0" />
@@ -198,7 +198,7 @@ export default function AdminLayout({ onLogout }: Props) {
             )}
             {!isRestricted && badgeCount > 0 && (
               <span className={`h-5 min-w-[20px] rounded-full flex items-center justify-center text-[10px] font-bold ${
-                isActive ? 'bg-white text-red-600' : 'bg-red-600/10 text-red-600'
+                isActive ? 'bg-white text-red-600' : 'bg-red-100 text-red-700'
               }`}>{badgeCount}</span>
             )}
           </button>
@@ -208,28 +208,28 @@ export default function AdminLayout({ onLogout }: Props) {
   );
 
   return (
-    <div className="flex h-screen" style={{ background: 'radial-gradient(circle at top right, rgba(239, 68, 68, 0.08), transparent 16%), radial-gradient(circle at bottom left, rgba(239, 68, 68, 0.04), transparent 24%), #f8fafc' }}>
+    <div className="flex h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Desktop Sidebar */}
-      <aside className="hidden w-[260px] flex-col border-r border-slate-300 bg-white lg:flex">
-        <div className="h-16 flex items-center gap-3 border-b border-slate-200 px-5 shrink-0">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-red-600 to-slate-900 flex items-center justify-center font-black text-xs text-white shadow-lg shadow-red-600/20">OP</div>
+      <aside className="hidden w-[260px] flex-col border-r border-slate-200 bg-white lg:flex shadow-sm">
+        <div className="h-16 flex items-center gap-3 bg-gradient-to-r from-red-50 to-red-50/50 border-b border-red-100 px-5 shrink-0">
+          <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-red-600 via-red-500 to-red-700 flex items-center justify-center font-black text-xs text-white shadow-lg shadow-red-600/30">OP</div>
           <div>
             <p className="text-sm font-bold text-slate-900">Admin Panel</p>
-            <p className="text-[9px] uppercase tracking-[.15em] font-semibold text-red-600">Content Manager</p>
+            <p className="text-[8px] uppercase tracking-[.2em] font-semibold text-red-600">Content Manager</p>
           </div>
         </div>
 
         <SidebarNav />
 
-        <div className="border-t border-slate-100 p-3 space-y-0.5 shrink-0">
-          <a href="/" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">
+        <div className="border-t border-slate-200 p-3 space-y-2 shrink-0">
+          <a href="/" className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-colors">
             <ExternalLink className="h-4 w-4" />View Website
           </a>
-          <button onClick={handleResetOpen} title="Erases ALL content — requires typing RESET to confirm"
-            className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-slate-300 hover:text-red-600 hover:bg-red-50/60 transition">
-            <RotateCcw className="h-3 w-3" />Reset to defaults
+          <button onClick={handleResetOpen} title="Erases ALL content — requires email verification to confirm"
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:text-red-600 hover:bg-red-50 transition-colors">
+            <RotateCcw className="h-3.5 w-3.5" />Reset to defaults
           </button>
-          <button onClick={onLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition">
+          <button onClick={onLogout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors">
             <LogOut className="h-4 w-4" />Sign Out
           </button>
         </div>
@@ -240,25 +240,25 @@ export default function AdminLayout({ onLogout }: Props) {
         <div className="fixed inset-0 z-50 flex lg:hidden">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSidebar(false)} />
           <aside className="relative w-72 bg-white flex flex-col shadow-2xl">
-            <div className="h-16 flex items-center justify-between border-b border-slate-100 px-5 shrink-0">
+            <div className="h-16 flex items-center justify-between bg-gradient-to-r from-red-50 to-red-50/50 border-b border-red-100 px-5 shrink-0">
               <div className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center font-black text-xs text-white">OP</div>
+                <div className="h-9 w-9 rounded-lg bg-gradient-to-br from-red-600 via-red-500 to-red-700 flex items-center justify-center font-black text-xs text-white shadow-md shadow-red-600/25">OP</div>
                 <div>
                   <p className="text-sm font-bold text-slate-900">Admin Panel</p>
-                  <p className="text-[9px] uppercase tracking-[.15em] font-semibold text-accent">Content Manager</p>
+                  <p className="text-[8px] uppercase tracking-[.2em] font-semibold text-red-600">Content Manager</p>
                 </div>
               </div>
-              <button onClick={() => setSidebar(false)} className="rounded-lg p-1.5 hover:bg-slate-50 transition">
-                <X className="h-5 w-5 text-slate-400" />
+              <button onClick={() => setSidebar(false)} className="rounded-lg p-1.5 hover:bg-red-100/50 transition-colors">
+                <X className="h-5 w-5 text-slate-500" />
               </button>
             </div>
             <SidebarNav mobile />
-            <div className="border-t border-slate-100 p-3 space-y-0.5 shrink-0">
-              <button onClick={handleResetOpen} title="Erases ALL content — requires typing RESET to confirm"
-                className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-slate-300 hover:text-red-600 hover:bg-red-50/60">
-                <RotateCcw className="h-3 w-3" />Reset to defaults
+            <div className="border-t border-slate-200 p-3 space-y-2 shrink-0">
+              <button onClick={handleResetOpen} title="Erases ALL content — requires email verification to confirm"
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-slate-500 hover:text-red-600 hover:bg-red-50">
+                <RotateCcw className="h-3.5 w-3.5" />Reset to defaults
               </button>
-              <button onClick={onLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50">
+              <button onClick={onLogout} className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700">
                 <LogOut className="h-4 w-4" />Sign Out
               </button>
             </div>
@@ -268,24 +268,24 @@ export default function AdminLayout({ onLogout }: Props) {
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="h-16 flex items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-8 shrink-0">
+        <header className="h-16 flex items-center justify-between bg-white border-b border-slate-200 px-4 lg:px-8 shrink-0 shadow-sm">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebar(true)} className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-50 lg:hidden">
+            <button onClick={() => setSidebar(true)} className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 lg:hidden transition-colors">
               <Menu className="h-5 w-5" />
             </button>
             <div>
               <h1 className="text-base font-bold text-slate-900">{tabs.find(t => t.id === tab)?.label}</h1>
-              <p className="text-[10px] text-slate-400">Changes save to browser storage</p>
+              <p className="text-[10px] text-slate-500">Changes save to browser storage</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
             {newLeads > 0 && (
-              <button onClick={() => setTab('leads')} className="flex items-center gap-1.5 rounded-lg bg-accent/10 px-3 py-1.5 text-xs font-semibold text-accent hover:bg-accent/20 transition">
-                <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />
+              <button onClick={() => setTab('leads')} className="flex items-center gap-1.5 rounded-lg bg-red-50 px-4 py-2 text-xs font-semibold text-red-700 hover:bg-red-100 transition-colors">
+                <span className="h-2 w-2 rounded-full bg-red-600 animate-pulse" />
                 {newLeads} new lead{newLeads > 1 ? 's' : ''}
               </button>
             )}
-            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-xs font-bold text-white">A</div>
+            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-xs font-bold text-white shadow-md shadow-red-600/20">A</div>
           </div>
         </header>
 
@@ -296,8 +296,8 @@ export default function AdminLayout({ onLogout }: Props) {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white shadow-2xl flex items-center gap-2">
-          <span className="h-5 w-5 rounded-full bg-accent flex items-center justify-center text-[10px]">✓</span>
+        <div className="fixed bottom-6 right-6 z-50 rounded-xl bg-gradient-to-r from-red-700 to-red-600 px-6 py-4 text-sm font-medium text-white shadow-2xl shadow-red-600/30 flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <span className="h-5 w-5 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold">✓</span>
           {toast}
         </div>
       )}
@@ -305,14 +305,14 @@ export default function AdminLayout({ onLogout }: Props) {
       {/* Access Request Dialog */}
       {showAccessRequest && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
-            <div className="border-b border-slate-200 px-6 py-4">
-              <h3 className="text-lg font-bold text-slate-900">🔒 Request Access</h3>
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div className="border-b border-slate-200 bg-gradient-to-r from-red-50 to-red-50/50 px-6 py-4">
+              <h3 className="text-lg font-bold text-red-700">🔒 Request Access</h3>
             </div>
             <div className="px-6 py-6 space-y-4">
-              <div className="rounded-lg bg-amber-50 border border-amber-200 p-4">
-                <p className="text-sm text-amber-900 font-medium mb-2">Access Restricted</p>
-                <p className="text-xs text-amber-800">
+              <div className="rounded-lg bg-red-50 border border-red-200 p-4">
+                <p className="text-sm text-red-900 font-medium mb-2">Access Restricted</p>
+                <p className="text-xs text-red-800">
                   The "<strong>{tabs.find(t => t.id === requestedTab)?.label}</strong>" panel is restricted. An admin must approve your access request via email.
                 </p>
               </div>
@@ -326,24 +326,24 @@ export default function AdminLayout({ onLogout }: Props) {
                   value={requestEmail}
                   onChange={(e) => setRequestEmail(e.target.value)}
                   placeholder="your@email.com"
-                  className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-600/20"
                 />
               </div>
 
-              <div className="bg-slate-100 rounded-lg p-3">
+              <div className="bg-slate-50 rounded-lg p-3 border border-slate-200">
                 <p className="text-xs text-slate-600">
                   <strong>What happens next:</strong> An admin will review your request and send you an approval email if authorized.
                 </p>
               </div>
             </div>
 
-            <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end">
+            <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end bg-slate-50">
               <button onClick={() => setShowAccessRequest(false)}
-                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors">
                 Cancel
               </button>
               <button onClick={handleRequestAccess}
-                className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dark">
+                className="rounded-lg bg-gradient-to-r from-red-600 to-red-500 px-4 py-2 text-sm font-medium text-white hover:from-red-700 hover:to-red-600 transition-all shadow-md shadow-red-600/20">
                 Send Request
               </button>
             </div>
@@ -354,12 +354,12 @@ export default function AdminLayout({ onLogout }: Props) {
       {/* Enhanced Reset Dialog */}
       {showResetDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
             {/* Step 1: Initial Confirmation */}
             {resetStep === 'confirm' && (
               <>
-                <div className="border-b border-slate-200 px-6 py-4">
-                  <h3 className="text-lg font-bold text-red-600">⚠️ Reset All Content</h3>
+                <div className="border-b border-slate-200 bg-gradient-to-r from-red-50 to-red-50/50 px-6 py-4">
+                  <h3 className="text-lg font-bold text-red-700">⚠️ Reset All Content</h3>
                 </div>
                 <div className="px-6 py-6 space-y-4">
                   <div className="rounded-lg bg-red-50 border border-red-200 p-4">
@@ -374,13 +374,13 @@ export default function AdminLayout({ onLogout }: Props) {
                     To proceed, you'll need to verify your identity via email. Continue?
                   </p>
                 </div>
-                <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end">
+                <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end bg-slate-50">
                   <button onClick={() => setShowResetDialog(false)}
-                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors">
                     Cancel
                   </button>
                   <button onClick={handleResetConfirm}
-                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700">
+                    className="rounded-lg bg-gradient-to-r from-red-600 to-red-500 px-4 py-2 text-sm font-medium text-white hover:from-red-700 hover:to-red-600 transition-all shadow-md shadow-red-600/20">
                     Continue to Verification
                   </button>
                 </div>
@@ -390,15 +390,15 @@ export default function AdminLayout({ onLogout }: Props) {
             {/* Step 2: Email Verification */}
             {resetStep === 'email' && (
               <>
-                <div className="border-b border-slate-200 px-6 py-4">
-                  <h3 className="text-lg font-bold text-slate-900">Verify Your Email</h3>
+                <div className="border-b border-slate-200 bg-gradient-to-r from-red-50 to-red-50/50 px-6 py-4">
+                  <h3 className="text-lg font-bold text-red-700">Verify Your Email</h3>
                 </div>
                 <div className="px-6 py-6 space-y-4">
-                  <div className="rounded-lg bg-blue-50 border border-blue-200 p-4">
-                    <p className="text-sm text-blue-900">
+                  <div className="rounded-lg bg-red-50 border border-red-200 p-4">
+                    <p className="text-sm text-red-900 font-medium">
                       A verification code has been sent to your admin email. Check your inbox for a 6-digit code.
                     </p>
-                    <p className="text-xs text-blue-700 mt-2">
+                    <p className="text-xs text-red-700 mt-2">
                       (Demo: Check the notification in the bottom right)
                     </p>
                   </div>
@@ -412,17 +412,17 @@ export default function AdminLayout({ onLogout }: Props) {
                       onChange={(e) => setResetVerifyCode(e.target.value.toUpperCase())}
                       placeholder="000000"
                       maxLength={6}
-                      className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-center text-lg tracking-widest font-mono focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                      className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-center text-lg tracking-widest font-mono focus:border-red-600 focus:outline-none focus:ring-2 focus:ring-red-600/20"
                     />
                   </div>
                 </div>
-                <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end">
+                <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end bg-slate-50">
                   <button onClick={() => setResetStep('confirm')}
-                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors">
                     Back
                   </button>
                   <button onClick={handleResetVerify} disabled={resetVerifyCode.length !== 6}
-                    className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dark disabled:opacity-50">
+                    className="rounded-lg bg-gradient-to-r from-red-600 to-red-500 px-4 py-2 text-sm font-medium text-white hover:from-red-700 hover:to-red-600 transition-all shadow-md shadow-red-600/20 disabled:opacity-50">
                     Verify Code
                   </button>
                 </div>
@@ -432,30 +432,30 @@ export default function AdminLayout({ onLogout }: Props) {
             {/* Step 3: Final Confirmation */}
             {resetStep === 'verify' && (
               <>
-                <div className="border-b border-slate-200 px-6 py-4">
-                  <h3 className="text-lg font-bold text-slate-900">Identity Verified ✓</h3>
+                <div className="border-b border-slate-200 bg-gradient-to-r from-green-50 to-green-50/50 px-6 py-4">
+                  <h3 className="text-lg font-bold text-green-700">Identity Verified ✓</h3>
                 </div>
                 <div className="px-6 py-6 space-y-4">
-                  <div className="rounded-lg bg-amber-50 border border-amber-200 p-4">
-                    <p className="text-sm text-amber-900 font-medium mb-2">Final Confirmation Required</p>
-                    <p className="text-xs text-amber-800">
+                  <div className="rounded-lg bg-red-50 border border-red-200 p-4">
+                    <p className="text-sm text-red-900 font-medium mb-2">Final Confirmation Required</p>
+                    <p className="text-xs text-red-800">
                       You're about to permanently reset all website content. This is your last chance to cancel.
                     </p>
                   </div>
-                  <div className="bg-slate-100 rounded-lg p-4">
+                  <div className="bg-slate-100 rounded-lg p-4 border border-slate-200">
                     <p className="text-xs text-slate-600 mb-2">Log entry will be created:</p>
                     <p className="text-xs font-mono text-slate-700">
                       [AUDIT] Content reset executed at {new Date().toISOString()}
                     </p>
                   </div>
                 </div>
-                <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end">
+                <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end bg-slate-50">
                   <button onClick={() => setShowResetDialog(false)}
-                    className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                    className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors">
                     Cancel
                   </button>
                   <button onClick={handleResetExecute}
-                    className="rounded-lg bg-red-600 px-4 py-2 text-sm font-bold text-white hover:bg-red-700">
+                    className="rounded-lg bg-gradient-to-r from-red-600 to-red-500 px-4 py-2 text-sm font-bold text-white hover:from-red-700 hover:to-red-600 transition-all shadow-md shadow-red-600/20">
                     ⚠️ RESET ALL CONTENT
                   </button>
                 </div>
