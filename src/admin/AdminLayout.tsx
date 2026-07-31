@@ -141,6 +141,24 @@ export default function AdminLayout({ onLogout }: Props) {
 
   const newLeads = data.leads.filter(l => l.status === 'New').length;
 
+  // Safety check: prevent rendering content for restricted tabs
+  const hasAccessToCurrentTab = accessibleTabs.has(tab) || accessApprovals.has(tab);
+  if (!hasAccessToCurrentTab) {
+    console.warn(`[SECURITY] Attempt to access restricted tab: ${tab}`);
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <div className="text-4xl mb-4">🔒</div>
+          <h2 className="text-2xl font-bold text-slate-900 mb-2">Access Restricted</h2>
+          <p className="text-slate-600">You don't have permission to view this section.</p>
+          <button onClick={() => setTab('dashboard')} className="mt-4 rounded-lg bg-red-600 px-6 py-2 text-white hover:bg-red-700">
+            Go to Dashboard
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const renderEditor = () => {
     switch (tab) {
       case 'dashboard': return <DashboardHome data={data} onNav={setTab} />;
