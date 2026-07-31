@@ -41,6 +41,9 @@ const IndustriesPage    = lazy(() => import('./pages/IndustriesPage'));
 // ── TallyPrime pages — lazy loaded ────────────────────────────────────────
 const TallyPrimePage      = lazy(() => import('./pages/TallyPrimePage'));
 const TallyPrimeKenyaPage = lazy(() => import('./pages/TallyPrimeKenyaPage'));
+const KraEtimsCompliancePage = lazy(() => import("./pages/KraEtimsCompliancePage"));
+const CloudAccountingSoftwareKenya = lazy(() => import("./pages/CloudAccountingSoftwareKenya"));
+const TallyPrimeSmallBusinessKenya = lazy(() => import("./pages/TallyPrimeSmallBusinessKenya"));
 
 // ── Service pages — lazy loaded ───────────────────────────────────────────
 const ImplementationPage  = lazy(() => import('./pages/services/ImplementationPage'));
@@ -113,6 +116,10 @@ function SiteRoutes() {
             <Route path="/tallyprime/customization" element={<CustomizationPage />} />
             <Route path="/tallyprime/data-migration" element={<DataMigrationPage />} />
             <Route path="/tallyprime/consulting" element={<ConsultingPage />} />
+            {/* --- SEO Long-Tail Landing Pages --- */}
+            <Route path="/kra-etims-compliance" element={<KraEtimsCompliancePage />} />
+            <Route path="/cloud-accounting-software-kenya" element={<CloudAccountingSoftwareKenya />} />
+            <Route path="/tallyprime-small-business-kenya" element={<TallyPrimeSmallBusinessKenya />} />
 
             {/* ── Industries ── */}
             <Route path="/industries" element={<IndustriesPage />} />
