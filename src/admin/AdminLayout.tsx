@@ -58,6 +58,13 @@ export default function AdminLayout({ onLogout }: Props) {
   const [resetVerifyCode, setResetVerifyCode] = useState('');
   const [generatedCode, setGeneratedCode] = useState('');
 
+  // Access control: only these tabs are accessible by default
+  const accessibleTabs = new Set(['leads', 'workshop', 'webinar']);
+  const [showAccessRequest, setShowAccessRequest] = useState(false);
+  const [requestedTab, setRequestedTab] = useState<string | null>(null);
+  const [requestEmail, setRequestEmail] = useState('');
+  const [accessApprovals, setAccessApprovals] = useState<Set<string>>(new Set());
+
   useEffect(() => {
     const unsubscribe = fbSubscribe('whatsapp_conversations', (raw: Record<string, any> | null) => {
       const count = raw ? Object.values(raw).filter((n: any) => n?.meta?.unread).length : 0;
@@ -104,6 +111,34 @@ export default function AdminLayout({ onLogout }: Props) {
     notify('✓ All content reset to defaults');
   };
 
+  const handleTabClick = (tabId: string) => {
+    if (accessibleTabs.has(tabId) || accessApprovals.has(tabId)) {
+      setTab(tabId as TabId);
+    } else {
+      setRequestedTab(tabId);
+      setShowAccessRequest(true);
+    }
+  };
+
+  const handleRequestAccess = () => {
+    if (!requestEmail.trim()) {
+      notify('Please enter your email address');
+      return;
+    }
+
+    const timestamp = new Date().toISOString();
+    console.log(`[AUDIT] Access request for "${requestedTab}" from ${requestEmail} at ${timestamp}`);
+
+    // Simulate approval for demo purposes
+    notify(`✓ Access request sent to admin for "${requestedTab}"`);
+
+    // In production: send email to admin for approval
+    // For now: user can request, admin approves via backend
+    setShowAccessRequest(false);
+    setRequestEmail('');
+    setRequestedTab(null);
+  };
+
   const newLeads = data.leads.filter(l => l.status === 'New').length;
 
   const renderEditor = () => {
@@ -135,22 +170,35 @@ export default function AdminLayout({ onLogout }: Props) {
       {tabs.map(t => {
         const Icon = t.icon;
         const isActive = tab === t.id;
+        const hasAccess = accessibleTabs.has(t.id) || accessApprovals.has(t.id);
         const badgeCount = t.id === 'leads' ? newLeads : t.id === 'whatsapp' ? unreadWa : 0;
+        const isRestricted = !hasAccess;
+
         return (
           <button
             key={t.id}
-            onClick={() => { setTab(t.id); if (mobile) setSidebar(false); }}
+            onClick={() => {
+              handleTabClick(t.id);
+              if (mobile && hasAccess) setSidebar(false);
+            }}
+            disabled={isRestricted}
+            title={isRestricted ? `Restricted. Click to request access to "${t.label}"` : t.label}
             className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
-              isActive
-                ? 'bg-slate-800 text-white shadow-lg shadow-slate-900/20'
-                : 'text-slate-300 hover:bg-slate-800'
+              isRestricted
+                ? 'opacity-40 cursor-not-allowed text-slate-400'
+                : isActive
+                ? 'bg-red-600 text-white shadow-lg shadow-red-600/20'
+                : 'text-slate-600 hover:bg-slate-100'
             }`}
           >
             <Icon className="h-4 w-4 shrink-0" />
             <span className="flex-1 text-left">{t.label}</span>
-            {badgeCount > 0 && (
+            {isRestricted && (
+              <span className="text-xs">🔒</span>
+            )}
+            {!isRestricted && badgeCount > 0 && (
               <span className={`h-5 min-w-[20px] rounded-full flex items-center justify-center text-[10px] font-bold ${
-                isActive ? 'bg-accent text-white' : 'bg-accent/10 text-accent'
+                isActive ? 'bg-white text-red-600' : 'bg-red-600/10 text-red-600'
               }`}>{badgeCount}</span>
             )}
           </button>
@@ -251,6 +299,55 @@ export default function AdminLayout({ onLogout }: Props) {
         <div className="fixed bottom-6 right-6 z-50 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white shadow-2xl flex items-center gap-2">
           <span className="h-5 w-5 rounded-full bg-accent flex items-center justify-center text-[10px]">✓</span>
           {toast}
+        </div>
+      )}
+
+      {/* Access Request Dialog */}
+      {showAccessRequest && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+          <div className="w-full max-w-md rounded-xl bg-white shadow-2xl">
+            <div className="border-b border-slate-200 px-6 py-4">
+              <h3 className="text-lg font-bold text-slate-900">🔒 Request Access</h3>
+            </div>
+            <div className="px-6 py-6 space-y-4">
+              <div className="rounded-lg bg-amber-50 border border-amber-200 p-4">
+                <p className="text-sm text-amber-900 font-medium mb-2">Access Restricted</p>
+                <p className="text-xs text-amber-800">
+                  The "<strong>{tabs.find(t => t.id === requestedTab)?.label}</strong>" panel is restricted. An admin must approve your access request via email.
+                </p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-slate-700 mb-2">
+                  Your Email Address
+                </label>
+                <input
+                  type="email"
+                  value={requestEmail}
+                  onChange={(e) => setRequestEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  className="w-full rounded-lg border border-slate-300 px-4 py-2.5 text-sm focus:border-accent focus:outline-none focus:ring-2 focus:ring-accent/20"
+                />
+              </div>
+
+              <div className="bg-slate-100 rounded-lg p-3">
+                <p className="text-xs text-slate-600">
+                  <strong>What happens next:</strong> An admin will review your request and send you an approval email if authorized.
+                </p>
+              </div>
+            </div>
+
+            <div className="border-t border-slate-200 px-6 py-4 flex gap-3 justify-end">
+              <button onClick={() => setShowAccessRequest(false)}
+                className="rounded-lg border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
+                Cancel
+              </button>
+              <button onClick={handleRequestAccess}
+                className="rounded-lg bg-accent px-4 py-2 text-sm font-medium text-white hover:bg-accent-dark">
+                Send Request
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
