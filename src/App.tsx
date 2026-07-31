@@ -180,42 +180,28 @@ function App() {
   }, [pathname]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setAuthReady(true);
-    }, 2000);
-
     let unsubscribe: (() => void) | null = null;
+    let mounted = true;
+
     try {
       unsubscribe = fbOnAuthStateChanged((currentUser) => {
-        clearTimeout(timeout);
-        setUser(currentUser);
-        setAuthReady(true);
+        if (mounted) {
+          setUser(currentUser);
+          setAuthReady(true);
+        }
       });
       if (!unsubscribe || unsubscribe.toString() === '() => {}') {
-        clearTimeout(timeout);
-        setAuthReady(true);
+        if (mounted) setAuthReady(true);
       }
     } catch {
-      clearTimeout(timeout);
-      setAuthReady(true);
+      if (mounted) setAuthReady(true);
     }
 
     return () => {
-      clearTimeout(timeout);
+      mounted = false;
       if (unsubscribe) unsubscribe();
     };
   }, []);
-
-  useEffect(() => {
-    if (user === null) {
-      try {
-        const authInstance = fbAuth();
-        signInAnonymously(authInstance).catch(() => {});
-      } catch {
-        // Firebase auth not available, continue without it
-      }
-    }
-  }, [user]);
 
   const isAuthenticated = useMemo(
     () => Boolean(user && !user.isAnonymous),
@@ -223,8 +209,15 @@ function App() {
   );
 
   const handleLogin = async (email: string, password: string) => {
-    await fbLogin(email, password);
-    navigate('/admin/dashboard');
+    try {
+      await fbLogin(email, password);
+      // Wait a moment for Firebase auth state to propagate
+      // fbOnAuthStateChanged will update user state automatically
+      // Then navigation will succeed when route check runs
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const handleLogout = async () => {

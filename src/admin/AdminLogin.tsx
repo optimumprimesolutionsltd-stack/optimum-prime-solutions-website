@@ -29,7 +29,11 @@ export default function AdminLogin({ onLogin }: Props) {
 
     try {
       await onLogin(email.trim(), password);
-      navigate('/admin/dashboard');
+      // Wait a moment for Firebase auth state to update before navigating
+      // This prevents race condition where route check happens before auth state updates
+      setTimeout(() => {
+        navigate('/admin/dashboard');
+      }, 100);
     } catch (err) {
       setError('Login failed. Check your credentials and try again.');
       console.error(err);
