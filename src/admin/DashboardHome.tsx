@@ -27,8 +27,8 @@ export default function DashboardHome({ data, onNav }: P) {
   return (
     <div>
       <div className="mb-8">
-        <h2 className="text-2xl font-bold text-navy-900">Welcome to your Admin Panel</h2>
-        <p className="mt-1.5 text-navy-500">Manage every section of your website. Changes are saved instantly and update the live site.</p>
+        <h2 className="text-2xl font-bold text-slate-900">Welcome to your Admin Panel</h2>
+        <p className="mt-1.5 text-slate-500">Manage every section of your website. Changes are saved instantly and update the live site.</p>
       </div>
 
       {newLeads > 0 && (
@@ -39,8 +39,8 @@ export default function DashboardHome({ data, onNav }: P) {
               <Users className="h-5 w-5 text-accent" />
             </div>
             <div>
-              <p className="text-sm font-bold text-navy-900">🔔 {newLeads} new demo request{newLeads > 1 ? 's' : ''} waiting</p>
-              <p className="text-xs text-navy-500">Click to view and manage incoming leads</p>
+              <p className="text-sm font-bold text-slate-900">🔔 {newLeads} new demo request{newLeads > 1 ? 's' : ''} waiting</p>
+              <p className="text-xs text-slate-500">Click to view and manage incoming leads</p>
             </div>
           </div>
         </button>
@@ -51,33 +51,33 @@ export default function DashboardHome({ data, onNav }: P) {
           const I = c.icon;
           return (
             <button key={c.id} onClick={() => onNav(c.id)}
-              className="group rounded-2xl border border-navy-200 bg-white p-6 text-left hover:border-accent/30 hover:shadow-lg transition-all">
+              className="group rounded-2xl border border-slate-200 bg-white p-6 text-left hover:border-accent/30 hover:shadow-lg transition-all">
               <div className="flex items-center justify-between mb-3">
-                <div className="h-11 w-11 rounded-xl bg-navy-50 flex items-center justify-center group-hover:bg-accent/10 transition">
-                  <I className="h-5 w-5 text-navy-600 group-hover:text-accent transition" />
+                <div className="h-11 w-11 rounded-xl bg-slate-50 flex items-center justify-center group-hover:bg-accent/10 transition">
+                  <I className="h-5 w-5 text-slate-600 group-hover:text-accent transition" />
                 </div>
                 <div className="flex items-center gap-2">
                   {c.alert && <span className="h-2.5 w-2.5 rounded-full bg-accent animate-pulse" />}
-                  <span className="rounded-full bg-navy-50 px-3 py-1 text-xs font-semibold text-navy-600">{c.stat}</span>
+                  <span className="rounded-full bg-slate-50 px-3 py-1 text-xs font-semibold text-slate-600">{c.stat}</span>
                 </div>
               </div>
-              <h3 className="text-sm font-bold text-navy-900">{c.label}</h3>
-              <p className="mt-1 text-xs text-navy-500">{c.desc}</p>
+              <h3 className="text-sm font-bold text-slate-900">{c.label}</h3>
+              <p className="mt-1 text-xs text-slate-500">{c.desc}</p>
             </button>
           );
         })}
       </div>
 
       <div className="mt-8 rounded-2xl border border-accent/20 bg-gradient-to-br from-accent/5 to-transparent p-6">
-        <h3 className="font-bold text-navy-800 text-base">💡 Admin Panel Guide</h3>
-        <ul className="mt-4 space-y-2 text-sm text-navy-600">
+        <h3 className="font-bold text-slate-800 text-base">💡 Admin Panel Guide</h3>
+        <ul className="mt-4 space-y-2 text-sm text-slate-600">
           <li className="flex items-start gap-2"><span className="h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center text-[10px] font-bold text-accent shrink-0 mt-0.5">1</span>Click any section card above to open its editor</li>
           <li className="flex items-start gap-2"><span className="h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center text-[10px] font-bold text-accent shrink-0 mt-0.5">2</span>Make your changes — add, edit, reorder, or remove items</li>
-          <li className="flex items-start gap-2"><span className="h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center text-[10px] font-bold text-accent shrink-0 mt-0.5">3</span>Press <strong className="text-navy-800">Save</strong> — changes update the live website instantly</li>
+          <li className="flex items-start gap-2"><span className="h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center text-[10px] font-bold text-accent shrink-0 mt-0.5">3</span>Press <strong className="text-slate-800">Save</strong> — changes update the live website instantly</li>
           <li className="flex items-start gap-2"><span className="h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center text-[10px] font-bold text-accent shrink-0 mt-0.5">4</span>FAQ changes also improve chatbot responses automatically</li>
-          <li className="flex items-start gap-2"><span className="h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center text-[10px] font-bold text-accent shrink-0 mt-0.5">5</span>Use <strong className="text-navy-800">Reset to Defaults</strong> in sidebar to undo all changes</li>
+          <li className="flex items-start gap-2"><span className="h-5 w-5 rounded-full bg-accent/10 flex items-center justify-center text-[10px] font-bold text-accent shrink-0 mt-0.5">5</span>Use <strong className="text-slate-800">Reset to Defaults</strong> in sidebar to undo all changes</li>
         </ul>
-        <p className="mt-4 text-xs text-navy-400">Access this panel anytime by visiting <code className="rounded bg-navy-100 px-1.5 py-0.5 text-[11px] font-mono text-navy-600">/admin</code></p>
+        <p className="mt-4 text-xs text-slate-400">Access this panel anytime by visiting <code className="rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-mono text-slate-600">/admin</code></p>
       </div>
     </div>
   );

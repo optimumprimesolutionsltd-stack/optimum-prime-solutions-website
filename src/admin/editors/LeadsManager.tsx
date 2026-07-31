@@ -795,17 +795,17 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       {/* ── Header ── */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-xl font-bold text-navy-900">Demo Leads</h2>
-          <p className="text-sm text-navy-500 mt-0.5">All demo requests — website and manually booked</p>
+          <h2 className="text-xl font-bold text-slate-900">Demo Leads</h2>
+          <p className="text-sm text-slate-500 mt-0.5">All demo requests — website and manually booked</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 rounded-xl border border-navy-200 bg-white px-3 py-2.5">
-            <FileText className="h-4 w-4 text-navy-500" />
+          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
+            <FileText className="h-4 w-4 text-slate-500" />
             <select
               defaultValue=""
               onChange={e => { const v = e.target.value; e.target.value = ''; if (v) downloadReport(v); }}
               title="Download the CRM status report for Tally Solutions"
-              className="bg-transparent text-sm font-semibold text-navy-700 outline-none cursor-pointer">
+              className="bg-transparent text-sm font-semibold text-slate-700 outline-none cursor-pointer">
               <option value="" disabled>CRM Report…</option>
               <option value="pdf">Download as PDF</option>
               <option value="excel">Download as Excel</option>
@@ -845,11 +845,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       {/* ── Stats Strip ── */}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
         {[
-          { label: 'Total',     value: filtered.length,                                          color: 'bg-navy-50 text-navy-700' },
+          { label: 'Total',     value: filtered.length,                                          color: 'bg-slate-50 text-slate-700' },
           { label: 'New',       value: filtered.filter(l => l.status === 'New').length,          color: 'bg-accent/10 text-accent' },
           { label: 'Contacted', value: filtered.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
           { label: 'Qualified', value: filtered.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
-          { label: 'Demo Set',  value: filtered.filter(l => l.status === 'Schedule a Demo').length, color: 'bg-amber-50 text-amber-600' },
+          { label: 'Demo Set',  value: filtered.filter(l => l.status === 'Schedule a Demo').length, color: 'bg-red-50 text-red-600' },
           { label: 'Won',       value: filtered.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
         ].map(s => (
           <div key={s.label} className={`rounded-xl p-3 text-center ${s.color}`}>
@@ -864,44 +864,44 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         {/* Search + Export row */}
         <div className="flex flex-wrap items-center gap-3">
           <div className="relative flex-1 min-w-[200px]">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
             <input value={search} onChange={e => setSearch(e.target.value)}
               placeholder="Search by name, email, phone, company..."
-              className="w-full rounded-lg border border-navy-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
+              className="w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
           </div>
           <button onClick={exportCSV} disabled={data.leads.length === 0}
             title="Detailed leads-only spreadsheet (all lead columns)"
-            className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-40">
             <Download className="h-4 w-4" /> Leads CSV
           </button>
         </div>
         {/* Report/export date range only — this NEVER hides leads from the list
             above; it just scopes what the CRM Report and CSV downloads contain. */}
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-navy-100 bg-navy-50/50 px-3 py-2.5 text-xs"
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5 text-xs"
           title="This range only scopes the CRM Report and CSV downloads — your lead list above always shows everyone.">
-          <span className="font-semibold text-navy-500">Report date range:</span>
-          <label className="flex items-center gap-1.5 text-navy-600">
+          <span className="font-semibold text-slate-500">Report date range:</span>
+          <label className="flex items-center gap-1.5 text-slate-600">
             From
             <input type="date" value={exportFrom} onChange={e => setExportFrom(e.target.value)}
-              className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs outline-none focus:border-accent" />
+              className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs outline-none focus:border-accent" />
           </label>
-          <label className="flex items-center gap-1.5 text-navy-600">
+          <label className="flex items-center gap-1.5 text-slate-600">
             To
             <input type="date" value={exportTo} onChange={e => setExportTo(e.target.value)}
-              className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs outline-none focus:border-accent" />
+              className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs outline-none focus:border-accent" />
           </label>
           {(exportFrom || exportTo) && (
             <button onClick={() => { setExportFrom(''); setExportTo(''); }}
-              className="text-navy-400 hover:text-navy-600 underline">clear dates</button>
+              className="text-slate-400 hover:text-slate-600 underline">clear dates</button>
           )}
-          <span className="text-navy-400">
+          <span className="text-slate-400">
             {(exportFrom || exportTo)
               ? `Report covers ${exportLeads.length} lead${exportLeads.length === 1 ? '' : 's'} in this range`
               : `Report covers all ${exportLeads.length} leads`}
           </span>
-          <label className="flex items-center gap-1.5 text-navy-600 cursor-pointer" title="Only affects what the exports contain">
+          <label className="flex items-center gap-1.5 text-slate-600 cursor-pointer" title="Only affects what the exports contain">
             <input type="checkbox" checked={includeClosed} onChange={e => setIncludeClosed(e.target.checked)}
-              className="h-3.5 w-3.5 rounded border-navy-300 text-accent focus:ring-accent" />
+              className="h-3.5 w-3.5 rounded border-slate-300 text-accent focus:ring-accent" />
             Include Closed in exports
           </label>
           {workshopDateFixCount > 0 && (
@@ -921,7 +921,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         {/* Source filter — separate online / workshop / manual so bulk actions
             and Select-all only touch the source you're looking at. */}
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-navy-500 mr-1">Source:</span>
+          <span className="text-xs font-semibold text-slate-500 mr-1">Source:</span>
           {([['All', 'All sources'], ['online', 'Online / Website'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['manual', 'Manual']] as [typeof filterSource, string][]).map(([val, label]) => {
             const isActive = filterSource === val;
             const count = val === 'All'
@@ -941,13 +941,13 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           {/* Which workshop? A workshop is a group event, so once you're looking
               at Workshop leads you can narrow to one specific event. */}
           {filterSource === 'workshop' && (
-            <label className="flex items-center gap-1.5 text-xs text-navy-600 ml-1">
-              <Calendar className="h-3.5 w-3.5 text-navy-400" />
+            <label className="flex items-center gap-1.5 text-xs text-slate-600 ml-1">
+              <Calendar className="h-3.5 w-3.5 text-slate-400" />
               <select
                 value={filterWorkshop}
                 onChange={e => setFilterWorkshop(e.target.value)}
                 title="Show leads from a specific workshop"
-                className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs font-semibold text-navy-700 outline-none focus:border-accent cursor-pointer">
+                className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 outline-none focus:border-accent cursor-pointer">
                 <option value="all">
                   All workshops ({data.leads.filter(l => sourceCategory(l) === 'workshop').length})
                 </option>
@@ -977,13 +977,13 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           )}
           {/* Which webinar? Same idea as workshops — narrow to one online event. */}
           {filterSource === 'webinar' && (
-            <label className="flex items-center gap-1.5 text-xs text-navy-600 ml-1">
-              <Video className="h-3.5 w-3.5 text-navy-400" />
+            <label className="flex items-center gap-1.5 text-xs text-slate-600 ml-1">
+              <Video className="h-3.5 w-3.5 text-slate-400" />
               <select
                 value={filterWebinar}
                 onChange={e => setFilterWebinar(e.target.value)}
                 title="Show leads from a specific webinar"
-                className="rounded-lg border border-navy-200 bg-white px-2 py-1 text-xs font-semibold text-navy-700 outline-none focus:border-accent cursor-pointer">
+                className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 outline-none focus:border-accent cursor-pointer">
                 <option value="all">
                   All webinars ({data.leads.filter(l => sourceCategory(l) === 'webinar').length})
                 </option>
@@ -1046,15 +1046,15 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
       {/* ── Manual Booking Panel (slide-in) ── */}
       {showBooking && (
-        <div className="fixed inset-0 z-50 flex justify-center bg-navy-900/60 backdrop-blur-sm p-4 sm:p-6 overflow-y-auto pt-20">
+        <div className="fixed inset-0 z-50 flex justify-center bg-slate-900/60 backdrop-blur-sm p-4 sm:p-6 overflow-y-auto pt-20">
           <div className="rounded-2xl border border-accent/30 bg-white shadow-lg overflow-hidden w-full max-w-2xl">
-            <div className="flex items-center justify-between px-6 py-4 border-b border-navy-100 bg-navy-50">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50">
               <div className="flex items-center gap-2">
                 <CalendarDays className="h-5 w-5 text-accent" />
-                <h3 className="font-bold text-navy-900">Book a New Demo</h3>
+                <h3 className="font-bold text-slate-900">Book a New Demo</h3>
               </div>
-              <button onClick={() => setShowBooking(false)} className="rounded-lg p-1.5 hover:bg-navy-200 transition">
-                <X className="h-4 w-4 text-navy-500" />
+              <button onClick={() => setShowBooking(false)} className="rounded-lg p-1.5 hover:bg-slate-200 transition">
+                <X className="h-4 w-4 text-slate-500" />
               </button>
             </div>
 
@@ -1068,19 +1068,19 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             <div className="grid gap-5 lg:grid-cols-2">
               {/* Client Details */}
               <div className="space-y-3">
-                <p className="text-xs font-bold text-navy-500 uppercase tracking-wider">Client Details</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Client Details</p>
                 <input value={booking.clientName} onChange={e => setB('clientName', e.target.value)}
-                  placeholder="Client name *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                  placeholder="Client name *" className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                 <div className="grid grid-cols-2 gap-3">
                   <input value={booking.clientPhone} onChange={e => setB('clientPhone', e.target.value)}
-                    placeholder="+254 7XX XXX XXX *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                    placeholder="+254 7XX XXX XXX *" className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                   <input value={booking.clientEmail} onChange={e => setB('clientEmail', e.target.value)}
-                    placeholder="Email (optional)" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                    placeholder="Email (optional)" className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                 </div>
                 <input value={booking.clientCompany} onChange={e => setB('clientCompany', e.target.value)}
-                  placeholder="Company name *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                  placeholder="Company name *" className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                 <select value={booking.clientIndustry} onChange={e => setB('clientIndustry', e.target.value)}
-                  className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-white">
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-white">
                   <option value="">Select industry *</option>
                   {INDUSTRIES.map(i => <option key={i} value={i}>{i}</option>)}
                 </select>
@@ -1088,16 +1088,16 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
               {/* Demo Schedule */}
               <div className="space-y-3">
-                <p className="text-xs font-bold text-navy-500 uppercase tracking-wider">Demo Schedule</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Demo Schedule</p>
 
                 {/* Demo Type */}
-                <div className="flex rounded-xl overflow-hidden border border-navy-200">
+                <div className="flex rounded-xl overflow-hidden border border-slate-200">
                   <button type="button" onClick={() => setB('demoType', 'online')}
-                    className={`flex-1 py-2.5 text-sm font-semibold transition ${booking.demoType === 'online' ? 'bg-blue-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                    className={`flex-1 py-2.5 text-sm font-semibold transition ${booking.demoType === 'online' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
                     💻 Online
                   </button>
                   <button type="button" onClick={() => setB('demoType', 'physical')}
-                    className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-navy-200 ${booking.demoType === 'physical' ? 'bg-green-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                    className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-slate-200 ${booking.demoType === 'physical' ? 'bg-green-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
                     📍 Physical
                   </button>
                 </div>
@@ -1107,19 +1107,19 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   <input type="date" value={booking.demoDate}
                     min={new Date().toISOString().split('T')[0]}
                     onChange={e => { setB('demoDate', e.target.value); setB('demoTime', ''); }}
-                    className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent ${booking.demoDate && isDateBlocked(booking.demoDate) ? 'border-red-400 bg-red-50' : 'border-navy-200'}`} />
+                    className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent ${booking.demoDate && isDateBlocked(booking.demoDate) ? 'border-red-400 bg-red-50' : 'border-slate-200'}`} />
                   {booking.demoDate && isDateBlocked(booking.demoDate) && (
                     <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(booking.demoDate) === 0 ? 'Sundays are not available' : 'This is a public holiday'} — please choose another date.</p>
                   )}
                   {booking.demoDate && getDayOfWeek(booking.demoDate) === 6 && !isDateBlocked(booking.demoDate) && (
-                    <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — available slots: 8:00 AM – 1:00 PM only.</p>
+                    <p className="mt-1 text-xs text-red-600">⚠️ Saturday — available slots: 8:00 AM – 1:00 PM only.</p>
                   )}
                 </div>
 
                 {/* Time slots */}
                 {booking.demoDate && !isDateBlocked(booking.demoDate) && bookingSlots.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-navy-500 mb-1.5">Select time *</p>
+                    <p className="text-xs font-semibold text-slate-500 mb-1.5">Select time *</p>
                     <div className="grid grid-cols-4 gap-1.5 max-h-36 overflow-y-auto pr-1">
                       {bookingSlots.map(s => (
                         <button key={s.value} type="button"
@@ -1128,10 +1128,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                           title={s.blocked ? 'Already booked' : ''}
                           className={`rounded-lg py-1.5 text-xs font-medium transition border ${
                             s.blocked
-                              ? 'border-navy-100 bg-navy-100 text-navy-300 cursor-not-allowed line-through'
+                              ? 'border-slate-100 bg-slate-100 text-slate-300 cursor-not-allowed line-through'
                               : booking.demoTime === s.value
                                 ? 'border-accent bg-accent text-white'
-                                : 'border-navy-200 bg-white text-navy-700 hover:border-accent hover:bg-accent/5'
+                                : 'border-slate-200 bg-white text-slate-700 hover:border-accent hover:bg-accent/5'
                           }`}>
                           {s.label}
                         </button>
@@ -1143,15 +1143,15 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                 {/* Location for physical */}
                 {booking.demoType === 'physical' && (
                   <input value={booking.demoLocation} onChange={e => setB('demoLocation', e.target.value)}
-                    placeholder="Location / address *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                    placeholder="Location / address *" className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                 )}
 
                 <div>
-                  <label className="block text-xs font-semibold text-navy-600 mb-1">What's this about? <span className="font-normal text-navy-400">(purpose — optional)</span></label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">What's this about? <span className="font-normal text-slate-400">(purpose — optional)</span></label>
                   <textarea value={booking.demoNotes} onChange={e => setB('demoNotes', e.target.value)}
                     placeholder="e.g. Product demo · buying an add-on · paying for implementation · training / support"
                     rows={2}
-                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
                 </div>
               </div>
             </div>
@@ -1159,7 +1159,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             {/* Team Members */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <p className="text-xs font-bold text-navy-500 uppercase tracking-wider">Assigned Team Members</p>
+                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Assigned Team Members</p>
                 {booking.extraTeam.length < 2 && (
                   <button type="button" onClick={addBookingExtraTeam}
                     className="text-xs text-accent font-semibold hover:underline flex items-center gap-1">
@@ -1170,20 +1170,20 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               {/* Primary */}
               <div className="grid grid-cols-2 gap-3">
                 <input value={booking.teamMemberName} onChange={e => setB('teamMemberName', e.target.value)}
-                  placeholder="Your name *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                  placeholder="Your name *" className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                 <input value={booking.teamMemberPhone} onChange={e => setB('teamMemberPhone', e.target.value)}
-                  placeholder="Your phone *" className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                  placeholder="Your phone *" className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
               </div>
               {/* Extra members */}
               {booking.extraTeam.map((m, i) => (
                 <div key={i} className="grid grid-cols-2 gap-2 items-center">
                   <input value={m.name} onChange={e => setBookingExtraTeam(i, 'name', e.target.value)}
                     placeholder={`Member ${i + 2} name`}
-                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                   <div className="flex gap-1">
                     <input value={m.phone} onChange={e => setBookingExtraTeam(i, 'phone', e.target.value)}
                       placeholder="+254 7XX XXX XXX"
-                      className="flex-1 rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                      className="flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                     <button type="button" onClick={() => removeBookingExtraTeam(i)}
                       className="rounded-lg p-2 text-red-400 hover:bg-red-50 transition shrink-0">
                       <X className="h-4 w-4" />
@@ -1196,8 +1196,8 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             {/* Notify client toggle */}
             <label className="flex items-center gap-3 cursor-pointer">
               <input type="checkbox" checked={booking.notifyClient} onChange={e => setB('notifyClient', e.target.checked)}
-                className="h-4 w-4 rounded border-navy-300 text-accent focus:ring-accent" />
-              <span className="text-sm text-navy-700">Send WhatsApp confirmation to client</span>
+                className="h-4 w-4 rounded border-slate-300 text-accent focus:ring-accent" />
+              <span className="text-sm text-slate-700">Send WhatsApp confirmation to client</span>
             </label>
 
             {/* Submit */}
@@ -1216,16 +1216,16 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       {/* ── Selection / Bulk Actions Bar ── */}
       {filtered.length > 0 && (
         <div className="flex items-center justify-between gap-3 flex-wrap">
-          <label className="flex items-center gap-2 text-xs font-medium text-navy-600 cursor-pointer select-none">
+          <label className="flex items-center gap-2 text-xs font-medium text-slate-600 cursor-pointer select-none">
             <input type="checkbox" checked={allFilteredSelected} onChange={toggleSelectAll}
-              className="h-4 w-4 rounded border-navy-300 text-accent focus:ring-accent" />
+              className="h-4 w-4 rounded border-slate-300 text-accent focus:ring-accent" />
             Select all ({filtered.length})
           </label>
           {selectedIds.size > 0 && (
             <div className="flex items-center gap-2 rounded-xl border border-accent/30 bg-accent/5 px-3 py-2 flex-wrap">
-              <span className="text-xs font-semibold text-navy-700">{selectedIds.size} selected</span>
+              <span className="text-xs font-semibold text-slate-700">{selectedIds.size} selected</span>
               <select value={bulkStatus} onChange={e => setBulkStatus(e.target.value)}
-                className="rounded-lg border border-navy-200 px-2 py-1.5 text-xs font-medium outline-none focus:border-accent bg-white">
+                className="rounded-lg border border-slate-200 px-2 py-1.5 text-xs font-medium outline-none focus:border-accent bg-white">
                 {statuses.map(s => <option key={s}>{s}</option>)}
               </select>
               <button onClick={applyBulkStatus}
@@ -1237,7 +1237,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                 Delete
               </button>
               <button onClick={() => setSelectedIds(new Set())}
-                className="rounded-lg px-2 py-1.5 text-xs font-medium text-navy-500 hover:bg-navy-100 transition">
+                className="rounded-lg px-2 py-1.5 text-xs font-medium text-slate-500 hover:bg-slate-100 transition">
                 Clear
               </button>
             </div>
@@ -1247,12 +1247,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
       {/* ── Leads List ── */}
       {filtered.length === 0 ? (
-        <div className="rounded-2xl border border-navy-200 bg-white py-16 text-center">
-          <UsersIcon className="mx-auto h-10 w-10 text-navy-300" />
-          <p className="mt-3 text-sm font-medium text-navy-500">
+        <div className="rounded-2xl border border-slate-200 bg-white py-16 text-center">
+          <UsersIcon className="mx-auto h-10 w-10 text-slate-300" />
+          <p className="mt-3 text-sm font-medium text-slate-500">
             {data.leads.length === 0 ? 'No leads yet' : 'No leads match your filters'}
           </p>
-          <p className="mt-1 text-xs text-navy-400">
+          <p className="mt-1 text-xs text-slate-400">
             {data.leads.length === 0
               ? 'Demo requests from the website and manual bookings will appear here.'
               : 'Try a different search or status filter.'}
@@ -1266,32 +1266,32 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   ? 'border-accent bg-red-50/30 shadow-sm shadow-accent/10'
                   : expandedId === l.id
                   ? 'border-accent/30 bg-white shadow-md'
-                  : 'border-navy-200 bg-white'
+                  : 'border-slate-200 bg-white'
               }`}>
               {/* Lead row */}
               <div className="flex items-center gap-4 p-4 cursor-pointer" onClick={() => setExpandedId(expandedId === l.id ? null : l.id)}>
                 <input type="checkbox" checked={selectedIds.has(l.id)}
                   onClick={e => e.stopPropagation()}
                   onChange={() => toggleSelect(l.id)}
-                  className="h-4 w-4 rounded border-navy-300 text-accent focus:ring-accent shrink-0" />
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-navy-700 to-navy-900 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                  className="h-4 w-4 rounded border-slate-300 text-accent focus:ring-accent shrink-0" />
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-xs font-bold text-white shrink-0">
                   {l.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-bold text-navy-900 truncate">{l.name}</p>
+                    <p className="text-sm font-bold text-slate-900 truncate">{l.name}</p>
                     {l.status === 'New' && <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />}
                     {l.source === 'manual' && (
-                      <span className="rounded-full bg-navy-100 px-2 py-0.5 text-[9px] font-semibold text-navy-500">MANUAL</span>
+                      <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-semibold text-slate-500">MANUAL</span>
                     )}
                     {l.source === 'workshop' && (
-                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-semibold text-amber-700"
+                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-semibold text-red-700"
                         title={l.attendedWorkshop ? 'Attended the breakfast workshop' : 'Registered for workshop — did not attend'}>
                         🥐 WORKSHOP{l.attendedWorkshop ? ' ✓' : ''}
                       </span>
                     )}
                   </div>
-                  <p className="text-xs text-navy-500 truncate">{l.phone} · {l.company || 'No company'}</p>
+                  <p className="text-xs text-slate-500 truncate">{l.phone} · {l.company || 'No company'}</p>
                 </div>
                 <span
                   className="rounded-full px-2.5 py-1 text-[10px] font-semibold whitespace-nowrap"
@@ -1314,12 +1314,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   </span>
                 )}
                 {l.scheduledDate && (
-                  <span className="text-[10px] text-navy-400 hidden sm:block whitespace-nowrap">
+                  <span className="text-[10px] text-slate-400 hidden sm:block whitespace-nowrap">
                     📅 {new Date(l.scheduledDate + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}
                     {l.scheduledTime && ` · ${l.scheduledTime}`}
                   </span>
                 )}
-                <span className="text-[10px] text-navy-400 hidden sm:block whitespace-nowrap">
+                <span className="text-[10px] text-slate-400 hidden sm:block whitespace-nowrap">
                   {new Date(l.createdAt).toLocaleDateString()}
                 </span>
                 {/* One-click demo action. If a demo is already booked, this
@@ -1329,7 +1329,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   <button
                     onClick={e => { e.stopPropagation(); setExpandedId(l.id); openEdit(l); }}
                     title="Edit this booked demo (date, time, team)"
-                    className="inline-flex items-center gap-1 rounded-lg bg-amber-500 hover:bg-amber-600 px-3 py-1.5 text-xs font-bold text-white shadow-md hover:shadow-lg transition whitespace-nowrap shrink-0">
+                    className="inline-flex items-center gap-1 rounded-lg bg-red-500 hover:bg-red-600 px-3 py-1.5 text-xs font-bold text-white shadow-md hover:shadow-lg transition whitespace-nowrap shrink-0">
                     ✏️ Edit
                   </button>
                 ) : (
@@ -1340,12 +1340,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                     📅 Book
                   </button>
                 )}
-                <ChevronDown className={`h-4 w-4 text-navy-400 transition-transform shrink-0 ${expandedId === l.id ? 'rotate-180' : ''}`} />
+                <ChevronDown className={`h-4 w-4 text-slate-400 transition-transform shrink-0 ${expandedId === l.id ? 'rotate-180' : ''}`} />
               </div>
 
               {/* Expanded detail */}
               {expandedId === l.id && (
-                <div className="border-t border-navy-100 p-5 space-y-4">
+                <div className="border-t border-slate-100 p-5 space-y-4">
                   {/* Info grid — always 1 col on mobile, 2 cols on sm, 3 cols on lg */}
                   <div style={{ display: 'grid', gap: '12px 24px', gridTemplateColumns: 'repeat(1, minmax(0, 1fr))' }}
                     className="sm:grid-cols-2-override lg:grid-cols-3-override"
@@ -1356,31 +1356,31 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                     }}
                   >
                     <div className="flex items-start gap-2 min-w-0">
-                      <Mail className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
+                      <Mail className="h-4 w-4 text-slate-400 mt-0.5 shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-[10px] text-navy-500 font-medium">Email</p>
-                        <p className="text-sm text-navy-900 break-all">{l.email || '—'}</p>
+                        <p className="text-[10px] text-slate-500 font-medium">Email</p>
+                        <p className="text-sm text-slate-900 break-all">{l.email || '—'}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-2 min-w-0">
-                      <Phone className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
+                      <Phone className="h-4 w-4 text-slate-400 mt-0.5 shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-[10px] text-navy-500 font-medium">Phone</p>
-                        <p className="text-sm text-navy-900">{l.phone}</p>
+                        <p className="text-[10px] text-slate-500 font-medium">Phone</p>
+                        <p className="text-sm text-slate-900">{l.phone}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-2 min-w-0">
-                      <Building2 className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
+                      <Building2 className="h-4 w-4 text-slate-400 mt-0.5 shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-[10px] text-navy-500 font-medium">Company</p>
-                        <p className="text-sm text-navy-900 truncate">{l.company || '—'}</p>
+                        <p className="text-[10px] text-slate-500 font-medium">Company</p>
+                        <p className="text-sm text-slate-900 truncate">{l.company || '—'}</p>
                       </div>
                     </div>
                     <div className="flex items-start gap-2 min-w-0">
-                      <Calendar className="h-4 w-4 text-navy-400 mt-0.5 shrink-0" />
+                      <Calendar className="h-4 w-4 text-slate-400 mt-0.5 shrink-0" />
                       <div className="min-w-0">
-                        <p className="text-[10px] text-navy-500 font-medium">Requested Slot</p>
-                        <p className="text-sm text-navy-900">
+                        <p className="text-[10px] text-slate-500 font-medium">Requested Slot</p>
+                        <p className="text-sm text-slate-900">
                           {l.demoDate
                             ? `${new Date(l.demoDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' })}${l.demoTime ? ` · ${l.demoTime}` : ''}`
                             : 'Flexible'}
@@ -1388,63 +1388,63 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                       </div>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] text-navy-500 font-medium mb-0.5">Industry</p>
-                      <p className="text-sm text-navy-900 truncate">{l.industry || l.businessType || '—'}</p>
+                      <p className="text-[10px] text-slate-500 font-medium mb-0.5">Industry</p>
+                      <p className="text-sm text-slate-900 truncate">{l.industry || l.businessType || '—'}</p>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] text-navy-500 font-medium mb-0.5">Current Software</p>
-                      <p className="text-sm text-navy-900 truncate">{l.currentSoftware || '—'}</p>
+                      <p className="text-[10px] text-slate-500 font-medium mb-0.5">Current Software</p>
+                      <p className="text-sm text-slate-900 truncate">{l.currentSoftware || '—'}</p>
                     </div>
                   </div>
 
                   {l.message && (
                     <div>
-                      <p className="text-[10px] text-navy-500 font-medium mb-1">Message</p>
-                      <p className="text-sm text-navy-700 bg-navy-50 rounded-xl p-3 leading-relaxed">{l.message}</p>
+                      <p className="text-[10px] text-slate-500 font-medium mb-1">Message</p>
+                      <p className="text-sm text-slate-700 bg-slate-50 rounded-xl p-3 leading-relaxed">{l.message}</p>
                     </div>
                   )}
 
                   {/* Scheduled demo info (if already scheduled) */}
                   {l.status === 'Schedule a Demo' && l.scheduledDate && l.meetSent && editingId !== l.id && (
-                    <div className="rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 border-2 border-amber-300 p-5 space-y-3 shadow-sm">
+                    <div className="rounded-xl bg-gradient-to-br from-red-50 to-red-50 border-2 border-red-300 p-5 space-y-3 shadow-sm">
                       <div className="flex items-center justify-between gap-3 flex-wrap">
                         <div className="flex items-center gap-2">
-                          <div className="h-8 w-8 rounded-full bg-amber-200 flex items-center justify-center text-lg">📅</div>
+                          <div className="h-8 w-8 rounded-full bg-red-200 flex items-center justify-center text-lg">📅</div>
                           <div>
-                            <p className="text-xs font-bold uppercase tracking-wide text-amber-700">Demo Booked & Confirmed</p>
-                            <p className="text-[11px] text-amber-600">Ready for presentation</p>
+                            <p className="text-xs font-bold uppercase tracking-wide text-red-700">Demo Booked & Confirmed</p>
+                            <p className="text-[11px] text-red-600">Ready for presentation</p>
                           </div>
                         </div>
                         <button
                           onClick={() => openEdit(l)}
-                          className="flex items-center gap-2 rounded-lg bg-amber-500 hover:bg-amber-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:shadow-lg transition">
+                          className="flex items-center gap-2 rounded-lg bg-red-500 hover:bg-red-600 px-4 py-2.5 text-sm font-bold text-white shadow-md hover:shadow-lg transition">
                           ✏️ Edit
                         </button>
                       </div>
                       <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-sm">
-                        <div className="bg-white rounded-lg p-3 border border-amber-200">
-                          <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Date</p>
-                          <p className="text-base font-bold text-amber-900">{new Date(l.scheduledDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</p>
+                        <div className="bg-white rounded-lg p-3 border border-red-200">
+                          <p className="text-[10px] font-semibold text-red-600 uppercase tracking-wide mb-1">Date</p>
+                          <p className="text-base font-bold text-red-900">{new Date(l.scheduledDate + 'T12:00:00').toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' })}</p>
                         </div>
-                        <div className="bg-white rounded-lg p-3 border border-amber-200">
-                          <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Time</p>
-                          <p className="text-base font-bold text-amber-900">{l.scheduledTime} EAT</p>
+                        <div className="bg-white rounded-lg p-3 border border-red-200">
+                          <p className="text-[10px] font-semibold text-red-600 uppercase tracking-wide mb-1">Time</p>
+                          <p className="text-base font-bold text-red-900">{l.scheduledTime} EAT</p>
                         </div>
-                        <div className="bg-white rounded-lg p-3 border border-amber-200">
-                          <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Type</p>
-                          <p className="text-base font-bold text-amber-900">{l.demoType === 'online' ? '💻 Online' : '📍 Physical'}</p>
+                        <div className="bg-white rounded-lg p-3 border border-red-200">
+                          <p className="text-[10px] font-semibold text-red-600 uppercase tracking-wide mb-1">Type</p>
+                          <p className="text-base font-bold text-red-900">{l.demoType === 'online' ? '💻 Online' : '📍 Physical'}</p>
                         </div>
-                        {l.teamMemberName && <div className="bg-white rounded-lg p-3 border border-amber-200">
-                          <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Staff</p>
-                          <p className="text-base font-bold text-amber-900 truncate">{l.teamMemberName}{(l as any).extraTeam?.length > 0 ? ` +${(l as any).extraTeam.length}` : ''}</p>
+                        {l.teamMemberName && <div className="bg-white rounded-lg p-3 border border-red-200">
+                          <p className="text-[10px] font-semibold text-red-600 uppercase tracking-wide mb-1">Staff</p>
+                          <p className="text-base font-bold text-red-900 truncate">{l.teamMemberName}{(l as any).extraTeam?.length > 0 ? ` +${(l as any).extraTeam.length}` : ''}</p>
                         </div>}
                       </div>
                       {l.demoType === 'physical' && l.demoLocation && (
-                        <div className="bg-white rounded-lg p-3 border border-amber-200 flex items-start gap-2">
-                          <MapPin className="h-5 w-5 text-amber-600 mt-0.5 shrink-0" />
+                        <div className="bg-white rounded-lg p-3 border border-red-200 flex items-start gap-2">
+                          <MapPin className="h-5 w-5 text-red-600 mt-0.5 shrink-0" />
                           <div className="min-w-0">
-                            <p className="text-[10px] font-semibold text-amber-600 uppercase tracking-wide mb-1">Location</p>
-                            <p className="text-sm font-semibold text-amber-900 break-words">{l.demoLocation}</p>
+                            <p className="text-[10px] font-semibold text-red-600 uppercase tracking-wide mb-1">Location</p>
+                            <p className="text-sm font-semibold text-red-900 break-words">{l.demoLocation}</p>
                           </div>
                         </div>
                       )}
@@ -1473,18 +1473,18 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   )}
 
                   {/* Auto next step — derived from the stage, shown in the CRM report */}
-                  <div className="flex items-center gap-2 text-xs text-navy-500">
+                  <div className="flex items-center gap-2 text-xs text-slate-500">
                     <span className="font-semibold">Next step:</span>
-                    <span className="rounded-lg bg-navy-50 px-2.5 py-1 font-medium text-navy-700">{defaultNextStep(l.status)}</span>
-                    <span className="text-navy-400">— set automatically from the stage</span>
+                    <span className="rounded-lg bg-slate-50 px-2.5 py-1 font-medium text-slate-700">{defaultNextStep(l.status)}</span>
+                    <span className="text-slate-400">— set automatically from the stage</span>
                   </div>
 
                   {/* Status + actions */}
-                  <div className="flex items-center justify-between border-t border-navy-100 pt-4 flex-wrap gap-3">
+                  <div className="flex items-center justify-between border-t border-slate-100 pt-4 flex-wrap gap-3">
                     <div className="flex items-center gap-2">
-                      <label className="text-xs font-semibold text-navy-600">Status:</label>
+                      <label className="text-xs font-semibold text-slate-600">Status:</label>
                       <select value={l.status} onChange={e => updateStatus(l.id, e.target.value)}
-                        className="rounded-lg border border-navy-200 px-3 py-1.5 text-sm font-medium outline-none focus:border-accent">
+                        className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium outline-none focus:border-accent">
                         {statuses.map(s => <option key={s}>{s}</option>)}
                       </select>
                     </div>
@@ -1538,11 +1538,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                         <div className="sm:col-span-2">
                           <div className="flex rounded-xl overflow-hidden border border-blue-300">
                             <button type="button" onClick={() => setS('demoType', 'online')}
-                              className={`flex-1 py-2.5 text-sm font-semibold transition ${schedForm.demoType === 'online' ? 'bg-blue-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                              className={`flex-1 py-2.5 text-sm font-semibold transition ${schedForm.demoType === 'online' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
                               💻 Online (Google Meet)
                             </button>
                             <button type="button" onClick={() => setS('demoType', 'physical')}
-                              className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-blue-300 ${schedForm.demoType === 'physical' ? 'bg-green-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                              className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-blue-300 ${schedForm.demoType === 'physical' ? 'bg-green-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
                               📍 Physical / On-site
                             </button>
                           </div>
@@ -1550,22 +1550,22 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
                         {/* Date */}
                         <div>
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Date *</label>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1.5">Date *</label>
                           <input type="date" value={schedForm.scheduledDate}
                             min={new Date().toISOString().split('T')[0]}
                             onChange={e => { setS('scheduledDate', e.target.value); setS('scheduledTime', ''); }}
-                            className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 ${schedForm.scheduledDate && isDateBlocked(schedForm.scheduledDate) ? 'border-red-400 bg-red-50' : 'border-navy-200'}`} />
+                            className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 ${schedForm.scheduledDate && isDateBlocked(schedForm.scheduledDate) ? 'border-red-400 bg-red-50' : 'border-slate-200'}`} />
                           {schedForm.scheduledDate && isDateBlocked(schedForm.scheduledDate) && (
                             <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(schedForm.scheduledDate) === 0 ? 'Sundays not available' : 'Public holiday'} — choose another date.</p>
                           )}
                           {schedForm.scheduledDate && getDayOfWeek(schedForm.scheduledDate) === 6 && !isDateBlocked(schedForm.scheduledDate) && (
-                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–1:00 PM only.</p>
+                            <p className="mt-1 text-xs text-red-600">⚠️ Saturday — 8:00 AM–1:00 PM only.</p>
                           )}
                         </div>
 
                         {/* Time slots */}
                         <div>
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Time *</label>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1.5">Time *</label>
                           {schedForm.scheduledDate && !isDateBlocked(schedForm.scheduledDate) && schedSlots.length > 0 ? (
                             <div className="grid grid-cols-3 gap-1.5 max-h-32 overflow-y-auto pr-1">
                               {schedSlots.map(s => (
@@ -1575,34 +1575,34 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                                   title={s.blocked ? 'Already booked' : ''}
                                   className={`rounded-lg py-1.5 text-xs font-medium transition border ${
                                     s.blocked
-                                      ? 'border-navy-100 bg-navy-100 text-navy-300 cursor-not-allowed line-through'
+                                      ? 'border-slate-100 bg-slate-100 text-slate-300 cursor-not-allowed line-through'
                                       : schedForm.scheduledTime === s.value
                                         ? 'border-blue-500 bg-blue-500 text-white'
-                                        : 'border-navy-200 bg-white text-navy-700 hover:border-blue-400 hover:bg-blue-50'
+                                        : 'border-slate-200 bg-white text-slate-700 hover:border-blue-400 hover:bg-blue-50'
                                   }`}>
                                   {s.label}
                                 </button>
                               ))}
                             </div>
                           ) : (
-                            <p className="text-xs text-navy-400 italic">Select a date first</p>
+                            <p className="text-xs text-slate-400 italic">Select a date first</p>
                           )}
                         </div>
 
                         {/* Location (physical only) */}
                         {schedForm.demoType === 'physical' && (
                           <div className="sm:col-span-2">
-                            <label className="block text-xs font-semibold text-navy-600 mb-1.5">Location / Address *</label>
+                            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Location / Address *</label>
                             <input value={schedForm.demoLocation} onChange={e => setS('demoLocation', e.target.value)}
                               placeholder="e.g. Client's office — Moi Avenue, Nairobi"
-                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
+                              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
                           </div>
                         )}
 
                         {/* Team members */}
                         <div className="sm:col-span-2 space-y-3">
                           <div className="flex items-center justify-between">
-                            <label className="text-xs font-bold text-navy-600 uppercase tracking-wider">
+                            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                               <User className="h-3 w-3 inline mr-1" />Team Members *
                             </label>
                             {schedForm.extraTeam.length < 2 && (
@@ -1615,20 +1615,20 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                           <div className="grid grid-cols-2 gap-2">
                             <input value={schedForm.teamMemberName} onChange={e => setS('teamMemberName', e.target.value)}
                               placeholder="Name *"
-                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
+                              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
                             <input value={schedForm.teamMemberPhone} onChange={e => setS('teamMemberPhone', e.target.value)}
                               placeholder="+254 7XX XXX XXX"
-                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
+                              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
                           </div>
                           {schedForm.extraTeam.map((m, i) => (
                             <div key={i} className="grid grid-cols-2 gap-2 items-center">
                               <input value={m.name} onChange={e => setExtraTeam(i, 'name', e.target.value)}
                                 placeholder={`Member ${i + 2} name`}
-                                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
+                                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
                               <div className="flex gap-1">
                                 <input value={m.phone} onChange={e => setExtraTeam(i, 'phone', e.target.value)}
                                   placeholder="+254 7XX XXX XXX"
-                                  className="flex-1 rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
+                                  className="flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
                                 <button type="button" onClick={() => removeExtraTeam(i)}
                                   className="rounded-lg p-2 text-red-400 hover:bg-red-50 transition shrink-0">
                                   <X className="h-4 w-4" />
@@ -1640,10 +1640,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
                         {/* Notes */}
                         <div className="sm:col-span-2">
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">What's this about? <span className="font-normal text-navy-400">(purpose)</span></label>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1.5">What's this about? <span className="font-normal text-slate-400">(purpose)</span></label>
                           <textarea value={schedForm.demoNotes} onChange={e => setS('demoNotes', e.target.value)}
                             placeholder="e.g. Product demo · buying an add-on · paying for implementation · training / support"
-                            rows={2} className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 resize-none" />
+                            rows={2} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 resize-none" />
                         </div>
                       </div>
 
@@ -1656,11 +1656,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                             : <><Send className="h-4 w-4" /> Save & Re-send to Client</>}
                         </button>
                         <button onClick={() => handleEditSubmit(l, false)} disabled={editSubmitting}
-                          className="flex items-center justify-center gap-2 rounded-xl border border-navy-300 px-4 py-3 text-sm font-semibold text-navy-700 hover:bg-navy-50 disabled:opacity-60 transition">
+                          className="flex items-center justify-center gap-2 rounded-xl border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50 disabled:opacity-60 transition">
                           Save Only (no message)
                         </button>
                         <button onClick={() => setEditingId(null)}
-                          className="rounded-xl border border-navy-200 px-4 py-3 text-sm font-medium text-navy-500 hover:bg-navy-50 transition">
+                          className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-500 hover:bg-slate-50 transition">
                           Cancel
                         </button>
                       </div>
@@ -1672,20 +1672,20 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                       click outside must never discard a half-filled booking.
                       Close only via the X or Cancel button (or on submit). */}
                   {schedulingId === l.id && !l.meetSent && (
-                    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy-900/60 backdrop-blur-sm p-4 sm:p-6">
+                    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/60 backdrop-blur-sm p-4 sm:p-6">
                     <div
-                      className="my-6 w-full max-w-2xl rounded-2xl border border-amber-300 bg-amber-50 p-5 space-y-4 shadow-2xl">
+                      className="my-6 w-full max-w-2xl rounded-2xl border border-red-300 bg-red-50 p-5 space-y-4 shadow-2xl">
                       <div className="flex items-center justify-between gap-2">
                         <div className="flex items-center gap-2">
-                          <CalendarDays className="h-5 w-5 text-amber-600" />
+                          <CalendarDays className="h-5 w-5 text-red-600" />
                           <p className="font-bold text-amber-800">Book a Demo — {l.name}</p>
                         </div>
                         <button onClick={() => setSchedulingId(null)} title="Close"
-                          className="rounded-lg p-1.5 text-amber-500 hover:bg-amber-100 transition">
+                          className="rounded-lg p-1.5 text-red-500 hover:bg-red-100 transition">
                           <X className="h-5 w-5" />
                         </button>
                       </div>
-                      <p className="text-xs text-amber-700">
+                      <p className="text-xs text-red-700">
                         Fill in the details below. The client will receive a WhatsApp confirmation
                         {schedForm.demoType === 'online' ? ' with a Google Meet link.' : ' with the location.'}
                       </p>
@@ -1699,13 +1699,13 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                       <div className="grid gap-4 sm:grid-cols-2">
                         {/* Demo type */}
                         <div className="sm:col-span-2">
-                          <div className="flex rounded-xl overflow-hidden border border-amber-300">
+                          <div className="flex rounded-xl overflow-hidden border border-red-300">
                             <button type="button" onClick={() => setS('demoType', 'online')}
-                              className={`flex-1 py-2.5 text-sm font-semibold transition ${schedForm.demoType === 'online' ? 'bg-blue-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                              className={`flex-1 py-2.5 text-sm font-semibold transition ${schedForm.demoType === 'online' ? 'bg-blue-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
                               💻 Online (Google Meet)
                             </button>
                             <button type="button" onClick={() => setS('demoType', 'physical')}
-                              className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-amber-300 ${schedForm.demoType === 'physical' ? 'bg-green-600 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                              className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-red-300 ${schedForm.demoType === 'physical' ? 'bg-green-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
                               📍 Physical / On-site
                             </button>
                           </div>
@@ -1713,22 +1713,22 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
                         {/* Date */}
                         <div>
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Date *</label>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1.5">Date *</label>
                           <input type="date" value={schedForm.scheduledDate}
                             min={new Date().toISOString().split('T')[0]}
                             onChange={e => { setS('scheduledDate', e.target.value); setS('scheduledTime', ''); }}
-                            className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent ${schedForm.scheduledDate && isDateBlocked(schedForm.scheduledDate) ? 'border-red-400 bg-red-50' : 'border-navy-200'}`} />
+                            className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent ${schedForm.scheduledDate && isDateBlocked(schedForm.scheduledDate) ? 'border-red-400 bg-red-50' : 'border-slate-200'}`} />
                           {schedForm.scheduledDate && isDateBlocked(schedForm.scheduledDate) && (
                             <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(schedForm.scheduledDate) === 0 ? 'Sundays not available' : 'Public holiday'} — choose another date.</p>
                           )}
                           {schedForm.scheduledDate && getDayOfWeek(schedForm.scheduledDate) === 6 && !isDateBlocked(schedForm.scheduledDate) && (
-                            <p className="mt-1 text-xs text-amber-600">⚠️ Saturday — 8:00 AM–1:00 PM only.</p>
+                            <p className="mt-1 text-xs text-red-600">⚠️ Saturday — 8:00 AM–1:00 PM only.</p>
                           )}
                         </div>
 
                         {/* Time slots */}
                         <div>
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">Time *</label>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1.5">Time *</label>
                           {schedForm.scheduledDate && !isDateBlocked(schedForm.scheduledDate) && schedSlots.length > 0 ? (
                             <div className="grid grid-cols-3 gap-1.5 max-h-32 overflow-y-auto pr-1">
                               {schedSlots.map(s => (
@@ -1738,33 +1738,33 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                                   title={s.blocked ? 'Already booked' : ''}
                                   className={`rounded-lg py-1.5 text-xs font-medium transition border ${
                                     s.blocked
-                                      ? 'border-navy-100 bg-navy-100 text-navy-300 cursor-not-allowed line-through'
+                                      ? 'border-slate-100 bg-slate-100 text-slate-300 cursor-not-allowed line-through'
                                       : schedForm.scheduledTime === s.value
                                         ? 'border-accent bg-accent text-white'
-                                        : 'border-navy-200 bg-white text-navy-700 hover:border-accent hover:bg-accent/5'
+                                        : 'border-slate-200 bg-white text-slate-700 hover:border-accent hover:bg-accent/5'
                                   }`}>
                                   {s.label}
                                 </button>
                               ))}
                             </div>
                           ) : (
-                            <p className="text-xs text-navy-400 italic">Select a date first</p>
+                            <p className="text-xs text-slate-400 italic">Select a date first</p>
                           )}
                         </div>
 
                         {/* Location (physical only) */}
                         {schedForm.demoType === 'physical' && (
                           <div className="sm:col-span-2">
-                            <label className="block text-xs font-semibold text-navy-600 mb-1.5">Location / Address *</label>
+                            <label className="block text-xs font-semibold text-slate-600 mb-1.5">Location / Address *</label>
                             <input value={schedForm.demoLocation} onChange={e => setS('demoLocation', e.target.value)}
                               placeholder="e.g. Client's office — Moi Avenue, Nairobi"
-                              className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                           </div>
                         )}
 
                         {/* Optimum staff member (required) */}
                         <div className="sm:col-span-2">
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5"><User className="h-3 w-3 inline mr-1" />Optimum Staff *</label>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1.5"><User className="h-3 w-3 inline mr-1" />Optimum Staff *</label>
                           <select value={schedForm.teamMemberName} onChange={e => {
                             const selected = OPTIMUM_STAFF.find(s => s.name === e.target.value);
                             if (selected) {
@@ -1772,7 +1772,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                               setS('teamMemberPhone', selected.phone);
                             }
                           }}
-                            className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent">
+                            className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent">
                             <option value="">Select a staff member</option>
                             {OPTIMUM_STAFF.map(s => (
                               <option key={s.email} value={s.name}>{s.name} • {s.phone}</option>
@@ -1782,21 +1782,21 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
                         {/* Optional Tally Solutions staff */}
                         <div className="sm:col-span-2 space-y-2">
-                          <label className="block text-xs font-semibold text-navy-600">Tally Solutions Staff (optional, max 2)</label>
+                          <label className="block text-xs font-semibold text-slate-600">Tally Solutions Staff (optional, max 2)</label>
                           <input value={schedForm.tallyStaff1} onChange={e => setS('tallyStaff1', e.target.value)}
                             placeholder="Name or contact (optional)"
-                            className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                            className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                           <input value={schedForm.tallyStaff2} onChange={e => setS('tallyStaff2', e.target.value)}
                             placeholder="Name or contact (optional)"
-                            className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                            className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
                         </div>
 
                         {/* Notes */}
                         <div className="sm:col-span-2">
-                          <label className="block text-xs font-semibold text-navy-600 mb-1.5">What's this about? <span className="font-normal text-navy-400">(purpose)</span></label>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1.5">What's this about? <span className="font-normal text-slate-400">(purpose)</span></label>
                           <textarea value={schedForm.demoNotes} onChange={e => setS('demoNotes', e.target.value)}
                             placeholder="e.g. Product demo · buying an add-on · paying for implementation · training / support"
-                            rows={2} className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
+                            rows={2} className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none" />
                         </div>
                       </div>
 
@@ -1809,7 +1809,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                             : <><Send className="h-4 w-4" /> Confirm & Send {schedForm.demoType === 'online' ? 'Meet Link' : 'Location'}</>}
                         </button>
                         <button onClick={() => setSchedulingId(null)}
-                          className="rounded-xl border border-navy-200 px-4 py-3 text-sm font-medium text-navy-600 hover:bg-navy-50 transition">
+                          className="rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">
                           Cancel
                         </button>
                       </div>
@@ -1817,7 +1817,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                     </div>
                   )}
 
-                  <p className="text-[10px] text-navy-400">Submitted: {new Date(l.createdAt).toLocaleString()}</p>
+                  <p className="text-[10px] text-slate-400">Submitted: {new Date(l.createdAt).toLocaleString()}</p>
                 </div>
               )}
             </div>

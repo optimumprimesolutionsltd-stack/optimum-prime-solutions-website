@@ -133,19 +133,19 @@ export default function BookDemoManager() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-bold text-navy-900">Book a Client Demo</h2>
-          <p className="text-sm text-navy-500 mt-0.5">Schedule a TallyPrime demo and notify all parties automatically</p>
+          <h2 className="text-xl font-bold text-slate-900">Book a Client Demo</h2>
+          <p className="text-sm text-slate-500 mt-0.5">Schedule a TallyPrime demo and notify all parties automatically</p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={() => setView('book')}
-            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${view === 'book' ? 'bg-accent text-white' : 'bg-navy-100 text-navy-600 hover:bg-navy-200'}`}
+            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${view === 'book' ? 'bg-accent text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
           >
             <Plus className="h-4 w-4 inline mr-1.5" />Book Demo
           </button>
           <button
             onClick={() => setView('list')}
-            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${view === 'list' ? 'bg-accent text-white' : 'bg-navy-100 text-navy-600 hover:bg-navy-200'}`}
+            className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${view === 'list' ? 'bg-accent text-white' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}`}
           >
             <CalendarDays className="h-4 w-4 inline mr-1.5" />Scheduled ({demos.filter(d => d.status === 'scheduled').length})
           </button>
@@ -172,65 +172,65 @@ export default function BookDemoManager() {
         <div className="space-y-6 pb-20">
         <div className="grid gap-6 lg:grid-cols-2">
           {/* Client Details */}
-          <div className="rounded-2xl border border-navy-200 bg-white p-6 space-y-4">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
             <div className="flex items-center gap-2 mb-2">
               <div className="h-8 w-8 rounded-xl bg-blue-50 flex items-center justify-center">
                 <User className="h-4 w-4 text-blue-600" />
               </div>
-              <h3 className="font-bold text-navy-900">Client Details</h3>
+              <h3 className="font-bold text-slate-900">Client Details</h3>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-navy-600 mb-1.5">Client Name *</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Client Name *</label>
               <input
                 type="text"
                 value={form.clientName}
                 onChange={e => set('clientName', e.target.value)}
                 placeholder="e.g. John Kamau"
-                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
               />
             </div>
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-navy-600 mb-1.5">Phone Number *</label>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">Phone Number *</label>
                 <input
                   type="tel"
                   value={form.clientPhone}
                   onChange={e => set('clientPhone', e.target.value)}
                   placeholder="+254 7XX XXX XXX"
-                  className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
                 />
               </div>
               <div>
-                <label className="block text-xs font-semibold text-navy-600 mb-1.5">Email (optional)</label>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">Email (optional)</label>
                 <input
                   type="email"
                   value={form.clientEmail}
                   onChange={e => set('clientEmail', e.target.value)}
                   placeholder="john@company.co.ke"
-                  className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-navy-600 mb-1.5">Company Name *</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Company Name *</label>
               <input
                 type="text"
                 value={form.clientCompany}
                 onChange={e => set('clientCompany', e.target.value)}
                 placeholder="e.g. ABC Ltd"
-                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-navy-600 mb-1.5">Industry *</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Industry *</label>
               <select
                 value={form.clientIndustry}
                 onChange={e => set('clientIndustry', e.target.value)}
-                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-white"
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-white"
               >
                 <option value="">Select industry...</option>
                 {INDUSTRIES.map(i => <option key={i} value={i}>{i}</option>)}
@@ -240,25 +240,25 @@ export default function BookDemoManager() {
 
           {/* Demo Details */}
           <div className="space-y-6">
-            <div className="rounded-2xl border border-navy-200 bg-white p-6 space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
               <div className="flex items-center gap-2 mb-2">
                 <div className="h-8 w-8 rounded-xl bg-purple-50 flex items-center justify-center">
                   <CalendarDays className="h-4 w-4 text-purple-600" />
                 </div>
-                <h3 className="font-bold text-navy-900">Demo Schedule</h3>
+                <h3 className="font-bold text-slate-900">Demo Schedule</h3>
               </div>
 
               {/* Demo Type Toggle */}
               <div>
-                <label className="block text-xs font-semibold text-navy-600 mb-1.5">Demo Type *</label>
-                <div className="flex rounded-xl overflow-hidden border border-navy-200">
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">Demo Type *</label>
+                <div className="flex rounded-xl overflow-hidden border border-slate-200">
                   <button
                     type="button"
                     onClick={() => set('demoType', 'online')}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold transition ${
                       form.demoType === 'online'
                         ? 'bg-blue-600 text-white'
-                        : 'bg-white text-navy-600 hover:bg-navy-50'
+                        : 'bg-white text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     <span>💻</span> Online (Google Meet)
@@ -266,10 +266,10 @@ export default function BookDemoManager() {
                   <button
                     type="button"
                     onClick={() => set('demoType', 'physical')}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold transition border-l border-navy-200 ${
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-sm font-semibold transition border-l border-slate-200 ${
                       form.demoType === 'physical'
                         ? 'bg-green-600 text-white'
-                        : 'bg-white text-navy-600 hover:bg-navy-50'
+                        : 'bg-white text-slate-600 hover:bg-slate-50'
                     }`}
                   >
                     <span>📍</span> Physical / On-site
@@ -280,102 +280,102 @@ export default function BookDemoManager() {
               {/* Location field — only for physical demos */}
               {form.demoType === 'physical' && (
                 <div>
-                  <label className="block text-xs font-semibold text-navy-600 mb-1.5">Location / Address *</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Location / Address *</label>
                   <input
                     type="text"
                     value={form.demoLocation}
                     onChange={e => set('demoLocation', e.target.value)}
                     placeholder="e.g. Client's office — Moi Avenue, Nairobi"
-                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
                   />
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-navy-600 mb-1.5">Date *</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Date *</label>
                   <input
                     type="date"
                     value={form.demoDate}
                     min={new Date().toISOString().split('T')[0]}
                     onChange={e => set('demoDate', e.target.value)}
-                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-navy-600 mb-1.5">Time *</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Time *</label>
                   <input
                     type="time"
                     value={form.demoTime}
                     onChange={e => set('demoTime', e.target.value)}
-                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-navy-600 mb-1.5">Notes (optional)</label>
+                <label className="block text-xs font-semibold text-slate-600 mb-1.5">Notes (optional)</label>
                 <textarea
                   value={form.demoNotes}
                   onChange={e => set('demoNotes', e.target.value)}
                   placeholder="e.g. Client is interested in manufacturing module. Met at Ruiru expo."
                   rows={3}
-                  className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent resize-none"
                 />
               </div>
             </div>
 
             {/* Team Member */}
-            <div className="rounded-2xl border border-navy-200 bg-white p-6 space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 space-y-4">
               <div className="flex items-center gap-2 mb-2">
                 <div className="h-8 w-8 rounded-xl bg-green-50 flex items-center justify-center">
                   <Building2 className="h-4 w-4 text-green-600" />
                 </div>
-                <h3 className="font-bold text-navy-900">Team Member(s)</h3>
+                <h3 className="font-bold text-slate-900">Team Member(s)</h3>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-navy-600 mb-1.5">Your Name *</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Your Name *</label>
                   <input
                     type="text"
                     value={form.teamMemberName}
                     onChange={e => set('teamMemberName', e.target.value)}
                     placeholder="Your name"
-                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-navy-600 mb-1.5">Your Phone *</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Your Phone *</label>
                   <input
                     type="tel"
                     value={form.teamMemberPhone}
                     onChange={e => set('teamMemberPhone', e.target.value)}
                     placeholder="+254 7XX XXX XXX"
-                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-navy-600 mb-1.5">2nd Member (optional)</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">2nd Member (optional)</label>
                   <input
                     type="text"
                     value={form.teamMember2Name}
                     onChange={e => set('teamMember2Name', e.target.value)}
                     placeholder="Name"
-                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-navy-600 mb-1.5">2nd Member Phone</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">2nd Member Phone</label>
                   <input
                     type="tel"
                     value={form.teamMember2Phone}
                     onChange={e => set('teamMember2Phone', e.target.value)}
                     placeholder="+254 7XX XXX XXX"
-                    className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
                   />
                 </div>
               </div>
@@ -383,12 +383,12 @@ export default function BookDemoManager() {
           </div>
 
           {/* Notification Preferences */}
-          <div className="rounded-2xl border border-navy-200 bg-white p-6 lg:col-span-2">
+          <div className="rounded-2xl border border-slate-200 bg-white p-6 lg:col-span-2">
             <div className="flex items-center gap-2 mb-4">
-              <div className="h-8 w-8 rounded-xl bg-orange-50 flex items-center justify-center">
-                <Send className="h-4 w-4 text-orange-600" />
+              <div className="h-8 w-8 rounded-xl bg-red-50 flex items-center justify-center">
+                <Send className="h-4 w-4 text-red-600" />
               </div>
-              <h3 className="font-bold text-navy-900">Notifications</h3>
+              <h3 className="font-bold text-slate-900">Notifications</h3>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
@@ -456,42 +456,42 @@ export default function BookDemoManager() {
       )}
 
       {view === 'list' && (
-        <div className="rounded-2xl border border-navy-200 bg-white overflow-hidden">
+        <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
           {demos.length === 0 ? (
             <div className="py-16 text-center">
-              <CalendarDays className="h-10 w-10 text-navy-300 mx-auto mb-3" />
-              <p className="text-sm font-semibold text-navy-500">No demos booked yet</p>
-              <p className="text-xs text-navy-400 mt-1">Demos you book will appear here</p>
+              <CalendarDays className="h-10 w-10 text-slate-300 mx-auto mb-3" />
+              <p className="text-sm font-semibold text-slate-500">No demos booked yet</p>
+              <p className="text-xs text-slate-400 mt-1">Demos you book will appear here</p>
               <button onClick={() => setView('book')} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-accent text-white px-5 py-2.5 text-sm font-semibold">
                 <Plus className="h-4 w-4" /> Book First Demo
               </button>
             </div>
           ) : (
             <table className="w-full text-sm">
-              <thead className="bg-navy-50 border-b border-navy-200">
+              <thead className="bg-slate-50 border-b border-slate-200">
                 <tr>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-navy-500 uppercase tracking-wide">Client</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-navy-500 uppercase tracking-wide">Company</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-navy-500 uppercase tracking-wide">Date & Time</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-navy-500 uppercase tracking-wide">Team</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-navy-500 uppercase tracking-wide">Status</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Client</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Company</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Date & Time</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Team</th>
+                  <th className="text-left px-5 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">Status</th>
                   <th className="px-5 py-3" />
                 </tr>
               </thead>
-              <tbody className="divide-y divide-navy-100">
+              <tbody className="divide-y divide-slate-100">
                 {demos.map(demo => (
-                  <tr key={demo.id} className="hover:bg-navy-50/50 transition">
+                  <tr key={demo.id} className="hover:bg-slate-50/50 transition">
                     <td className="px-5 py-4">
-                      <p className="font-semibold text-navy-900">{demo.clientName}</p>
-                      <p className="text-xs text-navy-400">{demo.clientPhone}</p>
+                      <p className="font-semibold text-slate-900">{demo.clientName}</p>
+                      <p className="text-xs text-slate-400">{demo.clientPhone}</p>
                     </td>
                     <td className="px-5 py-4">
-                      <p className="text-navy-700">{demo.clientCompany}</p>
-                      <p className="text-xs text-navy-400">{demo.clientIndustry}</p>
+                      <p className="text-slate-700">{demo.clientCompany}</p>
+                      <p className="text-xs text-slate-400">{demo.clientIndustry}</p>
                     </td>
                     <td className="px-5 py-4">
-                      <p className="font-medium text-navy-800">{new Date(demo.demoDate).toLocaleDateString('en-KE', { weekday: 'short', day: 'numeric', month: 'short' })}</p>
-                      <p className="text-xs text-navy-400">{demo.demoTime}</p>
+                      <p className="font-medium text-slate-800">{new Date(demo.demoDate).toLocaleDateString('en-KE', { weekday: 'short', day: 'numeric', month: 'short' })}</p>
+                      <p className="text-xs text-slate-400">{demo.demoTime}</p>
                       <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                         demo.demoType === 'online' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'
                       }`}>
@@ -499,8 +499,8 @@ export default function BookDemoManager() {
                       </span>
                     </td>
                     <td className="px-5 py-4">
-                      <p className="text-navy-700">{demo.teamMemberName}</p>
-                      {demo.teamMember2Name && <p className="text-xs text-navy-400">+ {demo.teamMember2Name}</p>}
+                      <p className="text-slate-700">{demo.teamMemberName}</p>
+                      {demo.teamMember2Name && <p className="text-xs text-slate-400">+ {demo.teamMember2Name}</p>}
                     </td>
                     <td className="px-5 py-4">
                       <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-semibold capitalize ${statusColor(demo.status)}`}>

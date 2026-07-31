@@ -145,8 +145,8 @@ export default function SubscribersManager() {
     <div className="mx-auto max-w-3xl space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-xl font-bold text-navy-900">Newsletter Subscribers</h2>
-          <p className="text-sm text-navy-500 mt-0.5">Everyone who gets "Notify Subscribers" blog emails via Resend</p>
+          <h2 className="text-xl font-bold text-slate-900">Newsletter Subscribers</h2>
+          <p className="text-sm text-slate-500 mt-0.5">Everyone who gets "Notify Subscribers" blog emails via Resend</p>
         </div>
         <div className="flex items-center gap-2">
           <button onClick={() => setShowBroadcast(v => !v)}
@@ -155,7 +155,7 @@ export default function SubscribersManager() {
             <Megaphone className="h-4 w-4" /> Send Broadcast
           </button>
           <button onClick={exportCSV} disabled={deduped.length === 0}
-            className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-40">
             <Download className="h-4 w-4" /> Export CSV
           </button>
         </div>
@@ -165,25 +165,25 @@ export default function SubscribersManager() {
       {showBroadcast && (
         <div className="rounded-2xl border p-5 space-y-3" style={{ borderColor: '#C0392B4D', backgroundColor: '#C0392B0D' }}>
           <div className="flex items-center justify-between">
-            <p className="text-sm font-bold text-navy-900">Send a custom email to subscribers</p>
-            <span className="text-xs text-navy-500">{activeCount} active recipient{activeCount === 1 ? '' : 's'}</span>
+            <p className="text-sm font-bold text-slate-900">Send a custom email to subscribers</p>
+            <span className="text-xs text-slate-500">{activeCount} active recipient{activeCount === 1 ? '' : 's'}</span>
           </div>
           <input
             value={bSubject}
             onChange={e => { setBSubject(e.target.value); if (bState === 'error') setBState('idle'); }}
             placeholder="Subject line"
-            className="w-full rounded-lg border border-navy-200 px-3 py-2.5 text-sm outline-none focus:border-accent"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-accent"
           />
           <textarea
             value={bBody}
             onChange={e => { setBBody(e.target.value); if (bState === 'error') setBState('idle'); }}
             placeholder="Write your message... Leave a blank line between paragraphs."
             rows={6}
-            className="w-full rounded-lg border border-navy-200 px-3 py-2.5 text-sm outline-none focus:border-accent resize-y"
+            className="w-full rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-accent resize-y"
           />
           <div className="flex items-center gap-3">
             <button onClick={sendBroadcast} disabled={bState === 'sending' || activeCount === 0}
-              className="flex items-center gap-2 rounded-lg bg-navy-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-navy-800 transition disabled:opacity-50 disabled:cursor-not-allowed">
+              className="flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-slate-800 transition disabled:opacity-50 disabled:cursor-not-allowed">
               {bState === 'sending' ? <Loader className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
               {bState === 'sending' ? 'Sending...' : `Send to ${activeCount} subscriber${activeCount === 1 ? '' : 's'}`}
             </button>
@@ -195,66 +195,66 @@ export default function SubscribersManager() {
             )}
           </div>
           {activeCount === 0 && (
-            <p className="text-xs text-navy-500">No active subscribers to send to.</p>
+            <p className="text-xs text-slate-500">No active subscribers to send to.</p>
           )}
         </div>
       )}
 
       {/* Add subscriber */}
-      <div className="rounded-2xl border border-navy-200 bg-white p-4">
-        <p className="text-xs font-bold text-navy-500 uppercase tracking-wider mb-2">Add subscriber manually</p>
+      <div className="rounded-2xl border border-slate-200 bg-white p-4">
+        <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Add subscriber manually</p>
         <div className="flex gap-2">
           <input
             value={newName}
             onChange={e => setNewName(e.target.value)}
             onKeyDown={e => { if (e.key === 'Enter') addSubscriber(); }}
             placeholder="Name (optional)"
-            className="w-40 shrink-0 rounded-lg border border-navy-200 px-3 py-2.5 text-sm outline-none focus:border-accent"
+            className="w-40 shrink-0 rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-accent"
           />
           <input
             value={newEmail}
             onChange={e => { setNewEmail(e.target.value); setAddError(''); }}
             onKeyDown={e => { if (e.key === 'Enter') addSubscriber(); }}
             placeholder="someone@company.com"
-            className="flex-1 rounded-lg border border-navy-200 px-3 py-2.5 text-sm outline-none focus:border-accent"
+            className="flex-1 rounded-lg border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-accent"
           />
           <button onClick={addSubscriber}
-            className="flex items-center gap-1.5 rounded-lg bg-navy-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-navy-800 transition shrink-0">
+            className="flex items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition shrink-0">
             <Plus className="h-4 w-4" /> Add
           </button>
         </div>
         {addError && <p className="mt-1.5 text-xs text-red-600">{addError}</p>}
-        <p className="mt-1.5 text-xs text-navy-500">They won't get a welcome email — this just adds them to future blog-post broadcasts.</p>
+        <p className="mt-1.5 text-xs text-slate-500">They won't get a welcome email — this just adds them to future blog-post broadcasts.</p>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-3">
-        <div className="rounded-xl bg-navy-50 p-3 text-center">
-          <p className="text-xl font-bold text-navy-700">{deduped.length}</p>
-          <p className="text-[10px] font-medium text-navy-700">Total</p>
+        <div className="rounded-xl bg-slate-50 p-3 text-center">
+          <p className="text-xl font-bold text-slate-700">{deduped.length}</p>
+          <p className="text-[10px] font-medium text-slate-700">Total</p>
         </div>
         <div className="rounded-xl bg-green-50 p-3 text-center">
           <p className="text-xl font-bold text-green-700">{activeCount}</p>
           <p className="text-[10px] font-medium text-green-700">Active</p>
         </div>
-        <div className="rounded-xl bg-navy-50 p-3 text-center">
-          <p className="text-xl font-bold text-navy-500">{unsubCount}</p>
-          <p className="text-[10px] font-medium text-navy-500">Unsubscribed</p>
+        <div className="rounded-xl bg-slate-50 p-3 text-center">
+          <p className="text-xl font-bold text-slate-500">{unsubCount}</p>
+          <p className="text-[10px] font-medium text-slate-500">Unsubscribed</p>
         </div>
       </div>
 
       {/* Search + filter */}
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-400" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
           <input value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Search by email..."
-            className="w-full rounded-lg border border-navy-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
+            className="w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
         </div>
-        <div className="flex rounded-lg border border-navy-200 overflow-hidden">
+        <div className="flex rounded-lg border border-slate-200 overflow-hidden">
           {(['active', 'unsubscribed', 'all'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={`px-3 py-2 text-xs font-semibold capitalize transition ${filter === f ? 'bg-navy-900 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+              className={`px-3 py-2 text-xs font-semibold capitalize transition ${filter === f ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
               {f}
             </button>
           ))}
@@ -263,16 +263,16 @@ export default function SubscribersManager() {
 
       {/* List */}
       {!loaded ? (
-        <div className="rounded-2xl border border-navy-200 bg-white py-16 text-center">
-          <p className="text-sm font-medium text-navy-500">Loading subscribers…</p>
+        <div className="rounded-2xl border border-slate-200 bg-white py-16 text-center">
+          <p className="text-sm font-medium text-slate-500">Loading subscribers…</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-navy-200 bg-white py-16 text-center">
-          <UsersIcon className="mx-auto h-10 w-10 text-navy-300" />
-          <p className="mt-3 text-sm font-medium text-navy-500">
+        <div className="rounded-2xl border border-slate-200 bg-white py-16 text-center">
+          <UsersIcon className="mx-auto h-10 w-10 text-slate-300" />
+          <p className="mt-3 text-sm font-medium text-slate-500">
             {deduped.length === 0 ? 'No subscribers yet' : 'No subscribers match your search'}
           </p>
-          <p className="mt-1 text-xs text-navy-400">
+          <p className="mt-1 text-xs text-slate-400">
             {deduped.length === 0
               ? 'Newsletter signups from the website will appear here.'
               : 'Try a different search or filter.'}
@@ -281,28 +281,28 @@ export default function SubscribersManager() {
       ) : (
         <div className="space-y-2">
           {filtered.map(s => (
-            <div key={s.id} className="flex items-center gap-3 rounded-xl border border-navy-200 bg-white p-3.5">
-              <div className={`h-9 w-9 rounded-full flex items-center justify-center shrink-0 ${s.status === 'unsubscribed' ? 'bg-navy-100' : 'bg-green-100'}`}>
-                <Mail className={`h-4 w-4 ${s.status === 'unsubscribed' ? 'text-navy-400' : 'text-green-600'}`} />
+            <div key={s.id} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3.5">
+              <div className={`h-9 w-9 rounded-full flex items-center justify-center shrink-0 ${s.status === 'unsubscribed' ? 'bg-slate-100' : 'bg-green-100'}`}>
+                <Mail className={`h-4 w-4 ${s.status === 'unsubscribed' ? 'text-slate-400' : 'text-green-600'}`} />
               </div>
               <div className="flex-1 min-w-0">
                 {s.name
                   ? <>
-                      <p className="text-sm font-medium text-navy-900 truncate">{s.name}</p>
-                      <p className="text-xs text-navy-500 truncate">{s.email}</p>
+                      <p className="text-sm font-medium text-slate-900 truncate">{s.name}</p>
+                      <p className="text-xs text-slate-500 truncate">{s.email}</p>
                     </>
-                  : <p className="text-sm font-medium text-navy-900 truncate">{s.email}</p>
+                  : <p className="text-sm font-medium text-slate-900 truncate">{s.email}</p>
                 }
-                <p className="text-[10px] text-navy-400">{new Date(s.subscribedAt).toLocaleDateString()}</p>
+                <p className="text-[10px] text-slate-400">{new Date(s.subscribedAt).toLocaleDateString()}</p>
               </div>
               <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold whitespace-nowrap ${
-                s.status === 'unsubscribed' ? 'bg-navy-100 text-navy-500' : 'bg-green-100 text-green-700'
+                s.status === 'unsubscribed' ? 'bg-slate-100 text-slate-500' : 'bg-green-100 text-green-700'
               }`}>
                 {s.status === 'unsubscribed' ? 'Unsubscribed' : 'Active'}
               </span>
               <button onClick={() => toggleStatus(s)}
                 title={s.status === 'unsubscribed' ? 'Reactivate' : 'Mark unsubscribed'}
-                className="rounded-lg p-1.5 text-navy-400 hover:bg-navy-50 transition shrink-0">
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-50 transition shrink-0">
                 {s.status === 'unsubscribed' ? <UserCheck className="h-4 w-4" /> : <UserX className="h-4 w-4" />}
               </button>
               <button onClick={() => removeSubscriber(s.id)}

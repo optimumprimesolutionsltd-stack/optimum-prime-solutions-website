@@ -117,8 +117,8 @@ export default function AdminLayout({ onLogout }: Props) {
             onClick={() => { setTab(t.id); if (mobile) setSidebar(false); }}
             className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all ${
               isActive
-                ? 'bg-navy-800 text-white shadow-lg shadow-navy-900/20'
-                : 'text-navy-300 hover:bg-navy-800'
+                ? 'bg-slate-800 text-white shadow-lg shadow-slate-900/20'
+                : 'text-slate-300 hover:bg-slate-800'
             }`}
           >
             <Icon className="h-4 w-4 shrink-0" />
@@ -135,25 +135,25 @@ export default function AdminLayout({ onLogout }: Props) {
   );
 
   return (
-    <div className="flex h-screen bg-navy-50">
+    <div className="flex h-screen" style={{ background: 'radial-gradient(circle at top right, rgba(239, 68, 68, 0.08), transparent 16%), radial-gradient(circle at bottom left, rgba(239, 68, 68, 0.04), transparent 24%), #f8fafc' }}>
       {/* Desktop Sidebar */}
-      <aside className="hidden w-[260px] flex-col border-r border-navy-200 bg-white lg:flex">
-        <div className="h-16 flex items-center gap-3 border-b border-navy-100 px-5 shrink-0">
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-accent to-navy-800 flex items-center justify-center font-black text-xs text-white shadow-lg shadow-accent/20">OP</div>
+      <aside className="hidden w-[260px] flex-col border-r border-slate-300 bg-white lg:flex">
+        <div className="h-16 flex items-center gap-3 border-b border-slate-200 px-5 shrink-0">
+          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-red-600 to-slate-900 flex items-center justify-center font-black text-xs text-white shadow-lg shadow-red-600/20">OP</div>
           <div>
-            <p className="text-sm font-bold text-navy-900">Admin Panel</p>
-            <p className="text-[9px] uppercase tracking-[.15em] font-semibold text-accent">Content Manager</p>
+            <p className="text-sm font-bold text-slate-900">Admin Panel</p>
+            <p className="text-[9px] uppercase tracking-[.15em] font-semibold text-red-600">Content Manager</p>
           </div>
         </div>
 
         <SidebarNav />
 
-        <div className="border-t border-navy-100 p-3 space-y-0.5 shrink-0">
-          <a href="/" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-navy-600 hover:bg-navy-50 transition">
+        <div className="border-t border-slate-100 p-3 space-y-0.5 shrink-0">
+          <a href="/" className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">
             <ExternalLink className="h-4 w-4" />View Website
           </a>
           <button onClick={handleReset} title="Erases ALL content — requires typing RESET to confirm"
-            className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-navy-300 hover:text-orange-600 hover:bg-orange-50/60 transition">
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-slate-300 hover:text-red-600 hover:bg-red-50/60 transition">
             <RotateCcw className="h-3 w-3" />Reset to defaults
           </button>
           <button onClick={onLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition">
@@ -167,22 +167,22 @@ export default function AdminLayout({ onLogout }: Props) {
         <div className="fixed inset-0 z-50 flex lg:hidden">
           <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setSidebar(false)} />
           <aside className="relative w-72 bg-white flex flex-col shadow-2xl">
-            <div className="h-16 flex items-center justify-between border-b border-navy-100 px-5 shrink-0">
+            <div className="h-16 flex items-center justify-between border-b border-slate-100 px-5 shrink-0">
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-lg bg-accent flex items-center justify-center font-black text-xs text-white">OP</div>
                 <div>
-                  <p className="text-sm font-bold text-navy-900">Admin Panel</p>
+                  <p className="text-sm font-bold text-slate-900">Admin Panel</p>
                   <p className="text-[9px] uppercase tracking-[.15em] font-semibold text-accent">Content Manager</p>
                 </div>
               </div>
-              <button onClick={() => setSidebar(false)} className="rounded-lg p-1.5 hover:bg-navy-50 transition">
-                <X className="h-5 w-5 text-navy-400" />
+              <button onClick={() => setSidebar(false)} className="rounded-lg p-1.5 hover:bg-slate-50 transition">
+                <X className="h-5 w-5 text-slate-400" />
               </button>
             </div>
             <SidebarNav mobile />
-            <div className="border-t border-navy-100 p-3 space-y-0.5 shrink-0">
+            <div className="border-t border-slate-100 p-3 space-y-0.5 shrink-0">
               <button onClick={handleReset} title="Erases ALL content — requires typing RESET to confirm"
-                className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-navy-300 hover:text-orange-600 hover:bg-orange-50/60">
+                className="flex w-full items-center justify-center gap-1.5 rounded-lg px-3 py-1.5 text-[11px] font-medium text-slate-300 hover:text-red-600 hover:bg-red-50/60">
                 <RotateCcw className="h-3 w-3" />Reset to defaults
               </button>
               <button onClick={onLogout} className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50">
@@ -195,14 +195,14 @@ export default function AdminLayout({ onLogout }: Props) {
 
       {/* Main Content */}
       <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="h-16 flex items-center justify-between border-b border-navy-200 bg-white px-4 lg:px-8 shrink-0">
+        <header className="h-16 flex items-center justify-between border-b border-slate-200 bg-white px-4 lg:px-8 shrink-0">
           <div className="flex items-center gap-3">
-            <button onClick={() => setSidebar(true)} className="rounded-lg p-1.5 text-navy-500 hover:bg-navy-50 lg:hidden">
+            <button onClick={() => setSidebar(true)} className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-50 lg:hidden">
               <Menu className="h-5 w-5" />
             </button>
             <div>
-              <h1 className="text-base font-bold text-navy-900">{tabs.find(t => t.id === tab)?.label}</h1>
-              <p className="text-[10px] text-navy-400">Changes save to browser storage</p>
+              <h1 className="text-base font-bold text-slate-900">{tabs.find(t => t.id === tab)?.label}</h1>
+              <p className="text-[10px] text-slate-400">Changes save to browser storage</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -212,7 +212,7 @@ export default function AdminLayout({ onLogout }: Props) {
                 {newLeads} new lead{newLeads > 1 ? 's' : ''}
               </button>
             )}
-            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-navy-700 to-navy-900 flex items-center justify-center text-xs font-bold text-white">A</div>
+            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center text-xs font-bold text-white">A</div>
           </div>
         </header>
 
@@ -223,7 +223,7 @@ export default function AdminLayout({ onLogout }: Props) {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 rounded-xl bg-navy-900 px-5 py-3 text-sm font-medium text-white shadow-2xl flex items-center gap-2">
+        <div className="fixed bottom-6 right-6 z-50 rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white shadow-2xl flex items-center gap-2">
           <span className="h-5 w-5 rounded-full bg-accent flex items-center justify-center text-[10px]">✓</span>
           {toast}
         </div>

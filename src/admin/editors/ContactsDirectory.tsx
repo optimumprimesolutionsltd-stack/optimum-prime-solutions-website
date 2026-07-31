@@ -144,48 +144,48 @@ export default function ContactsDirectory({ leads, subscribers, whatsappContacts
     <div className="mx-auto max-w-6xl space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-xl font-bold text-navy-900">Unified Contacts Directory</h2>
-          <p className="text-sm text-navy-500 mt-0.5">
+          <h2 className="text-xl font-bold text-slate-900">Unified Contacts Directory</h2>
+          <p className="text-sm text-slate-500 mt-0.5">
             {unifiedContacts.length} unique contacts merged from leads, subscribers & WhatsApp
           </p>
         </div>
         <button
           onClick={exportCSV}
           disabled={filtered.length === 0}
-          className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40"
+          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-40"
         >
           <Download className="h-4 w-4" /> Export CSV
         </button>
       </div>
 
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder="Search by name, email, or phone..."
-          className="w-full rounded-lg border border-navy-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent"
+          className="w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent"
         />
       </div>
 
-      <div className="rounded-lg border border-navy-200 bg-white overflow-x-auto">
+      <div className="rounded-lg border border-slate-200 bg-white overflow-x-auto">
         <table className="w-full">
           <thead>
-            <tr className="border-b border-navy-200 bg-navy-50">
-              <th className="px-4 py-3 text-left text-xs font-semibold text-navy-600">Name</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-navy-600">Email</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-navy-600">Phone</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-navy-600">Sources</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-navy-600">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-semibold text-navy-600">Last Interaction</th>
+            <tr className="border-b border-slate-200 bg-slate-50">
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Name</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Email</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Phone</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Sources</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Status</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Last Interaction</th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((contact, i) => (
-              <tr key={i} className="border-b border-navy-100 hover:bg-navy-50 transition">
-                <td className="px-4 py-3 text-sm font-medium text-navy-900">{contact.name}</td>
-                <td className="px-4 py-3 text-sm text-navy-600">{contact.email || '—'}</td>
-                <td className="px-4 py-3 text-sm text-navy-600">{contact.phone || '—'}</td>
+              <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition">
+                <td className="px-4 py-3 text-sm font-medium text-slate-900">{contact.name}</td>
+                <td className="px-4 py-3 text-sm text-slate-600">{contact.email || '—'}</td>
+                <td className="px-4 py-3 text-sm text-slate-600">{contact.phone || '—'}</td>
                 <td className="px-4 py-3 text-sm">
                   <div className="flex gap-1.5 flex-wrap">
                     {contact.sources.has('lead') && (
@@ -206,7 +206,7 @@ export default function ContactsDirectory({ leads, subscribers, whatsappContacts
                     <span className="text-red-600">Unsubscribed</span>
                   )}
                 </td>
-                <td className="px-4 py-3 text-sm text-navy-500">
+                <td className="px-4 py-3 text-sm text-slate-500">
                   {new Date(contact.lastInteraction).toLocaleDateString('en-GB')}
                 </td>
               </tr>
@@ -216,8 +216,8 @@ export default function ContactsDirectory({ leads, subscribers, whatsappContacts
       </div>
 
       {filtered.length === 0 && (
-        <div className="rounded-lg border border-navy-200 bg-navy-50 p-8 text-center">
-          <p className="text-sm text-navy-600">No contacts match your search.</p>
+        <div className="rounded-lg border border-slate-200 bg-slate-50 p-8 text-center">
+          <p className="text-sm text-slate-600">No contacts match your search.</p>
         </div>
       )}
     </div>
