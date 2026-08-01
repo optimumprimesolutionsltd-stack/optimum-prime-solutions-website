@@ -1,19 +1,13 @@
 import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 if (!admin.apps.length) {
   admin.initializeApp();
 }
 const db = admin.firestore();
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'optimumprimesolutionsltd@gmail.com',
-    pass: 'hmwc lzxq bdyl gmhd',
-  },
-});
+const resend = new Resend(process.env.RESEND_API_KEY || '');
 
 const ADMIN_EMAIL = 'optimumprimesolutionsltd@gmail.com';
 const WEBSITE_URL = 'https://www.optimumprimesolutions.co.ke';
@@ -28,8 +22,8 @@ export const onAccessRequestSubmitted = functions.region('europe-west1').firesto
     const { email, requestedTab } = request;
 
     try {
-      await transporter.sendMail({
-        from: ADMIN_EMAIL,
+      await resend.emails.send({
+        from: 'Optimum Prime <onboarding@resend.dev>',
         to: ADMIN_EMAIL,
         subject: `New Access Request: ${requestedTab}`,
         html: `
@@ -67,8 +61,8 @@ export const onAccessRequestApproved = functions.region('europe-west1').firestor
       const { email, requestedTab } = afterData;
 
       try {
-        await transporter.sendMail({
-          from: ADMIN_EMAIL,
+        await resend.emails.send({
+          from: 'Optimum Prime <onboarding@resend.dev>',
           to: email,
           subject: `✓ Access Approved: ${requestedTab}`,
           html: `
@@ -96,8 +90,8 @@ export const onAccessRequestApproved = functions.region('europe-west1').firestor
       const { email, requestedTab } = afterData;
 
       try {
-        await transporter.sendMail({
-          from: ADMIN_EMAIL,
+        await resend.emails.send({
+          from: 'Optimum Prime <onboarding@resend.dev>',
           to: email,
           subject: `Access Request Decision: ${requestedTab}`,
           html: `
