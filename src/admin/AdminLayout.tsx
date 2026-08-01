@@ -146,13 +146,17 @@ export default function AdminLayout({ onLogout }: Props) {
   if (!hasAccessToCurrentTab) {
     console.warn(`[SECURITY] Attempt to access restricted tab: ${tab}`);
     return (
-      <div className="flex h-screen items-center justify-center">
+      <div className="flex h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
         <div className="text-center">
-          <div className="text-4xl mb-4">🔒</div>
-          <h2 className="text-2xl font-bold text-slate-900 mb-2">Access Restricted</h2>
-          <p className="text-slate-600">You don't have permission to view this section.</p>
-          <button onClick={() => setTab('dashboard')} className="mt-4 rounded-lg bg-red-600 px-6 py-2 text-white hover:bg-red-700">
-            Go to Dashboard
+          <div className="text-6xl mb-6">🔒</div>
+          <h2 className="text-3xl font-bold text-slate-900 mb-3">Access Restricted</h2>
+          <p className="text-slate-600 mb-8 max-w-sm">You don't have permission to view this section. Please request access from an administrator.</p>
+          <button
+            type="button"
+            onClick={() => setTab('dashboard')}
+            className="inline-flex items-center gap-2 rounded-lg bg-red-600 px-8 py-3 text-white font-semibold hover:bg-red-700 active:bg-red-800 transition-colors cursor-pointer shadow-lg"
+          >
+            ← Go to Dashboard
           </button>
         </div>
       </div>
