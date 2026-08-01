@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Building2, Briefcase, ShoppingCart, Globe,
   HelpCircle, Users, FileText, Phone, MessageCircle, CalendarDays, Video,
-  LogOut, Menu, X, ExternalLink, RotateCcw, Mail
+  LogOut, Menu, X, ExternalLink, RotateCcw, Mail, Lock
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import { defaultData, type SiteData } from '../data/siteData';
 import { fbSubscribe } from '../firebase/config';
+import { submitAccessRequest } from '../firebase/accessRequests';
 import DashboardHome, { type TabId } from './DashboardHome';
 import CompanyEditor from './editors/CompanyEditor';
 import ServicesEditor from './editors/ServicesEditor';
@@ -21,24 +22,27 @@ import WhatsAppManager from './editors/WhatsAppManager';
 import WorkshopRegistrationsManager from './editors/WorkshopRegistrationsManager';
 import WebinarRegistrationsManager from './editors/WebinarRegistrationsManager';
 import SubscribersManager from './editors/SubscribersManager';
+import AccessRequestsManager from './editors/AccessRequestsManager';
 // import ContactsDirectory from './editors/ContactsDirectory';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { id: 'leads', label: 'Demo Leads', icon: Users },
+  { id: 'workshop', label: 'Workshop RSVPs', icon: CalendarDays },
+  { id: 'webinar', label: 'Webinar RSVPs', icon: Video },
+  // Restricted tabs require email approval
   { id: 'company', label: 'Company Info', icon: Building2 },
   { id: 'services', label: 'Services', icon: Briefcase },
   { id: 'products', label: 'Products & Pricing', icon: ShoppingCart },
   { id: 'industries', label: 'Industries', icon: Globe },
   { id: 'faqs', label: 'FAQ & Chatbot', icon: HelpCircle },
-  { id: 'leads', label: 'Demo Leads', icon: Users },
-  { id: 'workshop', label: 'Workshop RSVPs', icon: CalendarDays },
-  { id: 'webinar', label: 'Webinar RSVPs', icon: Video },
   { id: 'whatsapp', label: 'WhatsApp', icon: MessageCircle },
   { id: 'blogs', label: 'Blog Posts', icon: FileText },
   { id: 'subscribers', label: 'Subscribers', icon: Mail },
-  // { id: 'contacts', label: 'Unified Directory', icon: Users },
   { id: 'contact', label: 'Contact Info', icon: Phone },
   { id: 'testimonials', label: 'Reviews & Testimonials', icon: Users },
+  // Admin-only tabs
+  { id: 'access-requests', label: 'Access Requests', icon: Lock },
   // Book a Demo is now embedded inside Demo Leads tab
 ];
 
@@ -59,7 +63,8 @@ export default function AdminLayout({ onLogout }: Props) {
   const [generatedCode, setGeneratedCode] = useState('');
 
   // Access control: only these tabs are accessible by default
-  const accessibleTabs = new Set(['leads', 'workshop', 'webinar']);
+  // Admin tabs (access-requests, dashboard) are always accessible
+  const accessibleTabs = new Set(['dashboard', 'leads', 'workshop', 'webinar', 'access-requests']);
   const [showAccessRequest, setShowAccessRequest] = useState(false);
   const [requestedTab, setRequestedTab] = useState<string | null>(null);
   const [requestEmail, setRequestEmail] = useState('');
@@ -120,23 +125,23 @@ export default function AdminLayout({ onLogout }: Props) {
     }
   };
 
-  const handleRequestAccess = () => {
+  const handleRequestAccess = async () => {
     if (!requestEmail.trim()) {
       notify('Please enter your email address');
       return;
     }
 
-    const timestamp = new Date().toISOString();
-    console.log(`[AUDIT] Access request for "${requestedTab}" from ${requestEmail} at ${timestamp}`);
-
-    // Simulate approval for demo purposes
-    notify(`✓ Access request sent to admin for "${requestedTab}"`);
-
-    // In production: send email to admin for approval
-    // For now: user can request, admin approves via backend
-    setShowAccessRequest(false);
-    setRequestEmail('');
-    setRequestedTab(null);
+    try {
+      // Save request to Firebase
+      await submitAccessRequest(requestEmail, requestedTab || '');
+      notify(`✓ Access request sent to admin for "${requestedTab}"`);
+      setShowAccessRequest(false);
+      setRequestEmail('');
+      setRequestedTab(null);
+    } catch (error) {
+      console.error('Error submitting access request:', error);
+      notify('✗ Error sending request. Please try again.');
+    }
   };
 
   const newLeads = data.leads.filter(l => l.status === 'New').length;
@@ -183,6 +188,7 @@ export default function AdminLayout({ onLogout }: Props) {
       // case 'contacts': return <ContactsDirectory leads={data.leads} subscribers={[]} whatsappContacts={[]} />;
       case 'contact': return <ContactEditor data={data} onSave={d => handleSave(d, 'Contact info saved!')} />;
       case 'testimonials': return <TestimonialsEditor data={data} onSave={d => handleSave(d, 'Testimonials saved!')} />;
+      case 'access-requests': return <AccessRequestsManager />;
       case 'bookdemo': return null; // merged into leads tab
     }
   };

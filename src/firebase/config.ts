@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getDatabase, ref, get, set, onValue } from 'firebase/database';
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, type Auth, type User } from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
 
 // New Firebase project: optimum-prime-website (migrated July 2026)
 const firebaseConfig = {
@@ -16,11 +17,13 @@ const firebaseConfig = {
 
 let database: ReturnType<typeof getDatabase> | null = null;
 let auth: Auth | null = null;
+let db: ReturnType<typeof getFirestore> | null = null;
 
 try {
   const app = initializeApp(firebaseConfig);
   database = getDatabase(app);
   auth = getAuth(app);
+  db = getFirestore(app);
 } catch (error) {
   console.log('Firebase initialization deferred - config needed');
 }
@@ -88,3 +91,11 @@ export const fbSubscribe = (path: string, callback: (data: any) => void) => {
     return () => {};
   }
 };
+
+export const getDb = () => {
+  if (!db) throw new Error('Firestore not initialized');
+  return db;
+};
+
+// For direct Firestore access
+export { db };
