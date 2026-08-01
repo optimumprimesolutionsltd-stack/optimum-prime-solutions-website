@@ -2,7 +2,7 @@
   "indexes": [
     {
       "collectionGroup": "access_requests",
-      "queryScope": "Collection",
+      "queryScope": "COLLECTION",
       "fields": [
         {
           "fieldPath": "status",
@@ -16,7 +16,7 @@
     },
     {
       "collectionGroup": "access_requests",
-      "queryScope": "Collection",
+      "queryScope": "COLLECTION",
       "fields": [
         {
           "fieldPath": "email",
@@ -30,7 +30,7 @@
     },
     {
       "collectionGroup": "access_requests",
-      "queryScope": "Collection",
+      "queryScope": "COLLECTION",
       "fields": [
         {
           "fieldPath": "email",

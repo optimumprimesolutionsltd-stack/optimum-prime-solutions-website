@@ -62,13 +62,14 @@ export default function AdminLayout({ onLogout }: Props) {
   const [resetVerifyCode, setResetVerifyCode] = useState('');
   const [generatedCode, setGeneratedCode] = useState('');
 
-  // Access control: only these tabs are accessible by default
-  // Admin tabs (access-requests, dashboard) are always accessible
-  const accessibleTabs = new Set(['dashboard', 'leads', 'workshop', 'webinar', 'access-requests']);
+  // Access control: Users can only access these tabs by default
+  // Other tabs require email approval via the access request system
+  const accessibleTabs = new Set(['dashboard', 'leads', 'workshop', 'webinar']);
   const [showAccessRequest, setShowAccessRequest] = useState(false);
   const [requestedTab, setRequestedTab] = useState<string | null>(null);
   const [requestEmail, setRequestEmail] = useState('');
   const [accessApprovals, setAccessApprovals] = useState<Set<string>>(new Set());
+  const [submitStatus, setSubmitStatus] = useState<'idle' | 'sending' | 'success'>('idle');
 
   useEffect(() => {
     const unsubscribe = fbSubscribe('whatsapp_conversations', (raw: Record<string, any> | null) => {
@@ -131,16 +132,22 @@ export default function AdminLayout({ onLogout }: Props) {
       return;
     }
 
+    setSubmitStatus('sending');
     try {
       // Save request to Firebase
       await submitAccessRequest(requestEmail, requestedTab || '');
+      setSubmitStatus('success');
       notify(`✓ Access request sent to admin for "${requestedTab}"`);
-      setShowAccessRequest(false);
-      setRequestEmail('');
-      setRequestedTab(null);
+      setTimeout(() => {
+        setShowAccessRequest(false);
+        setRequestEmail('');
+        setRequestedTab(null);
+        setSubmitStatus('idle');
+      }, 1500);
     } catch (error) {
       console.error('Error submitting access request:', error);
       notify('✗ Error sending request. Please try again.');
+      setSubmitStatus('idle');
     }
   };
 
@@ -148,7 +155,7 @@ export default function AdminLayout({ onLogout }: Props) {
 
   // Safety check: prevent rendering content for restricted tabs
   const hasAccessToCurrentTab = accessibleTabs.has(tab) || accessApprovals.has(tab);
-  if (!hasAccessToCurrentTab) {
+  if (!hasAccessToCurrentTab && !showAccessRequest) {
     console.warn(`[SECURITY] Attempt to access restricted tab: ${tab}`);
     return (
       <div className="flex h-screen items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
@@ -209,11 +216,10 @@ export default function AdminLayout({ onLogout }: Props) {
               handleTabClick(t.id);
               if (mobile && hasAccess) setSidebar(false);
             }}
-            disabled={isRestricted}
             title={isRestricted ? `Restricted. Click to request access to "${t.label}"` : t.label}
-            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+            className={`flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200 cursor-pointer ${
               isRestricted
-                ? 'opacity-40 cursor-not-allowed text-slate-400'
+                ? 'opacity-60 text-slate-500 hover:bg-red-50 hover:opacity-80'
                 : isActive
                 ? 'bg-gradient-to-r from-red-600 to-red-500 text-white shadow-md shadow-red-600/25'
                 : 'text-slate-600 hover:bg-red-50 hover:text-slate-900'
@@ -370,9 +376,15 @@ export default function AdminLayout({ onLogout }: Props) {
                 className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 transition-colors">
                 Cancel
               </button>
-              <button onClick={handleRequestAccess}
-                className="rounded-lg bg-gradient-to-r from-red-600 to-red-500 px-4 py-2 text-sm font-medium text-white hover:from-red-700 hover:to-red-600 transition-all shadow-md shadow-red-600/20">
-                Send Request
+              <button onClick={handleRequestAccess} disabled={submitStatus !== 'idle'}
+                className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition-all shadow-md ${
+                  submitStatus === 'sending'
+                    ? 'bg-gradient-to-r from-yellow-600 to-yellow-500 shadow-yellow-600/20'
+                    : submitStatus === 'success'
+                    ? 'bg-gradient-to-r from-green-600 to-green-500 shadow-green-600/20'
+                    : 'bg-gradient-to-r from-red-600 to-red-500 hover:from-red-700 hover:to-red-600 shadow-red-600/20'
+                }`}>
+                {submitStatus === 'sending' ? '⏳ Sending...' : submitStatus === 'success' ? '✓ Sent!' : 'Send Request'}
               </button>
             </div>
           </div>

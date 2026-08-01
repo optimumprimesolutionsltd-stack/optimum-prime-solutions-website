@@ -2,8 +2,9 @@ import * as functions from 'firebase-functions';
 import * as admin from 'firebase-admin';
 import * as nodemailer from 'nodemailer';
 
-// Initialize Firebase Admin
-admin.initializeApp();
+if (!admin.apps.length) {
+  admin.initializeApp();
+}
 const db = admin.firestore();
 
 // Configure email service - Update with your email settings
@@ -12,18 +13,18 @@ const db = admin.firestore();
 const transporter = nodemailer.createTransport({
   service: 'gmail',
   auth: {
-    user: process.env.ADMIN_EMAIL || 'admin@optimumprimesolutions.co.ke',
-    pass: process.env.ADMIN_EMAIL_PASSWORD || 'your-app-password-here',
+    user: 'optimumprimesolutionsltd@gmail.com',
+    pass: 'cmrizlkufctbjief',
   },
 });
 
-const ADMIN_EMAIL = 'admin@optimumprimesolutions.co.ke';
+const ADMIN_EMAIL = 'optimumprimesolutionsltd@gmail.com';
 const WEBSITE_URL = 'https://www.optimumprimesolutions.co.ke';
 
 /**
  * Sends email when access request is submitted
  */
-export const onAccessRequestSubmitted = functions.firestore
+export const onAccessRequestSubmitted = functions.region('europe-west1').firestore
   .document('access_requests/{requestId}')
   .onCreate(async (snap) => {
     const request = snap.data();
@@ -59,7 +60,7 @@ export const onAccessRequestSubmitted = functions.firestore
 /**
  * Sends approval email to user when request is approved
  */
-export const onAccessRequestApproved = functions.firestore
+export const onAccessRequestApproved = functions.region('europe-west1').firestore
   .document('access_requests/{requestId}')
   .onUpdate(async (change) => {
     const beforeData = change.before.data();
@@ -129,7 +130,7 @@ export const onAccessRequestApproved = functions.firestore
 /**
  * HTTP endpoint to manually trigger email sending (for testing)
  */
-export const sendTestEmail = functions.https.onRequest(async (req, res) => {
+export const sendTestEmail = functions.region('europe-west1').https.onRequest(async (req, res) => {
   // Add authentication check here!
   if (req.query.token !== process.env.TEST_EMAIL_TOKEN) {
     res.status(403).json({ error: 'Unauthorized' });
