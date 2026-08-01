@@ -42,8 +42,8 @@ export const onAccessRequestSubmitted = functions.region('europe-west1').firesto
           <p><strong>Requested Panel:</strong> ${requestedTab}</p>
           <p><strong>Request ID:</strong> ${snap.id}</p>
           <p>
-            <a href="${WEBSITE_URL}/admin" style="background-color: #dc2626; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; display: inline-block;">
-              Review Request in Admin Panel
+            <a href="${WEBSITE_URL}/admin?tab=access-requests" style="background-color: #dc2626; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; display: inline-block;">
+              Review & Approve Request
             </a>
           </p>
           <p><em>Requested at: ${new Date(request.createdAt.toDate()).toLocaleString()}</em></p>
