@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import { defaultData, type SiteData } from '../data/siteData';
-import { fbSubscribe } from '../firebase/config';
+import { fbSubscribe, fbAuth } from '../firebase/config';
 import { submitAccessRequest } from '../firebase/accessRequests';
 import DashboardHome, { type TabId } from './DashboardHome';
 import CompanyEditor from './editors/CompanyEditor';
@@ -22,6 +22,7 @@ import WhatsAppManager from './editors/WhatsAppManager';
 import WorkshopRegistrationsManager from './editors/WorkshopRegistrationsManager';
 import WebinarRegistrationsManager from './editors/WebinarRegistrationsManager';
 import SubscribersManager from './editors/SubscribersManager';
+import AccessRequestsManager from './editors/AccessRequestsManager';
 // import ContactsDirectory from './editors/ContactsDirectory';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
@@ -40,6 +41,8 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'subscribers', label: 'Subscribers', icon: Mail },
   { id: 'contact', label: 'Contact Info', icon: Phone },
   { id: 'testimonials', label: 'Reviews & Testimonials', icon: Users },
+  // Admin-only tabs
+  { id: 'access-requests', label: 'Access Requests', icon: Lock },
   // Book a Demo is now embedded inside Demo Leads tab
 ];
 
@@ -119,6 +122,9 @@ export default function AdminLayout({ onLogout }: Props) {
       setTab(tabId as TabId);
     } else {
       setRequestedTab(tabId);
+      // Auto-fill with current user's email
+      const userEmail = fbAuth().currentUser?.email || '';
+      setRequestEmail(userEmail);
       setShowAccessRequest(true);
     }
   };
@@ -192,6 +198,7 @@ export default function AdminLayout({ onLogout }: Props) {
       // case 'contacts': return <ContactsDirectory leads={data.leads} subscribers={[]} whatsappContacts={[]} />;
       case 'contact': return <ContactEditor data={data} onSave={d => handleSave(d, 'Contact info saved!')} />;
       case 'testimonials': return <TestimonialsEditor data={data} onSave={d => handleSave(d, 'Testimonials saved!')} />;
+      case 'access-requests': return <AccessRequestsManager />;
       case 'bookdemo': return null; // merged into leads tab
     }
   };
