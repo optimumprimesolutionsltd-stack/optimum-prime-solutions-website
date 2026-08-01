@@ -132,13 +132,20 @@ export const onAccessRequestApproved = functions.firestore
 export const sendTestEmail = functions.https.onRequest(async (req, res) => {
   // Add authentication check here!
   if (req.query.token !== process.env.TEST_EMAIL_TOKEN) {
-    return res.status(403).json({ error: 'Unauthorized' });
+    res.status(403).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  const toEmail = typeof req.query.to === 'string' ? req.query.to : undefined;
+  if (!toEmail) {
+    res.status(400).json({ error: 'Missing email parameter' });
+    return;
   }
 
   try {
     await transporter.sendMail({
       from: ADMIN_EMAIL,
-      to: req.query.to,
+      to: toEmail,
       subject: 'Test Email',
       html: '<p>This is a test email from Optimum Prime Solutions Cloud Functions.</p>',
     });
