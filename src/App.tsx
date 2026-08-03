@@ -7,7 +7,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
 import MobileStickyCTA from './components/MobileStickyCTA';
-import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth } from './firebase/config';
+import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth, fbHasAdminClaim } from './firebase/config';
+import { isAdminEmail } from './admin/permissions';
 import type { User } from 'firebase/auth';
 import { signInAnonymously } from 'firebase/auth';
 
@@ -169,6 +170,7 @@ function SiteRoutes() {
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(false);
+  const [isFullAdmin, setIsFullAdmin] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -178,6 +180,24 @@ function App() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
+
+  useEffect(() => {
+    if (!user) {
+      setIsFullAdmin(false);
+      return;
+    }
+
+    const checkAdminStatus = async () => {
+      if (isAdminEmail(user.email)) {
+        setIsFullAdmin(true);
+      } else {
+        const hasAdminClaim = await fbHasAdminClaim(user);
+        setIsFullAdmin(hasAdminClaim);
+      }
+    };
+
+    checkAdminStatus();
+  }, [user]);
 
   useEffect(() => {
     let unsubscribe: (() => void) | null = null;
@@ -236,7 +256,7 @@ function App() {
             path="/admin/*"
             element={
               isAuthenticated
-                ? <Suspense fallback={<PageLoader />}><AdminLayout onLogout={handleLogout} /></Suspense>
+                ? <Suspense fallback={<PageLoader />}><AdminLayout onLogout={handleLogout} isFullAdmin={isFullAdmin} /></Suspense>
                 : <Navigate to="/admin" replace />
             }
           />

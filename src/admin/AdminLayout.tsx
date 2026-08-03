@@ -9,6 +9,7 @@ import { defaultData, type SiteData } from '../data/siteData';
 import { fbSubscribe, fbAuth } from '../firebase/config';
 import { submitAccessRequest } from '../firebase/accessRequests';
 import DashboardHome, { type TabId } from './DashboardHome';
+import { canAccessTab } from './permissions';
 import CompanyEditor from './editors/CompanyEditor';
 import ServicesEditor from './editors/ServicesEditor';
 import ProductsEditor from './editors/ProductsEditor';
@@ -46,9 +47,9 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   // Book a Demo is now embedded inside Demo Leads tab
 ];
 
-interface Props { onLogout: () => void }
+interface Props { onLogout: () => void; isFullAdmin: boolean }
 
-export default function AdminLayout({ onLogout }: Props) {
+export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
   const { data, update } = useSite();
   const [tab, setTab] = useState<TabId>('dashboard');
   // A lead id handed from Webinar RSVPs when the user wants to book a demo for
@@ -64,7 +65,9 @@ export default function AdminLayout({ onLogout }: Props) {
 
   // Access control: Users can only access these tabs by default
   // Other tabs require email approval via the access request system
-  const accessibleTabs = new Set(['dashboard', 'leads', 'workshop', 'webinar']);
+  // Full admins can access all tabs
+  const baseAccessibleTabs = isFullAdmin ? new Set(tabs.map(t => t.id)) : new Set(['dashboard', 'leads', 'workshop', 'webinar']);
+  const accessibleTabs = baseAccessibleTabs;
   const [showAccessRequest, setShowAccessRequest] = useState(false);
   const [requestedTab, setRequestedTab] = useState<string | null>(null);
   const [requestEmail, setRequestEmail] = useState('');

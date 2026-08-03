@@ -92,6 +92,17 @@ export const fbSubscribe = (path: string, callback: (data: any) => void) => {
   }
 };
 
+export const fbHasAdminClaim = async (user: User | null, forceRefresh = false): Promise<boolean> => {
+  if (!user || user.isAnonymous) return false;
+  try {
+    const tokenResult = await user.getIdTokenResult(forceRefresh);
+    return tokenResult.claims.admin === true;
+  } catch (error) {
+    console.error('Error checking admin claim:', error);
+    return false;
+  }
+};
+
 export const getDb = () => {
   if (!db) throw new Error('Firestore not initialized');
   return db;
