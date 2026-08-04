@@ -5,6 +5,7 @@ import {
   User, Send, AlertCircle, FileText, Video,
 } from 'lucide-react';
 import type { SiteData, Lead } from '../../data/siteData';
+import AddLeadForm from './AddLeadForm';
 import { fbSubscribe, fbSet } from '../../firebase/config';
 import {
   buildCrmReportHtml, buildUnifiedCsv, buildUnifiedXls, downloadFile, printHtml,
@@ -897,6 +898,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   // Edit form uses the same schedForm state — slots computed from schedForm.scheduledDate
   // (editSlots reuse schedSlots since they share the same form state)
 
+  // ── Add new lead ─────────────────────────────────────────────────────────
+  const handleAddLead = (newLead: Lead) => {
+    onSave({ ...data, leads: [...data.leads, newLead] });
+  };
+
   return (
     <div className="mx-auto max-w-4xl space-y-5">
 
@@ -921,6 +927,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               <option value="html">Download as Web page</option>
             </select>
           </div>
+          <AddLeadForm onAddLead={handleAddLead} />
           <button
             onClick={() => { setShowBooking(true); setBookingError(''); setBooking(emptyBooking); }}
             className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
