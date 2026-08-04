@@ -2034,16 +2034,16 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                     const content = document.getElementById('export-content');
                     if (content) content.scrollBy({ top: -100, behavior: 'smooth' });
                   }}
-                  className="px-2 py-2 rounded-lg bg-slate-100 border border-slate-300 hover:bg-slate-200 active:bg-slate-300 transition flex items-center justify-center">
-                  <ChevronUp className="h-5 w-5 text-slate-700 font-bold" />
+                  className="px-3 py-3 rounded-lg bg-blue-500 border-2 border-blue-600 hover:bg-blue-600 active:bg-blue-700 transition flex items-center justify-center">
+                  <ChevronUp className="h-6 w-6 text-white font-bold" />
                 </button>
                 <button
                   onClick={() => {
                     const content = document.getElementById('export-content');
                     if (content) content.scrollBy({ top: 100, behavior: 'smooth' });
                   }}
-                  className="px-2 py-2 rounded-lg bg-slate-100 border border-slate-300 hover:bg-slate-200 active:bg-slate-300 transition flex items-center justify-center">
-                  <ChevronDown className="h-5 w-5 text-slate-700 font-bold" />
+                  className="px-3 py-3 rounded-lg bg-blue-500 border-2 border-blue-600 hover:bg-blue-600 active:bg-blue-700 transition flex items-center justify-center">
+                  <ChevronDown className="h-6 w-6 text-white font-bold" />
                 </button>
               </div>
               <button onClick={performExport} disabled={selectedFields.size === 0}
