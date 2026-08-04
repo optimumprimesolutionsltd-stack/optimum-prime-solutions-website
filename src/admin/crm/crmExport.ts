@@ -151,6 +151,39 @@ export function buildCrmReportHtml(
   // Closed Lost only appears here when the export includes closed deals.
   const lost = leads.filter(l => l.status === 'Closed Lost').length;
 
+  // Count leads by source for the graph
+  const sourceData = {
+    website: leads.filter(l => l.source === 'website').length,
+    workshop: leads.filter(l => l.source === 'workshop').length,
+    webinar: leads.filter(l => l.source === 'webinar').length,
+    email: leads.filter(l => l.source === 'email').length,
+    whatsapp: leads.filter(l => l.source === 'whatsapp').length,
+    referral: leads.filter(l => l.source === 'referral').length,
+    phone: leads.filter(l => l.source === 'phone').length,
+    direct: leads.filter(l => l.source === 'direct').length,
+  };
+  const totalBySource = Object.values(sourceData).reduce((a, b) => a + b, 0);
+  const sourceChartBars = Object.entries(sourceData)
+    .filter(([_, count]) => count > 0)
+    .map(([source, count]) => {
+      const pct = totalBySource > 0 ? (count / totalBySource * 100) : 0;
+      const label = source === 'whatsapp' ? 'WhatsApp' : source.charAt(0).toUpperCase() + source.slice(1);
+      const color = {
+        website: '#3b82f6', workshop: '#f59e0b', webinar: '#8b5cf6',
+        email: '#10b981', whatsapp: '#059669', referral: '#ec4899',
+        phone: '#f97316', direct: '#6366f1',
+      }[source] || '#64748b';
+      return `<div style="margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+          <span style="font-size: 12px; font-weight: 600; color: #1e3a5f;">${esc(label)}</span>
+          <span style="font-size: 12px; font-weight: 700; color: #1e3a5f;">${count}</span>
+        </div>
+        <div style="height: 24px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+          <div style="height: 100%; width: ${pct}%; background: ${color}; transition: width 0.3s;"></div>
+        </div>
+      </div>`;
+    }).join('');
+
   // Group leads by pipeline stage in canonical order.
   const grouped = PIPELINE_ORDER
     .map(stage => ({ stage, items: leads.filter(l => l.status === stage) }))
@@ -277,6 +310,13 @@ export function buildCrmReportHtml(
     <div class="kpi"><b>${won}</b><span>Closed Won</span></div>
     ${lost > 0 ? `<div class="kpi"><b>${lost}</b><span>Closed Lost</span></div>` : ''}
   </div>
+
+  ${sourceChartBars ? `<section class="stage" style="margin-bottom: 28px;">
+    <h3 style="margin-bottom: 18px;">📊 Leads by Source</h3>
+    <div style="padding: 0 8px;">
+      ${sourceChartBars}
+    </div>
+  </section>` : ''}
 
   ${staffSection}
   ${stageSections || '<p style="color:#64748b">No leads in the pipeline yet.</p>'}
