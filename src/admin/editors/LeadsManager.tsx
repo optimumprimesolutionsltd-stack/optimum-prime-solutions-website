@@ -2032,7 +2032,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                 className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-base font-bold text-white hover:bg-blue-700 active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed">
                 <Download className="h-5 w-5 text-white" />
                 <span className="text-white font-bold">EXPORT</span>
-                <ChevronDown className="h-5 w-5 text-white" />
               </button>
             </div>
           </div>
