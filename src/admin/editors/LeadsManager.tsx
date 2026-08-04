@@ -1003,7 +1003,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   : 'text-slate-500 hover:text-slate-700'
               }`}
             >
-              <LayoutGrid className="h-4 w-4" /> Kanban Board
+              <LayoutGrid className="h-4 w-4" /> Board
             </button>
           </div>
 
