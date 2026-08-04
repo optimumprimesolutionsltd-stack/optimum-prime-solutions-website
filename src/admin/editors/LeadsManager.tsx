@@ -1017,7 +1017,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         const sources = Object.entries(sourceData).filter(([_, count]) => count > 0);
 
         return sources.length > 0 ? (
-          <div className="sticky top-0 z-10 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-white p-5">
             <h3 className="text-sm font-bold text-slate-900 mb-4">📊 Leads by Source</h3>
             <div className="space-y-3">
               {sources.map(([source, count]) => {
