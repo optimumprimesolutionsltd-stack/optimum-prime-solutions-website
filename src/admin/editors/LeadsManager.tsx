@@ -56,6 +56,7 @@ const statusBadgeStyle = (status: string) => ({ backgroundColor: stageColor(stat
 interface BookingForm {
   clientName: string; clientPhone: string; clientEmail: string;
   clientCompany: string; clientIndustry: string;
+  sourceOfEnquiry: 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'website';
   demoType: 'online' | 'physical';
   demoDate: string; demoTime: string; demoLocation: string; demoNotes: string;
   teamMemberName: string; teamMemberPhone: string;
@@ -65,6 +66,7 @@ interface BookingForm {
 const emptyBooking: BookingForm = {
   clientName: '', clientPhone: '', clientEmail: '',
   clientCompany: '', clientIndustry: '',
+  sourceOfEnquiry: 'website',
   demoType: 'online', demoDate: '', demoTime: '', demoLocation: '', demoNotes: '',
   teamMemberName: '', teamMemberPhone: '',
   extraTeam: [],
@@ -93,7 +95,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const [addLeadForm, setAddLeadForm] = useState({
     name: '', email: '', phone: '', company: '', businessType: '', currentSoftware: '', message: '', industry: '',
     source: 'email' as 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct',
-    requestType: 'demo' as 'demo' | 'consultation' | 'bizanalyst' | 'addon' | 'tdl' | 'customization',
+    requestType: 'demo' as 'demo' | 'consultation' | 'bizanalyst' | 'customization' | 'other',
   });
   const [addLeadError, setAddLeadError] = useState('');
   const [addLeadSuccess, setAddLeadSuccess] = useState(false);
@@ -1246,6 +1248,16 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   <option value="">Select industry *</option>
                   {INDUSTRIES.map(i => <option key={i} value={i}>{i}</option>)}
                 </select>
+                <select value={booking.sourceOfEnquiry} onChange={e => setB('sourceOfEnquiry', e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-white">
+                  <option value="">Source of Enquiry *</option>
+                  <option value="website">Website</option>
+                  <option value="email">Email</option>
+                  <option value="whatsapp">WhatsApp</option>
+                  <option value="referral">Referral</option>
+                  <option value="phone">Phone Call</option>
+                  <option value="direct">Direct Contact</option>
+                </select>
               </div>
 
               {/* Demo Schedule */}
@@ -2203,9 +2215,8 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                       <option value="demo">Demo</option>
                       <option value="consultation">Consultation</option>
                       <option value="bizanalyst">BizAnalyst</option>
-                      <option value="addon">Add On</option>
-                      <option value="tdl">TDL</option>
-                      <option value="customization">Customization</option>
+                      <option value="customization">Customization / Add-On / TDL</option>
+                      <option value="other">Other</option>
                     </select>
                   </div>
                 </div>
