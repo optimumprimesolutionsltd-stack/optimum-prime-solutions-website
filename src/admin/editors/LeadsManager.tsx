@@ -1043,23 +1043,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         </div>
       )}
 
-      {/* ── Stats Strip ── */}
-      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
-        {[
-          { label: 'Total',     value: filtered.length,                                          color: 'bg-slate-50 text-slate-700' },
-          { label: 'New',       value: filtered.filter(l => l.status === 'New').length,          color: 'bg-accent/10 text-accent' },
-          { label: 'Contacted', value: filtered.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
-          { label: 'Qualified', value: filtered.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
-          { label: 'Demo Set',  value: filtered.filter(l => l.status === 'Schedule a Demo').length, color: 'bg-red-50 text-red-600' },
-          { label: 'Won',       value: filtered.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
-        ].map(s => (
-          <div key={s.label} className={`rounded-xl p-3 text-center ${s.color}`}>
-            <p className="text-xl font-bold">{s.value}</p>
-            <p className="text-[10px] font-medium">{s.label}</p>
-          </div>
-        ))}
-      </div>
-
       {/* ── Source Distribution Graph ── */}
       {(() => {
         const sourceData = {
@@ -1106,6 +1089,23 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           </div>
         ) : null;
       })()}
+
+      {/* ── Stats Strip ── */}
+      <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
+        {[
+          { label: 'Total',     value: filtered.length,                                          color: 'bg-slate-50 text-slate-700' },
+          { label: 'New',       value: filtered.filter(l => l.status === 'New').length,          color: 'bg-accent/10 text-accent' },
+          { label: 'Contacted', value: filtered.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
+          { label: 'Qualified', value: filtered.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
+          { label: 'Demo Set',  value: filtered.filter(l => l.status === 'Schedule a Demo').length, color: 'bg-red-50 text-red-600' },
+          { label: 'Won',       value: filtered.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
+        ].map(s => (
+          <div key={s.label} className={`rounded-xl p-3 text-center ${s.color}`}>
+            <p className="text-xl font-bold">{s.value}</p>
+            <p className="text-[10px] font-medium">{s.label}</p>
+          </div>
+        ))}
+      </div>
 
       {/* ── Toolbar ── */}
       <div className="space-y-3">
