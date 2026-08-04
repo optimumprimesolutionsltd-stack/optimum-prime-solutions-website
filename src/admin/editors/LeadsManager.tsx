@@ -2,10 +2,11 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown, ChevronUp,
   Download, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
-  User, Send, AlertCircle, FileText, Video,
+  User, Send, AlertCircle, FileText, Video, LayoutGrid, List,
 } from 'lucide-react';
 import type { SiteData, Lead } from '../../data/siteData';
 import { fbSubscribe, fbSet } from '../../firebase/config';
+import KanbanBoard from './KanbanBoard';
 import {
   buildCrmReportHtml, buildUnifiedCsv, buildUnifiedXls, downloadFile, printHtml,
   type WorkshopRegistrant,
@@ -99,6 +100,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   });
   const [addLeadError, setAddLeadError] = useState('');
   const [addLeadSuccess, setAddLeadSuccess] = useState(false);
+  const [viewMode, setViewMode] = useState<'list' | 'kanban'>('kanban');
 
   // Workshop attendees — pulled in for the unified CRM report / export
   const [registrants, setRegistrants] = useState<WorkshopRegistrant[]>([]);
@@ -981,6 +983,30 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               <option value="html">Download as Web page</option>
             </select>
           </div>
+          {/* View toggle */}
+          <div className="flex items-center gap-1 rounded-xl border border-slate-200 bg-white p-1">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                viewMode === 'list'
+                  ? 'bg-slate-100 text-slate-900'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <List className="h-4 w-4" /> List
+            </button>
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                viewMode === 'kanban'
+                  ? 'bg-slate-100 text-slate-900'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <LayoutGrid className="h-4 w-4" /> Kanban
+            </button>
+          </div>
+
           <button
             onClick={() => { setShowAddLead(true); setAddLeadError(''); }}
             className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
@@ -1431,8 +1457,20 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         </div>
       )}
 
-      {/* ── Leads List ── */}
-      {filtered.length === 0 ? (
+      {/* ── Leads View (List or Kanban) ── */}
+      {viewMode === 'kanban' ? (
+        <KanbanBoard
+          data={data}
+          onSave={onSave}
+          onEditLead={(leadId) => {
+            const lead = data.leads.find(l => l.id === leadId);
+            if (lead) {
+              setExpandedId(leadId);
+              openEdit(lead);
+            }
+          }}
+        />
+      ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-slate-200 bg-white py-16 text-center">
           <UsersIcon className="mx-auto h-10 w-10 text-slate-300" />
           <p className="mt-3 text-sm font-medium text-slate-500">
@@ -2009,6 +2047,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             </div>
           ))}
         </div>
+      ) : null}
       )}
 
       {/* Export Dialog */}
