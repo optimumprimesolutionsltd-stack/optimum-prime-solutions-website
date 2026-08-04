@@ -157,6 +157,23 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     });
   }, [data.leads, registrants, onSave]);
 
+  // Auto-remove Closed Lost leads older than 60 days to keep the pipeline clean.
+  // Self-terminating — once all old closed leads are removed, nothing matches.
+  useEffect(() => {
+    const SIX_DAYS_MS = 60 * 24 * 60 * 60 * 1000;
+    const now = Date.now();
+    const toRemove = data.leads.filter(l => {
+      if (l.status !== 'Closed Lost') return false;
+      const createdTime = new Date(l.createdAt).getTime();
+      return (now - createdTime) > SIX_DAYS_MS;
+    });
+    if (toRemove.length === 0) return;
+    const toRemoveIds = new Set(toRemove.map(l => l.id));
+    onSave({ ...data, leads: data.leads.filter(l => !toRemoveIds.has(l.id)) });
+    // Also clear them from Firebase so they don't re-sync back
+    toRemove.forEach(l => fbSet(`leads/${l.id}`, null));
+  }, [data.leads, onSave]);
+
   // Which workshop a lead belongs to. Newer leads carry workshopEventId directly;
   // older ones are resolved through their registrant (legacy July RSVPs have no
   // eventId and fall back to the legacy workshop id).
@@ -310,19 +327,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     registrants.forEach(r => { if (r.createdAt) m.set(r.id, r.createdAt); });
     return m;
   }, [registrants]);
-  // Permanently remove all Closed Lost leads to declutter the pipeline.
-  const closedLostCount = useMemo(() => data.leads.filter(l => l.status === 'Closed Lost').length, [data.leads]);
-  const deleteClosedLost = () => {
-    if (closedLostCount === 0) return;
-    if (confirm(`Permanently delete all ${closedLostCount} "Closed Lost" lead(s)? This cannot be undone.`)) {
-      // Also clear them from the /leads node, otherwise the live sync
-      // re-merges them back in and the delete appears not to work.
-      data.leads.filter(l => l.status === 'Closed Lost').forEach(l => fbSet(`leads/${l.id}`, null));
-      onSave({ ...data, leads: data.leads.filter(l => l.status !== 'Closed Lost') });
-      setSelectedIds(new Set());
-    }
-  };
-
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus]   = useState('Contacted');
@@ -1075,12 +1079,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               className="h-3.5 w-3.5 rounded border-slate-300 text-accent focus:ring-accent" />
             Include Closed in exports
           </label>
-          {closedLostCount > 0 && (
-            <button onClick={deleteClosedLost}
-              className="ml-auto flex items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1 font-semibold text-red-500 hover:bg-red-50 transition">
-              <Trash2 className="h-3.5 w-3.5" /> Delete Closed Lost ({closedLostCount})
-            </button>
-          )}
         </div>
         {/* Source filter — separate online / workshop / manual so bulk actions
             and Select-all only touch the source you're looking at. */}
