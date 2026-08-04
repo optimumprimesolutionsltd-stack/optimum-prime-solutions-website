@@ -133,6 +133,30 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     });
   }, [data, onSave]);
 
+  // Auto-fix workshop lead dates: re-date workshop leads to their registration
+  // date so date filters align with the actual workshop, not conversion date.
+  // Self-terminating — once all are fixed, nothing matches.
+  useEffect(() => {
+    if (registrants.length === 0) return;
+    const regCreatedById = new Map(registrants.map(r => [r.id, r.createdAt]));
+    const needsFix = data.leads.filter(l =>
+      l.source === 'workshop' && l.workshopRegId
+      && regCreatedById.has(l.workshopRegId)
+      && regCreatedById.get(l.workshopRegId) !== l.createdAt
+    );
+    if (needsFix.length === 0) return;
+    onSave({
+      ...data,
+      leads: data.leads.map(l => {
+        if (l.source === 'workshop' && l.workshopRegId) {
+          const regDate = regCreatedById.get(l.workshopRegId);
+          if (regDate && regDate !== l.createdAt) return { ...l, createdAt: regDate };
+        }
+        return l;
+      }),
+    });
+  }, [data.leads, registrants, onSave]);
+
   // Which workshop a lead belongs to. Newer leads carry workshopEventId directly;
   // older ones are resolved through their registrant (legacy July RSVPs have no
   // eventId and fall back to the legacy workshop id).
@@ -286,23 +310,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     registrants.forEach(r => { if (r.createdAt) m.set(r.id, r.createdAt); });
     return m;
   }, [registrants]);
-  const workshopDateFixCount = useMemo(() => data.leads.filter(l =>
-    l.source === 'workshop' && l.workshopRegId
-    && regCreatedById.has(l.workshopRegId)
-    && regCreatedById.get(l.workshopRegId) !== l.createdAt
-  ).length, [data.leads, regCreatedById]);
-  const fixWorkshopDates = () => {
-    if (workshopDateFixCount === 0) return;
-    if (!confirm(`Set the date of ${workshopDateFixCount} workshop lead(s) to their workshop registration date, so date filters line up with the workshop?`)) return;
-    onSave({ ...data, leads: data.leads.map(l => {
-      if (l.source === 'workshop' && l.workshopRegId) {
-        const c = regCreatedById.get(l.workshopRegId);
-        if (c && c !== l.createdAt) return { ...l, createdAt: c };
-      }
-      return l;
-    }) });
-  };
-
   // Permanently remove all Closed Lost leads to declutter the pipeline.
   const closedLostCount = useMemo(() => data.leads.filter(l => l.status === 'Closed Lost').length, [data.leads]);
   const deleteClosedLost = () => {
@@ -1068,13 +1075,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               className="h-3.5 w-3.5 rounded border-slate-300 text-accent focus:ring-accent" />
             Include Closed in exports
           </label>
-          {workshopDateFixCount > 0 && (
-            <button onClick={fixWorkshopDates}
-              title="Older workshop leads carry the date you converted them. Click to re-date them to their workshop registration date."
-              className="ml-auto flex items-center gap-1 rounded-lg border border-accent/30 bg-white px-2.5 py-1 font-semibold text-accent hover:bg-accent/10 transition">
-              <Calendar className="h-3.5 w-3.5" /> Fix workshop dates ({workshopDateFixCount})
-            </button>
-          )}
           {closedLostCount > 0 && (
             <button onClick={deleteClosedLost}
               className="ml-auto flex items-center gap-1 rounded-lg border border-red-200 bg-white px-2.5 py-1 font-semibold text-red-500 hover:bg-red-50 transition">
