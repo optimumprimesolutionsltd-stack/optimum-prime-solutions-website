@@ -5,7 +5,6 @@ import {
   User, Send, AlertCircle, FileText, Video,
 } from 'lucide-react';
 import type { SiteData, Lead } from '../../data/siteData';
-import AddLeadForm from './AddLeadForm';
 import { fbSubscribe, fbSet } from '../../firebase/config';
 import {
   buildCrmReportHtml, buildUnifiedCsv, buildUnifiedXls, downloadFile, printHtml,
@@ -90,6 +89,14 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const [filterStatus, setFilterStatus] = useState('All');
   const [filterSource, setFilterSource] = useState<'All' | 'workshop' | 'webinar' | 'online' | 'manual'>('All');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
+  const [showAddLead, setShowAddLead] = useState(false);
+  const [addLeadForm, setAddLeadForm] = useState({
+    name: '', email: '', phone: '', company: '', businessType: '', currentSoftware: '', message: '',
+    source: 'email' as 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct',
+    requestType: 'demo' as 'demo' | 'consultation' | 'bizanalyst',
+  });
+  const [addLeadError, setAddLeadError] = useState('');
+  const [addLeadSuccess, setAddLeadSuccess] = useState(false);
 
   // Workshop attendees — pulled in for the unified CRM report / export
   const [registrants, setRegistrants] = useState<WorkshopRegistrant[]>([]);
@@ -899,8 +906,41 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   // (editSlots reuse schedSlots since they share the same form state)
 
   // ── Add new lead ─────────────────────────────────────────────────────────
-  const handleAddLead = (newLead: Lead) => {
+  const handleAddLeadSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setAddLeadError('');
+
+    if (!addLeadForm.name.trim() || !addLeadForm.email.trim() || !addLeadForm.phone.trim()) {
+      setAddLeadError('Name, Email, and Phone are required');
+      return;
+    }
+
+    const newLead: Lead = {
+      id: `lead-${Date.now()}`,
+      name: addLeadForm.name.trim(),
+      email: addLeadForm.email.trim(),
+      phone: addLeadForm.phone.trim(),
+      company: addLeadForm.company.trim(),
+      businessType: addLeadForm.businessType.trim(),
+      currentSoftware: addLeadForm.currentSoftware.trim(),
+      message: addLeadForm.message.trim(),
+      demoDate: '',
+      createdAt: new Date().toISOString(),
+      status: 'New',
+      source: addLeadForm.source,
+      requestType: addLeadForm.requestType,
+    };
+
     onSave({ ...data, leads: [...data.leads, newLead] });
+    setAddLeadSuccess(true);
+    setAddLeadForm({
+      name: '', email: '', phone: '', company: '', businessType: '', currentSoftware: '', message: '',
+      source: 'email', requestType: 'demo',
+    });
+    setTimeout(() => {
+      setAddLeadSuccess(false);
+      setShowAddLead(false);
+    }, 2000);
   };
 
   return (
@@ -927,7 +967,13 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               <option value="html">Download as Web page</option>
             </select>
           </div>
-          <AddLeadForm onAddLead={handleAddLead} />
+          <button
+            onClick={() => { setShowAddLead(true); setAddLeadError(''); }}
+            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
+            style={{ backgroundColor: '#2563eb' }}
+          >
+            <Plus className="h-4 w-4" /> Add New Lead
+          </button>
           <button
             onClick={() => { setShowBooking(true); setBookingError(''); setBooking(emptyBooking); }}
             className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
@@ -2058,6 +2104,149 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                 <Download className="h-5 w-5 text-white" />
                 <span className="text-white font-bold">EXPORT</span>
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Add Lead Modal ── */}
+      {showAddLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="w-full max-w-2xl max-h-[90vh] flex flex-col rounded-xl bg-white shadow-2xl">
+            <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
+              <h3 className="text-lg font-bold text-slate-900">Add New Lead</h3>
+              <button onClick={() => setShowAddLead(false)} className="text-slate-400 hover:text-slate-600">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="px-6 py-4 space-y-4 min-h-0 flex-1 overflow-y-auto pb-20">
+              {addLeadError && (
+                <div className="flex items-start gap-3 rounded-lg bg-red-50 border border-red-200 p-4">
+                  <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
+                  <span className="text-sm text-red-700">{addLeadError}</span>
+                </div>
+              )}
+
+              {addLeadSuccess && (
+                <div className="flex items-start gap-3 rounded-lg bg-green-50 border border-green-200 p-4">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0 mt-0.5" />
+                  <span className="text-sm text-green-700">Lead added successfully!</span>
+                </div>
+              )}
+
+              <form onSubmit={handleAddLeadSubmit} className="space-y-4">
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Name *</label>
+                    <input
+                      type="text"
+                      value={addLeadForm.name}
+                      onChange={e => setAddLeadForm({...addLeadForm, name: e.target.value})}
+                      placeholder="John Doe"
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Email *</label>
+                    <input
+                      type="email"
+                      value={addLeadForm.email}
+                      onChange={e => setAddLeadForm({...addLeadForm, email: e.target.value})}
+                      placeholder="john@company.com"
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Phone *</label>
+                    <input
+                      type="tel"
+                      value={addLeadForm.phone}
+                      onChange={e => setAddLeadForm({...addLeadForm, phone: e.target.value})}
+                      placeholder="+254 700 000 000"
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Company</label>
+                    <input
+                      type="text"
+                      value={addLeadForm.company}
+                      onChange={e => setAddLeadForm({...addLeadForm, company: e.target.value})}
+                      placeholder="Company Ltd"
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Lead Source</label>
+                    <select
+                      value={addLeadForm.source}
+                      onChange={e => setAddLeadForm({...addLeadForm, source: e.target.value as any})}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                      <option value="email">Email Inquiry</option>
+                      <option value="whatsapp">WhatsApp</option>
+                      <option value="referral">Referral</option>
+                      <option value="phone">Phone Call</option>
+                      <option value="direct">Direct Contact</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Request Type</label>
+                    <select
+                      value={addLeadForm.requestType}
+                      onChange={e => setAddLeadForm({...addLeadForm, requestType: e.target.value as any})}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                      <option value="demo">Demo</option>
+                      <option value="consultation">Consultation</option>
+                      <option value="bizanalyst">BizAnalyst</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Business Type</label>
+                    <input
+                      type="text"
+                      value={addLeadForm.businessType}
+                      onChange={e => setAddLeadForm({...addLeadForm, businessType: e.target.value})}
+                      placeholder="e.g., Retail, Manufacturing"
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Current Software</label>
+                    <input
+                      type="text"
+                      value={addLeadForm.currentSoftware}
+                      onChange={e => setAddLeadForm({...addLeadForm, currentSoftware: e.target.value})}
+                      placeholder="e.g., QuickBooks, Manual"
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1">Message / Notes</label>
+                  <textarea
+                    value={addLeadForm.message}
+                    onChange={e => setAddLeadForm({...addLeadForm, message: e.target.value})}
+                    placeholder="Add any notes or details about this lead..."
+                    rows={3}
+                    className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition">
+                  <Plus className="h-4 w-4" />
+                  Add Lead
+                </button>
+              </form>
             </div>
           </div>
         </div>
