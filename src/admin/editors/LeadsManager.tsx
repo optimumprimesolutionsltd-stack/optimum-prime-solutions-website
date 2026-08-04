@@ -161,7 +161,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const [exportTo, setExportTo]       = useState('');
   const [includeClosed, setIncludeClosed] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
-  const [exportFormat, setExportFormat] = useState<'csv' | 'excel'>('csv');
+  const [exportFormat, setExportFormat] = useState<'csv' | 'excel' | 'pdf'>('csv');
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set([
     'name', 'email', 'phone', 'company', 'industry', 'status', 'demoDate', 'scheduledDate', 'createdAt'
   ]));
@@ -558,15 +558,47 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       }
     }));
 
+    const date = new Date().toISOString().split('T')[0];
+
     if (exportFormat === 'csv') {
       const csv = [headers, ...rows].map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
       const blob = new Blob([csv], { type: 'text/csv' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `demo-leads-${new Date().toISOString().split('T')[0]}.csv`;
+      a.download = `demo-leads-${date}.csv`;
       a.click();
       URL.revokeObjectURL(url);
+    } else if (exportFormat === 'excel') {
+      // Use the unified Excel export
+      downloadFile(`demo-leads-${date}.xls`, buildUnifiedXls(exportLeads, exportRegistrants), 'application/vnd.ms-excel');
+    } else if (exportFormat === 'pdf') {
+      // Generate HTML table and print to PDF
+      const htmlTable = `
+        <html>
+          <head>
+            <title>Demo Leads Export</title>
+            <style>
+              body { font-family: Arial, sans-serif; margin: 20px; }
+              table { width: 100%; border-collapse: collapse; }
+              th { background: #1e3a5f; color: white; padding: 10px; text-align: left; font-weight: bold; }
+              td { padding: 8px; border-bottom: 1px solid #ddd; }
+              tr:nth-child(even) { background: #f5f5f5; }
+            </style>
+          </head>
+          <body>
+            <h2>Demo Leads Report - ${date}</h2>
+            <p>Total leads: ${exportLeads.length}</p>
+            <table>
+              <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+              <tbody>
+                ${rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}
+              </tbody>
+            </table>
+          </body>
+        </html>
+      `;
+      printHtml(htmlTable);
     }
 
     setShowExportDialog(false);
@@ -1938,7 +1970,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               {/* Format Selection */}
               <div>
                 <label className="block text-sm font-semibold text-slate-900 mb-2">Format</label>
-                <div className="flex gap-3">
+                <div className="space-y-2">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="radio" checked={exportFormat === 'csv'} onChange={() => setExportFormat('csv')}
                       className="h-4 w-4 text-accent border-slate-300" />
@@ -1946,8 +1978,13 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   </label>
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input type="radio" checked={exportFormat === 'excel'} onChange={() => setExportFormat('excel')}
-                      className="h-4 w-4 text-accent border-slate-300" disabled />
-                    <span className="text-sm text-slate-500">Excel (coming soon)</span>
+                      className="h-4 w-4 text-accent border-slate-300" />
+                    <span className="text-sm text-slate-700">Excel (.xlsx for spreadsheets)</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <input type="radio" checked={exportFormat === 'pdf'} onChange={() => setExportFormat('pdf')}
+                      className="h-4 w-4 text-accent border-slate-300" />
+                    <span className="text-sm text-slate-700">PDF (for printing & sharing)</span>
                   </label>
                 </div>
               </div>
