@@ -21,7 +21,7 @@ export interface Lead {
   meetLink?: string; meetSent?: boolean;
   source?: 'website' | 'manual' | 'workshop' | 'webinar' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct'; // where the lead came from
   industry?: string; demoNotes?: string;
-  requestType?: 'demo' | 'consultation' | 'bizanalyst'; // demo, consultation, or biz analyst enquiry
+  requestType?: 'demo' | 'consultation' | 'bizanalyst' | 'addon' | 'tdl' | 'customization'; // demo, consultation, biz analyst, add-on, training/development/learning, or customization enquiry
   // CRM follow-up fields
   nextStep?: string;              // free-text next action, shown in CRM report
   attendedWorkshop?: boolean;     // true if this lead came from a breakfast-workshop attendee

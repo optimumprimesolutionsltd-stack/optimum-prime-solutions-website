@@ -91,9 +91,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const [expandedId, setExpandedId]   = useState<string | null>(null);
   const [showAddLead, setShowAddLead] = useState(false);
   const [addLeadForm, setAddLeadForm] = useState({
-    name: '', email: '', phone: '', company: '', businessType: '', currentSoftware: '', message: '',
+    name: '', email: '', phone: '', company: '', businessType: '', currentSoftware: '', message: '', industry: '',
     source: 'email' as 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct',
-    requestType: 'demo' as 'demo' | 'consultation' | 'bizanalyst',
+    requestType: 'demo' as 'demo' | 'consultation' | 'bizanalyst' | 'addon' | 'tdl' | 'customization',
   });
   const [addLeadError, setAddLeadError] = useState('');
   const [addLeadSuccess, setAddLeadSuccess] = useState(false);
@@ -929,12 +929,13 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       status: 'New',
       source: addLeadForm.source,
       requestType: addLeadForm.requestType,
+      industry: addLeadForm.industry.trim(),
     };
 
     onSave({ ...data, leads: [...data.leads, newLead] });
     setAddLeadSuccess(true);
     setAddLeadForm({
-      name: '', email: '', phone: '', company: '', businessType: '', currentSoftware: '', message: '',
+      name: '', email: '', phone: '', company: '', businessType: '', currentSoftware: '', message: '', industry: '',
       source: 'email', requestType: 'demo',
     });
     setTimeout(() => {
@@ -2202,20 +2203,25 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                       <option value="demo">Demo</option>
                       <option value="consultation">Consultation</option>
                       <option value="bizanalyst">BizAnalyst</option>
+                      <option value="addon">Add On</option>
+                      <option value="tdl">TDL</option>
+                      <option value="customization">Customization</option>
                     </select>
                   </div>
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Business Type</label>
-                    <input
-                      type="text"
-                      value={addLeadForm.businessType}
-                      onChange={e => setAddLeadForm({...addLeadForm, businessType: e.target.value})}
-                      placeholder="e.g., Retail, Manufacturing"
-                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                    />
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Industry</label>
+                    <select
+                      value={addLeadForm.industry}
+                      onChange={e => setAddLeadForm({...addLeadForm, industry: e.target.value})}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                      <option value="">Select industry...</option>
+                      {INDUSTRIES.map(ind => (
+                        <option key={ind} value={ind}>{ind}</option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1">Current Software</label>
