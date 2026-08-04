@@ -1060,6 +1060,53 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         ))}
       </div>
 
+      {/* ── Source Distribution Graph ── */}
+      {(() => {
+        const sourceData = {
+          website: data.leads.filter(l => l.source === 'website').length,
+          workshop: data.leads.filter(l => l.source === 'workshop').length,
+          webinar: data.leads.filter(l => l.source === 'webinar').length,
+          email: data.leads.filter(l => l.source === 'email').length,
+          whatsapp: data.leads.filter(l => l.source === 'whatsapp').length,
+          referral: data.leads.filter(l => l.source === 'referral').length,
+          phone: data.leads.filter(l => l.source === 'phone').length,
+          direct: data.leads.filter(l => l.source === 'direct').length,
+        };
+        const totalBySource = Object.values(sourceData).reduce((a, b) => a + b, 0);
+        const sources = Object.entries(sourceData).filter(([_, count]) => count > 0);
+
+        return sources.length > 0 ? (
+          <div className="rounded-xl border border-slate-200 bg-white p-5">
+            <h3 className="text-sm font-bold text-slate-900 mb-4">📊 Leads by Source</h3>
+            <div className="space-y-2.5">
+              {sources.map(([source, count]) => {
+                const pct = totalBySource > 0 ? Math.round((count / totalBySource) * 100) : 0;
+                const label = source === 'whatsapp' ? 'WhatsApp' : source.charAt(0).toUpperCase() + source.slice(1);
+                const colors: Record<string, string> = {
+                  website: 'bg-blue-500', workshop: 'bg-amber-500', webinar: 'bg-purple-500',
+                  email: 'bg-green-500', whatsapp: 'bg-emerald-600', referral: 'bg-pink-500',
+                  phone: 'bg-orange-500', direct: 'bg-indigo-500',
+                };
+                return (
+                  <div key={source}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-semibold text-slate-600">{label}</span>
+                      <span className="text-xs font-bold text-slate-500">{count} ({pct}%)</span>
+                    </div>
+                    <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
+                      <div
+                        className={`h-full ${colors[source] || 'bg-slate-400'} transition-all`}
+                        style={{ width: `${pct}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        ) : null;
+      })()}
+
       {/* ── Toolbar ── */}
       <div className="space-y-3">
         {/* Search + Export row */}
