@@ -158,20 +158,20 @@ export default function ProductsEditor({ data, onSave }: P) {
       {/* Header Actions */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="text-sm text-navy-500">{items.length} products/licenses</p>
-          <p className="text-xs text-navy-400">Manage your TallyPrime pricing tiers</p>
+          <p className="text-sm text-slate-500">{items.length} products/licenses</p>
+          <p className="text-xs text-slate-400">Manage your TallyPrime pricing tiers</p>
         </div>
         <div className="flex items-center gap-2">
           <button 
             onClick={() => setShowPresetModal(true)}
-            className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition"
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition"
           >
             <Layers className="h-4 w-4" />
             Add from Preset
           </button>
           <button 
             onClick={addProduct}
-            className="flex items-center gap-2 rounded-lg bg-navy-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-navy-800 transition"
+            className="flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-800 transition"
           >
             <Plus className="h-4 w-4" />
             Add Custom
@@ -183,8 +183,8 @@ export default function ProductsEditor({ data, onSave }: P) {
       {showPresetModal && (
         <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-sm font-bold text-navy-900">Quick Add Preset License</h4>
-            <button onClick={() => setShowPresetModal(false)} className="text-navy-400 hover:text-navy-600">
+            <h4 className="text-sm font-bold text-slate-900">Quick Add Preset License</h4>
+            <button onClick={() => setShowPresetModal(false)} className="text-slate-400 hover:text-slate-600">
               <X className="h-4 w-4" />
             </button>
           </div>
@@ -197,11 +197,11 @@ export default function ProductsEditor({ data, onSave }: P) {
               <button
                 key={preset.key}
                 onClick={() => addPresetProduct(preset.key as 'silver' | 'gold' | 'custom')}
-                className="rounded-xl border border-navy-200 bg-white p-4 text-left hover:border-accent/30 hover:shadow-md transition-all group"
+                className="rounded-xl border border-slate-200 bg-white p-4 text-left hover:border-accent/30 hover:shadow-md transition-all group"
               >
                 <div className={`h-8 w-8 rounded-lg bg-gradient-to-br ${preset.color} mb-3 group-hover:scale-110 transition-transform`} />
-                <p className="text-sm font-bold text-navy-900">{preset.label}</p>
-                <p className="text-xs text-navy-500">{preset.desc}</p>
+                <p className="text-sm font-bold text-slate-900">{preset.label}</p>
+                <p className="text-xs text-slate-500">{preset.desc}</p>
                 <p className="text-xs font-semibold text-accent mt-1">{preset.price}</p>
               </button>
             ))}
@@ -216,7 +216,7 @@ export default function ProductsEditor({ data, onSave }: P) {
           <div 
             key={product.id} 
             className={`rounded-2xl border bg-white overflow-hidden transition-all ${
-              isExpanded ? 'border-accent/30 shadow-lg' : 'border-navy-200'
+              isExpanded ? 'border-accent/30 shadow-lg' : 'border-slate-200'
             } ${product.popular ? 'ring-1 ring-accent/20' : ''}`}
           >
             {/* Header */}
@@ -237,15 +237,15 @@ export default function ProductsEditor({ data, onSave }: P) {
               {/* Product Info */}
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <Package className="h-4 w-4 text-navy-400 shrink-0" />
-                  <p className="text-sm font-bold text-navy-900 truncate">
+                  <Package className="h-4 w-4 text-slate-400 shrink-0" />
+                  <p className="text-sm font-bold text-slate-900 truncate">
                     {product.name} {product.edition}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 mt-0.5">
                   <span className="text-xs font-semibold text-accent">{product.price}</span>
-                  <span className="text-[10px] text-navy-400">• {product.period}</span>
-                  <span className="text-[10px] text-navy-400">• {product.features.length} features</span>
+                  <span className="text-[10px] text-slate-400">• {product.period}</span>
+                  <span className="text-[10px] text-slate-400">• {product.features.length} features</span>
                 </div>
               </div>
 
@@ -253,7 +253,7 @@ export default function ProductsEditor({ data, onSave }: P) {
               <div className="flex items-center gap-1">
                 <button 
                   onClick={(e) => { e.stopPropagation(); duplicateProduct(product); }}
-                  className="rounded-lg p-1.5 text-navy-400 hover:bg-navy-50 hover:text-navy-600"
+                  className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-50 hover:text-slate-600"
                   title="Duplicate"
                 >
                   <Copy className="h-4 w-4" />
@@ -261,14 +261,14 @@ export default function ProductsEditor({ data, onSave }: P) {
                 <button 
                   onClick={(e) => { e.stopPropagation(); moveProduct(index, -1); }}
                   disabled={index === 0}
-                  className="rounded-lg p-1.5 text-navy-400 hover:bg-navy-50 disabled:opacity-30"
+                  className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-50 disabled:opacity-30"
                 >
                   <ChevronDown className="h-4 w-4 rotate-180" />
                 </button>
                 <button 
                   onClick={(e) => { e.stopPropagation(); moveProduct(index, 1); }}
                   disabled={index === items.length - 1}
-                  className="rounded-lg p-1.5 text-navy-400 hover:bg-navy-50 disabled:opacity-30"
+                  className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-50 disabled:opacity-30"
                 >
                   <ChevronDown className="h-4 w-4" />
                 </button>
@@ -283,24 +283,24 @@ export default function ProductsEditor({ data, onSave }: P) {
 
             {/* Expanded Editor */}
             {isExpanded && (
-              <div className="border-t border-navy-100 p-5 space-y-5">
+              <div className="border-t border-slate-100 p-5 space-y-5">
                 {/* Basic Info */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-navy-600 mb-1.5">Product Name</label>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Product Name</label>
                     <input 
                       value={product.name} 
                       onChange={e => updateProduct(product.id, { name: e.target.value })}
-                      className="w-full rounded-lg border border-navy-200 px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/10"
+                      className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/10"
                       placeholder="TallyPrime"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-navy-600 mb-1.5">Edition/Type</label>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Edition/Type</label>
                     <input 
                       value={product.edition} 
                       onChange={e => updateProduct(product.id, { edition: e.target.value })}
-                      className="w-full rounded-lg border border-navy-200 px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/10"
+                      className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/10"
                       placeholder="Silver / Gold / Custom"
                     />
                   </div>
@@ -309,7 +309,7 @@ export default function ProductsEditor({ data, onSave }: P) {
                 {/* Price & Period */}
                 <div className="grid grid-cols-3 gap-4">
                   <div className="col-span-2">
-                    <label className="block text-xs font-semibold text-navy-600 mb-1.5">
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">
                       <DollarSign className="h-3 w-3 inline mr-1" />
                       Price
                     </label>
@@ -317,17 +317,17 @@ export default function ProductsEditor({ data, onSave }: P) {
                       value={product.price} 
                       onChange={e => updateProduct(product.id, { price: e.target.value })}
                       onBlur={e => updateProduct(product.id, { price: formatPrice(e.target.value) })}
-                      className="w-full rounded-lg border border-navy-200 px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/10"
+                      className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/10"
                       placeholder="KES 54,000"
                     />
-                    <p className="text-[10px] text-navy-400 mt-1">Format: KES 54,000 or "Custom Quote"</p>
+                    <p className="text-[10px] text-slate-400 mt-1">Format: KES 54,000 or "Custom Quote"</p>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold text-navy-600 mb-1.5">Billing Period</label>
+                    <label className="block text-xs font-semibold text-slate-600 mb-1.5">Billing Period</label>
                     <select 
                       value={product.period} 
                       onChange={e => updateProduct(product.id, { period: e.target.value })}
-                      className="w-full rounded-lg border border-navy-200 px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/10"
+                      className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/10"
                     >
                       <option value="one-time">One-time</option>
                       <option value="per year">Per Year</option>
@@ -340,25 +340,25 @@ export default function ProductsEditor({ data, onSave }: P) {
 
                 {/* CTA Button */}
                 <div>
-                  <label className="block text-xs font-semibold text-navy-600 mb-1.5">Button Text</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1.5">Button Text</label>
                   <input 
                     value={product.cta} 
                     onChange={e => updateProduct(product.id, { cta: e.target.value })}
-                    className="w-full rounded-lg border border-navy-200 px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/10"
+                    className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm outline-none focus:border-accent focus:ring-2 focus:ring-accent/10"
                     placeholder="Get Started / Buy Now / Contact Sales"
                   />
                 </div>
 
                 {/* Popular Toggle */}
-                <div className="flex items-center gap-3 p-3 rounded-xl bg-navy-50">
+                <div className="flex items-center gap-3 p-3 rounded-xl bg-slate-50">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input 
                       type="checkbox" 
                       checked={!!product.popular} 
                       onChange={e => updateProduct(product.id, { popular: e.target.checked })}
-                      className="h-4 w-4 rounded border-navy-300 text-accent focus:ring-accent"
+                      className="h-4 w-4 rounded border-slate-300 text-accent focus:ring-accent"
                     />
-                    <span className="text-sm font-medium text-navy-700">Mark as Most Popular / Recommended</span>
+                    <span className="text-sm font-medium text-slate-700">Mark as Most Popular / Recommended</span>
                   </label>
                   {product.popular && (
                     <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-accent/10 px-2 py-0.5 text-[10px] font-bold text-accent">
@@ -369,7 +369,7 @@ export default function ProductsEditor({ data, onSave }: P) {
 
                 {/* Features List */}
                 <div>
-                  <label className="block text-xs font-semibold text-navy-600 mb-2">
+                  <label className="block text-xs font-semibold text-slate-600 mb-2">
                     Features Included ({product.features.length})
                   </label>
                   <div className="space-y-2">
@@ -382,7 +382,7 @@ export default function ProductsEditor({ data, onSave }: P) {
                             features[fi] = e.target.value;
                             updateProduct(product.id, { features });
                           }}
-                          className="flex-1 rounded-lg border border-navy-200 px-3 py-2 text-sm outline-none focus:border-accent"
+                          className="flex-1 rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-accent"
                           placeholder="Feature description..."
                         />
                         <button 
@@ -410,7 +410,7 @@ export default function ProductsEditor({ data, onSave }: P) {
                             e.target.value = '';
                           }
                         }}
-                        className="text-xs border border-navy-200 rounded-lg px-2 py-1 outline-none focus:border-accent"
+                        className="text-xs border border-slate-200 rounded-lg px-2 py-1 outline-none focus:border-accent"
                       >
                         <option value="">+ Quick add...</option>
                         {defaultFeatures.filter(f => !product.features.includes(f)).map(f => (
@@ -428,13 +428,13 @@ export default function ProductsEditor({ data, onSave }: P) {
 
       {/* Empty State */}
       {items.length === 0 && (
-        <div className="rounded-2xl border border-navy-200 bg-navy-50/50 py-16 text-center">
-          <Package className="mx-auto h-12 w-12 text-navy-300" />
-          <p className="mt-4 text-sm font-medium text-navy-600">No products yet</p>
-          <p className="mt-1 text-xs text-navy-400">Add your first TallyPrime license using the buttons above</p>
+        <div className="rounded-2xl border border-slate-200 bg-slate-50/50 py-16 text-center">
+          <Package className="mx-auto h-12 w-12 text-slate-300" />
+          <p className="mt-4 text-sm font-medium text-slate-600">No products yet</p>
+          <p className="mt-1 text-xs text-slate-400">Add your first TallyPrime license using the buttons above</p>
           <button 
             onClick={() => setShowPresetModal(true)}
-            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-navy-900 px-5 py-2.5 text-sm font-medium text-white"
+            className="mt-4 inline-flex items-center gap-2 rounded-lg bg-slate-900 px-5 py-2.5 text-sm font-medium text-white"
           >
             <Plus className="h-4 w-4" /> Add Your First Product
           </button>
@@ -442,13 +442,13 @@ export default function ProductsEditor({ data, onSave }: P) {
       )}
 
       {/* Save Button */}
-      <div className="flex items-center justify-between pt-4 border-t border-navy-200">
-        <div className="text-xs text-navy-400">
+      <div className="flex items-center justify-between pt-4 border-t border-slate-200">
+        <div className="text-xs text-slate-400">
           Last saved: {new Date().toLocaleTimeString()}
         </div>
         <button 
           onClick={() => onSave({ ...data, products: items })}
-          className="flex items-center gap-2 rounded-xl bg-navy-900 px-7 py-3 text-sm font-bold text-white shadow-lg hover:bg-navy-800 hover:scale-[1.02] transition-all"
+          className="flex items-center gap-2 rounded-xl bg-slate-900 px-7 py-3 text-sm font-bold text-white shadow-lg hover:bg-slate-800 hover:scale-[1.02] transition-all"
         >
           <Save className="h-4 w-4" />
           Save All Changes

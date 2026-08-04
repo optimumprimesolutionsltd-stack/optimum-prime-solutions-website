@@ -5,7 +5,7 @@
 // and are triggered from the admin panel as file downloads.
 // ─────────────────────────────────────────────────────────────────────────────
 import type { Lead } from '../../data/siteData';
-import { PIPELINE_ORDER, defaultNextStep, stageColor } from './pipeline';
+import { PIPELINE_ORDER, defaultNextStep, stageColor, stageReportLabel } from './pipeline';
 
 export interface WorkshopRegistrant {
   id: string;
@@ -35,27 +35,43 @@ const fmtDate = (iso?: string) => {
   return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 };
 
+const fmtDateTime = (iso?: string, time?: string) => {
+  if (!iso) return '';
+  const date = fmtDate(iso);
+  if (!time) return date;
+  return `${date} · ${time} EAT`;
+};
+
 // Shared tabular data — leads plus any workshop attendees not yet in the pipeline.
 // Used by both the CSV and Excel exports so the two stay identical.
 function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { headers: string[]; rows: string[][] } {
   const headers = [
     'Name', 'Company', 'Phone', 'Email', 'Industry',
-    'Source', 'Attended Breakfast', 'Stage', 'Next Step',
-    'Scheduled Date', 'Scheduled Time', 'Date Added',
+    'Source', 'Event', 'Attended', 'Stage', 'Next Step',
+    'Demo Contact Person', 'Demo Contact Phone', 'Scheduled Demo (EAT)', 'Date Added (EAT)',
   ];
 
-  const leadRows = leads.map(l => [
-    l.name, l.company, l.phone, l.email, l.industry || l.businessType || '',
-    // Name the specific workshop / webinar so different events are
-    // distinguishable in the export, not just lumped as "workshop"/"webinar".
-    l.source === 'workshop' ? (l.workshopTitle || 'workshop')
-      : l.source === 'webinar' ? (l.webinarTitle || 'webinar')
-      : (l.source || 'website'),
-    (l.attendedWorkshop || l.attendedWebinar) ? 'Yes'
-      : (l.source === 'workshop' || l.source === 'webinar') ? 'No' : '',
-    l.status, l.nextStep || defaultNextStep(l.status),
-    l.scheduledDate || '', l.scheduledTime || '', fmtDate(l.createdAt),
-  ]);
+  const leadRows = leads.map(l => {
+    const eventName = l.source === 'workshop' ? (l.workshopTitle || '')
+      : l.source === 'webinar' ? (l.webinarTitle || '')
+      : '';
+    return [
+      l.name, l.company, l.phone, l.email, l.industry || l.businessType || '',
+      // Source is just the channel (website, workshop, webinar), not the event name
+      l.source === 'workshop' ? 'Workshop'
+        : l.source === 'webinar' ? 'Webinar'
+        : 'Website',
+      // Event name goes in its own column
+      eventName,
+      // Attended indicates if they actually showed up
+      (l.attendedWorkshop || l.attendedWebinar) ? 'Yes'
+        : (l.source === 'workshop' || l.source === 'webinar') ? 'No' : '',
+      stageReportLabel(l.status), l.nextStep || defaultNextStep(l.status),
+      // Demo contact person (assigned team member)
+      l.teamMemberName || '', l.teamMemberPhone || '',
+      fmtDateTime(l.scheduledDate, l.scheduledTime), fmtDateTime(l.createdAt),
+    ];
+  });
 
   // Workshop registrants who were NOT converted into a lead — so Tally Solutions
   // sees the full room, not just the ones already being worked.
@@ -64,10 +80,12 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
     .filter(r => !convertedRegIds.has(r.id) && !r.staff)
     .map(r => [
       r.name, r.company || '', r.phone, r.email, '',
-      'workshop',
+      'Workshop',
+      '', // Event name (not tracked at registrant level)
       r.attended ? 'Yes' : 'No',
       'Not in pipeline', 'Add to follow-up if qualified',
-      '', '', fmtDate(r.createdAt),
+      '', '', // Demo contact person columns (not yet assigned)
+      '', fmtDateTime(r.createdAt),
     ]);
 
   return { headers, rows: [...leadRows, ...registrantRows] };
@@ -98,14 +116,21 @@ export function buildCrmReportHtml(
   opts?: {
     companyName?: string;
     preparedFor?: string;
-    // When the report covers a single workshop, its details title the report.
+    // When the report covers a single event, its details title the report.
     workshop?: { title: string; date?: string; venue?: string };
+    webinar?: { title: string; date?: string };
+    online?: { title: string };
+    manual?: { title: string };
   },
 ): string {
   const companyName = opts?.companyName || 'Optimum Prime Solutions';
   const preparedFor = opts?.preparedFor || 'Tally Solutions';
   const workshop = opts?.workshop;
-  const reportTitle = workshop ? workshop.title : 'CRM Status Report';
+  const webinar = opts?.webinar;
+  const online = opts?.online;
+  const manual = opts?.manual;
+  const event = workshop || webinar || online || manual;
+  const reportTitle = event ? event.title : 'CRM Status Report';
   const generated = new Date().toLocaleString('en-GB', {
     day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit',
   });
@@ -119,6 +144,9 @@ export function buildCrmReportHtml(
   const staffPresent      = registrants.filter(r => r.attended && r.staff).length;
   const headCount         = registrants.filter(r => r.attended).length; // prospects + staff in the room
   const workshopLeads = leads.filter(l => l.source === 'workshop').length;
+  const webinarLeads = leads.filter(l => l.source === 'webinar').length;
+  const onlineLeads = leads.filter(l => l.source === 'website').length;
+  const manualLeads = leads.filter(l => l.source === 'manual').length;
   const won = leads.filter(l => l.status === 'Closed Won').length;
   // Closed Lost only appears here when the export includes closed deals.
   const lost = leads.filter(l => l.status === 'Closed Lost').length;
@@ -130,9 +158,9 @@ export function buildCrmReportHtml(
 
   const stageSections = grouped.map(g => `
     <section class="stage">
-      <h3><span class="dot" style="background:${stageColor(g.stage)}"></span>${esc(g.stage)} <span class="count">${g.items.length}</span></h3>
+      <h3><span class="dot" style="background:${stageColor(g.stage)}"></span>${esc(stageReportLabel(g.stage))} <span class="count">${g.items.length}</span></h3>
       <table>
-        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Next Step</th></tr></thead>
+        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Demo Contact</th><th>Scheduled Demo (EAT)</th><th>Next Step</th></tr></thead>
         <tbody>
           ${g.items.map(l => `
             <tr>
@@ -140,6 +168,8 @@ export function buildCrmReportHtml(
               <td>${esc(l.company || '—')}</td>
               <td>${esc(l.phone || '—')}</td>
               <td>${l.attendedWorkshop ? '✅' : (l.source === 'workshop' ? '—' : '')}</td>
+              <td><small>${esc(l.teamMemberName || '—')}<br>${esc(l.teamMemberPhone || '')}</small></td>
+              <td><small>${esc(fmtDateTime(l.scheduledDate, l.scheduledTime) || '—')}</small></td>
               <td>${esc(l.nextStep || defaultNextStep(l.status))}</td>
             </tr>`).join('')}
         </tbody>
@@ -152,7 +182,7 @@ export function buildCrmReportHtml(
     <section class="stage">
       <h3><span class="dot" style="background:#94a3b8"></span>Workshop attendees — not yet in pipeline <span class="count">${pendingReg.length}</span></h3>
       <table>
-        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Registered</th></tr></thead>
+        <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Registered (EAT)</th></tr></thead>
         <tbody>
           ${pendingReg.map(r => `
             <tr>
@@ -160,7 +190,7 @@ export function buildCrmReportHtml(
               <td>${esc(r.company || '—')}</td>
               <td>${esc(r.phone || '—')}</td>
               <td>${r.attended ? '✅' : '—'}</td>
-              <td>${esc(fmtDate(r.createdAt))}</td>
+              <td><small>${esc(fmtDateTime(r.createdAt))}</small></td>
             </tr>`).join('')}
         </tbody>
       </table>
@@ -215,9 +245,17 @@ export function buildCrmReportHtml(
 <body><div class="wrap">
   <header class="rpt">
     <h1>${esc(reportTitle)}</h1>
-    <p><strong>${esc(companyName)}</strong> — ${workshop ? 'workshop follow-up &amp; sales pipeline' : 'sales pipeline &amp; workshop follow-up'}</p>
+    <p><strong>${esc(companyName)}</strong> — ${
+      workshop ? 'workshop follow-up &amp; sales pipeline'
+      : webinar ? 'webinar follow-up &amp; sales pipeline'
+      : online ? 'online demo pipeline'
+      : manual ? 'manual lead pipeline'
+      : 'sales pipeline'
+    }</p>
     ${workshop && (workshop.date || workshop.venue)
       ? `<p>${esc([workshop.date, workshop.venue].filter(Boolean).join(' · '))}</p>`
+      : webinar && webinar.date
+      ? `<p>${esc(webinar.date)}</p>`
       : ''}
     <p>Prepared for: ${esc(preparedFor)}</p>
     <p>Generated: ${esc(generated)}</p>
@@ -225,12 +263,17 @@ export function buildCrmReportHtml(
 
   <div class="kpis">
     <div class="kpi"><b>${leads.length}</b><span>Total Leads</span></div>
-    <div class="kpi"><b>${registrants.length}</b><span>Workshop Registered</span></div>
-    <div class="kpi"><b>${prospectsAttended}</b><span>Attended (Prospects)</span></div>
-    <div class="kpi"><b>${prospectsNoShow}</b><span>Not Attended</span></div>
-    <div class="kpi"><b>${staffPresent}</b><span>Staff Present</span></div>
-    <div class="kpi"><b>${headCount}</b><span>Total Head Count</span></div>
-    <div class="kpi"><b>${workshopLeads}</b><span>Workshop → Pipeline</span></div>
+    ${registrants.length > 0 ? `
+      <div class="kpi"><b>${registrants.length}</b><span>Workshop Registered</span></div>
+      <div class="kpi"><b>${prospectsAttended}</b><span>Attended (Prospects)</span></div>
+      <div class="kpi"><b>${prospectsNoShow}</b><span>Not Attended</span></div>
+      <div class="kpi"><b>${staffPresent}</b><span>Staff Present</span></div>
+      <div class="kpi"><b>${headCount}</b><span>Total Head Count</span></div>
+    ` : ''}
+    ${workshopLeads > 0 ? `<div class="kpi"><b>${workshopLeads}</b><span>Workshop → Pipeline</span></div>` : ''}
+    ${webinarLeads > 0 ? `<div class="kpi"><b>${webinarLeads}</b><span>Webinar → Pipeline</span></div>` : ''}
+    ${onlineLeads > 0 ? `<div class="kpi"><b>${onlineLeads}</b><span>Online → Pipeline</span></div>` : ''}
+    ${manualLeads > 0 ? `<div class="kpi"><b>${manualLeads}</b><span>Manual → Pipeline</span></div>` : ''}
     <div class="kpi"><b>${won}</b><span>Closed Won</span></div>
     ${lost > 0 ? `<div class="kpi"><b>${lost}</b><span>Closed Lost</span></div>` : ''}
   </div>

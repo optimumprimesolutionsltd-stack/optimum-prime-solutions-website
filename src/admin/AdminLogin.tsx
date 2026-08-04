@@ -29,7 +29,11 @@ export default function AdminLogin({ onLogin }: Props) {
 
     try {
       await onLogin(email.trim(), password);
-      navigate('/admin/dashboard');
+      // Wait a moment for Firebase auth state to update before navigating
+      // This prevents race condition where route check happens before auth state updates
+      setTimeout(() => {
+        navigate('/admin/dashboard');
+      }, 100);
     } catch (err) {
       setError('Login failed. Check your credentials and try again.');
       console.error(err);
@@ -45,7 +49,7 @@ export default function AdminLogin({ onLogin }: Props) {
             <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center font-black text-sm text-white">OP</div>
           </div>
           <h1 className="text-xl font-bold text-white">Admin Panel</h1>
-          <p className="text-sm text-navy-400">Sign in to manage your website content</p>
+          <p className="text-sm text-slate-400">Sign in to manage your website content</p>
         </div>
 
         <form onSubmit={handleSubmit} className="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur">
@@ -56,7 +60,7 @@ export default function AdminLogin({ onLogin }: Props) {
           )}
 
           <div className="mb-4">
-            <label className="block text-sm text-navy-300 mb-1.5">Email</label>
+            <label className="block text-sm text-slate-300 mb-1.5">Email</label>
             <input
               type="email"
               value={email}
@@ -67,7 +71,7 @@ export default function AdminLogin({ onLogin }: Props) {
           </div>
 
           <div className="mb-4 relative">
-            <label className="block text-sm text-navy-300 mb-1.5">Password</label>
+            <label className="block text-sm text-slate-300 mb-1.5">Password</label>
             <input
               type={isPasswordVisible ? 'text' : 'password'}
               value={password}
@@ -92,14 +96,14 @@ export default function AdminLogin({ onLogin }: Props) {
             <Lock className="h-4 w-4" /> Sign In
           </button>
 
-          <div className="mt-4 flex items-center justify-between text-xs text-navy-500">
+          <div className="mt-4 flex items-center justify-between text-xs text-slate-500">
             <p>Hidden admin backend: direct access via /admin only</p>
             <button type="button" onClick={resetAuth} className="font-semibold text-accent hover:text-accent-dark">
               Return to website
             </button>
           </div>
 
-          <p className="mt-3 text-center text-xs text-navy-400">
+          <p className="mt-3 text-center text-xs text-slate-400">
             Note: the admin panel uses Firebase authentication. Create your admin account in the Firebase console.
           </p>
         </form>

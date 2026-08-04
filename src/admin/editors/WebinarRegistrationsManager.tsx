@@ -11,6 +11,10 @@ import {
   regEventId, isTrainingWebinar, type WebinarEvent, type WebinarAudience,
 } from '../../data/webinarEvent';
 
+// Short date for a scheduled demo, e.g. "1 Aug". Noon avoids TZ date-shift.
+const fmtShort = (d?: string) =>
+  d ? new Date(d + 'T12:00:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
+
 interface Registrant {
   id: string;
   name: string;
@@ -33,9 +37,14 @@ interface EventForm {
   active: boolean; calendarStart: string; calendarEnd: string;
 }
 
-interface Props { data: SiteData; onSave: (d: SiteData) => void }
+interface Props {
+  data: SiteData;
+  onSave: (d: SiteData) => void;
+  // Ask the parent to open the Book-a-Demo pop-up (in Demo Leads) for a lead.
+  onBookDemo?: (leadId: string) => void;
+}
 
-export default function WebinarRegistrationsManager({ data, onSave }: Props) {
+export default function WebinarRegistrationsManager({ data, onSave, onBookDemo }: Props) {
   const [registrants, setRegistrants] = useState<Registrant[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState('');
@@ -244,11 +253,21 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
 
   const addToPipeline = (r: Registrant, stage: string) => {
     if (isInPipeline(r) || !stage) return;
-    // Training webinars are for existing clients — never turn attendees into
-    // new sales leads.
-    if (isTrainingWebinar(selectedEvent)) return;
-    const leadId = `weblead_${r.id}`;
     const eventTitle = selectedEvent?.title || 'the webinar';
+    // Training webinars are for existing clients, so attendees are NOT cold
+    // prospects — we never bulk-convert them. But an existing client who raises
+    // a need during or after training IS a real opportunity, so we still let the
+    // rep log it, capturing exactly what they asked for.
+    const training = isTrainingWebinar(selectedEvent);
+    let need = '';
+    if (training) {
+      need = (window.prompt(
+        `${r.name} is an existing client (training webinar).\n\n`
+        + 'What did they request? e.g. buying an add-on, paying for implementation, '
+        + 'a new module, or more training. Leave blank to just log a follow-up.',
+      ) || '').trim();
+    }
+    const leadId = `weblead_${r.id}`;
     const newLead: Lead = {
       id: leadId,
       name: r.name,
@@ -258,7 +277,10 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
       businessType: '',
       demoDate: '',
       currentSoftware: '',
-      message: r.message || `Attended ${eventTitle}.`,
+      message: training
+        ? `Existing client — follow-up from training "${eventTitle}"${need ? `: ${need}` : ''}.`
+        : (r.message || `Attended ${eventTitle}.`),
+      ...(training && need ? { demoNotes: need } : {}),
       // Date the lead to the webinar DAY, so every attendee reflects on the
       // webinar day in Demo Leads regardless of when they registered. Falls
       // back to their registration date, then now.
@@ -274,6 +296,9 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
     };
     onSave({ ...data, leads: [newLead, ...data.leads] });
     fbSet(`webinar_registrants/${r.id}/webinarLeadId`, leadId);
+    // Booking a demo: jump straight into the Book-a-Demo pop-up in Demo Leads
+    // for this new lead (date / time / team). Same pop-up used everywhere.
+    if (stage === 'Schedule a Demo') onBookDemo?.(leadId);
   };
 
   const removeFromPipeline = (r: Registrant) => {
@@ -316,21 +341,21 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
     <div className="mx-auto max-w-4xl space-y-5">
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-xl font-bold text-navy-900">Webinar RSVPs</h2>
-          <p className="text-sm text-navy-500 mt-0.5">Registrations per webinar — pick a webinar below</p>
+          <h2 className="text-xl font-bold text-slate-900">Webinar RSVPs</h2>
+          <p className="text-sm text-slate-500 mt-0.5">Registrations per webinar — pick a webinar below</p>
         </div>
         <button onClick={exportCSV} disabled={eventRegistrants.length === 0}
-          className="flex items-center gap-2 rounded-lg border border-navy-200 bg-white px-4 py-2.5 text-sm font-medium text-navy-700 hover:bg-navy-50 transition disabled:opacity-40">
+          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-40">
           <Download className="h-4 w-4" /> Export CSV
         </button>
       </div>
 
       {/* ── Webinar selector ── */}
-      <div className="rounded-2xl border border-navy-200 bg-white p-4 space-y-3">
+      <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
         <div className="flex items-center gap-2 flex-wrap">
-          <label className="text-xs font-bold text-navy-500 uppercase tracking-wider">Webinar</label>
+          <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Webinar</label>
           <select value={selectedEventId} onChange={e => setSelectedEventId(e.target.value)}
-            className="flex-1 min-w-[220px] rounded-lg border border-navy-200 bg-white px-3 py-2 text-sm font-medium text-navy-800 outline-none focus:border-accent">
+            className="flex-1 min-w-[220px] rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm font-medium text-slate-800 outline-none focus:border-accent">
             {events.map(e => (
               <option key={e.id} value={e.id}>
                 {e.title} — {e.date}{e.active ? '  (active)' : ''}
@@ -338,7 +363,7 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
             ))}
           </select>
           <button onClick={openEditEvent}
-            className="flex items-center gap-1.5 rounded-lg border border-navy-200 bg-white px-3 py-2 text-xs font-semibold text-navy-700 hover:bg-navy-50 transition">
+            className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 transition">
             <Pencil className="h-3.5 w-3.5" /> Edit details
           </button>
           <button onClick={openNewEvent}
@@ -347,25 +372,29 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
           </button>
         </div>
         {selectedEvent && (
-          <div className="flex items-center gap-3 flex-wrap text-xs text-navy-500">
+          <div className="flex items-center gap-3 flex-wrap text-xs text-slate-500">
             <span className="inline-flex items-center gap-1"><Calendar className="h-3.5 w-3.5" />{cardDate}</span>
             <span className="inline-flex items-center gap-1"><Building2 className="h-3.5 w-3.5" />{selectedEvent.venue}</span>
-            {isTrainingWebinar(selectedEvent) ? (
-              <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 px-2 py-0.5 font-semibold text-purple-700">
-                🎓 Training — existing clients
-              </span>
-            ) : (
-              <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 font-semibold text-amber-700">
-                🎯 New prospects
-              </span>
-            )}
+            {/* Audience is settable right here on the main view — no need to
+                open "Edit details". Writes straight to Firebase. */}
+            <label className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-semibold ${isTrainingWebinar(selectedEvent) ? 'bg-purple-100 text-purple-700' : 'bg-red-100 text-red-700'}`}>
+              <span className="opacity-70">For:</span>
+              <select
+                value={selectedEvent.audience || 'prospects'}
+                onChange={e => fbSet(`webinars/${selectedEvent.id}/audience`, e.target.value)}
+                title="Who is this webinar for?"
+                className="bg-transparent font-semibold outline-none cursor-pointer">
+                <option value="prospects">🎯 New prospects</option>
+                <option value="clients">🎓 Existing clients — training</option>
+              </select>
+            </label>
             {selectedEvent.active ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 font-semibold text-green-700">
                 <Star className="h-3 w-3" /> Live — open for RSVPs
               </span>
             ) : (
               <button onClick={makeActive}
-                className="inline-flex items-center gap-1 rounded-full bg-navy-100 px-2 py-0.5 font-semibold text-navy-600 hover:bg-navy-200 transition">
+                className="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 font-semibold text-slate-600 hover:bg-slate-200 transition">
                 <Star className="h-3 w-3" /> Make this the live webinar
               </button>
             )}
@@ -374,7 +403,7 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
             {!isTrainingWebinar(selectedEvent) && (
               <button onClick={reflectOnWebinarDay}
                 title="Set every lead from this webinar to the webinar day, so early sign-ups group with everyone else on that date in Demo Leads"
-                className="inline-flex items-center gap-1 rounded-full border border-navy-200 bg-white px-2.5 py-0.5 font-semibold text-navy-600 hover:bg-navy-50 transition">
+                className="inline-flex items-center gap-1 rounded-full border border-slate-200 bg-white px-2.5 py-0.5 font-semibold text-slate-600 hover:bg-slate-50 transition">
                 <Calendar className="h-3 w-3" /> Reflect all on webinar day
               </button>
             )}
@@ -386,71 +415,71 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
       {editing && (
         <div className="rounded-2xl border border-accent/30 bg-white shadow-lg p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-bold text-navy-900">
+            <h3 className="font-bold text-slate-900">
               {events.some(e => e.id === editing.id) ? 'Edit webinar details' : 'New webinar'}
             </h3>
-            <button onClick={() => setEditing(null)} className="rounded-lg p-1.5 hover:bg-navy-100 transition">
-              <X className="h-4 w-4 text-navy-500" />
+            <button onClick={() => setEditing(null)} className="rounded-lg p-1.5 hover:bg-slate-100 transition">
+              <X className="h-4 w-4 text-slate-500" />
             </button>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-navy-600 mb-1">Title *</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Title *</label>
               <input value={editing.title} onChange={e => setE('title', e.target.value)}
-                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-navy-600 mb-1">Date * (as shown to visitors)</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Date * (as shown to visitors)</label>
               <input value={editing.date} onChange={e => setE('date', e.target.value)}
                 placeholder="e.g. Friday, 30th October 2026"
-                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-navy-600 mb-1">Time</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Time</label>
               <input value={editing.time} onChange={e => setE('time', e.target.value)}
                 placeholder="e.g. 7:00 AM (EAT)"
-                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-navy-600 mb-1">Join details / link *</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Join details / link *</label>
               <input value={editing.venue} onChange={e => setE('venue', e.target.value)}
                 placeholder="e.g. Online via Google Meet — https://meet.google.com/xxx-xxxx-xxx"
-                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
             </div>
             <div className="sm:col-span-2">
-              <label className="block text-xs font-semibold text-navy-600 mb-1">Who is this webinar for?</label>
-              <div className="flex rounded-xl overflow-hidden border border-navy-200">
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Who is this webinar for?</label>
+              <div className="flex rounded-xl overflow-hidden border border-slate-200">
                 <button type="button" onClick={() => setE('audience', 'prospects')}
-                  className={`flex-1 py-2.5 text-sm font-semibold transition ${editing.audience === 'prospects' ? 'bg-accent text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                  className={`flex-1 py-2.5 text-sm font-semibold transition ${editing.audience === 'prospects' ? 'bg-accent text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
                   🎯 New prospects
                 </button>
                 <button type="button" onClick={() => setE('audience', 'clients')}
-                  className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-navy-200 ${editing.audience === 'clients' ? 'bg-navy-700 text-white' : 'bg-white text-navy-600 hover:bg-navy-50'}`}>
+                  className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-slate-200 ${editing.audience === 'clients' ? 'bg-slate-700 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}>
                   🎓 Existing clients — training
                 </button>
               </div>
-              <p className="mt-1 text-[11px] text-navy-400">
+              <p className="mt-1 text-[11px] text-slate-400">
                 {editing.audience === 'clients'
-                  ? 'Training session — attendees are tracked for attendance only and are NOT added to Demo Leads.'
+                  ? 'Training for existing clients — attendees aren’t treated as new leads. If a client requests something afterwards (add-on, implementation, training…), you can still log that follow-up per person.'
                   : 'Lead-generation webinar — attendees can be converted into Demo Leads, just like a workshop.'}
               </p>
             </div>
             <div>
-              <label className="block text-xs font-semibold text-navy-600 mb-1">Calendar start (optional)</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Calendar start (optional)</label>
               <input value={editing.calendarStart} onChange={e => setE('calendarStart', e.target.value)}
                 placeholder="20261030T040000Z"
-                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
             </div>
             <div>
-              <label className="block text-xs font-semibold text-navy-600 mb-1">Calendar end (optional)</label>
+              <label className="block text-xs font-semibold text-slate-600 mb-1">Calendar end (optional)</label>
               <input value={editing.calendarEnd} onChange={e => setE('calendarEnd', e.target.value)}
                 placeholder="20261030T070000Z"
-                className="w-full rounded-xl border border-navy-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
             </div>
           </div>
-          <label className="flex items-center gap-2 text-sm text-navy-700 cursor-pointer">
+          <label className="flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
             <input type="checkbox" checked={editing.active} onChange={e => setE('active', e.target.checked)}
-              className="h-4 w-4 rounded border-navy-300 text-accent focus:ring-accent" />
+              className="h-4 w-4 rounded border-slate-300 text-accent focus:ring-accent" />
             Make this the live webinar shown on the public RSVP page
           </label>
           <div className="flex items-center gap-2">
@@ -459,7 +488,7 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
               Save webinar
             </button>
             <button onClick={() => setEditing(null)}
-              className="rounded-xl border border-navy-200 px-4 py-2.5 text-sm font-medium text-navy-600 hover:bg-navy-50 transition">
+              className="rounded-xl border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">
               Cancel
             </button>
             {events.some(e => e.id === editing.id) && (
@@ -477,17 +506,17 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
           <p className="text-xl font-bold text-green-700">{prospectsAttended}</p>
           <p className="text-[10px] font-medium text-green-700">Attended (Prospects)</p>
         </div>
-        <div className="rounded-xl bg-amber-50 p-3 text-center">
-          <p className="text-xl font-bold text-amber-700">{prospectsNoShow}</p>
-          <p className="text-[10px] font-medium text-amber-700">Not Attended</p>
+        <div className="rounded-xl bg-red-50 p-3 text-center">
+          <p className="text-xl font-bold text-red-700">{prospectsNoShow}</p>
+          <p className="text-[10px] font-medium text-red-700">Not Attended</p>
         </div>
         <div className="rounded-xl bg-slate-100 p-3 text-center">
           <p className="text-xl font-bold text-slate-600">{staffPresent}</p>
           <p className="text-[10px] font-medium text-slate-600">Staff Present</p>
         </div>
-        <div className="rounded-xl bg-navy-50 p-3 text-center">
-          <p className="text-xl font-bold text-navy-700">{attendedCount}</p>
-          <p className="text-[10px] font-medium text-navy-700">Total Head Count</p>
+        <div className="rounded-xl bg-slate-50 p-3 text-center">
+          <p className="text-xl font-bold text-slate-700">{attendedCount}</p>
+          <p className="text-[10px] font-medium text-slate-700">Total Head Count</p>
         </div>
       </div>
 
@@ -495,7 +524,7 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
         {([['all', 'All'], ['attended', 'Attended'], ['pending', 'Not Arrived'], ['staff', 'Staff']] as const).map(([key, label]) => (
           <button key={key} onClick={() => setFilter(key)}
             className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
-              filter === key ? 'bg-navy-900 text-white' : 'bg-navy-50 text-navy-600 hover:bg-navy-100'
+              filter === key ? 'bg-slate-900 text-white' : 'bg-slate-50 text-slate-600 hover:bg-slate-100'
             }`}>
             {label}
           </button>
@@ -503,23 +532,23 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
       </div>
 
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-navy-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
         <input value={search} onChange={e => setSearch(e.target.value)}
           placeholder="Search by name, email, phone, company..."
-          className="w-full rounded-lg border border-navy-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
+          className="w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
       </div>
 
       {!loaded ? (
-        <div className="rounded-2xl border border-navy-200 bg-white py-16 text-center">
-          <p className="text-sm font-medium text-navy-500">Loading registrations…</p>
+        <div className="rounded-2xl border border-slate-200 bg-white py-16 text-center">
+          <p className="text-sm font-medium text-slate-500">Loading registrations…</p>
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-navy-200 bg-white py-16 text-center">
-          <UsersIcon className="mx-auto h-10 w-10 text-navy-300" />
-          <p className="mt-3 text-sm font-medium text-navy-500">
+        <div className="rounded-2xl border border-slate-200 bg-white py-16 text-center">
+          <UsersIcon className="mx-auto h-10 w-10 text-slate-300" />
+          <p className="mt-3 text-sm font-medium text-slate-500">
             {eventRegistrants.length === 0 ? 'No registrations for this webinar yet' : 'No registrations match your search'}
           </p>
-          <p className="mt-1 text-xs text-navy-400">
+          <p className="mt-1 text-xs text-slate-400">
             {eventRegistrants.length === 0
               ? 'Make this webinar live and share the invite link — signups will appear here.'
               : 'Try a different search term.'}
@@ -528,13 +557,13 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
       ) : (
         <div className="space-y-3">
           {filtered.map(r => (
-            <div key={r.id} className={`rounded-2xl border p-4 space-y-2 ${r.staff ? 'border-slate-300 bg-slate-100' : r.attended ? 'border-green-300 bg-green-50/40' : 'border-navy-200 bg-white'}`}>
+            <div key={r.id} className={`rounded-2xl border p-4 space-y-2 ${r.staff ? 'border-slate-300 bg-slate-100' : r.attended ? 'border-green-300 bg-green-50/40' : 'border-slate-200 bg-white'}`}>
               <div className="flex items-center gap-4">
-                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-teal-600 to-navy-900 flex items-center justify-center text-xs font-bold text-white shrink-0">
+                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-teal-600 to-slate-900 flex items-center justify-center text-xs font-bold text-white shrink-0">
                   {r.name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-navy-900 truncate">
+                  <p className="text-sm font-bold text-slate-900 truncate">
                     {r.name}
                     {r.staff && (
                       <span className="ml-2 inline-flex items-center gap-1 rounded-full bg-slate-200 px-2 py-0.5 text-[10px] font-semibold text-slate-600 align-middle">
@@ -547,9 +576,9 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
                       </span>
                     )}
                   </p>
-                  <p className="text-xs text-navy-500 truncate">{r.phone} · {r.company || 'No company'}</p>
+                  <p className="text-xs text-slate-500 truncate">{r.phone} · {r.company || 'No company'}</p>
                 </div>
-                <span className="text-[10px] text-navy-400 whitespace-nowrap">
+                <span className="text-[10px] text-slate-400 whitespace-nowrap">
                   {new Date(r.createdAt).toLocaleDateString()}
                 </span>
                 <select
@@ -557,7 +586,7 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
                   onChange={e => setStaff(r, e.target.value === 'staff')}
                   title="Is this attendee a prospect or your own staff? Staff are excluded from lead stats and exports."
                   className={`rounded-lg border px-2 py-1.5 text-xs font-semibold outline-none cursor-pointer shrink-0 ${
-                    r.staff ? 'border-slate-400 bg-slate-200 text-slate-700' : 'border-navy-200 bg-white text-navy-700 focus:border-accent'
+                    r.staff ? 'border-slate-400 bg-slate-200 text-slate-700' : 'border-slate-200 bg-white text-slate-700 focus:border-accent'
                   }`}>
                   <option value="prospect">Prospect</option>
                   <option value="staff">Staff</option>
@@ -571,15 +600,15 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
                   attendance for the head count. Only the pipeline action
                   below is hidden for staff (they are not prospects). */}
               <div className="space-y-2">
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pl-14 text-xs text-navy-600">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pl-14 text-xs text-slate-600">
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <Mail className="h-3.5 w-3.5 text-navy-400 shrink-0" /><span className="truncate">{r.email || '—'}</span>
+                  <Mail className="h-3.5 w-3.5 text-slate-400 shrink-0" /><span className="truncate">{r.email || '—'}</span>
                 </div>
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <Building2 className="h-3.5 w-3.5 text-navy-400 shrink-0" /><span className="truncate">{r.company || '—'}</span>
+                  <Building2 className="h-3.5 w-3.5 text-slate-400 shrink-0" /><span className="truncate">{r.company || '—'}</span>
                 </div>
                 <div className="flex items-center gap-1.5 min-w-0">
-                  <Calendar className="h-3.5 w-3.5 text-navy-400 shrink-0" /><span className="truncate">{cardDate}</span>
+                  <Calendar className="h-3.5 w-3.5 text-slate-400 shrink-0" /><span className="truncate">{cardDate}</span>
                 </div>
               </div>
               <div className="pl-14 flex items-center gap-2 pt-1 flex-wrap">
@@ -587,7 +616,7 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
                   className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                     r.attended
                       ? 'bg-green-600 text-white hover:bg-green-700'
-                      : 'bg-navy-100 text-navy-700 hover:bg-navy-200'
+                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
                   }`}>
                   {r.attended ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Circle className="h-3.5 w-3.5" />}
                   {r.attended ? 'Attended' : 'Mark Attended'}
@@ -602,19 +631,52 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
                   className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
                   <Phone className="h-3 w-3 inline mr-1" />WhatsApp
                 </a>
+                {/* Book a demo straight from a webinar attendee — opens the same
+                    Book-a-Demo pop-up over in Demo Leads. */}
+                {!r.staff && !isInPipeline(r) && (
+                  <button onClick={() => addToPipeline(r, 'Schedule a Demo')}
+                    title="Book a demo for this attendee (opens the scheduling pop-up)"
+                    className="inline-flex items-center gap-1 rounded-lg bg-accent px-3 py-1.5 text-xs font-bold text-white hover:bg-accent/90 transition">
+                    <Calendar className="h-3.5 w-3.5" /> Book demo
+                  </button>
+                )}
                 {r.staff ? (
                   <span className="text-xs text-slate-400 italic">Internal — not a lead</span>
-                ) : isInPipeline(r) ? (
-                  <span className="rounded-lg bg-navy-100 pl-3 pr-1.5 py-1 text-xs font-semibold text-navy-500 inline-flex items-center gap-1.5">
-                    <CheckCircle2 className="h-3.5 w-3.5" />
-                    In pipeline: {data.leads.find(l => l.webinarRegId === r.id)?.status || '—'}
-                    <button onClick={() => removeFromPipeline(r)} title="Remove from pipeline (added by mistake)"
-                      className="rounded p-1 text-red-400 hover:bg-red-100 hover:text-red-600 transition">
-                      <Undo2 className="h-3.5 w-3.5" />
-                    </button>
+                ) : isInPipeline(r) ? (() => {
+                  const lead = data.leads.find(l => l.webinarRegId === r.id);
+                  return (
+                    <span className="rounded-lg bg-slate-100 pl-3 pr-1.5 py-1 text-xs font-semibold text-slate-500 inline-flex items-center gap-1.5">
+                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      {lead?.scheduledDate
+                        ? <span className="text-red-700">📅 {fmtShort(lead.scheduledDate)}{lead.scheduledTime ? ` · ${lead.scheduledTime}` : ''}</span>
+                        : <>In pipeline: {lead?.status || '—'}</>}
+                      {lead && (
+                        <button onClick={() => onBookDemo?.(lead.id)}
+                          title={lead.scheduledDate ? 'Edit this booked demo' : 'Book a demo (date & time)'}
+                          className="rounded p-1 text-accent hover:bg-accent/10 transition">
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                      <button onClick={() => removeFromPipeline(r)} title="Remove from pipeline (added by mistake)"
+                        className="rounded p-1 text-red-400 hover:bg-red-100 hover:text-red-600 transition">
+                        <Undo2 className="h-3.5 w-3.5" />
+                      </button>
+                    </span>
+                  );
+                })() : isTrainingWebinar(selectedEvent) ? (
+                  <span className="inline-flex items-center gap-1 rounded-lg bg-purple-50 pl-2.5 pr-1 py-1 text-xs font-semibold text-purple-700">
+                    <UserPlus className="h-3.5 w-3.5" />
+                    <select
+                      defaultValue=""
+                      onChange={e => { if (e.target.value) addToPipeline(r, e.target.value); }}
+                      title="Existing client — if they requested something (add-on, implementation, training…), log it as a follow-up opportunity"
+                      className="bg-transparent text-purple-700 font-semibold text-xs outline-none cursor-pointer pr-1 py-0.5">
+                      <option value="" disabled>Requested something? Log follow-up →</option>
+                      {PIPELINE_STAGES.map(s => (
+                        <option key={s.id} value={s.id} className="text-slate-900">{s.id} — {s.hint}</option>
+                      ))}
+                    </select>
                   </span>
-                ) : isTrainingWebinar(selectedEvent) ? (
-                  <span className="text-xs text-slate-400 italic">Existing client — training (not a lead)</span>
                 ) : (
                   <span className="inline-flex items-center gap-1 rounded-lg bg-accent/10 pl-2.5 pr-1 py-1 text-xs font-semibold text-accent">
                     <UserPlus className="h-3.5 w-3.5" />
@@ -625,7 +687,7 @@ export default function WebinarRegistrationsManager({ data, onSave }: Props) {
                       className="bg-transparent text-accent font-semibold text-xs outline-none cursor-pointer pr-1 py-0.5">
                       <option value="" disabled>Add to follow-up as…</option>
                       {PIPELINE_STAGES.map(s => (
-                        <option key={s.id} value={s.id} className="text-navy-900">{s.id} — {s.hint}</option>
+                        <option key={s.id} value={s.id} className="text-slate-900">{s.id} — {s.hint}</option>
                       ))}
                     </select>
                   </span>

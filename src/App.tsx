@@ -7,7 +7,8 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
 import MobileStickyCTA from './components/MobileStickyCTA';
-import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth } from './firebase/config';
+import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth, fbHasAdminClaim } from './firebase/config';
+import { isAdminEmail } from './admin/permissions';
 import type { User } from 'firebase/auth';
 import { signInAnonymously } from 'firebase/auth';
 
@@ -176,6 +177,7 @@ function SiteRoutes() {
 function App() {
   const [user, setUser] = useState<User | null>(null);
   const [authReady, setAuthReady] = useState(false);
+  const [isFullAdmin, setIsFullAdmin] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
@@ -187,42 +189,46 @@ function App() {
   }, [pathname]);
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setAuthReady(true);
-    }, 2000);
+    if (!user) {
+      setIsFullAdmin(false);
+      return;
+    }
 
+    const checkAdminStatus = async () => {
+      if (isAdminEmail(user.email)) {
+        setIsFullAdmin(true);
+      } else {
+        const hasAdminClaim = await fbHasAdminClaim(user);
+        setIsFullAdmin(hasAdminClaim);
+      }
+    };
+
+    checkAdminStatus();
+  }, [user]);
+
+  useEffect(() => {
     let unsubscribe: (() => void) | null = null;
+    let mounted = true;
+
     try {
       unsubscribe = fbOnAuthStateChanged((currentUser) => {
-        clearTimeout(timeout);
-        setUser(currentUser);
-        setAuthReady(true);
+        if (mounted) {
+          setUser(currentUser);
+          setAuthReady(true);
+        }
       });
       if (!unsubscribe || unsubscribe.toString() === '() => {}') {
-        clearTimeout(timeout);
-        setAuthReady(true);
+        if (mounted) setAuthReady(true);
       }
     } catch {
-      clearTimeout(timeout);
-      setAuthReady(true);
+      if (mounted) setAuthReady(true);
     }
 
     return () => {
-      clearTimeout(timeout);
+      mounted = false;
       if (unsubscribe) unsubscribe();
     };
   }, []);
-
-  useEffect(() => {
-    if (user === null) {
-      try {
-        const authInstance = fbAuth();
-        signInAnonymously(authInstance).catch(() => {});
-      } catch {
-        // Firebase auth not available, continue without it
-      }
-    }
-  }, [user]);
 
   const isAuthenticated = useMemo(
     () => Boolean(user && !user.isAnonymous),
@@ -230,8 +236,15 @@ function App() {
   );
 
   const handleLogin = async (email: string, password: string) => {
-    await fbLogin(email, password);
-    navigate('/admin/dashboard');
+    try {
+      await fbLogin(email, password);
+      // Wait a moment for Firebase auth state to propagate
+      // fbOnAuthStateChanged will update user state automatically
+      // Then navigation will succeed when route check runs
+    } catch (error) {
+      console.error('Login error:', error);
+      throw error;
+    }
   };
 
   const handleLogout = async () => {
@@ -250,7 +263,7 @@ function App() {
             path="/admin/*"
             element={
               isAuthenticated
-                ? <Suspense fallback={<PageLoader />}><AdminLayout onLogout={handleLogout} /></Suspense>
+                ? <Suspense fallback={<PageLoader />}><AdminLayout onLogout={handleLogout} isFullAdmin={isFullAdmin} /></Suspense>
                 : <Navigate to="/admin" replace />
             }
           />
