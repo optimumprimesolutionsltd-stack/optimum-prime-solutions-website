@@ -26,6 +26,7 @@ interface UnifiedContact {
   name: string;
   email?: string;
   phone?: string;
+  company?: string;
   sources: Set<'lead' | 'subscriber' | 'whatsapp'>;
   lastInteraction: string;
   status: 'active' | 'unsubscribed';
@@ -51,6 +52,7 @@ export default function ContactsDirectory({ leads, subscribers, whatsappContacts
           name: l.name,
           email: l.email,
           phone: l.phone,
+          company: l.company,
           sources: new Set(['lead']),
           lastInteraction: l.createdAt,
           status: 'active',
@@ -58,6 +60,9 @@ export default function ContactsDirectory({ leads, subscribers, whatsappContacts
       } else {
         const existing = contactMap.get(key)!;
         existing.sources.add('lead');
+        if (!existing.company && l.company) {
+          existing.company = l.company;
+        }
         if (new Date(l.createdAt).getTime() > new Date(existing.lastInteraction).getTime()) {
           existing.lastInteraction = l.createdAt;
         }
@@ -119,9 +124,10 @@ export default function ContactsDirectory({ leads, subscribers, whatsappContacts
   }, [unifiedContacts, search]);
 
   const exportCSV = () => {
-    const headers = ['Name', 'Email', 'Phone', 'Sources', 'Status', 'Last Interaction'];
+    const headers = ['Name', 'Company', 'Email', 'Phone', 'Sources', 'Status', 'Last Interaction'];
     const rows = filtered.map(c => [
       c.name,
+      c.company || '',
       c.email || '',
       c.phone || '',
       Array.from(c.sources).join(' + '),
@@ -173,6 +179,7 @@ export default function ContactsDirectory({ leads, subscribers, whatsappContacts
           <thead>
             <tr className="border-b border-slate-200 bg-slate-50">
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Name</th>
+              <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Company</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Email</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Phone</th>
               <th className="px-4 py-3 text-left text-xs font-semibold text-slate-600">Sources</th>
@@ -184,6 +191,7 @@ export default function ContactsDirectory({ leads, subscribers, whatsappContacts
             {filtered.map((contact, i) => (
               <tr key={i} className="border-b border-slate-100 hover:bg-slate-50 transition">
                 <td className="px-4 py-3 text-sm font-medium text-slate-900">{contact.name}</td>
+                <td className="px-4 py-3 text-sm text-slate-600">{contact.company || '—'}</td>
                 <td className="px-4 py-3 text-sm text-slate-600">{contact.email || '—'}</td>
                 <td className="px-4 py-3 text-sm text-slate-600">{contact.phone || '—'}</td>
                 <td className="px-4 py-3 text-sm">
