@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import {
-  Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown,
+  Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown, ChevronUp,
   Download, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
   User, Send, AlertCircle, FileText, Video,
 } from 'lucide-react';
@@ -1958,7 +1958,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               </button>
             </div>
 
-            <div className="px-6 py-4 space-y-5 min-h-0 flex-1 overflow-y-auto pb-20">
+            <div id="export-content" className="px-6 py-4 space-y-5 min-h-0 flex-1 overflow-y-auto pb-20">
               {/* Summary */}
               <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3">
                 <p className="text-sm text-blue-900">
@@ -2024,10 +2024,28 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             </div>
 
             <div className="absolute bottom-0 left-0 right-0 border-t border-slate-200 px-4 sm:px-6 py-4 flex flex-col-reverse gap-2 bg-white z-20 rounded-b-lg">
-              <button onClick={() => setShowExportDialog(false)}
-                className="w-full rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition">
-                Cancel
-              </button>
+              <div className="flex gap-2">
+                <button onClick={() => setShowExportDialog(false)}
+                  className="flex-1 rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition">
+                  Cancel
+                </button>
+                <button
+                  onClick={() => {
+                    const content = document.getElementById('export-content');
+                    if (content) content.scrollBy({ top: -100, behavior: 'smooth' });
+                  }}
+                  className="px-3 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 active:bg-slate-100 transition">
+                  <ChevronUp className="h-4 w-4 text-slate-600" />
+                </button>
+                <button
+                  onClick={() => {
+                    const content = document.getElementById('export-content');
+                    if (content) content.scrollBy({ top: 100, behavior: 'smooth' });
+                  }}
+                  className="px-3 py-2.5 rounded-lg border border-slate-200 hover:bg-slate-50 active:bg-slate-100 transition">
+                  <ChevronDown className="h-4 w-4 text-slate-600" />
+                </button>
+              </div>
               <button onClick={performExport} disabled={selectedFields.size === 0}
                 className="w-full flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-3 text-base font-bold text-white hover:bg-blue-700 active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed">
                 <Download className="h-5 w-5 text-white" />
