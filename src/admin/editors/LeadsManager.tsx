@@ -89,7 +89,7 @@ interface ScheduleForm {
 export default function LeadsManager({ data, onSave, openScheduleLeadId, onScheduleConsumed }: P) {
   const [search, setSearch]           = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
-  const [filterSource, setFilterSource] = useState<'All' | 'workshop' | 'webinar' | 'online' | 'manual'>('All');
+  const [filterSource, setFilterSource] = useState<'All' | 'workshop' | 'webinar' | 'online' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct'>('All');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
   const [showAddLead, setShowAddLead] = useState(false);
   const [addLeadForm, setAddLeadForm] = useState({
@@ -183,11 +183,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     return true;
   };
 
-  const sourceCategory = (l: Lead): 'workshop' | 'webinar' | 'online' | 'manual' =>
+  const sourceCategory = (l: Lead): 'workshop' | 'webinar' | 'online' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' =>
     l.source === 'workshop' ? 'workshop'
     : l.source === 'webinar' ? 'webinar'
     : l.source === 'website' ? 'online'
-    : 'manual';
+    : (l.source as 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | undefined) || 'email';
 
   // The date range scopes the whole Demo Leads view — stats, tab counts and the
   // list — so the numbers always match the chosen period.
@@ -1086,7 +1086,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             and Select-all only touch the source you're looking at. */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-slate-500 mr-1">Source:</span>
-          {([['All', 'All sources'], ['online', 'Online / Website'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['manual', 'Manual']] as [typeof filterSource, string][]).map(([val, label]) => {
+          {([['All', 'All sources'], ['online', 'Online / Website'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['email', 'Email'], ['whatsapp', 'WhatsApp'], ['referral', 'Referral'], ['phone', 'Phone'], ['direct', 'Direct']] as [typeof filterSource, string][]).map(([val, label]) => {
             const isActive = filterSource === val;
             const count = val === 'All'
               ? data.leads.length
