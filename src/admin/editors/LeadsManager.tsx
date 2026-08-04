@@ -962,6 +962,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   return (
     <div className="mx-auto max-w-4xl space-y-5">
 
+      {/* TEST BANNER */}
+      <div className="bg-red-500 text-white p-4 rounded-lg mb-4">
+        <p>TEST BANNER - If you see this, updates are working!</p>
+      </div>
+
       {/* ── Header ── */}
       <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
