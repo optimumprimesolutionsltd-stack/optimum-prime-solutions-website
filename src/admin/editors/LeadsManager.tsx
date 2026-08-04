@@ -963,7 +963,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     <div className="mx-auto max-w-4xl space-y-5">
 
       {/* ── Header ── */}
-      <div className="flex items-center justify-between flex-wrap gap-3">
+      <div className="sticky top-0 z-20 bg-white py-4 -mx-5 px-5 border-b border-slate-200 flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-xl font-bold text-slate-900">Demo Leads</h2>
           <p className="text-sm text-slate-500 mt-0.5">All demo requests — website and manually booked</p>
