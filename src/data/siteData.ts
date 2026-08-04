@@ -19,7 +19,7 @@ export interface Lead {
   demoType?: 'online' | 'physical'; demoLocation?: string;
   teamMemberName?: string; teamMemberPhone?: string;
   meetLink?: string; meetSent?: boolean;
-  source?: 'website' | 'manual' | 'workshop' | 'webinar'; // where the lead came from
+  source?: 'website' | 'manual' | 'workshop' | 'webinar' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct'; // where the lead came from
   industry?: string; demoNotes?: string;
   requestType?: 'demo' | 'consultation' | 'bizanalyst'; // demo, consultation, or biz analyst enquiry
   // CRM follow-up fields
