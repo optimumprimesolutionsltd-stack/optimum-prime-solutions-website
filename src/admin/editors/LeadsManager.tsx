@@ -2048,7 +2048,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           ))}
         </div>
       ) : null}
-      )}
 
       {/* Export Dialog */}
       {showExportDialog && (
