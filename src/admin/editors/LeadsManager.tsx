@@ -1045,6 +1045,30 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           >
             <Plus className="h-4 w-4" /> Book New Demo
           </button>
+
+          {/* View toggle */}
+          <div className="flex items-center gap-1.5 rounded-xl border-2 border-slate-300 bg-slate-50 p-1.5">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                viewMode === 'list'
+                  ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <List className="h-4 w-4" /> List
+            </button>
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition ${
+                viewMode === 'kanban'
+                  ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
+                  : 'text-slate-500 hover:text-slate-700'
+              }`}
+            >
+              <LayoutGrid className="h-4 w-4" /> Board
+            </button>
+          </div>
         </div>
       </div>
 
@@ -1066,30 +1090,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           <p className="text-sm font-semibold text-blue-800">{editSuccess}</p>
         </div>
       )}
-
-      {/* View toggle */}
-      <div className="flex items-center gap-1.5 rounded-xl border-2 border-slate-300 bg-slate-50 p-1.5">
-        <button
-          onClick={() => setViewMode('list')}
-          className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-            viewMode === 'list'
-              ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
-              : 'text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          <List className="h-4 w-4" /> List
-        </button>
-        <button
-          onClick={() => setViewMode('kanban')}
-          className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold transition ${
-            viewMode === 'kanban'
-              ? 'bg-white text-slate-900 shadow-sm border border-slate-200'
-              : 'text-slate-500 hover:text-slate-700'
-          }`}
-        >
-          <LayoutGrid className="h-4 w-4" /> Board
-        </button>
-      </div>
 
       {/* ── Stats Strip ── */}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
