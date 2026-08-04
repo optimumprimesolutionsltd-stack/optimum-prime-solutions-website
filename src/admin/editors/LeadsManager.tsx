@@ -1958,7 +1958,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               </button>
             </div>
 
-            <div className="px-6 py-4 space-y-5 max-h-[70vh] overflow-y-auto">
+            <div className="px-6 py-4 space-y-5 flex-1 overflow-y-auto">
               {/* Summary */}
               <div className="rounded-lg bg-blue-50 border border-blue-200 px-4 py-3">
                 <p className="text-sm text-blue-900">
