@@ -1950,7 +1950,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       {/* Export Dialog */}
       {showExportDialog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="w-full max-w-2xl max-h-[90vh] flex flex-col rounded-xl bg-white shadow-2xl overflow-hidden">
+          <div className="w-full max-w-2xl max-h-[90vh] flex flex-col rounded-xl bg-white shadow-2xl">
             <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
               <h3 className="text-lg font-bold text-slate-900">Export Leads</h3>
               <button onClick={() => setShowExportDialog(false)} className="text-slate-400 hover:text-slate-600">
