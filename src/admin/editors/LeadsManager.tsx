@@ -10,7 +10,7 @@ import {
   buildCrmReportHtml, buildUnifiedCsv, buildUnifiedXls, downloadFile, printHtml,
   type WorkshopRegistrant,
 } from '../crm/crmExport';
-import { PIPELINE_ORDER, stageColor, stageTint, defaultNextStep } from '../crm/pipeline';
+import { PIPELINE_ORDER, stageColor, stageTint, defaultNextStep, isValidTransition, getValidNextStages } from '../crm/pipeline';
 import {
   LEGACY_WORKSHOP_ID, parseWorkshops, regEventId, type WorkshopEvent,
 } from '../../data/workshopEvent';
@@ -317,6 +317,7 @@ export default function LeadsManager({ data, onSave }: P) {
   });
   const [schedSubmitting, setSchedSubmitting] = useState(false);
   const [schedError, setSchedError]           = useState('');
+  const [escalationError, setEscalationError] = useState<string | null>(null);
 
   // Edit mode for already-scheduled leads
   const [editingId, setEditingId]   = useState<string | null>(null);
@@ -390,21 +391,32 @@ export default function LeadsManager({ data, onSave }: P) {
 
   // ── Status update ────────────────────────────────────────────────────────
   const updateStatus = (id: string, status: string) => {
+    const lead = data.leads.find(l => l.id === id);
+    if (!lead) return;
+
+    // Validate escalation: prevent moving backward in the pipeline
+    if (!isValidTransition(lead.status, status)) {
+      setEscalationError(`Cannot move "${lead.name}" from "${lead.status}" back to "${status}". Leads can only escalate forward or to Closed Lost.`);
+      setTimeout(() => setEscalationError(null), 5000);
+      return;
+    }
+
     onSave({ ...data, leads: data.leads.map(l => l.id === id ? { ...l, status } : l) });
+    setEscalationError(null);
+
     if (status === 'Schedule a Demo') {
       setSchedulingId(id);
-      const lead = data.leads.find(l => l.id === id);
       setSchedForm({
         // Pre-fill with already-saved schedule details first,
         // then fall back to the client's requested preferences
-        scheduledDate: lead?.scheduledDate || lead?.demoDate || '',
-        scheduledTime: lead?.scheduledTime || lead?.demoTime || '',
-        demoType: lead?.demoType || 'online',
-        demoLocation: lead?.demoLocation || '',
-        teamMemberName: lead?.teamMemberName || '',
-        teamMemberPhone: lead?.teamMemberPhone || '',
+        scheduledDate: lead.scheduledDate || lead.demoDate || '',
+        scheduledTime: lead.scheduledTime || lead.demoTime || '',
+        demoType: lead.demoType || 'online',
+        demoLocation: lead.demoLocation || '',
+        teamMemberName: lead.teamMemberName || '',
+        teamMemberPhone: lead.teamMemberPhone || '',
         extraTeam: (lead as any)?.extraTeam || [],
-        demoNotes: lead?.demoNotes || lead?.message || '',
+        demoNotes: lead.demoNotes || lead.message || '',
       });
       setSchedError('');
     } else {
@@ -441,10 +453,21 @@ export default function LeadsManager({ data, onSave }: P) {
 
   const applyBulkStatus = () => {
     if (selectedIds.size === 0) return;
-    onSave({
-      ...data,
-      leads: data.leads.map(l => selectedIds.has(l.id) ? { ...l, status: bulkStatus } : l),
+    let skipped = 0;
+    const updated = data.leads.map(l => {
+      if (!selectedIds.has(l.id)) return l;
+      // Validate escalation for each lead
+      if (!isValidTransition(l.status, bulkStatus)) {
+        skipped++;
+        return l; // Skip this lead
+      }
+      return { ...l, status: bulkStatus };
     });
+    onSave({ ...data, leads: updated });
+    if (skipped > 0) {
+      setEscalationError(`${skipped} lead(s) couldn't be moved (already at or past this stage).`);
+      setTimeout(() => setEscalationError(null), 5000);
+    }
     setSelectedIds(new Set());
   };
 
@@ -1194,6 +1217,20 @@ export default function LeadsManager({ data, onSave }: P) {
         </div>
       )}
 
+      {/* Escalation Error Alert */}
+      {escalationError && (
+        <div className="rounded-2xl border border-orange-200 bg-orange-50 p-4 flex items-start gap-3">
+          <AlertCircle className="h-5 w-5 text-orange-600 shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-orange-900">{escalationError}</p>
+            <p className="text-xs text-orange-700 mt-1">Leads can only move forward through the pipeline stages.</p>
+          </div>
+          <button onClick={() => setEscalationError(null)} className="text-orange-400 hover:text-orange-600">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+      )}
+
       {/* ── Leads List ── */}
       {filtered.length === 0 ? (
         <div className="rounded-2xl border border-navy-200 bg-white py-16 text-center">
@@ -1379,7 +1416,7 @@ export default function LeadsManager({ data, onSave }: P) {
                       <label className="text-xs font-semibold text-navy-600">Status:</label>
                       <select value={l.status} onChange={e => updateStatus(l.id, e.target.value)}
                         className="rounded-lg border border-navy-200 px-3 py-1.5 text-sm font-medium outline-none focus:border-accent">
-                        {statuses.map(s => <option key={s}>{s}</option>)}
+                        {getValidNextStages(l.status).map(s => <option key={s.id}>{s.id}</option>)}
                       </select>
                     </div>
                     <div className="flex items-center gap-2">
