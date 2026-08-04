@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { GripVertical, Mail, Phone, Building2, Trash2 } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { GripVertical, Mail, Phone, Building2, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Lead, SiteData } from '../../data/siteData';
 import { PIPELINE_ORDER, stageColor, stageReportLabel } from '../crm/pipeline';
 
@@ -10,8 +10,19 @@ interface Props {
 }
 
 export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [draggedLead, setDraggedLead] = useState<Lead | null>(null);
   const [draggedFrom, setDraggedFrom] = useState<string | null>(null);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = 400;
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth',
+      });
+    }
+  };
 
   const handleDragStart = (e: React.DragEvent, lead: Lead) => {
     setDraggedLead(lead);
@@ -63,8 +74,29 @@ export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
   };
 
   return (
-    <div className="overflow-x-auto pb-4">
-      <div className="flex gap-4 min-w-full">
+    <div className="space-y-3">
+      {/* Scroll Navigation */}
+      <div className="flex items-center justify-between">
+        <button
+          onClick={() => scroll('left')}
+          className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+          title="Scroll left"
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <p className="text-xs text-slate-500">Drag to scroll or use arrows →</p>
+        <button
+          onClick={() => scroll('right')}
+          className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+          title="Scroll right"
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* Kanban Board */}
+      <div className="overflow-x-auto pb-4">
+        <div className="flex gap-4 min-w-full" ref={scrollContainerRef}>
         {PIPELINE_ORDER.map(stage => {
           const stageLeads = data.leads.filter(l => l.status === stage);
           const color = stageColor(stage);
@@ -171,6 +203,7 @@ export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
             </div>
           );
         })}
+      </div>
       </div>
     </div>
   );
