@@ -2023,7 +2023,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               </div>
             </div>
 
-            <div className="w-full border-t border-slate-200 px-4 sm:px-6 py-4 flex gap-2 sm:gap-3 justify-end bg-white flex-shrink-0 z-10 relative">
+            <div className="w-full border-t border-slate-200 px-4 sm:px-6 py-3 flex gap-2 sm:gap-3 justify-end bg-white flex-shrink-0 z-10 relative min-h-14">
               <button onClick={() => setShowExportDialog(false)}
                 className="rounded-lg border border-slate-200 px-3 sm:px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 active:bg-slate-100 transition">
                 Cancel
