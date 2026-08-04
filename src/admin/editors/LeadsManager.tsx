@@ -2029,10 +2029,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                 Cancel
               </button>
               <button onClick={performExport} disabled={selectedFields.size === 0}
-                className="flex items-center gap-2 rounded-lg bg-accent px-3 sm:px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-dark active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                <Download className="h-4 w-4 shrink-0" />
-                <span className="hidden sm:inline">Export {selectedFields.size > 0 ? `(${selectedFields.size})` : 'No fields'}</span>
-                <span className="sm:hidden">Export</span>
+                className="flex items-center gap-2 rounded-lg bg-accent px-3 sm:px-4 py-2.5 text-sm font-medium text-white hover:bg-accent-dark active:scale-95 transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
+                <Download className="h-4 w-4 shrink-0 flex-shrink-0" />
+                <span className="inline">Export {selectedFields.size > 0 ? `(${selectedFields.size})` : ''}</span>
               </button>
             </div>
           </div>
