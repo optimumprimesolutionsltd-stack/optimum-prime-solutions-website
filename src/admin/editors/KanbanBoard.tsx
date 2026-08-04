@@ -95,8 +95,8 @@ export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
       </div>
 
       {/* Kanban Board */}
-      <div className="overflow-x-auto pb-4">
-        <div className="flex gap-4 min-w-full" ref={scrollContainerRef}>
+      <div className="overflow-x-auto pb-4" ref={scrollContainerRef}>
+        <div className="flex gap-4 min-w-full">
         {PIPELINE_ORDER.map(stage => {
           const stageLeads = data.leads.filter(l => l.status === stage);
           const color = stageColor(stage);
