@@ -79,18 +79,18 @@ export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
       <div className="flex items-center justify-between">
         <button
           onClick={() => scroll('left')}
-          className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+          className="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition shadow-md"
           title="Scroll left"
         >
-          <ChevronLeft className="h-5 w-5" />
+          <ChevronLeft className="h-6 w-6" />
         </button>
-        <p className="text-xs text-slate-500">Drag to scroll or use arrows →</p>
+        <p className="text-xs text-slate-500">Drag to scroll or use arrows</p>
         <button
           onClick={() => scroll('right')}
-          className="flex items-center justify-center h-10 w-10 rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition"
+          className="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition shadow-md"
           title="Scroll right"
         >
-          <ChevronRight className="h-5 w-5" />
+          <ChevronRight className="h-6 w-6" />
         </button>
       </div>
 
