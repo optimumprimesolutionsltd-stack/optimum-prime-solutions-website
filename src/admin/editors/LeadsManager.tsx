@@ -962,45 +962,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   return (
     <div className="mx-auto max-w-4xl space-y-5">
 
-      {/* ── Header ── */}
-      <div className="sticky top-0 z-20 bg-white py-4 -mx-5 px-5 border-b border-slate-200 flex items-center justify-between flex-wrap gap-3">
-        <div>
-          <h2 className="text-xl font-bold text-slate-900">Demo Leads</h2>
-          <p className="text-sm text-slate-500 mt-0.5">All demo requests — website and manually booked</p>
-        </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
-            <FileText className="h-4 w-4 text-slate-500" />
-            <select
-              defaultValue=""
-              onChange={e => { const v = e.target.value; e.target.value = ''; if (v) downloadReport(v); }}
-              title="Download the CRM status report for Tally Solutions"
-              className="bg-transparent text-sm font-semibold text-slate-700 outline-none cursor-pointer">
-              <option value="" disabled>CRM Report…</option>
-              <option value="pdf">Download as PDF</option>
-              <option value="excel">Download as Excel</option>
-              <option value="csv">Download as CSV</option>
-              <option value="html">Download as Web page</option>
-            </select>
-          </div>
-
-          <button
-            onClick={() => { setShowAddLead(true); setAddLeadError(''); }}
-            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
-            style={{ backgroundColor: '#2563eb' }}
-          >
-            <Plus className="h-4 w-4" /> Add New Lead
-          </button>
-          <button
-            onClick={() => { setShowBooking(true); setBookingError(''); setBooking(emptyBooking); }}
-            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
-            style={{ backgroundColor: '#e53e3e' }}
-          >
-            <Plus className="h-4 w-4" /> Book New Demo
-          </button>
-        </div>
-      </div>
-
       {/* ── Source Distribution Graph ── */}
       {(() => {
         const sourceData = {
@@ -1047,6 +1008,45 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           </div>
         ) : null;
       })()}
+
+      {/* ── Header ── */}
+      <div className="sticky top-0 z-20 bg-white py-4 -mx-5 px-5 border-b border-slate-200 flex items-center justify-between flex-wrap gap-3">
+        <div>
+          <h2 className="text-xl font-bold text-slate-900">Demo Leads</h2>
+          <p className="text-sm text-slate-500 mt-0.5">All demo requests — website and manually booked</p>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2.5">
+            <FileText className="h-4 w-4 text-slate-500" />
+            <select
+              defaultValue=""
+              onChange={e => { const v = e.target.value; e.target.value = ''; if (v) downloadReport(v); }}
+              title="Download the CRM status report for Tally Solutions"
+              className="bg-transparent text-sm font-semibold text-slate-700 outline-none cursor-pointer">
+              <option value="" disabled>CRM Report…</option>
+              <option value="pdf">Download as PDF</option>
+              <option value="excel">Download as Excel</option>
+              <option value="csv">Download as CSV</option>
+              <option value="html">Download as Web page</option>
+            </select>
+          </div>
+
+          <button
+            onClick={() => { setShowAddLead(true); setAddLeadError(''); }}
+            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
+            style={{ backgroundColor: '#2563eb' }}
+          >
+            <Plus className="h-4 w-4" /> Add New Lead
+          </button>
+          <button
+            onClick={() => { setShowBooking(true); setBookingError(''); setBooking(emptyBooking); }}
+            className="flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold text-white transition"
+            style={{ backgroundColor: '#e53e3e' }}
+          >
+            <Plus className="h-4 w-4" /> Book New Demo
+          </button>
+        </div>
+      </div>
 
       {/* ── Success banner ── */}
       {bookingSuccess && (
