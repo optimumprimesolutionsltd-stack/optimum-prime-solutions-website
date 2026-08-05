@@ -17,9 +17,13 @@ export interface Lead {
   // Scheduling fields (set when status → Schedule a Demo)
   scheduledDate?: string; scheduledTime?: string;
   demoType?: 'online' | 'physical'; demoLocation?: string;
-  teamMemberName?: string; teamMemberPhone?: string;
+  teamMemberName?: string; teamMemberPhone?: string; teamMemberEmail?: string;
+  extraTeam?: { name: string; phone: string; email?: string }[];
   meetLink?: string; meetSent?: boolean;
-  source?: 'website' | 'manual' | 'workshop' | 'webinar' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct'; // where the lead came from
+  // Where the lead came from. 'field' = met on the road — field storming,
+  // road shows, market visits and other outbound marketing.
+  source?: 'website' | 'manual' | 'workshop' | 'webinar' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'field';
+  fieldCampaign?: string;         // which drive/area a field lead was captured on
   industry?: string; demoNotes?: string;
   requestType?: 'demo' | 'consultation' | 'bizanalyst' | 'customization' | 'other'; // demo, consultation, biz analyst, customization/add-on/TDL, or other enquiry
   // CRM follow-up fields
@@ -32,6 +36,45 @@ export interface Lead {
   webinarRegId?: string;          // links back to the webinar_registrants entry
   webinarEventId?: string;        // WHICH webinar event this lead came from
   webinarTitle?: string;          // snapshot of that webinar's title at conversion
+  // ── Closed Lost / restart ────────────────────────────────────────────────
+  lostReason?: string;            // why the deal was lost
+  lostAt?: string;                // when it was marked Closed Lost
+  reopenedAt?: string;            // when the pipeline was last restarted
+  reopenCount?: number;           // how many times this lead has been restarted
+  originalCreatedAt?: string;     // the first period it was domiciled in, kept when re-dated
+  // Link to the delivery job created once the deal is won.
+  wipJobId?: string;
+}
+
+// ── Work in progress ────────────────────────────────────────────────────────
+// Client work being delivered after the sale — training, implementation,
+// migration, support. Kept alongside leads so a won deal flows straight into
+// delivery instead of falling off the end of the pipeline.
+export type WipJobType = 'Training' | 'Implementation' | 'Migration' | 'Customization' | 'Support' | 'Other';
+export type WipStatus = 'Not Started' | 'In Progress' | 'On Hold' | 'Completed';
+
+export interface WipTask { id: string; label: string; done: boolean }
+
+export interface WipJob {
+  id: string;
+  client: string;                 // contact person
+  company: string;
+  phone?: string;
+  email?: string;
+  jobType: WipJobType;
+  title: string;                  // e.g. "TallyPrime 6.0 rollout — 3 branches"
+  assignedStaff: string[];        // names from the shared staff directory
+  startDate?: string;             // YYYY-MM-DD
+  targetDate?: string;            // YYYY-MM-DD — agreed completion
+  completedAt?: string;           // ISO, set when status → Completed
+  status: WipStatus;
+  progress: number;               // 0–100
+  value?: string;                 // contract value, free text (e.g. "KES 120,000")
+  notes?: string;
+  tasks?: WipTask[];              // simple delivery checklist
+  leadId?: string;                // the won lead this came from, if any
+  createdAt: string;
+  updatedAt?: string;
 }
 export interface ContactInfo { location:string; phones:string[]; emails:string[]; workingHours:string[]; whatsapp:string; mapUrl:string }
 export interface CompanyInfo { name:string; tagline:string; mission:string; vision:string; about:string[]; stats:{label:string;value:string}[] }
@@ -40,6 +83,8 @@ export interface SiteData {
   company: CompanyInfo; contact: ContactInfo; services: ServiceItem[]; products: ProductItem[];
   testimonials: TestimonialItem[]; faqs: FaqItem[]; industries: IndustryItem[];
   blogs: BlogPost[]; leads: Lead[];
+  // Client work being delivered (training, implementation, …)
+  wipJobs?: WipJob[];
   // Optional mapping of page/theme -> hero image URL (use real photos of African users)
   heroImages?: Record<string, string>;
 }
@@ -664,8 +709,9 @@ None of these reports need to be read daily. What separates owners who use Tally
 Twenty minutes a month, same day every month, is enough to catch most problems while they're still cheap to fix.`},
   ],
   leads: [],
+  wipJobs: [],
 };
 
 const KEY = 'ops_site_v2';
-export const load = (): SiteData => { try { const r=localStorage.getItem(KEY); if(r){ const p=JSON.parse(r); return {...defaultData,...p, leads:p.leads||[]}; } } catch{} return defaultData; };
+export const load = (): SiteData => { try { const r=localStorage.getItem(KEY); if(r){ const p=JSON.parse(r); return {...defaultData,...p, leads:p.leads||[], wipJobs:p.wipJobs||[]}; } } catch{} return defaultData; };
 export const save = (d: SiteData) => localStorage.setItem(KEY, JSON.stringify(d));

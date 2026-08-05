@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Building2, Briefcase, ShoppingCart, Globe,
   HelpCircle, Users, FileText, Phone, MessageCircle, CalendarDays, Video,
-  LogOut, Menu, X, ExternalLink, Mail, Lock
+  LogOut, Menu, X, ExternalLink, Mail, Lock, Wrench
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import { type SiteData } from '../data/siteData';
@@ -25,10 +25,13 @@ import WebinarRegistrationsManager from './editors/WebinarRegistrationsManager';
 import SubscribersManager from './editors/SubscribersManager';
 import AccessRequestsManager from './editors/AccessRequestsManager';
 import ContactsDirectory from './editors/ContactsDirectory';
+import WorkInProgressManager from './editors/WorkInProgressManager';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { id: 'leads', label: 'Demo Leads', icon: Users },
+  // Delivery after the sale — training, implementation, support.
+  { id: 'wip', label: 'Work in Progress', icon: Wrench },
   { id: 'workshop', label: 'Workshop RSVPs', icon: CalendarDays },
   { id: 'webinar', label: 'Webinar RSVPs', icon: Video },
   // Restricted tabs require email approval
@@ -57,6 +60,9 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
   // A lead id handed from Webinar RSVPs when the user wants to book a demo for
   // an attendee — the Demo Leads tab opens that lead's booking pop-up.
   const [scheduleLeadId, setScheduleLeadId] = useState<string | null>(null);
+  // A delivery job id handed over from Demo Leads when a won deal starts work —
+  // the Work in Progress tab opens that job's editor.
+  const [openJobId, setOpenJobId] = useState<string | null>(null);
   const [sidebar, setSidebar] = useState(false);
   const [toast, setToast] = useState('');
   const [unreadWa, setUnreadWa] = useState(0);
@@ -64,7 +70,8 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
   // Access control: Users can only access these tabs by default
   // Other tabs require email approval via the access request system
   // Full admins can access all tabs
-  const baseAccessibleTabs = isFullAdmin ? new Set(tabs.map(t => t.id)) : new Set(['dashboard', 'leads', 'workshop', 'webinar']);
+  // Staff need the delivery board as much as the pipeline — they do the work.
+  const baseAccessibleTabs = isFullAdmin ? new Set(tabs.map(t => t.id)) : new Set(['dashboard', 'leads', 'wip', 'workshop', 'webinar']);
   const accessibleTabs = baseAccessibleTabs;
   const [showAccessRequest, setShowAccessRequest] = useState(false);
   const [requestedTab, setRequestedTab] = useState<string | null>(null);
@@ -154,7 +161,10 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
       case 'industries': return <IndustriesEditor data={data} onSave={d => handleSave(d, 'Industries saved!')} />;
       case 'faqs': return <FaqEditor data={data} onSave={d => handleSave(d, 'FAQs saved!')} />;
       case 'leads': return <LeadsManager data={data} onSave={d => handleSave(d, 'Leads updated!')}
-        openScheduleLeadId={scheduleLeadId} onScheduleConsumed={() => setScheduleLeadId(null)} />;
+        openScheduleLeadId={scheduleLeadId} onScheduleConsumed={() => setScheduleLeadId(null)}
+        onStartWork={jobId => { setOpenJobId(jobId); setTab('wip'); }} />;
+      case 'wip': return <WorkInProgressManager data={data} onSave={d => handleSave(d, 'Work in progress updated!')}
+        openJobId={openJobId} onOpenConsumed={() => setOpenJobId(null)} />;
       case 'workshop': return <WorkshopRegistrationsManager data={data} onSave={d => handleSave(d, 'Workshop updated!')}
         onBookDemo={leadId => { setScheduleLeadId(leadId); setTab('leads'); }} />;
       case 'webinar': return <WebinarRegistrationsManager data={data} onSave={d => handleSave(d, 'Webinar updated!')}

@@ -3,8 +3,9 @@ import {
   Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown, ChevronUp,
   Download, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
   User, Send, AlertCircle, FileText, Video, LayoutGrid, List,
+  RotateCcw, CalendarPlus, Briefcase,
 } from 'lucide-react';
-import type { SiteData, Lead } from '../../data/siteData';
+import type { SiteData, Lead, WipJob } from '../../data/siteData';
 import { fbSubscribe, fbSet } from '../../firebase/config';
 import KanbanBoard from './KanbanBoard';
 import {
@@ -19,6 +20,12 @@ import {
   LEGACY_WEBINAR_ID, parseWebinars, type WebinarEvent,
 } from '../../data/webinarEvent';
 import { getDayOfWeek, isDateBlocked, generateTimeSlots } from '../../data/demoTimings';
+import {
+  OPTIMUM_STAFF, DEMO_TEAM, DEFAULT_STAFF, COMPANY_EMAIL, staffByName, staffEmail,
+} from '../../data/staff';
+import {
+  googleCalendarUrl, buildIcs, downloadIcs, demoGuestList, type CalendarEvent,
+} from '../crm/calendar';
 
 interface P {
   data: SiteData;
@@ -27,6 +34,8 @@ interface P {
   // is that lead's id; LeadsManager auto-opens its Book-a-Demo pop-up.
   openScheduleLeadId?: string | null;
   onScheduleConsumed?: () => void;
+  // Won deals hand off to the Work in Progress tab once a delivery job exists.
+  onStartWork?: (jobId: string) => void;
 }
 
 const BACKEND_URL = 'https://optimum-prime-lead-notifier.onrender.com';
@@ -37,13 +46,9 @@ const INDUSTRIES = [
   'SACCO / Cooperative', 'Professional Services', 'Other',
 ];
 
-const OPTIMUM_STAFF = [
-  { name: 'Mr. Frederick Chege', phone: '+254 758449475', email: 'chege@optimumprimesolutions.co.ke' },
-  { name: 'Mr. Kenneth Wamiatu', phone: '+254 736 711057', email: 'ken@optimumprimesolutions.co.ke' },
-  { name: 'Mr. John Mark Kiruki', phone: '+254 701 146343', email: 'john@optimumprimesolutions.co.ke' },
-  { name: 'Ms. Joan Wairimu', phone: '+254 796 808316', email: 'joan@optimumprimesolutions.co.ke' },
-  { name: 'Ms. Jane Njoki', phone: '+254 726 006085', email: 'jane@optimumprimesolutions.co.ke' },
-];
+// Staff come from the shared directory (src/data/staff.ts) so a name, phone and
+// email can never drift apart between the booking pop-up, the edit panel and
+// the calendar invite.
 
 // Booking-day / time-slot rules live in one shared module so the admin pop-up
 // and the public request form always offer the same days and hours.
@@ -87,15 +92,73 @@ interface ScheduleForm {
   demoNotes: string;
 }
 
-export default function LeadsManager({ data, onSave, openScheduleLeadId, onScheduleConsumed }: P) {
+// ── Staff picker ────────────────────────────────────────────────────────────
+// Kenneth and John Mark do the demos, consultations and client work, so they
+// are one-tap buttons; everyone else is a click deeper in the dropdown. Picking
+// a name fills in that person's phone, and their email flows into the calendar
+// invite.
+function StaffPicker({ value, onPick, accent = 'accent' }: {
+  value: string;
+  onPick: (name: string, phone: string) => void;
+  accent?: 'accent' | 'blue';
+}) {
+  const others = OPTIMUM_STAFF.filter(s => !s.demoTeam);
+  const isOther = !!value && !DEMO_TEAM.some(s => s.name === value);
+  const activeStyle = accent === 'blue'
+    ? { backgroundColor: '#2563eb', color: '#fff', borderColor: '#2563eb' }
+    : { backgroundColor: '#e53e3e', color: '#fff', borderColor: '#e53e3e' };
+  const idleStyle = { backgroundColor: '#fff', color: '#475569', borderColor: '#e2e8f0' };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        {DEMO_TEAM.map(s => (
+          <button key={s.email} type="button"
+            onClick={() => onPick(s.name, s.phone)}
+            title={`${s.name} · ${s.phone} · ${s.email}`}
+            className="flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition"
+            style={value === s.name ? activeStyle : idleStyle}>
+            {value === s.name ? <CheckCircle2 className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
+            {s.name.replace(/^(Mr\.|Ms\.)\s*/, '')}
+          </button>
+        ))}
+        <select
+          value={isOther ? value : ''}
+          onChange={e => {
+            const s = staffByName(e.target.value);
+            if (s) onPick(s.name, s.phone);
+          }}
+          title="Assign someone else on the team"
+          className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 outline-none focus:border-accent cursor-pointer">
+          <option value="">Someone else…</option>
+          {others.map(s => <option key={s.email} value={s.name}>{s.name}</option>)}
+        </select>
+      </div>
+      {value && (
+        <p className="text-[11px] text-slate-500">
+          {value} · {staffByName(value)?.phone || ''}
+          {staffEmail(value) && <> · <span className="text-slate-400">{staffEmail(value)}</span></>}
+        </p>
+      )}
+    </div>
+  );
+}
+
+export default function LeadsManager({ data, onSave, openScheduleLeadId, onScheduleConsumed, onStartWork }: P) {
   const [search, setSearch]           = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
-  const [filterSource, setFilterSource] = useState<'All' | 'workshop' | 'webinar' | 'online' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct'>('All');
+  const [filterSource, setFilterSource] = useState<'All' | 'workshop' | 'webinar' | 'online' | 'field' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct'>('All');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
   const [showAddLead, setShowAddLead] = useState(false);
+  // Scroll anchor for the modal's error banner — the form is taller than the
+  // pop-up, so an error at the top is invisible from the submit button.
+  const addLeadTopRef = useRef<HTMLDivElement>(null);
   const [addLeadForm, setAddLeadForm] = useState({
     name: '', email: '', phone: '', company: '', businessType: '', currentSoftware: '', message: '', industry: '',
-    source: 'email' as 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct',
+    source: 'field' as 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'field',
+    fieldCampaign: '',
+    capturedBy: DEFAULT_STAFF.name,
+    createdAt: new Date().toISOString().split('T')[0],
     requestType: 'demo' as 'demo' | 'consultation' | 'bizanalyst' | 'customization' | 'other',
   });
   const [addLeadError, setAddLeadError] = useState('');
@@ -226,10 +289,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     return true;
   };
 
-  const sourceCategory = (l: Lead): 'workshop' | 'webinar' | 'online' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' =>
+  const sourceCategory = (l: Lead): 'workshop' | 'webinar' | 'online' | 'field' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' =>
     l.source === 'workshop' ? 'workshop'
     : l.source === 'webinar' ? 'webinar'
     : l.source === 'website' ? 'online'
+    : l.source === 'field' ? 'field'
     : (l.source as 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | undefined) || 'email';
 
   // The date range scopes the whole Demo Leads view — stats, tab counts and the
@@ -427,7 +491,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       return;
     }
 
-    onSave({ ...data, leads: data.leads.map(l => l.id === id ? { ...l, status } : l) });
+    onSave({ ...data, leads: data.leads.map(l => l.id === id
+      // Stamp when a deal was lost, so a restart later can show how long it sat.
+      ? { ...l, status, ...(status === 'Closed Lost' ? { lostAt: new Date().toISOString() } : {}) }
+      : l) });
     setEscalationError(null);
 
     if (status === 'Schedule a Demo') {
@@ -439,8 +506,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         scheduledTime: lead.scheduledTime || lead.demoTime || '',
         demoType: lead.demoType || 'online',
         demoLocation: lead.demoLocation || '',
-        teamMemberName: lead.teamMemberName || '',
-        teamMemberPhone: lead.teamMemberPhone || '',
+        // Pre-fill the demo team so the form opens ready to send; one tap
+        // switches between Kenneth and John Mark.
+        teamMemberName: lead.teamMemberName || DEFAULT_STAFF.name,
+        teamMemberPhone: lead.teamMemberPhone || DEFAULT_STAFF.phone,
+        tallyStaff1: '', tallyStaff2: '',
         extraTeam: (lead as any)?.extraTeam || [],
         demoNotes: lead.demoNotes || lead.message || '',
       });
@@ -470,6 +540,136 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     else updateStatus(openScheduleLeadId, 'Schedule a Demo');
     onScheduleConsumed?.();
   }, [openScheduleLeadId, data.leads]);
+
+  // ── Restarting a Closed Lost lead ────────────────────────────────────────
+  // A lost deal is rarely dead forever — budgets free up, the person who said
+  // no moves on. Restarting drops the lead back into the working pipeline with
+  // a clean slate and asks which period it should be domiciled in: today's, so
+  // it shows up in this month's numbers and reports, or the original date, so
+  // the history of when it first came in is preserved.
+  //
+  // This deliberately bypasses the forward-only escalation guard in
+  // updateStatus — reopening a lost deal is the one legitimate way back.
+  const [restartLead, setRestartLead] = useState<Lead | null>(null);
+  const [restartPeriod, setRestartPeriod] = useState<'today' | 'original'>('today');
+  const [restartStage, setRestartStage] = useState('New');
+  const [restartNote, setRestartNote] = useState('');
+
+  const openRestart = (lead: Lead) => {
+    setRestartLead(lead);
+    setRestartPeriod('today');
+    setRestartStage('New');
+    setRestartNote('');
+  };
+
+  const confirmRestart = () => {
+    const lead = restartLead;
+    if (!lead) return;
+    const now = new Date().toISOString();
+    // Keep the very first date the lead was domiciled in, even after re-dating,
+    // so "when did we first meet them" is never lost.
+    const original = lead.originalCreatedAt || lead.createdAt;
+    const restarted: Lead = {
+      ...lead,
+      status: restartStage,
+      createdAt: restartPeriod === 'today' ? now : original,
+      originalCreatedAt: original,
+      reopenedAt: now,
+      reopenCount: (lead.reopenCount || 0) + 1,
+      // Clear the old booking so the lead goes through scheduling afresh
+      // instead of showing a demo that already came and went.
+      scheduledDate: '', scheduledTime: '', meetSent: false, meetLink: '',
+      demoNotes: restartNote.trim()
+        ? `${restartNote.trim()}${lead.demoNotes ? `\n— previously: ${lead.demoNotes}` : ''}`
+        : lead.demoNotes,
+      nextStep: defaultNextStep(restartStage),
+    };
+    onSave({ ...data, leads: data.leads.map(l => l.id === lead.id ? restarted : l) });
+    setRestartLead(null);
+    setEscalationError(null);
+    setExpandedId(lead.id);
+  };
+
+  // ── Won deal → delivery job ──────────────────────────────────────────────
+  // A won deal still has to be delivered. This opens the work (training,
+  // implementation…) in the Work in Progress tab, pre-filled from the lead.
+  const startWork = (lead: Lead) => {
+    const existing = (data.wipJobs || []).find(j => j.leadId === lead.id);
+    if (existing) { onStartWork?.(existing.id); return; }
+    const jobId = `wip_${Date.now()}`;
+    const job: WipJob = {
+      id: jobId,
+      client: lead.name,
+      company: lead.company || '',
+      phone: lead.phone || '',
+      email: lead.email || '',
+      jobType: lead.requestType === 'customization' ? 'Customization' : 'Implementation',
+      title: `${lead.company || lead.name} — TallyPrime implementation`,
+      assignedStaff: lead.teamMemberName ? [lead.teamMemberName] : [DEFAULT_STAFF.name],
+      startDate: new Date().toISOString().split('T')[0],
+      status: 'Not Started',
+      progress: 0,
+      notes: lead.demoNotes || lead.message || '',
+      leadId: lead.id,
+      createdAt: new Date().toISOString(),
+    };
+    onSave({
+      ...data,
+      wipJobs: [job, ...(data.wipJobs || [])],
+      leads: data.leads.map(l => l.id === lead.id ? { ...l, wipJobId: jobId } : l),
+    });
+    onStartWork?.(jobId);
+  };
+
+  // ── Calendar invites ─────────────────────────────────────────────────────
+  // Everything a booked slot needs to become a real calendar entry: both demo
+  // staff, the shared company mailbox, whoever is assigned, and the client.
+  const leadCalendar = (l: Lead): { event: CalendarEvent; guests: string[] } => {
+    const guests = demoGuestList({
+      assignedStaffName: l.teamMemberName,
+      extraStaffNames: (l.extraTeam || []).map(m => m.name),
+      clientEmail: l.email,
+    });
+    const kind = l.requestType === 'consultation' ? 'Consultation'
+      : l.requestType === 'bizanalyst' ? 'Biz Analyst session'
+      : l.requestType === 'customization' ? 'Customization / TDL session'
+      : 'TallyPrime demo';
+    const who = [l.company, l.name].filter(Boolean).join(' · ');
+    const detailLines = [
+      `${kind} with ${l.name}${l.company ? ` (${l.company})` : ''}`,
+      l.phone ? `Client phone: ${l.phone}` : '',
+      l.email ? `Client email: ${l.email}` : '',
+      l.teamMemberName ? `Optimum lead: ${l.teamMemberName}${l.teamMemberPhone ? ` (${l.teamMemberPhone})` : ''}` : '',
+      (l.extraTeam || []).length ? `Also attending: ${(l.extraTeam || []).map(m => m.name).join(', ')}` : '',
+      l.demoNotes ? `Purpose: ${l.demoNotes}` : '',
+      l.meetLink ? `Google Meet: ${l.meetLink}` : '',
+      '',
+      `Booked from the Optimum Prime admin panel. Office: ${COMPANY_EMAIL}`,
+    ].filter(Boolean);
+    return {
+      guests,
+      event: {
+        title: `${kind} — ${who || l.name}`,
+        description: detailLines.join('\n'),
+        location: l.demoType === 'online'
+          ? (l.meetLink || 'Google Meet — link to follow')
+          : (l.demoLocation || 'On-site'),
+        date: l.scheduledDate || l.demoDate,
+        time: l.scheduledTime || l.demoTime || '09:00',
+        durationMinutes: 60,
+        guests,
+        organizerEmail: staffEmail(l.teamMemberName) || COMPANY_EMAIL,
+      },
+    };
+  };
+
+  const addToGoogleCalendar = (l: Lead) => {
+    window.open(googleCalendarUrl(leadCalendar(l).event), '_blank', 'noopener,noreferrer');
+  };
+  const downloadInvite = (l: Lead) => {
+    const safe = (l.company || l.name || 'demo').toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 32);
+    downloadIcs(`demo-${safe}-${l.scheduledDate || 'unscheduled'}`, buildIcs(leadCalendar(l).event));
+  };
 
   const removeLead = (id: string) => {
     if (confirm('Delete this lead permanently?')) {
@@ -744,6 +944,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         demoLocation: schedForm.demoLocation,
         teamMemberName: schedForm.teamMemberName,
         teamMemberPhone: schedForm.teamMemberPhone,
+        teamMemberEmail: staffEmail(schedForm.teamMemberName),
         demoNotes: schedForm.demoNotes,
         meetSent: true,
         ...(schedForm.extraTeam.length > 0 ? { extraTeam: schedForm.extraTeam } : {}),
@@ -801,8 +1002,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       scheduledTime: lead.scheduledTime || '',
       demoType: lead.demoType || 'online',
       demoLocation: lead.demoLocation || '',
-      teamMemberName: lead.teamMemberName || '',
-      teamMemberPhone: lead.teamMemberPhone || '',
+      teamMemberName: lead.teamMemberName || DEFAULT_STAFF.name,
+      teamMemberPhone: lead.teamMemberPhone || DEFAULT_STAFF.phone,
+      tallyStaff1: '', tallyStaff2: '',
       extraTeam: (lead as any).extraTeam || [],
       demoNotes: lead.demoNotes || '',
     });
@@ -829,6 +1031,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         demoLocation: schedForm.demoLocation,
         teamMemberName: schedForm.teamMemberName,
         teamMemberPhone: schedForm.teamMemberPhone,
+        teamMemberEmail: staffEmail(schedForm.teamMemberName),
         demoNotes: schedForm.demoNotes,
         meetSent: true,
         ...(schedForm.extraTeam.length > 0 ? { extraTeam: schedForm.extraTeam } : { extraTeam: [] }),
@@ -925,8 +1128,14 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     e.preventDefault();
     setAddLeadError('');
 
-    if (!addLeadForm.name.trim() || !addLeadForm.email.trim() || !addLeadForm.phone.trim()) {
-      setAddLeadError('Name, Email, and Phone are required');
+    // Email is NOT required. A lead met in the field or picked up on a call
+    // usually comes with a name and a number and nothing else — refusing to
+    // save that is why the button looked broken.
+    if (!addLeadForm.name.trim() || !addLeadForm.phone.trim()) {
+      setAddLeadError('Name and phone are required');
+      // The form scrolls, so the message at the top can sit off-screen above
+      // the button that was just clicked. Bring it into view.
+      addLeadTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
 
@@ -940,19 +1149,38 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       currentSoftware: addLeadForm.currentSoftware.trim(),
       message: addLeadForm.message.trim(),
       demoDate: '',
-      createdAt: new Date().toISOString(),
+      // The day it was captured, not the day it was typed in — a field team
+      // entering Friday's round on Monday should still land in Friday.
+      createdAt: addLeadForm.createdAt
+        ? new Date(`${addLeadForm.createdAt}T12:00:00`).toISOString()
+        : new Date().toISOString(),
       status: 'New',
       source: addLeadForm.source,
+      ...(addLeadForm.source === 'field' && addLeadForm.fieldCampaign.trim()
+        ? { fieldCampaign: addLeadForm.fieldCampaign.trim() } : {}),
       requestType: addLeadForm.requestType,
       industry: addLeadForm.industry.trim(),
+      // Whoever captured it owns the follow-up until it is reassigned.
+      teamMemberName: addLeadForm.capturedBy,
+      teamMemberPhone: staffByName(addLeadForm.capturedBy)?.phone || '',
+      teamMemberEmail: staffEmail(addLeadForm.capturedBy),
     };
 
-    onSave({ ...data, leads: [...data.leads, newLead] });
+    // Newest first, so the lead you just added is at the top of the list
+    // rather than buried at the bottom.
+    onSave({ ...data, leads: [newLead, ...data.leads] });
     setAddLeadSuccess(true);
     setAddLeadForm({
       name: '', email: '', phone: '', company: '', businessType: '', currentSoftware: '', message: '', industry: '',
-      source: 'email', requestType: 'demo',
+      source: 'field', fieldCampaign: '', capturedBy: DEFAULT_STAFF.name,
+      createdAt: new Date().toISOString().split('T')[0],
+      requestType: 'demo',
     });
+    // A filter left on another stage or source is the classic "I added it and
+    // nothing happened" — clear them so the new lead is definitely on screen.
+    setFilterStatus('All');
+    setFilterSource('All');
+    setSearch('');
     setTimeout(() => {
       setAddLeadSuccess(false);
       setShowAddLead(false);
@@ -968,6 +1196,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           website: data.leads.filter(l => l.source === 'website').length,
           workshop: data.leads.filter(l => l.source === 'workshop').length,
           webinar: data.leads.filter(l => l.source === 'webinar').length,
+          field: data.leads.filter(l => l.source === 'field').length,
           email: data.leads.filter(l => l.source === 'email').length,
           whatsapp: data.leads.filter(l => l.source === 'whatsapp').length,
           referral: data.leads.filter(l => l.source === 'referral').length,
@@ -983,9 +1212,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             <div className="space-y-3">
               {sources.map(([source, count]) => {
                 const pct = totalBySource > 0 ? Math.round((count / totalBySource) * 100) : 0;
-                const label = source === 'whatsapp' ? 'WhatsApp' : source.charAt(0).toUpperCase() + source.slice(1);
+                const label = source === 'whatsapp' ? 'WhatsApp'
+                  : source === 'field' ? 'Field / Marketing'
+                  : source.charAt(0).toUpperCase() + source.slice(1);
                 const colors: Record<string, string> = {
                   website: 'bg-blue-500', workshop: 'bg-amber-500', webinar: 'bg-purple-500',
+                  field: 'bg-yellow-500',
                   email: 'bg-green-500', whatsapp: 'bg-emerald-600', referral: 'bg-pink-500',
                   phone: 'bg-orange-500', direct: 'bg-indigo-500',
                 };
@@ -1158,7 +1390,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             and Select-all only touch the source you're looking at. */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-slate-500 mr-1">Source:</span>
-          {([['All', 'All sources'], ['online', 'Online / Website'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['email', 'Email'], ['whatsapp', 'WhatsApp'], ['referral', 'Referral'], ['phone', 'Phone'], ['direct', 'Direct']] as [typeof filterSource, string][]).map(([val, label]) => {
+          {([['All', 'All sources'], ['online', 'Online / Website'], ['field', '📣 Field / Marketing'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['email', 'Email'], ['whatsapp', 'WhatsApp'], ['referral', 'Referral'], ['phone', 'Phone'], ['direct', 'Direct']] as [typeof filterSource, string][]).map(([val, label]) => {
             const isActive = filterSource === val;
             const count = val === 'All'
               ? data.leads.length
@@ -1413,13 +1645,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   </button>
                 )}
               </div>
-              {/* Primary */}
-              <div className="grid grid-cols-2 gap-3">
-                <input value={booking.teamMemberName} onChange={e => setB('teamMemberName', e.target.value)}
-                  placeholder="Your name *" className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
-                <input value={booking.teamMemberPhone} onChange={e => setB('teamMemberPhone', e.target.value)}
-                  placeholder="Your phone *" className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
-              </div>
+              {/* Primary — pre-filled with the demo team; one tap to switch */}
+              <StaffPicker value={booking.teamMemberName}
+                onPick={(name, phone) => { setB('teamMemberName', name); setB('teamMemberPhone', phone); }} />
               {/* Extra members */}
               {booking.extraTeam.map((m, i) => (
                 <div key={i} className="grid grid-cols-2 gap-2 items-center">
@@ -1560,6 +1788,18 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                       <span className="rounded-full bg-red-100 px-2 py-0.5 text-[9px] font-semibold text-red-700"
                         title={l.attendedWorkshop ? 'Attended the breakfast workshop' : 'Registered for workshop — did not attend'}>
                         🥐 WORKSHOP{l.attendedWorkshop ? ' ✓' : ''}
+                      </span>
+                    )}
+                    {l.source === 'field' && (
+                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[9px] font-semibold text-amber-700"
+                        title={l.fieldCampaign ? `Field storming / marketing — ${l.fieldCampaign}` : 'Captured in the field'}>
+                        📣 FIELD
+                      </span>
+                    )}
+                    {(l.reopenCount || 0) > 0 && (
+                      <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[9px] font-semibold text-white"
+                        title={`Restarted after being closed lost${l.reopenedAt ? ` on ${new Date(l.reopenedAt).toLocaleDateString()}` : ''}`}>
+                        ↻ RESTARTED{(l.reopenCount || 0) > 1 ? ` ×${l.reopenCount}` : ''}
                       </span>
                     )}
                   </div>
@@ -1727,6 +1967,73 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                           <p className="text-sm font-semibold text-blue-700 break-all hover:underline">📹 {l.meetLink}</p>
                         </a>
                       )}
+
+                      {/* Put the booking on everyone's calendar. Google for
+                          anyone on a Google account, .ics for Outlook and the
+                          shared company mailbox — same event, same guests. */}
+                      {l.demoType === 'online' && l.scheduledDate && (
+                        <div className="bg-white rounded-lg p-3 border border-blue-300 space-y-2">
+                          <p className="text-[10px] font-semibold text-blue-600 uppercase tracking-wide">
+                            <CalendarPlus className="h-3.5 w-3.5 inline mr-1" />Add to calendar
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            <button onClick={() => addToGoogleCalendar(l)}
+                              title="Open a pre-filled Google Calendar event with all guests attached"
+                              className="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-blue-700 transition">
+                              <CalendarPlus className="h-3.5 w-3.5" /> Google Calendar
+                            </button>
+                            <button onClick={() => downloadInvite(l)}
+                              title="Download an .ics invite for Outlook, Apple Calendar or the office mailbox"
+                              className="inline-flex items-center gap-1.5 rounded-lg border border-blue-300 bg-white px-3 py-1.5 text-xs font-bold text-blue-700 hover:bg-blue-50 transition">
+                              <Download className="h-3.5 w-3.5" /> Download invite (.ics)
+                            </button>
+                            {l.meetLink && (
+                              <button onClick={() => { navigator.clipboard?.writeText(l.meetLink || ''); }}
+                                className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 hover:bg-slate-50 transition">
+                                Copy Meet link
+                              </button>
+                            )}
+                          </div>
+                          <p className="text-[10px] text-slate-500 break-all">
+                            Invites: {leadCalendar(l).guests.join(' · ')}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  )}
+
+                  {/* ── Closed Lost: restart the pipeline ── */}
+                  {l.status === 'Closed Lost' && (
+                    <div className="rounded-xl border border-slate-300 bg-slate-50 p-4 flex items-start justify-between gap-3 flex-wrap">
+                      <div>
+                        <p className="text-sm font-bold text-slate-700">Deal closed lost</p>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {l.lostAt ? `Marked lost ${new Date(l.lostAt).toLocaleDateString()}. ` : ''}
+                          Circumstances change — restart the pipeline when they're worth another run.
+                        </p>
+                      </div>
+                      <button onClick={() => openRestart(l)}
+                        className="inline-flex items-center gap-2 rounded-lg bg-slate-800 px-4 py-2 text-xs font-bold text-white hover:bg-slate-900 transition shrink-0">
+                        <RotateCcw className="h-3.5 w-3.5" /> Restart pipeline
+                      </button>
+                    </div>
+                  )}
+
+                  {/* ── Closed Won: hand over to delivery ── */}
+                  {l.status === 'Closed Won' && (
+                    <div className="rounded-xl border border-green-300 bg-green-50 p-4 flex items-start justify-between gap-3 flex-wrap">
+                      <div>
+                        <p className="text-sm font-bold text-green-800">🎉 Deal won — what happens next?</p>
+                        <p className="text-xs text-green-700 mt-0.5">
+                          {l.wipJobId
+                            ? 'Delivery is already open in Work in Progress.'
+                            : 'Open the training / implementation job so the delivery is tracked to completion.'}
+                        </p>
+                      </div>
+                      <button onClick={() => startWork(l)}
+                        className="inline-flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-xs font-bold text-white hover:bg-green-800 transition shrink-0">
+                        <Briefcase className="h-3.5 w-3.5" /> {l.wipJobId ? 'Open the job' : 'Start work'}
+                      </button>
                     </div>
                   )}
 
@@ -1884,14 +2191,8 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                               </button>
                             )}
                           </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <input value={schedForm.teamMemberName} onChange={e => setS('teamMemberName', e.target.value)}
-                              placeholder="Name *"
-                              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
-                            <input value={schedForm.teamMemberPhone} onChange={e => setS('teamMemberPhone', e.target.value)}
-                              placeholder="+254 7XX XXX XXX"
-                              className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
-                          </div>
+                          <StaffPicker value={schedForm.teamMemberName} accent="blue"
+                            onPick={(name, phone) => { setS('teamMemberName', name); setS('teamMemberPhone', phone); }} />
                           {schedForm.extraTeam.map((m, i) => (
                             <div key={i} className="grid grid-cols-2 gap-2 items-center">
                               <input value={m.name} onChange={e => setExtraTeam(i, 'name', e.target.value)}
@@ -2034,23 +2335,26 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                           </div>
                         )}
 
-                        {/* Optimum staff member (required) */}
+                        {/* Who's running it — pre-filled with the demo team */}
                         <div className="sm:col-span-2">
-                          <label className="block text-xs font-semibold text-slate-600 mb-1.5"><User className="h-3 w-3 inline mr-1" />Optimum Staff *</label>
-                          <select value={schedForm.teamMemberName} onChange={e => {
-                            const selected = OPTIMUM_STAFF.find(s => s.name === e.target.value);
-                            if (selected) {
-                              setS('teamMemberName', selected.name);
-                              setS('teamMemberPhone', selected.phone);
-                            }
-                          }}
-                            className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent">
-                            <option value="">Select a staff member</option>
-                            {OPTIMUM_STAFF.map(s => (
-                              <option key={s.email} value={s.name}>{s.name} • {s.phone}</option>
-                            ))}
-                          </select>
+                          <label className="block text-xs font-semibold text-slate-600 mb-1.5"><User className="h-3 w-3 inline mr-1" />Who is doing this demo / consultation? *</label>
+                          <StaffPicker value={schedForm.teamMemberName}
+                            onPick={(name, phone) => { setS('teamMemberName', name); setS('teamMemberPhone', phone); }} />
                         </div>
+
+                        {/* Online demos land on everyone's calendar */}
+                        {schedForm.demoType === 'online' && schedForm.scheduledDate && schedForm.scheduledTime && (
+                          <div className="sm:col-span-2 rounded-xl border border-blue-200 bg-blue-50 p-3">
+                            <p className="text-xs font-semibold text-blue-800 mb-1.5">
+                              <CalendarPlus className="h-3.5 w-3.5 inline mr-1" />Calendar invite
+                            </p>
+                            <p className="text-[11px] text-blue-700">
+                              Once you confirm, use <strong>Add to calendar</strong> on the lead to send this to
+                              {' '}{DEMO_TEAM.map(s => s.name.replace(/^(Mr\.|Ms\.)\s*/, '')).join(' & ')}, {COMPANY_EMAIL}
+                              {' '}and the client — as a Google Calendar event or an .ics file for Outlook.
+                            </p>
+                          </div>
+                        )}
 
                         {/* Optional Tally Solutions staff */}
                         <div className="sm:col-span-2 space-y-2">
@@ -2094,6 +2398,95 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* ── Restart a Closed Lost lead ── */}
+      {restartLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-slate-100 bg-slate-50 px-6 py-4">
+              <div className="flex items-center gap-2">
+                <RotateCcw className="h-5 w-5 text-slate-700" />
+                <h3 className="font-bold text-slate-900">Restart — {restartLead.name}</h3>
+              </div>
+              <button onClick={() => setRestartLead(null)} className="rounded-lg p-1.5 hover:bg-slate-200 transition">
+                <X className="h-4 w-4 text-slate-500" />
+              </button>
+            </div>
+
+            <div className="px-6 py-5 space-y-5 max-h-[70vh] overflow-y-auto">
+              <p className="text-xs text-slate-500">
+                This puts the lead back into the working pipeline and clears the old booking,
+                so it goes through scheduling afresh. Nothing is deleted — the history stays on the record.
+              </p>
+
+              {/* Which period the restarted lead is domiciled in */}
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  Which period should it sit in?
+                </label>
+                <div className="space-y-2">
+                  <button type="button" onClick={() => setRestartPeriod('today')}
+                    className={`w-full rounded-xl border-2 px-4 py-3 text-left transition ${
+                      restartPeriod === 'today' ? 'border-accent bg-accent/5' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
+                    <p className="text-sm font-bold text-slate-900">
+                      Today — {new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Counts as a fresh lead in this period. It shows in this month's reports and date-range exports.
+                    </p>
+                  </button>
+                  <button type="button" onClick={() => setRestartPeriod('original')}
+                    className={`w-full rounded-xl border-2 px-4 py-3 text-left transition ${
+                      restartPeriod === 'original' ? 'border-accent bg-accent/5' : 'border-slate-200 bg-white hover:bg-slate-50'}`}>
+                    <p className="text-sm font-bold text-slate-900">
+                      Keep its original period — {new Date(restartLead.originalCreatedAt || restartLead.createdAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      Stays where it was first captured — the workshop, campaign or month it actually came from.
+                    </p>
+                  </button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Restart at stage</label>
+                  <select value={restartStage} onChange={e => setRestartStage(e.target.value)}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-accent">
+                    {statuses.filter(s => s !== 'Closed Lost').map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Restarted before</label>
+                  <p className="rounded-xl border border-slate-100 bg-slate-50 px-3 py-2.5 text-sm text-slate-600">
+                    {restartLead.reopenCount || 0} time{(restartLead.reopenCount || 0) === 1 ? '' : 's'}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Why restart? (optional)</label>
+                <textarea value={restartNote} onChange={e => setRestartNote(e.target.value)}
+                  placeholder="e.g. Budget approved for the new financial year · New finance manager · Asked us to call back in August"
+                  rows={2}
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-accent resize-none" />
+              </div>
+            </div>
+
+            <div className="flex gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4">
+              <button onClick={confirmRestart}
+                className="flex-1 flex items-center justify-center gap-2 rounded-xl py-3 text-sm font-bold text-white transition"
+                style={{ backgroundColor: '#e53e3e' }}>
+                <RotateCcw className="h-4 w-4" /> Restart as “{restartStage}”
+              </button>
+              <button onClick={() => setRestartLead(null)}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium text-slate-600 hover:bg-slate-100 transition">
+                Cancel
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -2218,6 +2611,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             </div>
 
             <div className="px-6 py-4 space-y-4 min-h-0 flex-1 overflow-y-auto pb-20">
+              <div ref={addLeadTopRef} />
               {addLeadError && (
                 <div className="flex items-start gap-3 rounded-lg bg-red-50 border border-red-200 p-4">
                   <AlertCircle className="h-5 w-5 text-red-600 shrink-0 mt-0.5" />
@@ -2245,7 +2639,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Email *</label>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">
+                      Email <span className="font-normal text-slate-400">(optional)</span>
+                    </label>
                     <input
                       type="email"
                       value={addLeadForm.email}
@@ -2283,12 +2679,24 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                       value={addLeadForm.source}
                       onChange={e => setAddLeadForm({...addLeadForm, source: e.target.value as any})}
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                      <option value="field">📣 Field storming / Marketing</option>
                       <option value="email">Email Inquiry</option>
                       <option value="whatsapp">WhatsApp</option>
                       <option value="referral">Referral</option>
                       <option value="phone">Phone Call</option>
                       <option value="direct">Direct Contact</option>
                     </select>
+                    {/* Which drive the lead came off, so a storming round can
+                        be reported on as a unit. */}
+                    {addLeadForm.source === 'field' && (
+                      <input
+                        type="text"
+                        value={addLeadForm.fieldCampaign}
+                        onChange={e => setAddLeadForm({...addLeadForm, fieldCampaign: e.target.value})}
+                        placeholder="Which drive / area? e.g. Industrial Area storming"
+                        className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                      />
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1">Request Type</label>
@@ -2330,6 +2738,26 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   </div>
                 </div>
 
+                {/* Who owns the follow-up, and which period the lead belongs to */}
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Following up</label>
+                    <StaffPicker value={addLeadForm.capturedBy} accent="blue"
+                      onPick={name => setAddLeadForm({...addLeadForm, capturedBy: name})} />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Date captured</label>
+                    <input
+                      type="date"
+                      value={addLeadForm.createdAt}
+                      max={new Date().toISOString().split('T')[0]}
+                      onChange={e => setAddLeadForm({...addLeadForm, createdAt: e.target.value})}
+                      title="The period this lead is domiciled in — defaults to today"
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
+                    />
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1">Message / Notes</label>
                   <textarea
@@ -2347,6 +2775,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   <Plus className="h-4 w-4" />
                   Add Lead
                 </button>
+                <p className="text-center text-xs text-slate-400">Only a name and phone number are required.</p>
               </form>
             </div>
           </div>

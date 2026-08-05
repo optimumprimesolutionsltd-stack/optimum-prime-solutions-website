@@ -150,10 +150,26 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  // Firebase rejects `undefined` anywhere in the payload and fbSet swallows the
+  // error, so a single stray undefined would silently drop the whole save —
+  // the change would look applied locally and be gone on the next reload.
+  // Strip them before writing.
+  const stripUndefined = (value: any): any => {
+    if (Array.isArray(value)) return value.map(stripUndefined);
+    if (value && typeof value === 'object' && !(value instanceof Date)) {
+      const out: Record<string, any> = {};
+      Object.entries(value).forEach(([k, v]) => {
+        if (v !== undefined) out[k] = stripUndefined(v);
+      });
+      return out;
+    }
+    return value;
+  };
+
   const update = useCallback((d: SiteData) => {
     setData(d);
     save(d);
-    fbSet('siteData', d).catch(() => {});
+    fbSet('siteData', stripUndefined(d)).catch(() => {});
     // Note: we deliberately no longer mirror leads back into the /leads inbox.
     // siteData.leads is the single source of truth; writing to /leads here used
     // to resurrect deleted leads and make the two stores drift apart.

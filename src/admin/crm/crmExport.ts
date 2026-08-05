@@ -54,12 +54,16 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
   const leadRows = leads.map(l => {
     const eventName = l.source === 'workshop' ? (l.workshopTitle || '')
       : l.source === 'webinar' ? (l.webinarTitle || '')
+      // Which storming drive / campaign the lead was picked up on.
+      : l.source === 'field' ? (l.fieldCampaign || '')
       : '';
     return [
       l.name, l.company, l.phone, l.email, l.industry || l.businessType || '',
-      // Source is just the channel (website, workshop, webinar), not the event name
+      // Source is just the channel (website, workshop, webinar, field), not the
+      // event name
       l.source === 'workshop' ? 'Workshop'
         : l.source === 'webinar' ? 'Webinar'
+        : l.source === 'field' ? 'Field / Marketing'
         : 'Website',
       // Event name goes in its own column
       eventName,
@@ -147,6 +151,8 @@ export function buildCrmReportHtml(
   const webinarLeads = leads.filter(l => l.source === 'webinar').length;
   const onlineLeads = leads.filter(l => l.source === 'website').length;
   const manualLeads = leads.filter(l => l.source === 'manual').length;
+  // Leads picked up on the road — field storming, road shows, market visits.
+  const fieldLeads = leads.filter(l => l.source === 'field').length;
   const won = leads.filter(l => l.status === 'Closed Won').length;
   // Closed Lost only appears here when the export includes closed deals.
   const lost = leads.filter(l => l.status === 'Closed Lost').length;
@@ -306,6 +312,7 @@ export function buildCrmReportHtml(
     ${workshopLeads > 0 ? `<div class="kpi"><b>${workshopLeads}</b><span>Workshop → Pipeline</span></div>` : ''}
     ${webinarLeads > 0 ? `<div class="kpi"><b>${webinarLeads}</b><span>Webinar → Pipeline</span></div>` : ''}
     ${onlineLeads > 0 ? `<div class="kpi"><b>${onlineLeads}</b><span>Online → Pipeline</span></div>` : ''}
+    ${fieldLeads > 0 ? `<div class="kpi"><b>${fieldLeads}</b><span>Field / Marketing → Pipeline</span></div>` : ''}
     ${manualLeads > 0 ? `<div class="kpi"><b>${manualLeads}</b><span>Manual → Pipeline</span></div>` : ''}
     <div class="kpi"><b>${won}</b><span>Closed Won</span></div>
     ${lost > 0 ? `<div class="kpi"><b>${lost}</b><span>Closed Lost</span></div>` : ''}

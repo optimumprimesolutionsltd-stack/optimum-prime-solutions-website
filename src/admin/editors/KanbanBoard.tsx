@@ -58,6 +58,7 @@ export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
       website: 'bg-blue-100 text-blue-700',
       workshop: 'bg-amber-100 text-amber-700',
       webinar: 'bg-purple-100 text-purple-700',
+      field: 'bg-yellow-100 text-yellow-800',
       email: 'bg-green-100 text-green-700',
       whatsapp: 'bg-emerald-100 text-emerald-700',
       referral: 'bg-pink-100 text-pink-700',
@@ -70,6 +71,7 @@ export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
   const getSourceLabel = (source?: string) => {
     if (!source) return 'Direct';
     if (source === 'whatsapp') return 'WhatsApp';
+    if (source === 'field') return '📣 Field';
     return source.charAt(0).toUpperCase() + source.slice(1);
   };
 
