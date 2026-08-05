@@ -183,50 +183,59 @@ export const defaultData: SiteData = {
     {id:'8',name:'Education & NGOs',icon:'GraduationCap',desc:'Fee management, donor tracking, and grant accounting.'},
   ],
   blogs: [
-    {id:'1',title:'Why Every Kenyan Business Needs TallyPrime Today',slug:'why-every-kenyan-business-needs-tally-prime-in-2025',excerpt:'Discover how Tally Prime is transforming business operations across Kenya with automated accounting, KRA compliance, and real-time reporting.',date:'2025-01-15',category:'Insights',readTime:'5 min',content:`Tally Prime has become the backbone of business operations across Kenya. Whether you're a small retail shop, a manufacturing facility, or a growing services company, the need for accurate financial management and KRA compliance is non-negotiable. As a [certified TallyPrime partner in Kenya](/), we've helped hundreds of businesses streamline their accounting and stay KRA-compliant.
+    {id:'1',title:'Why Every Kenyan Business Needs TallyPrime in 2026',slug:'why-every-kenyan-business-needs-tally-prime-in-2025',excerpt:'From the 2026 Year of Income, KRA validates the expenses you claim against electronic tax invoices. Here is why TallyPrime has moved from useful to unavoidable for Kenyan businesses.',date:'2026-01-15',category:'Insights',readTime:'7 min',content:`TallyPrime has become the backbone of business operations across Kenya. Whether you run a small retail shop, a manufacturing facility, or a growing services company, accurate financial management and KRA compliance are non-negotiable. As a [certified TallyPrime partner in Kenya](/), we've helped hundreds of businesses streamline their accounting and stay KRA-compliant.
 
-Why should your business invest in TallyPrime today?
+What changed in 2026 is the cost of getting it wrong. Compliance has stopped being a year-end clean-up exercise — KRA now checks your numbers as you file, against records it already holds. Here is why TallyPrime has moved from useful to unavoidable.
 
-1. KRA Compliance Made Easy
-Kenya's tax environment demands precision. Tally Prime simplifies VAT calculations, PAYE processing, and e-filing integration. The eTIMS module ensures real-time invoice tracking, and automated compliance reports keep your business audit-ready. No more manual calculations or missed deadlines.
+1. eTIMS Now Decides What You Can Deduct
+This is the single biggest shift for 2026. From the 2026 Year of Income, the income and expenses you declare need to be supported by valid electronic tax invoices — transmitted correctly, and carrying the buyer PIN where it applies. KRA validates at the point of filing and cross-references your claims against what your suppliers actually reported.
 
-2. Real-Time Business Insights
-Stop relying on spreadsheets. Tally Prime provides instant access to your:
+The transitional concession that let taxpayers declare non-eTIMS income and expenses for the 2025 period was a one-time arrangement. In practice, that means:
+- An expense with no matching electronic tax invoice is an expense you may not be able to claim
+- Your supplier's compliance is now your tax problem too
+- Fixing it after filing is far harder than getting the invoice right the first time
+
+Sectors that buy from a lot of small or informal suppliers — construction, hospitality, logistics, hardware — feel this first. TallyPrime handles it at source: invoices are raised in the required format, transmitted to eTIMS, and reconciled against your books, so what you file matches what KRA already has.
+
+2. Payroll Rules That Have Already Moved
+If your payroll template still says NHIF, it is out of date. Kenyan payroll now runs on:
+- PAYE on the current progressive bands
+- SHIF at 2.75% of gross pay — employee-only, with a minimum of KES 300 per month and no upper cap
+- Affordable Housing Levy at 1.5% from the employee, matched by 1.5% from the employer
+- NSSF Tier I and Tier II at the prevailing statutory rates and pensionable earnings limits
+- Remittance by the 9th of the following month
+
+Rates and limits change, and they change mid-year. TallyPrime's payroll module calculates the deductions, generates payslips, and produces the statutory reports — so a rate change is a configuration update, not a spreadsheet rebuild.
+
+3. Real-Time Business Insights
+Stop relying on spreadsheets. TallyPrime provides instant access to your:
 - Daily sales and expense reports
 - Inventory levels across multiple locations
-- Cash flow projections
+- Cash flow position and projections
 - Profit & loss statements
-- Customer and supplier analyses
+- Customer and supplier ageing analyses
 
 Decision-making becomes data-driven, not guesswork-based.
 
-3. Inventory Management at Scale
-Whether you have 1 warehouse or 10 branches, Tally Prime tracks inventory in real-time. Automated reorder points prevent stockouts, batch management prevents expired stock, and multi-location visibility ensures optimal stock distribution.
-
-4. Automated Payroll Processing
-Calculating payroll manually is error-prone and time-consuming. Tally Prime automates:
-- Salary calculations
-- PAYE, NHIF, NSSF, and Housing Levy deductions
-- Statutory compliance
-- Leave management
-- Payslip generation
-
-Your HR team gains 3+ hours daily that can be redirected to strategic work.
+4. Inventory Management at Scale
+Whether you have 1 warehouse or 10 branches, TallyPrime tracks inventory in real time. Automated reorder points prevent stockouts, batch management prevents expired stock, and multi-location visibility ensures optimal stock distribution — and every movement carries the documentation trail your returns now depend on.
 
 5. Cost Reduction & Efficiency
-Implementing Tally Prime typically reduces operational costs by 15-25% through:
+Implementing TallyPrime typically reduces operational costs by 15-25% through:
 - Reduced data entry errors (95% fewer manual entries)
 - Faster month-end closing (from 5 days to 1 day)
 - Minimized accounting staff requirements
 - Fewer compliance penalties and fines
 
-6. Scalability Built-In
-As your business grows, Tally Prime grows with you. Multi-user access, role-based controls, and unlimited transaction capacity ensure you're never outgrowing your system.
+That last line carries more weight in 2026 than it did two years ago. A disallowed expense is not a fine you can negotiate down — it is tax you pay on profit you never made.
+
+6. A Platform That Keeps Up
+TallyPrime 7.0, released in December 2025, moved the product from an accounting tool towards a connected business platform: scheduled cloud backup, SmartFind search across your data, and noticeably faster performance on large company files. TallyPrime 7.1 follows it. Multi-user access, role-based controls, and unlimited transaction capacity mean you are never outgrowing the system — and staying on a current release is how you stay ahead of the next compliance change instead of scrambling after it.
 
 The Bottom Line
-Today, manual accounting is not just inefficient—it's risky. Tally Prime eliminates operational friction, ensures compliance, and gives you the visibility needed to scale confidently.
+In 2026, manual accounting is not just inefficient — it is expensive in a way that shows up directly on your tax bill. TallyPrime eliminates operational friction, keeps your filings defensible, and gives you the visibility needed to scale confidently.
 
-Ready to transform your business? The businesses that embrace TallyPrime today will be the ones leading their industries tomorrow.`},
+Ready to transform your business? The businesses that get their invoice trail right this year will be the ones leading their industries next year.`},
     {id:'2',title:'Complete Guide to KRA e-Filing with Tally Prime',slug:'complete-guide-to-kra-e-filing-with-tally-prime',excerpt:'Step-by-step guide to setting up and filing your KRA returns directly from Tally Prime. Save time and avoid penalties.',date:'2025-02-01',category:'Tutorial',readTime:'8 min',content:`KRA compliance can be intimidating, but with Tally Prime, it's surprisingly straightforward. This guide walks you through the entire e-filing process. If you need expert setup, [we offer hands-on TallyPrime training and compliance support in Ruiru and across Kenya](/)
 
 What You Need Before Starting
