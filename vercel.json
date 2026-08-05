@@ -175,20 +175,23 @@
       "headers": { "Location": "/" }
     },
     {
-      "src": "^/knowledge-hub/guides(/.*)?$",
-      "dest": "/dist/knowledge-hub/guides/index.html"
-    },
-    {
-      "src": "^/knowledge-hub/case-studies(/.*)?$",
-      "dest": "/dist/knowledge-hub/case-studies/index.html"
-    },
-    {
       "src": "^/knowledge-hub/videos(/.*)?$",
       "dest": "/dist/knowledge-hub/videos/index.html"
     },
     {
-      "src": "^/knowledge-hub/webinars(/.*)?$",
-      "dest": "/dist/knowledge-hub/webinars/index.html"
+      "src": "^/knowledge-hub/guides/?$",
+      "status": 301,
+      "headers": { "Location": "/knowledge-hub/" }
+    },
+    {
+      "src": "^/knowledge-hub/case-studies/?$",
+      "status": 301,
+      "headers": { "Location": "/knowledge-hub/" }
+    },
+    {
+      "src": "^/knowledge-hub/webinars/?$",
+      "status": 301,
+      "headers": { "Location": "/knowledge-hub/" }
     },
     {
       "src": "^/knowledge-hub(/.*)?$",
@@ -227,6 +230,10 @@
       "dest": "/dist/workshop-attendees/index.html"
     },
     {
+      "src": "^/webinar-attendees(/.*)?$",
+      "dest": "/dist/webinar-attendees/index.html"
+    },
+    {
       "src": "^/why-choose-us(/.*)?$",
       "dest": "/dist/why-choose-us/index.html"
     },
@@ -249,6 +256,11 @@
     {
       "src": "^/admin(/.*)?$",
       "dest": "/dist/admin/index.html"
+    },
+    {
+      "src": "^/blog/why\\-every\\-kenyan\\-business\\-needs\\-tallyprime\\-in\\-2025(/)?$",
+      "status": 301,
+      "headers": { "Location": "/blog/why-every-kenyan-business-needs-tally-prime-in-2025/" }
     },
     {
       "src": "^/blog/why\\-every\\-kenyan\\-business\\-needs\\-tally\\-prime\\-in\\-2025(/)?$",
