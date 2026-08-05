@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, Cloud, Lock, Users, Globe, Zap } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Lock, Users, Globe, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 import SEO from '../components/SEO';
 import Breadcrumb from '../components/Breadcrumb';

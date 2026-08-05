@@ -70,6 +70,18 @@
       "dest": "/dist/tally-prime-kenya/index.html"
     },
     {
+      "src": "^/tallyprime-small-business-kenya(/.*)?$",
+      "dest": "/dist/tallyprime-small-business-kenya/index.html"
+    },
+    {
+      "src": "^/kra-etims-compliance(/.*)?$",
+      "dest": "/dist/kra-etims-compliance/index.html"
+    },
+    {
+      "src": "^/cloud-accounting-software-kenya(/.*)?$",
+      "dest": "/dist/cloud-accounting-software-kenya/index.html"
+    },
+    {
       "src": "^/tallyprime(/.*)?$",
       "dest": "/dist/tallyprime/index.html"
     },
@@ -265,6 +277,14 @@
     {
       "src": "^/blog/how\\-tallyprime\\-helps\\-distributors\\-in\\-kenya(/)?$",
       "dest": "/dist/blog/how-tallyprime-helps-distributors-in-kenya/index.html"
+    },
+    {
+      "src": "^/blog/tallyprime\\-reports\\-every\\-business\\-owner\\-should\\-know(/)?$",
+      "dest": "/dist/blog/tallyprime-reports-every-business-owner-should-know/index.html"
+    },
+    {
+      "src": "^/blog/sole\\-proprietorship\\-to\\-limited\\-company\\-kenya\\-kra\\-stock\\-transfer(/)?$",
+      "dest": "/dist/blog/sole-proprietorship-to-limited-company-kenya-kra-stock-transfer/index.html"
     },
     {
       "src": "^/blog/etims\\-income\\-tax\\-deadline\\-june\\-30\\-2026(/)?$",

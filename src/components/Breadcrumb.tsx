@@ -44,6 +44,9 @@ const pathLabelMap: Record<string, string> = {
   'products': 'Pricing',
   'testimonials': 'Testimonials',
   'why-choose-us': 'Why Choose Us',
+  'kra-etims-compliance': 'KRA eTIMS Compliance',
+  'cloud-accounting-software-kenya': 'Cloud Accounting',
+  'tallyprime-small-business-kenya': 'TallyPrime for Small Business',
 };
 
 function buildBreadcrumbs(pathname: string): BreadcrumbItem[] {

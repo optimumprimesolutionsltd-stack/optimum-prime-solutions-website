@@ -27,6 +27,9 @@ const routes = [
   '/products',
   '/tallyprime',
   '/tally-prime-kenya',
+  '/tallyprime-small-business-kenya',
+  '/kra-etims-compliance',
+  '/cloud-accounting-software-kenya',
   '/industries',
   '/pricing',
   '/contact',
@@ -169,6 +172,7 @@ async function prerender() {
     // Create route directories from SPA shell for any missing routes
     const routes = [
       '/', '/about', '/testimonials', '/features', '/products', '/tallyprime', '/tally-prime-kenya',
+      '/tallyprime-small-business-kenya', '/kra-etims-compliance', '/cloud-accounting-software-kenya',
       '/industries', '/pricing', '/contact',
       '/faq', '/blog', '/knowledge-hub',
       '/tallyprime/implementation', '/tallyprime/licensing', '/tallyprime/cloud-hosting',

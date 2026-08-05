@@ -1,266 +1,171 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, BookOpen, Users, Monitor, Award, Phone, MessageSquare, Clock } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Receipt, Wallet, Boxes, TrendingUp, Phone, MessageSquare } from 'lucide-react';
 import { motion } from 'framer-motion';
 import SEO from '../components/SEO';
 import Breadcrumb from '../components/Breadcrumb';
 
-const programs = [
+const painPoints = [
   {
-    icon: BookOpen,
-    title: 'Foundation Training',
-    audience: 'New TallyPrime users',
-    duration: '1 day',
-    color: 'bg-blue-50 text-blue-600',
-    topics: [
-      'Company setup and chart of accounts',
-      'Recording sales, purchases and payments',
-      'Basic inventory management',
-      'KRA eTIMS invoice generation',
-      'Day-end and month-end closing',
-      'Core reports: P&L, Balance Sheet, Trial Balance',
-    ],
+    icon: Receipt,
+    title: 'eTIMS Invoicing Without the Panic',
+    desc: 'Raise a compliant invoice in seconds and let it transmit to KRA automatically. No spreadsheets, no manual re-keying at month end.',
   },
   {
-    icon: Users,
-    title: 'Advanced User Training',
-    audience: 'Experienced users & finance teams',
-    duration: '2 days',
-    color: 'bg-purple-50 text-purple-600',
-    topics: [
-      'Multi-currency transactions',
-      'Cost centre and project accounting',
-      'Payroll: PAYE, NSSF, SHIF, Housing Levy',
-      'Manufacturing and BOM management',
-      'Advanced inventory: batches, godowns, reorder levels',
-      'Custom reports and MIS dashboards',
-    ],
+    icon: Wallet,
+    title: 'Know Exactly Who Owes You',
+    desc: 'Receivables and payables ageing at a glance, so you chase the right customer before cash flow becomes a crisis.',
   },
   {
-    icon: Monitor,
-    title: 'KRA Compliance Training',
-    audience: 'Accountants and finance managers',
-    duration: '1 day',
-    color: 'bg-red-50 text-red-600',
-    topics: [
-      'eTIMS setup and invoice transmission',
-      'VAT returns filing from TallyPrime',
-      'PAYE, NSSF, SHIF and Housing Levy remittance',
-      'Withholding tax management',
-      'Audit trail and Edit Log usage',
-      'iTax integration and reconciliation',
-    ],
+    icon: Boxes,
+    title: 'Stock That Matches Reality',
+    desc: 'Track what came in, what sold, and what is sitting on the shelf — including negative-stock warnings before they distort your margins.',
   },
   {
-    icon: Award,
-    title: 'Administrator Training',
-    audience: 'IT managers and system admins',
-    duration: '1 day',
-    color: 'bg-green-50 text-green-600',
-    topics: [
-      'User roles and access control setup',
-      'Data backup and restore procedures',
-      'TallyPrime server configuration',
-      'Multi-company and multi-branch setup',
-      'Security and audit settings',
-      'Troubleshooting common issues',
-    ],
+    icon: TrendingUp,
+    title: 'Reports You Actually Use',
+    desc: 'Profit & loss, balance sheet, and cash flow on demand — the numbers your bank, your landlord, and your accountant keep asking for.',
   },
 ];
 
-const deliveryModes = [
-  {
-    title: 'On-Site Training',
-    desc: 'Our trainer comes to your office in Nairobi, Ruiru, Kiambu, or anywhere in Kenya. Your team trains on your own data and setup — no travel required from your staff.',
-    icon: Users,
-  },
-  {
-    title: 'Remote Training',
-    desc: 'Live, interactive training via Zoom or Microsoft Teams. Ideal for teams spread across multiple locations or businesses outside Nairobi.',
-    icon: Monitor,
-  },
-  {
-    title: 'At Our Training Centre',
-    desc: 'Attend a scheduled group training session at our Ruiru office. Great for individuals and small teams who want structured classroom learning.',
-    icon: BookOpen,
-  },
+const included = [
+  'TallyPrime licensing advice — Silver for a single user, Gold when your team grows',
+  'Company setup and a chart of accounts that fits how you actually trade',
+  'KRA eTIMS configuration and test transmission before you go live',
+  'VAT, PAYE, NSSF, SHIF and Housing Levy set up at current Kenyan rates',
+  'Opening balances and stock brought over from your books or spreadsheets',
+  'Hands-on training for you and your staff, on your own data',
+  'WhatsApp support after go-live, so a stuck invoice never stops your day',
+];
+
+const steps = [
+  { n: '1', title: 'Free Consultation', desc: 'We look at how you trade today — invoices, stock, staff, and what KRA expects of you.' },
+  { n: '2', title: 'Right-Sized Setup', desc: 'We configure only what a small business needs. No enterprise complexity you will never touch.' },
+  { n: '3', title: 'Training & Go-Live', desc: 'Your team learns on your own data, then starts issuing real invoices with us on standby.' },
 ];
 
 const faqs = [
   {
-    q: 'How many people can attend a training session?',
-    a: 'On-site and remote training sessions accommodate up to 10 participants per session. For larger teams, we run multiple sessions or split into groups.',
+    q: 'Is TallyPrime affordable for a small business in Kenya?',
+    a: 'Yes. TallyPrime is a one-time licence rather than a per-user monthly subscription, which is why it works out cheaper than most cloud accounting tools once you have more than one person using it. Silver covers a single user and Gold covers unlimited users on your network. We will quote you for the edition that matches your team size rather than the biggest one.',
   },
   {
-    q: 'Do you provide training materials?',
-    a: 'Yes. Every participant receives a printed or digital training manual, exercise files, and a quick-reference guide they can use after training.',
+    q: 'Do I need an accountant to use TallyPrime?',
+    a: 'No. Most of our small-business clients run day-to-day invoicing, payments and stock themselves, and bring in an accountant monthly or at year end. We set the system up so that ordinary transactions are simple, and your accountant can pull the reports they need without disturbing you.',
   },
   {
-    q: 'Can training be customised for our business?',
-    a: 'Absolutely. We tailor all training to your industry, your chart of accounts, and the specific TallyPrime modules you use. Manufacturing training looks very different from retail training.',
+    q: 'Will TallyPrime keep me compliant with KRA eTIMS?',
+    a: 'Yes. TallyPrime generates eTIMS-compliant invoices and transmits them to KRA. We configure and test the connection during setup so your first live invoice goes through cleanly, and we show your team what to do if KRA ever rejects one.',
   },
   {
-    q: 'What if our staff need a refresher after training?',
-    a: 'All training packages include 30 days of post-training support via WhatsApp. For ongoing support, we recommend our Annual Maintenance Contract (AMC).',
+    q: 'How long does setup take for a small business?',
+    a: 'For a typical small business — one location, one or two users — we are usually live within a week, including training. Businesses with a lot of historical data or stock to migrate take a little longer, and we tell you that up front rather than after we start.',
+  },
+  {
+    q: 'Can I start small and add users later?',
+    a: 'Yes. You can begin on Silver and upgrade to Gold when you take on more staff. Your data carries over — you are not starting again or paying twice for the same setup.',
   },
 ];
 
-export default function TrainingPage() {
+export default function TallyPrimeSmallBusinessKenya() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="TallyPrime Training Kenya | Optimum Prime"
-        description="Professional TallyPrime training in Kenya — foundation, advanced, KRA compliance, and administrator courses, on-site or remote."
-        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Training solutions for your business in Ruiru and beyond."
-        canonical="/tallyprime/training"
-breadcrumbs={[
+        title="TallyPrime for Small Business Kenya | Affordable Accounting Software"
+        description="Affordable accounting software for small businesses in Kenya. TallyPrime handles KRA eTIMS invoicing, VAT, stock and cash flow — set up and supported from Ruiru and Nairobi."
+        socialDescription="Running a small business in Kenya? Get TallyPrime set up properly — eTIMS invoicing, VAT, stock and cash flow, with training and WhatsApp support."
+        canonical="/tallyprime-small-business-kenya"
+        breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
-          { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },
-          { name: 'Training', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/training/' },
+          { name: 'TallyPrime for Small Business', item: 'https://www.optimumprimesolutions.co.ke/tallyprime-small-business-kenya/' },
         ]}
+        faqs={faqs}
       />
+      <Breadcrumb />
 
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-purple-900/20 via-transparent to-transparent pointer-events-none" />
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
-          <Breadcrumb className="mb-6 [&_a]:text-slate-400 [&_a:hover]:text-red-400 [&_span]:text-slate-300" />
-          <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 rounded-full bg-purple-600/20 border border-purple-500/30 px-4 py-1.5 text-sm font-semibold text-purple-400 mb-6">
-              <BookOpen className="h-4 w-4" />
-              TallyPrime Training
-            </span>
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">
-              Train Your Team to Use<br />
-              <span className="text-purple-400">TallyPrime Confidently</span>
-            </h1>
-            <p className="text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl">
-              A powerful system is only as good as the people using it. Our certified TallyPrime trainers deliver practical, Kenya-specific training — covering everything from daily transactions to KRA eTIMS compliance and payroll.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                to="/contact#demo-form"
-                className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition"
-              >
-                Book a Training Session <ArrowRight className="h-4 w-4" />
-              </Link>
-              <a
-                href="https://wa.me/254727209720?text=Hi%2C%20I%27d%20like%20to%20enquire%20about%20TallyPrime%20training"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-slate-600 hover:border-slate-400 bg-white/5 hover:bg-white/10 px-6 py-3 text-sm font-semibold text-white transition"
-              >
-                <MessageSquare className="h-4 w-4" /> Chat on WhatsApp
-              </a>
-            </div>
+      <section className="bg-gradient-to-br from-emerald-950 via-emerald-900 to-emerald-950 py-20 text-white">
+        <div className="relative mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <h1 className="text-4xl sm:text-5xl font-bold mb-6">Accounting Software Built for Kenya's Small Businesses</h1>
+          <p className="text-lg text-emerald-100 mb-8">
+            You did not start a business to fight with spreadsheets and KRA deadlines. TallyPrime gives you compliant invoicing,
+            clear cash flow, and honest stock figures — without the cost or complexity of enterprise software.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link to="/contact#demo-form" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 font-bold text-emerald-800 hover:bg-emerald-50">
+              Get a Free Consultation <ArrowRight className="h-5 w-5" />
+            </Link>
+            <a
+              href="https://wa.me/254727209720?text=Hi%2C%20I%20run%20a%20small%20business%20and%20I%27d%20like%20to%20know%20about%20TallyPrime"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 rounded-xl px-7 py-3.5 font-bold text-white border-2 border-white hover:bg-emerald-800"
+            >
+              <MessageSquare className="h-5 w-5" /> WhatsApp
+            </a>
           </div>
         </div>
       </section>
 
-      {/* Training Programs */}
-      <section className="bg-white py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Training Programs</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto text-lg">
-              Choose the program that matches your team's experience level and business needs. All programs can be combined or customised.
-            </p>
-          </div>
-          <div className="grid gap-6 sm:grid-cols-2">
-            {programs.map((prog, i) => {
-              const Icon = prog.icon;
-              return (
-                <motion.div
-                  key={prog.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm"
-                >
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className={`inline-flex h-11 w-11 items-center justify-center rounded-2xl flex-shrink-0 ${prog.color}`}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-slate-900 text-lg">{prog.title}</h3>
-                      <p className="text-sm text-slate-500">{prog.audience}</p>
-                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-slate-600 mt-1">
-                        <Clock className="h-3 w-3" /> {prog.duration}
-                      </span>
-                    </div>
-                  </div>
-                  <ul className="space-y-2">
-                    {prog.topics.map((t) => (
-                      <li key={t} className="flex items-start gap-2 text-sm text-slate-700">
-                        <CheckCircle2 className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
-                        {t}
-                      </li>
-                    ))}
-                  </ul>
-                </motion.div>
-              );
-            })}
+      {/* Pain points */}
+      <section className="py-16 bg-white">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold mb-8">What Changes for You</h2>
+          <div className="grid gap-8">
+            {painPoints.map((item, i) => (
+              <motion.div key={i} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }} className="flex gap-4">
+                <item.icon className="h-8 w-8 text-emerald-600 flex-shrink-0" />
+                <div>
+                  <h3 className="font-bold text-lg mb-2">{item.title}</h3>
+                  <p className="text-slate-600">{item.desc}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Delivery Modes */}
-      <section className="bg-slate-50 py-20">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">How We Deliver Training</h2>
-            <p className="text-slate-600 max-w-xl mx-auto">We come to you, or you connect online. Training is always live, interactive, and tailored to your business.</p>
+      {/* What's included */}
+      <section className="py-16 bg-slate-50">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold mb-8">What a Small Business Setup Includes</h2>
+          <div className="grid gap-4">
+            {included.map((item, i) => (
+              <div key={i} className="flex gap-3 p-4 bg-white rounded-lg border border-slate-200">
+                <CheckCircle2 className="h-6 w-6 text-emerald-600 flex-shrink-0" />
+                <span className="text-slate-700">{item}</span>
+              </div>
+            ))}
           </div>
-          <div className="grid gap-6 sm:grid-cols-3">
-            {deliveryModes.map((mode, i) => {
-              const Icon = mode.icon;
-              return (
-                <motion.div
-                  key={mode.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.1 }}
-                  className="rounded-3xl bg-white border border-slate-200 p-6"
-                >
-                  <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-purple-50 text-purple-600 mb-4">
-                    <Icon className="h-5 w-5" />
-                  </div>
-                  <h3 className="font-bold text-slate-900 mb-2">{mode.title}</h3>
-                  <p className="text-sm text-slate-600 leading-relaxed">{mode.desc}</p>
-                </motion.div>
-              );
-            })}
-          </div>
+          <p className="mt-6 text-sm text-slate-600">
+            Not sure which edition you need?{' '}
+            <Link to="/pricing" className="font-semibold text-emerald-700 hover:underline">See TallyPrime pricing</Link>{' '}
+            or ask us — we will quote for the size you are, not the size we wish you were.
+          </p>
         </div>
       </section>
 
-      {/* CTA Panel */}
-      <section className="bg-white py-16">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl bg-gradient-to-br from-purple-600 to-purple-800 p-8 md:p-12 text-white text-center">
-            <h2 className="text-3xl font-bold mb-4">Ready to Book a Training Session?</h2>
-            <p className="text-purple-100 mb-8 max-w-xl mx-auto">
-              Tell us your team size, location, and the modules you need. We'll send you a training plan and quote within 24 hours.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Link to="/contact#demo-form" className="inline-flex items-center gap-2 rounded-full bg-white text-purple-700 hover:bg-purple-50 font-semibold px-8 py-3 text-sm transition">
-                Book Training <ArrowRight className="h-4 w-4" />
-              </Link>
-              <a href="tel:+254116246074" className="inline-flex items-center gap-2 rounded-full border border-white/30 hover:bg-white/10 text-white font-semibold px-8 py-3 text-sm transition">
-                <Phone className="h-4 w-4" /> +254 116 246 074
-              </a>
-            </div>
+      {/* Process */}
+      <section className="py-16 bg-white">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl font-bold mb-8">How We Get You Started</h2>
+          <div className="space-y-6">
+            {steps.map((item, i) => (
+              <div key={i} className="flex gap-4 pb-6 border-b border-slate-200 last:border-0">
+                <div className="flex items-center justify-center h-12 w-12 rounded-full bg-emerald-100 text-emerald-700 font-bold flex-shrink-0">{item.n}</div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg mb-1">{item.title}</h3>
+                  <p className="text-slate-600">{item.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* FAQs */}
-      <section className="bg-slate-50 py-20">
+      <section className="py-16 bg-slate-50">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900 mb-4">Training FAQs</h2>
-          </div>
+          <h2 className="text-3xl font-bold mb-8">Small Business FAQs</h2>
           <div className="space-y-6">
             {faqs.map((faq) => (
               <div key={faq.q} className="rounded-2xl border border-slate-200 bg-white p-6">
@@ -272,18 +177,37 @@ breadcrumbs={[
         </div>
       </section>
 
-      {/* Related Services */}
+      {/* CTA */}
+      <section className="bg-gradient-to-r from-emerald-700 to-emerald-600 py-16 text-white">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl font-bold mb-4">Let's Get Your Books in Order</h2>
+          <p className="text-emerald-100 mb-8">
+            Tell us what you sell and how many people touch the books. We will tell you honestly whether TallyPrime is right for you.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link to="/contact#demo-form" className="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-7 py-3.5 font-bold text-emerald-800 hover:bg-emerald-50">
+              Book a Free Consultation
+            </Link>
+            <a href="tel:+254116246074" className="inline-flex items-center justify-center gap-2 rounded-xl px-7 py-3.5 font-bold text-white border-2 border-white hover:bg-emerald-800">
+              <Phone className="h-5 w-5" /> +254 116 246 074
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Related */}
       <section className="bg-white py-14 border-t border-slate-100">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <h3 className="text-lg font-bold text-slate-900 mb-6">Related Services</h3>
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <h3 className="text-lg font-bold text-slate-900 mb-6">Related Pages</h3>
           <div className="flex flex-wrap gap-3">
             {[
+              { label: 'KRA eTIMS Compliance', href: '/kra-etims-compliance' },
+              { label: 'Cloud Accounting', href: '/cloud-accounting-software-kenya' },
               { label: 'Implementation', href: '/tallyprime/implementation' },
-              { label: 'Support & Maintenance', href: '/tallyprime/support' },
-              { label: 'Customization', href: '/tallyprime/customization' },
-              { label: 'TallyPrime Licensing', href: '/tallyprime/licensing' },
+              { label: 'Training', href: '/tallyprime/training' },
+              { label: 'Pricing', href: '/pricing' },
             ].map((s) => (
-              <Link key={s.href} to={s.href} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white hover:border-red-300 hover:text-red-600 px-4 py-2 text-sm font-medium text-slate-700 transition">
+              <Link key={s.href} to={s.href} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-white hover:border-emerald-300 hover:text-emerald-700 px-4 py-2 text-sm font-medium text-slate-700 transition">
                 {s.label} <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             ))}
