@@ -1,12 +1,47 @@
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { writeFileSync, existsSync, mkdirSync, readFileSync, copyFileSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync, readFileSync, copyFileSync, readdirSync, statSync } from 'fs';
 import { createRequire } from 'module';
 import { createServer } from 'http';
 import { extname } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
+
+// Walk dist/ in plain Node rather than shelling out to `find` and `du`. Those are
+// Unix-only, and the paths were interpolated into the command unquoted — so any
+// checkout whose directory contains a space (e.g. "C:\Users\MR CHEGE\...") split
+// into separate arguments and the stats line reported "0 HTML files".
+function collectDistStats(dir) {
+  let htmlFiles = 0;
+  let bytes = 0;
+  const walk = (current) => {
+    for (const entry of readdirSync(current, { withFileTypes: true })) {
+      const full = join(current, entry.name);
+      if (entry.isDirectory()) {
+        walk(full);
+      } else if (entry.isFile()) {
+        bytes += statSync(full).size;
+        // Matches the old `find -name "index.html"`: route pages only, not 404.html.
+        if (entry.name === 'index.html') htmlFiles += 1;
+      }
+    }
+  };
+  if (existsSync(dir)) walk(dir);
+  return { htmlFiles, bytes };
+}
+
+// Approximates `du -sh` output (1K, 4.2M, …).
+function formatSize(bytes) {
+  const units = ['B', 'K', 'M', 'G'];
+  let value = bytes;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit += 1;
+  }
+  return `${unit === 0 || value >= 10 ? Math.round(value) : value.toFixed(1)}${units[unit]}`;
+}
 
 // siteData.ts is TypeScript and this script runs under plain Node ESM (no ts-node/tsx
 // loader configured), so it can't be imported directly. Scrape blog slugs out of the
@@ -221,12 +256,8 @@ async function prerender() {
     const total = Object.keys(checks).length;
     console.log(`  Verification: ${passed}/${total} checks passed`);
     
-    const { execSync } = await import('child_process');
-    try {
-      const count = execSync(`find ${join(__dirname, 'dist')} -name "index.html" | wc -l`, { encoding: 'utf-8' }).trim();
-      const totalSize = execSync(`du -sh ${join(__dirname, 'dist')} | cut -f1`, { encoding: 'utf-8' }).trim();
-      console.log(`\nFinal: ${count} HTML files, ${totalSize} total`);
-    } catch {}
+    const { htmlFiles, bytes } = collectDistStats(join(__dirname, 'dist'));
+    console.log(`\nFinal: ${htmlFiles} HTML files, ${formatSize(bytes)} total`);
     
     console.log('\n' + '='.repeat(60));
     console.log('PRE-RENDER PIPELINE COMPLETE (Vercel mode)');
@@ -348,12 +379,8 @@ async function prerender() {
   Object.entries(checks).filter(([, v]) => !v).forEach(([k]) => console.log(`  FAILED: ${k}`));
   
   // Stats
-  const { execSync } = await import('child_process');
-  try {
-    const count = execSync(`find ${join(__dirname, 'dist')} -name "index.html" | wc -l`, { encoding: 'utf-8' }).trim();
-    const totalSize = execSync(`du -sh ${join(__dirname, 'dist')} | cut -f1`, { encoding: 'utf-8' }).trim();
-    console.log(`\nFinal: ${count} HTML files, ${totalSize} total`);
-  } catch {}
+  const { htmlFiles, bytes } = collectDistStats(join(__dirname, 'dist'));
+  console.log(`\nFinal: ${htmlFiles} HTML files, ${formatSize(bytes)} total`);
   
   console.log('\n' + '='.repeat(60));
   console.log('PRE-RENDER PIPELINE COMPLETE');
