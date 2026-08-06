@@ -9,7 +9,6 @@ import { type SiteData } from '../data/siteData';
 import { fbSubscribe, fbAuth } from '../firebase/config';
 import { submitAccessRequest } from '../firebase/accessRequests';
 import DashboardHome, { type TabId } from './DashboardHome';
-import { canAccessTab } from './permissions';
 import CompanyEditor from './editors/CompanyEditor';
 import ServicesEditor from './editors/ServicesEditor';
 import ProductsEditor from './editors/ProductsEditor';
@@ -76,7 +75,11 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
   const [showAccessRequest, setShowAccessRequest] = useState(false);
   const [requestedTab, setRequestedTab] = useState<string | null>(null);
   const [requestEmail, setRequestEmail] = useState('');
-  const [accessApprovals, setAccessApprovals] = useState<Set<string>>(new Set());
+  // Read-only on purpose: nothing grants an approval in the browser. Requesting
+  // access emails an admin, who widens the user's real permissions server-side;
+  // this set only ever unlocks a tab within the current session if something
+  // later fills it. The setter was never called, so it has been dropped.
+  const [accessApprovals] = useState<Set<string>>(new Set());
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'sending' | 'success'>('idle');
 
   useEffect(() => {

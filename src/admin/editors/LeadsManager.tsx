@@ -348,8 +348,18 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     if (filterSource === 'online') {
       return { type: 'online' as const, title: 'Online Demos' };
     }
-    if (filterSource === 'manual') {
-      return { type: 'manual' as const, title: 'Manual Leads' };
+    // The remaining sources are direct contacts rather than events. This used to
+    // test for a 'manual' source that no longer exists, so it never fired and
+    // every one of these exports came out titled just "CRM Status Report".
+    const directTitles: Record<string, string> = {
+      email: 'Email Enquiries',
+      whatsapp: 'WhatsApp Leads',
+      referral: 'Referrals',
+      phone: 'Phone Enquiries',
+      direct: 'Direct Contacts',
+    };
+    if (directTitles[filterSource]) {
+      return { type: 'manual' as const, title: directTitles[filterSource] };
     }
     return undefined;
   }, [filterSource, filterWorkshop, filterWebinar, events, webinarEvents]);
@@ -385,14 +395,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     else if (format === 'html') downloadFile(`${fileBase}.html`, reportHtml(), 'text/html');
   };
 
-  // Re-date already-converted workshop leads to their workshop registration date
-  // (older ones carry the conversion date). Runs only on user click, so it acts
-  // on fully-loaded data — never a silent rewrite.
-  const regCreatedById = useMemo(() => {
-    const m = new Map<string, string>();
-    registrants.forEach(r => { if (r.createdAt) m.set(r.id, r.createdAt); });
-    return m;
-  }, [registrants]);
   // Bulk selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkStatus, setBulkStatus]   = useState('Contacted');

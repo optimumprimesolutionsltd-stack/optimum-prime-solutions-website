@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Search, Download, Mail, Phone, Trash2 } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Search, Download } from 'lucide-react';
 import type { Lead } from '../../data/siteData';
 
 interface Subscriber {

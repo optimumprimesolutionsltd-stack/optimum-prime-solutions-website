@@ -12,7 +12,6 @@ interface Props {
 export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [draggedLead, setDraggedLead] = useState<Lead | null>(null);
-  const [draggedFrom, setDraggedFrom] = useState<string | null>(null);
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollContainerRef.current) {
@@ -26,7 +25,6 @@ export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
 
   const handleDragStart = (e: React.DragEvent, lead: Lead) => {
     setDraggedLead(lead);
-    setDraggedFrom(lead.status);
     e.dataTransfer.effectAllowed = 'move';
   };
 
@@ -44,7 +42,6 @@ export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
     );
     onSave({ ...data, leads: updatedLeads });
     setDraggedLead(null);
-    setDraggedFrom(null);
   };
 
   const handleDelete = (leadId: string) => {
