@@ -64,16 +64,41 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     return { leads: [...incoming, ...siteleads], incomingIds: incoming.map(l => l.id) };
   };
 
+  // Firebase rejects `undefined` anywhere in the payload and fbSet swallows the
+  // error, so a single stray undefined would silently drop the whole save —
+  // the change would look applied locally and be gone on the next reload.
+  // Strip them before writing.
+  const stripUndefined = (value: any): any => {
+    if (Array.isArray(value)) return value.map(stripUndefined);
+    if (value && typeof value === 'object' && !(value instanceof Date)) {
+      const out: Record<string, any> = {};
+      Object.entries(value).forEach(([k, v]) => {
+        if (v !== undefined) out[k] = stripUndefined(v);
+      });
+      return out;
+    }
+    return value;
+  };
+
   useEffect(() => {
     let unsubscribeSite: (() => void) | null = null;
     let unsubscribeLeads: (() => void) | null = null;
+    let unsubscribeCrm: (() => void) | null = null;
     let latestSiteData: any = null;
     let latestRawLeads: Record<string, any> | null = null;
+    let latestCrmLeads: Lead[] | null = null;
 
     const applyMerge = () => {
       if (!latestSiteData) return;
-      const siteLeads: Lead[] = Array.isArray(latestSiteData.leads) ? latestSiteData.leads : [];
-      const { leads, incomingIds } = ingestInbox(siteLeads, latestRawLeads);
+      // Leads now live in /crm/leads. latestSiteData.leads is only consulted as
+      // a fallback for data written before the split, and disappears from
+      // /siteData on the first admin save.
+      const storedLeads: Lead[] = Array.isArray(latestCrmLeads)
+        ? latestCrmLeads
+        : Array.isArray(latestSiteData.leads)
+          ? latestSiteData.leads
+          : [];
+      const { leads, incomingIds } = ingestInbox(storedLeads, latestRawLeads);
       const merged = { ...defaultData, ...latestSiteData, leads };
       setData(merged);
       save(merged);
@@ -86,10 +111,10 @@ export function SiteProvider({ children }: { children: ReactNode }) {
         const inboxIds = Object.keys(latestRawLeads);
         const clearInbox = () => inboxIds.forEach(id => fbSet(`leads/${id}`, null).catch(() => {}));
         if (incomingIds.length > 0) {
-          latestSiteData = merged;
+          latestCrmLeads = leads;
           // Only clear the inbox AFTER the ingested leads are safely persisted,
           // so a failed write can never lose a lead.
-          fbSet('siteData', merged).then(clearInbox).catch(() => {});
+          fbSet('crm/leads', stripUndefined(leads)).then(clearInbox).catch(() => {});
         } else {
           // Inbox holds only duplicates already in siteData.leads — safe to clear.
           clearInbox();
@@ -104,19 +129,22 @@ export function SiteProvider({ children }: { children: ReactNode }) {
 
     const syncData = async () => {
       try {
-        const [fbData, rawLeads] = await Promise.all([
+        const [fbData, rawLeads, crmLeads] = await Promise.all([
           fbGet('siteData'),
           isAdminRoute ? fbGet('leads') : Promise.resolve(null),
+          isAdminRoute ? fbGet('crm/leads') : Promise.resolve(null),
         ]);
         latestSiteData = fbData || {};
         latestRawLeads = rawLeads;
+        latestCrmLeads = Array.isArray(crmLeads) ? crmLeads : null;
 
         if (fbData) {
           applyMerge();
         } else {
           const localData = load();
-          await fbSet('siteData', localData);
-          latestSiteData = localData;
+          const { leads: _seedLeads, wipJobs: _seedJobs, ...seedContent } = localData;
+          await fbSet('siteData', stripUndefined(seedContent));
+          latestSiteData = seedContent;
           applyMerge();
         }
         setSynced(true);
@@ -135,6 +163,10 @@ export function SiteProvider({ children }: { children: ReactNode }) {
             latestRawLeads = rawLeads;
             applyMerge();
           });
+          unsubscribeCrm = fbSubscribe('crm/leads', (crmLeads) => {
+            latestCrmLeads = Array.isArray(crmLeads) ? crmLeads : null;
+            applyMerge();
+          });
         }
       } catch (error) {
         console.log('Firebase sync failed, using local storage');
@@ -147,31 +179,25 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     return () => {
       if (unsubscribeSite) unsubscribeSite();
       if (unsubscribeLeads) unsubscribeLeads();
+      if (unsubscribeCrm) unsubscribeCrm();
     };
   }, []);
-
-  // Firebase rejects `undefined` anywhere in the payload and fbSet swallows the
-  // error, so a single stray undefined would silently drop the whole save —
-  // the change would look applied locally and be gone on the next reload.
-  // Strip them before writing.
-  const stripUndefined = (value: any): any => {
-    if (Array.isArray(value)) return value.map(stripUndefined);
-    if (value && typeof value === 'object' && !(value instanceof Date)) {
-      const out: Record<string, any> = {};
-      Object.entries(value).forEach(([k, v]) => {
-        if (v !== undefined) out[k] = stripUndefined(v);
-      });
-      return out;
-    }
-    return value;
-  };
 
   const update = useCallback((d: SiteData) => {
     setData(d);
     save(d);
-    fbSet('siteData', stripUndefined(d)).catch(() => {});
+    // Split the write. /siteData is world-readable (the whole public site
+    // renders from it) so customer data must never land there — leads and WIP
+    // jobs go to /crm, which is gated on the admin claim. See
+    // database.rules.json: RTDB cannot revoke read on a child once the parent
+    // is readable, so separating the nodes is the only way to make the public
+    // read rule safe.
+    const { leads, wipJobs, ...content } = d;
+    fbSet('siteData', stripUndefined(content)).catch(() => {});
+    fbSet('crm/leads', stripUndefined(leads || [])).catch(() => {});
+    if (wipJobs) fbSet('crm/wipJobs', stripUndefined(wipJobs)).catch(() => {});
     // Note: we deliberately no longer mirror leads back into the /leads inbox.
-    // siteData.leads is the single source of truth; writing to /leads here used
+    // /crm/leads is the single source of truth; writing to /leads here used
     // to resurrect deleted leads and make the two stores drift apart.
   }, []);
 

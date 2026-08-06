@@ -1,0 +1,126 @@
+{
+  "rules": {
+    // Deny by default. Every node below opts in explicitly.
+    //
+    // Two kinds of caller matter here:
+    //   * anonymous visitors — SiteContext calls signInAnonymously, so ordinary
+    //     site traffic has auth != null. That means "a browser on the site",
+    //     NOT "someone we trust".
+    //   * staff — the four accounts that can sign in to /admin. Identified by
+    //     uid, because uids are opaque and safe to keep in a git repo, and
+    //     because no account currently carries the "admin" custom claim.
+    //     auth.token.admin === true is honoured too, so once
+    //     scripts/set-admin-claim.mjs has been run the uid list can be dropped.
+    //
+    // uid map (see src/admin/permissions.ts):
+    //   BsdXX3iOObRAfi5hY8c35FjeeNj1  optimumprimesolutionsltd@gmail.com (full admin)
+    //   AbU1frdiAtYj1UxJavXbPX5p49x2  chege@optimumprimesolutions.co.ke
+    //   ng7Drwl4sseFIZDYX9fzVeyz5Oe2  mundarafrederick@gmail.com
+    //   qqAw6FvLycUuja7FoMoaZdLeacr1  kirukijohnmark123@gmail.com
+    ".read": false,
+    ".write": false,
+
+    // Public site content: every page renders from it, so it stays world
+    // readable. Only the full admin may change it. Customer data must never be
+    // stored here — RTDB cannot revoke read on a child once the parent is
+    // readable, which is exactly why leads moved to /crm.
+    "siteData": {
+      ".read": true,
+      ".write": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1')"
+    },
+
+    // Canonical CRM store: leads and WIP jobs. Staff only, read and write.
+    "crm": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      ".write": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+    },
+
+    // Inbox for the public contact form. A visitor may create their own entry
+    // and nothing else: no reading the list, no overwriting or deleting anyone
+    // else's. Staff drain it into /crm/leads.
+    "leads": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      "$leadId": {
+        ".write": "auth != null && (!data.exists() || auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+      }
+    },
+
+    "newsletter_subscribers": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      "$subId": {
+        ".write": "auth != null && (!data.exists() || auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+      }
+    },
+
+    "pending_reviews": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      "$reviewId": {
+        ".write": "auth != null && (!data.exists() || auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+      }
+    },
+
+    // Registrant lists hold names, phones and emails, so reading them needs a
+    // real sign-in. /workshop-attendees and /webinar-attendees gated on a
+    // passcode compiled into the JS bundle, which was never enforceable
+    // server-side; that view belongs behind /admin.
+    "workshop_registrants": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      "$regId": {
+        ".write": "auth != null && (!data.exists() || auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+      }
+    },
+
+    "webinar_registrants": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      "$regId": {
+        ".write": "auth != null && (!data.exists() || auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+      }
+    },
+
+    // Event metadata (title, date, venue, active flag). The footer and the RSVP
+    // pages render it, so it stays publicly readable. No personal data here.
+    "workshops": {
+      ".read": true,
+      ".write": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+    },
+
+    "webinars": {
+      ".read": true,
+      ".write": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+    },
+
+    // Chatbot transcripts, keyed by week and by the visitor's own random id.
+    // A visitor reads and writes their own thread; nobody can list the node and
+    // walk everyone else's conversations.
+    "chatHistory": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      "$week": {
+        "$visitorId": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        }
+      }
+    },
+
+    "leadProfiles": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      "$week": {
+        "$visitorId": {
+          ".read": "auth != null",
+          ".write": "auth != null"
+        }
+      }
+    },
+
+    // Written by Cloud Functions through the Admin SDK, which bypasses rules.
+    "whatsapp_conversations": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      ".write": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+    },
+
+    "booked_demos": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      ".write": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+    }
+  }
+}
