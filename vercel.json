@@ -300,8 +300,7 @@
     },
     {
       "src": "^/blog/etims\\-income\\-tax\\-deadline\\-june\\-30\\-2026(/)?$",
-      "status": 301,
-      "headers": { "Location": "/blog/" }
+      "dest": "/dist/blog/etims-income-tax-deadline-june-30-2026/index.html"
     },
     {
       "src": "^/blog/why\\-tallyprime\\-alone\\-isn\\-t\\-enough\\-for\\-growing\\-kenyan\\-businesses(/)?$",

@@ -236,15 +236,20 @@ The Bottom Line
 In 2026, manual accounting is not just inefficient — it is expensive in a way that shows up directly on your tax bill. TallyPrime eliminates operational friction, keeps your filings defensible, and gives you the visibility needed to scale confidently.
 
 Ready to transform your business? The businesses that get their invoice trail right this year will be the ones leading their industries next year.`},
-    {id:'2',title:'Complete Guide to KRA e-Filing with Tally Prime',slug:'complete-guide-to-kra-e-filing-with-tally-prime',excerpt:'Step-by-step guide to setting up and filing your KRA returns directly from Tally Prime. Save time and avoid penalties.',date:'2025-02-01',category:'Tutorial',readTime:'8 min',content:`KRA compliance can be intimidating, but with Tally Prime, it's surprisingly straightforward. This guide walks you through the entire e-filing process. If you need expert setup, [we offer hands-on TallyPrime training and compliance support in Ruiru and across Kenya](/)
+    {id:'2',title:'Complete Guide to KRA e-Filing with TallyPrime',slug:'complete-guide-to-kra-e-filing-with-tally-prime',excerpt:'Step-by-step guide to filing your KRA returns from TallyPrime, updated for the 2026 rules that tie every expense you claim to a valid electronic tax invoice.',date:'2026-08-06',category:'Tutorial',readTime:'8 min',content:`KRA compliance can be intimidating, but with TallyPrime, it's surprisingly straightforward. This guide walks you through the entire e-filing process. If you need expert setup, [we offer hands-on TallyPrime training and compliance support in Ruiru and across Kenya](/).
+
+What Changed for 2026
+Before the mechanics, the rule that reshaped filing this year. From the 2026 Year of Income, the income and expenses you declare need to be supported by valid electronic tax invoices, transmitted correctly and carrying the buyer PIN where it applies. KRA validates at the point of filing and cross-references what you claim against what your suppliers reported.
+
+The practical consequence: an expense with no matching eTIMS invoice behind it is an expense you may not be able to claim. The transitional concession that allowed non-eTIMS declarations for the 2025 period was a one-time arrangement. Filing accurately now depends on capturing invoices correctly all month, not on tidying up at the deadline — which makes Steps 1 and 2 below the most important part of this guide.
 
 What You Need Before Starting
 ✓ Active KRA PIN
 ✓ Valid iTax login credentials
-✓ Tally Prime configured with your business details
-✓ Up-to-date transaction records (should already be in Tally Prime)
+✓ TallyPrime configured with your business details
+✓ Up-to-date transaction records (should already be in TallyPrime)
 
-Step 1: Enable eTIMS in Tally Prime
+Step 1: Enable eTIMS in TallyPrime
 Navigate to F11 (Features) and ensure eTIMS is activated. This enables invoice-level tracking required by KRA.
 
 Step 2: Configure Your Invoice Format
@@ -255,7 +260,7 @@ All invoices must include:
 - Total amount and tax amount
 - Invoice date
 
-Tally Prime automatically formats this correctly when eTIMS is enabled.
+TallyPrime automatically formats this correctly when eTIMS is enabled.
 
 Step 3: Generate VAT Reports
 From the Gateway of Tally, go to:
@@ -266,31 +271,39 @@ Review your:
 - Output VAT (VAT collected on sales)
 - Net VAT payable
 
-Tally Prime calculates this automatically based on your invoices.
+TallyPrime calculates this automatically based on your invoices.
 
 Step 4: Export Data for iTax
-Tally Prime integrates with KRA's iTax system. The process is automatic:
+TallyPrime integrates with KRA's iTax system. The process is automatic:
 1. Period selection (monthly or quarterly)
 2. One-click export to iTax format
-3. Upload directly from Tally Prime to KRA portal
+3. Upload directly from TallyPrime to KRA portal
 
 Step 5: File Your Returns
 Through iTax:
 1. Log in with your credentials
-2. Import the exported Tally Prime data
+2. Import the exported TallyPrime data
 3. Review calculations
 4. File returns
 5. Keep acknowledgment receipt
 
+Know Your Deadlines
+- VAT: return and payment due on or before the 20th of the following month
+- PAYE and statutory deductions: by the 9th of the following month
+- Late filing penalty: 5% of the tax due or KES 10,000, whichever is higher
+- If you are VAT-registered but had no transactions, you must still file a NIL return — silence is not a filing
+
 Common Mistakes to Avoid
 ❌ Incomplete invoice details (missing buyer PIN)
+❌ Accepting supplier invoices that never reached eTIMS — their non-compliance becomes your disallowed expense
 ❌ Manual invoice adjustments without proper vouchers
 ❌ Mixing personal and business transactions
 ❌ Missing supporting documents
 ❌ Filing late (penalties increase after the due date)
 
 Pro Tips for Smooth Filing
-✓ File on the 10th of the following month (not on deadline)
+✓ File by the 10th rather than waiting for the 20th deadline — it leaves room to fix rejections
+✓ Reconcile your eTIMS-transmitted invoices against your sales register every month, not every quarter
 ✓ Keep digital copies of all invoices for 5 years
 ✓ Reconcile bank statements monthly
 ✓ Run reconciliation reports weekly
@@ -316,7 +329,7 @@ Keep records of:
 - Reconciliation reports
 - Monthly bank statements
 
-The entire process, once set up correctly, takes just 2-3 hours per month. Tally Prime handles the heavy lifting—you just need to ensure accurate data entry daily.
+The entire process, once set up correctly, takes just 2-3 hours per month. TallyPrime handles the heavy lifting—you just need to ensure accurate data entry daily.
 
 Need help with your first filing? Our team can guide you through every step.`},
     {id:'3',title:'Tally Prime Silver vs Gold: Which Edition Is Right for You?',slug:'tally-prime-silver-vs-gold-which-edition-is-right-for-you',excerpt:'A detailed comparison of Tally Prime Silver and Gold editions to help you choose the perfect solution for your business size.',date:'2025-02-15',category:'Comparison',readTime:'6 min',content:`Choosing between Tally Prime Silver and Gold is one of the first decisions you'll make. This comprehensive comparison helps you pick the right fit for your business.
@@ -716,6 +729,90 @@ None of these reports need to be read daily. What separates owners who use Tally
 5. Budget vs. Actual — course-correct before the quarter closes
 
 Twenty minutes a month, same day every month, is enough to catch most problems while they're still cheap to fix.`},
+    {id:'10',title:'eTIMS and Your Income Tax Return: What Changed After the June 30 Deadline',slug:'etims-income-tax-deadline-june-30-2026',excerpt:'The June 30 filing deadline has passed, and with it the transitional flexibility KRA allowed on unmatched expenses. Here is what the 2026 Year of Income requires, and why the work starts now.',date:'2026-08-06',category:'Compliance',readTime:'5 min',content:`The June 30 deadline has passed. Your 2025 income tax return is filed. And if you got through it without KRA disallowing a pile of expenses, it is tempting to treat eTIMS as handled for another year.
+
+It is not. The thing that made June 30, 2026 survivable for most businesses was a concession that no longer applies.
+
+For the 2025 Year of Income, KRA allowed some flexibility: you could declare legitimate expenses even where the supporting invoice was not yet on eTIMS, provided the cost was properly documented and uploaded for validation. That flexibility was explicitly transitional. From the 2026 Year of Income onward, every declared expense must be backed by a valid electronic tax invoice. No documentation workaround. No catch-up upload.
+
+Here is the part that catches people out: the return covering the 2026 Year of Income is not due until June 30, 2027, but the expenses it will be judged on are the ones you are recording right now. You cannot retrofit an invoice next June for a purchase you made this month.
+
+## What Actually Changed, and When
+
+eTIMS has been rolling out since 2022. What changed on January 1, 2026 was enforcement — KRA began cross-checking every return against the invoice data in its eTIMS system automatically, with no auditor and no manual review.
+
+Three consequences that have not gone away:
+
+- **Expenses without a valid eTIMS invoice are not deductible.** If a supplier did not issue one, that cost cannot reduce your taxable income, regardless of whether you actually paid it.
+- **This applies whether or not you are VAT-registered.** The old VAT/non-VAT distinction is gone. eTIMS covers practically every person in business, including landlords earning rental income above KES 24,000 per month.
+- **It is continuous, not seasonal.** Every return you file goes through the same automated check.
+
+What changed on June 30, 2026 is narrower but more consequential: the transitional allowance closed behind you.
+
+## Why Mid-Year Is the Real Deadline
+
+Filing season is the worst time to discover an eTIMS gap, because by then every transaction in question is already history.
+
+Consider a supplier you have used for years who still issues handwritten invoices. Under the 2025 rules, you could document that cost and declare it. Under the 2026 rules, every shilling you pay that supplier between now and December is an expense you will not be able to claim — and you will find out in June 2027, when it is far too late to renegotiate or switch.
+
+The businesses that will file cleanly next June are the ones fixing their supplier chain and their invoice flow in the second half of 2026. That is the actual window, and roughly half of it is already gone.
+
+## What to Do Between Now and December
+
+1. **Confirm your eTIMS registration is active and on the right channel.** Whether you belong on VSCU, OSCU, eTIMS Lite, or System-to-System depends on your business type and transaction volume. If you are not certain which you are on, find out this week.
+2. **Audit your suppliers now, not at filing time.** Pull your top suppliers by spend and check that each one issues a valid eTIMS invoice. Any that cannot now carry a direct, quantifiable tax cost. Raise it with them or find alternatives while you still have months of runway.
+3. **Verify that your accounting system actually transmits to eTIMS in real time.** There is a difference between software that can produce an invoice and software that syncs and reconciles with KRA automatically. Test it against a live transaction rather than assuming.
+4. **Reconcile monthly, not annually.** Compare your books against your eTIMS submissions every month. A one-month discrepancy takes minutes to resolve; twelve months of drift is a filing-season emergency.
+5. **Fix the gaps you find in 2026 transactions immediately.** Unlike last year, there is no documented-expense fallback to lean on.
+
+## What Non-Compliance Costs You
+
+This is not a theoretical exposure. Businesses without proper eTIMS integration face:
+
+- Automatic disallowance of expenses not matched to a valid invoice
+- Returns flagged for review with no manual trigger required
+- Difficulty qualifying for the Merchant Tax Compliance Certificate, increasingly required for tenders, licences, and supplier contracts
+- A higher effective tax bill — not because the business performed better, but because deductions you were entitled to were lost
+
+For SMEs still on manual records, informal supplier relationships, or accounting software with no genuine eTIMS connection, that is where the exposure sits, and it compounds every month it goes unaddressed.
+
+## How TallyPrime Handles This
+
+TallyPrime is a KRA-approved eTIMS solution, and this is the category of problem it exists to remove.
+
+With TallyPrime, your ledgers, stock items, purchases, credit notes, and transactions sync to the eTIMS portal in real time. No manual uploads, no separate system to reconcile, no month-end scramble. Built-in validation catches errors before they turn into disallowed expenses.
+
+If you are already on TallyPrime, getting fully compliant for the 2026 Year of Income is largely a configuration exercise rather than a system overhaul. If you are on spreadsheets, a standalone ETR device, or software with no real eTIMS link, the mid-year point is a far better moment to fix it properly than the week before filing.
+
+## Frequently Asked Questions
+
+**I filed on time in June. Am I fine?**
+
+For the 2025 Year of Income, probably. But the rules tightened for the 2026 Year of Income, and the transactions being assessed are the ones you are recording now. Filing cleanly last June says nothing about whether next June will go the same way.
+
+**Does eTIMS apply if I am not VAT-registered?**
+
+Yes. This remains the most common misconception we hear. The VAT/non-VAT distinction no longer applies — eTIMS compliance is expected of practically all persons in business, including non-VAT SMEs and landlords above the rental income threshold.
+
+**What if a supplier still will not issue an eTIMS invoice?**
+
+For 2026 transactions, that expense is very likely lost. There is no documented-expense fallback the way there was for 2025. Address it now, while you still have the option of switching suppliers before year end.
+
+**Can TallyPrime handle a multi-branch or inventory-heavy business?**
+
+Yes. The eTIMS integration covers ledgers, stock items, stock positions, and transactions across all branches, with bulk or individual upload depending on your volume.
+
+**We are not on TallyPrime. Is mid-year a bad time to move?**
+
+It is considerably better than filing season. A migration completed before December means your full 2026 second half is clean, and you are not reconstructing records under deadline pressure.
+
+## Book a Free eTIMS Compliance Review
+
+Not sure where your business stands for the 2026 Year of Income? We offer a free, no-obligation eTIMS compliance review — we will assess your current setup, identify the gaps, and give you a clear action plan while there is still time to act on it.
+
+Optimum Prime Solutions is a certified TallyPrime partner based in Nairobi, helping Kenyan businesses with TallyPrime licensing, eTIMS compliance, payroll, and cloud hosting.
+
+[Book Your Free Compliance Review Today](/contact)`},
   ],
   leads: [],
   wipJobs: [],
