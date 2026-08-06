@@ -1,6 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import { MapPin, Phone, Mail, Clock, Send, CheckCircle, Loader, ChevronDown } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import { useSite } from '../context/SiteContext';
@@ -281,18 +280,18 @@ export default function Contact() {
                 <form onSubmit={submit} className="mt-8 grid gap-4">
                   <div className="grid gap-4 sm:grid-cols-2">
                     {/* Full name */}
-                    {[{ k: 'name', l: 'Full name *', t: 'text', p: 'John Doe' },
+                    {([{ k: 'name', l: 'Full name *', t: 'text', p: 'John Doe' },
                       { k: 'company', l: 'Company name *', t: 'text', p: 'Your company' },
                       { k: 'phone', l: 'Phone *', t: 'tel', p: '+254 700 000000' },
                       { k: 'email', l: 'Email *', t: 'email', p: 'john@company.ke' },
-                    ].map((field) => {
+                    ] as { k: keyof FormData; l: string; t: string; p: string }[]).map((field) => {
                       const error = getFieldError(errors, field.k);
                       return (
                         <label key={field.k} className="block text-sm text-slate-200">
                           <span className="block mb-2 font-semibold text-slate-100">{field.l}</span>
                           <input
                             type={field.t}
-                            value={(form as Record<string, string>)[field.k]}
+                            value={form[field.k]}
                             onChange={(e) => set(field.k, e.target.value)}
                             placeholder={field.p}
                             required

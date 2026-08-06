@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { Play } from 'lucide-react';
 import { useState } from 'react';
 import WhatsAppIcon from './WhatsAppIcon';
-import { useSite } from '../context/SiteContext';
 
 // "TallyPrime 7.0 | Witness the Launch" — a real product video, but the
 // heading/caption avoid naming a version number so it doesn't read as
@@ -11,7 +10,6 @@ import { useSite } from '../context/SiteContext';
 const PRODUCT_VIDEO_ID = '5fAaRE-J3QE';
 
 export default function Hero3D() {
-  const { data } = useSite();
   const [playing, setPlaying] = useState(false);
   return (
     <section id="home" className="relative overflow-hidden bg-slate-900">

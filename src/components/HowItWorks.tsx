@@ -78,7 +78,7 @@ Join 2.5 million+ businesses worldwide already running on TallyPrime. Get a free
               </a>
             </div>
             <div className="mt-8 flex items-center justify-center gap-3 text-sm text-white/80">
-              <Logo className="h-6 w-auto text-white" variant="icon" />
+              <Logo className="h-6 w-auto text-white" />
               <span>Powered by Optimum Prime Solutions</span>
             </div>
             <p className="mt-6 text-xs text-slate-100">

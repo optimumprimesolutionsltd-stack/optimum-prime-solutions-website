@@ -6,8 +6,6 @@ import { useSite } from '../context/SiteContext';
 export default function Testimonials() {
   const { data } = useSite();
   const featured = data.testimonials[0];
-  // Show up to 3 additional reviews (skip the featured one)
-  const reviewCards = data.testimonials.slice(1, 4);
 
   return (
     <section id="testimonials" className="relative bg-slate-900 py-12 sm:py-16 overflow-hidden">

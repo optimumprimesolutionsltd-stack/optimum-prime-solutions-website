@@ -6,12 +6,13 @@ import { useForm, ValidationError } from '@formspree/react';
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  companyPhone: string;
-  companyEmail: string;
+  // Only the WhatsApp number is used — it builds the hand-off link on submit.
+  // companyPhone and companyEmail were declared but never read, so they are
+  // gone rather than left as props no caller can rely on.
   companyWhatsapp: string;
 }
 
-export default function DemoRequestModal({ isOpen, onClose, companyPhone, companyEmail, companyWhatsapp }: Props) {
+export default function DemoRequestModal({ isOpen, onClose, companyWhatsapp }: Props) {
   const [state, handleSubmit] = useForm('mvzyoyzz');
   const [formData, setFormData] = useState({
     name: '', email: '', phone: '', company: '', demoDate: '', message: ''

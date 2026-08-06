@@ -118,7 +118,7 @@ export default function Navbar() {
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className="flex items-center gap-3 shrink-0"
           >
-            <Logo className="h-10 w-auto text-slate-950" variant="full" />
+            <Logo className="h-10 w-auto text-slate-950" />
           </Link>
 
           {/* Desktop Navigation */}

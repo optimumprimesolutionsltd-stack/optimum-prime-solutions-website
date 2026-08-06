@@ -54,7 +54,7 @@ export default function Products() {
           viewport={{ once: true }}
           className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
         >
-          {data.products.map((p, i) => {
+          {data.products.map((p) => {
             const isCloud = p.edition === 'Cloud Hosting';
 
             if (isCloud) {

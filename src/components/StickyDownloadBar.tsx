@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Download, X, ArrowRight } from 'lucide-react';
+import { X, ArrowRight } from 'lucide-react';
 
 export default function StickyDownloadBar() {
   const [show, setShow] = useState(false);

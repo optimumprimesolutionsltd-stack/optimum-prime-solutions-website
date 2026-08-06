@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-import { motion } from 'framer-motion';
 import { Calculator, Users, MapPin, TrendingUp, CheckCircle2, ArrowRight } from 'lucide-react';
 
 export default function ROICalculator() {

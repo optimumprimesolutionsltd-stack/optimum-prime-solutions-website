@@ -426,7 +426,16 @@ export default function Chatbot() {
         )}
       </AnimatePresence>
 
-      {demoOpen && <DemoRequestModal open={demoOpen} onOpenChange={setDemoOpen} />}
+      {/* The modal takes isOpen/onClose, not open/onOpenChange — passing the
+          wrong names left isOpen undefined, so this never rendered and the
+          chatbot's demo request silently did nothing. */}
+      {demoOpen && (
+        <DemoRequestModal
+          isOpen={demoOpen}
+          onClose={() => setDemoOpen(false)}
+          companyWhatsapp={data.contact.whatsapp}
+        />
+      )}
     </>
   );
 }

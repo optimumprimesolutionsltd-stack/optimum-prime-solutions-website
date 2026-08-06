@@ -81,7 +81,7 @@ export function getNextUpcomingEvent(events: WorkshopEvent[], afterEvent?: Works
   if (afterEvent && futureEvents.length > 0) {
     // Find events that come after the given event
     const afterIdx = events.findIndex(e => e.id === afterEvent.id);
-    return futureEvents.find((e, i) => events.indexOf(e) > afterIdx) || futureEvents[0];
+    return futureEvents.find((e) => events.indexOf(e) > afterIdx) || futureEvents[0];
   }
   return futureEvents.length > 0 ? futureEvents[0] : null;
 }

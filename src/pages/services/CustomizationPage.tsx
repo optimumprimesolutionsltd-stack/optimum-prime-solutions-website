@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, Code2, FileText, BarChart3, Printer, Phone, MessageSquare, Puzzle } from 'lucide-react';
+import { ArrowRight, Code2, FileText, BarChart3, Printer, Phone, MessageSquare, Puzzle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import SEO from '../../components/SEO';
 import Breadcrumb from '../../components/Breadcrumb';

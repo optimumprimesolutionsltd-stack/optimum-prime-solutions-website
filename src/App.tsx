@@ -7,10 +7,9 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
 import MobileStickyCTA from './components/MobileStickyCTA';
-import { fbLogin, fbLogout, fbOnAuthStateChanged, fbAuth, fbHasAdminClaim } from './firebase/config';
+import { fbLogin, fbLogout, fbOnAuthStateChanged, fbHasAdminClaim } from './firebase/config';
 import { isAdminEmail } from './admin/permissions';
 import type { User } from 'firebase/auth';
-import { signInAnonymously } from 'firebase/auth';
 
 // ── Critical: loaded eagerly (homepage only) ────────────────────────────────
 import HomePage from './pages/HomePage';
@@ -176,7 +175,6 @@ function SiteRoutes() {
 
 function App() {
   const [user, setUser] = useState<User | null>(null);
-  const [authReady, setAuthReady] = useState(false);
   const [isFullAdmin, setIsFullAdmin] = useState(false);
   const navigate = useNavigate();
   const { pathname } = useLocation();
@@ -210,18 +208,15 @@ function App() {
     let unsubscribe: (() => void) | null = null;
     let mounted = true;
 
+    // An authReady flag used to be tracked here, but nothing ever read it —
+    // no route or render waited on auth settling, so it only ever caused
+    // extra renders. Routing keys off `user` directly.
     try {
       unsubscribe = fbOnAuthStateChanged((currentUser) => {
-        if (mounted) {
-          setUser(currentUser);
-          setAuthReady(true);
-        }
+        if (mounted) setUser(currentUser);
       });
-      if (!unsubscribe || unsubscribe.toString() === '() => {}') {
-        if (mounted) setAuthReady(true);
-      }
     } catch {
-      if (mounted) setAuthReady(true);
+      // Firebase auth unavailable — the app stays in its signed-out state.
     }
 
     return () => {
