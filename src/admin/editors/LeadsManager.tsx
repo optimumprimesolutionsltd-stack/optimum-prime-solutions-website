@@ -1,13 +1,14 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import {
   Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown, ChevronUp,
-  Download, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
+  Download, Upload, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
   User, Send, AlertCircle, FileText, Video, LayoutGrid, List,
   RotateCcw, CalendarPlus, Briefcase,
 } from 'lucide-react';
 import type { SiteData, Lead, WipJob } from '../../data/siteData';
 import { fbSubscribe, fbSet } from '../../firebase/config';
 import KanbanBoard from './KanbanBoard';
+import ImportLeadsDialog from './ImportLeadsDialog';
 import {
   buildCrmReportHtml, buildUnifiedCsv, buildUnifiedXls, downloadFile, printHtml,
   type WorkshopRegistrant,
@@ -277,6 +278,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const [exportTo, setExportTo]       = useState('');
   const [includeClosed, setIncludeClosed] = useState(false);
   const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showImportDialog, setShowImportDialog] = useState(false);
   const [exportFormat, setExportFormat] = useState<'csv' | 'excel' | 'pdf'>('csv');
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set([
     'name', 'email', 'phone', 'company', 'industry', 'status', 'demoDate', 'scheduledDate', 'createdAt'
@@ -1356,6 +1358,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             title={exportLeads.length === 0 ? "No leads to export" : "Export leads with custom fields"}
             className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-40">
             <Download className="h-4 w-4" /> Leads CSV
+          </button>
+          <button onClick={() => setShowImportDialog(true)}
+            title="Add clients in bulk from a CSV file"
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
+            <Upload className="h-4 w-4" /> Import CSV
           </button>
         </div>
         {/* Report/export date range only — this NEVER hides leads from the list
@@ -2490,6 +2497,24 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             </div>
           </div>
         </div>
+      )}
+
+      {/* Import Dialog — bulk-add clients from a CSV, the reverse of the export */}
+      {showImportDialog && (
+        <ImportLeadsDialog
+          existingLeads={data.leads}
+          onClose={() => setShowImportDialog(false)}
+          onImport={imported => {
+            // Newest first, same as a lead added by hand, so the batch you just
+            // brought in sits at the top of the list.
+            onSave({ ...data, leads: [...imported, ...data.leads] });
+            // Filters left on another stage or source are the classic "I
+            // imported and nothing happened" — clear them so the batch shows.
+            setFilterStatus('All');
+            setFilterSource('All');
+            setSearch('');
+          }}
+        />
       )}
 
       {/* Export Dialog */}
