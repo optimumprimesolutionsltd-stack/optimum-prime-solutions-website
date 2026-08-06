@@ -2,10 +2,8 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { X, Send, Bot, User, Minimize2, RotateCcw } from 'lucide-react';
 import WhatsAppIcon from './WhatsAppIcon';
 import WhatsAppButton from './WhatsAppButton';
-import { useSite } from '../context/SiteContext';
 import { fbSet, fbGet } from '../firebase/config';
 import { motion, AnimatePresence } from 'framer-motion';
-import DemoRequestModal from './DemoRequestModal';
 import { getChatResponse, type ChatMessage } from '../utils/chatgpt';
 
 interface Msg {
@@ -63,10 +61,8 @@ export default function Chatbot() {
   const [typing, setTyping] = useState(false);
   const [showTypingIndicator, setShowTypingIndicator] = useState(false);
   const [lead, setLead] = useState<LeadProfile>({});
-  const [demoOpen, setDemoOpen] = useState(false);
   const [visitorId] = useState(() => getVisitorId());
 
-  const { data } = useSite();
   const endRef = useRef<HTMLDivElement>(null);
 
   // Listen for external 'zawadi:open' event (fired by Talk to an Expert buttons)
@@ -426,16 +422,6 @@ export default function Chatbot() {
         )}
       </AnimatePresence>
 
-      {/* The modal takes isOpen/onClose, not open/onOpenChange — passing the
-          wrong names left isOpen undefined, so this never rendered and the
-          chatbot's demo request silently did nothing. */}
-      {demoOpen && (
-        <DemoRequestModal
-          isOpen={demoOpen}
-          onClose={() => setDemoOpen(false)}
-          companyWhatsapp={data.contact.whatsapp}
-        />
-      )}
     </>
   );
 }
