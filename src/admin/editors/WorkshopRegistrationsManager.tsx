@@ -1,9 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Search, Trash2, Mail, Phone, Building2, Calendar, Download, Users as UsersIcon,
+  Search, Trash2, Mail, Phone, Building2, Calendar, Download, Upload, Users as UsersIcon,
   CheckCircle2, Circle, UserPlus, Undo2, Plus, Pencil, X, Star,
 } from 'lucide-react';
 import { fbSubscribe, fbSet } from '../../firebase/config';
+import ImportRegistrantsDialog from './ImportRegistrantsDialog';
 import type { SiteData, Lead } from '../../data/siteData';
 import { PIPELINE_STAGES } from '../crm/pipeline';
 import {
@@ -49,6 +50,7 @@ export default function WorkshopRegistrationsManager({ data, onSave, onBookDemo 
   const [loaded, setLoaded] = useState(false);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<'all' | 'attended' | 'pending' | 'staff'>('all');
+  const [showImport, setShowImport] = useState(false);
 
   // ── Workshop events ────────────────────────────────────────────────────────
   const [events, setEvents] = useState<WorkshopEvent[]>([DEFAULT_WORKSHOP]);
@@ -326,11 +328,30 @@ export default function WorkshopRegistrationsManager({ data, onSave, onBookDemo 
           <h2 className="text-xl font-bold text-slate-900">Workshop RSVPs</h2>
           <p className="text-sm text-slate-500 mt-0.5">Registrations per workshop — pick a workshop below</p>
         </div>
-        <button onClick={exportCSV} disabled={eventRegistrants.length === 0}
-          className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-40">
-          <Download className="h-4 w-4" /> Export CSV
-        </button>
+        <div className="flex items-center gap-2">
+          <button onClick={exportCSV} disabled={eventRegistrants.length === 0}
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-40">
+            <Download className="h-4 w-4" /> Export CSV
+          </button>
+          <button onClick={() => setShowImport(true)} disabled={!selectedEvent}
+            title={selectedEvent ? `Add attendees in bulk to ${selectedEvent.title}` : 'Pick a workshop first'}
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-40">
+            <Upload className="h-4 w-4" /> Import CSV
+          </button>
+        </div>
       </div>
+
+      {/* Import dialog — bulk-add RSVPs to the workshop selected below. The list
+          refreshes itself: the Firebase subscription picks up the new rows. */}
+      {showImport && selectedEvent && (
+        <ImportRegistrantsDialog
+          eventId={selectedEventId}
+          eventTitle={selectedEvent.title}
+          existing={eventRegistrants}
+          onClose={() => setShowImport(false)}
+          onImported={() => { setFilter('all'); setSearch(''); }}
+        />
+      )}
 
       {/* ── Workshop selector ── */}
       <div className="rounded-2xl border border-slate-200 bg-white p-4 space-y-3">
