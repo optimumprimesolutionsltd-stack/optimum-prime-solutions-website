@@ -63,6 +63,11 @@ export default function CustomizationPage() {
       <SEO
         title="TallyPrime Customization Kenya | Optimum Prime"
         description="TallyPrime customization in Kenya — custom invoice templates, MIS reports, TDL development, and system integrations."
+        service={{
+          name: "TallyPrime Customization (TDL)",
+          description: "TallyPrime customization in Kenya - custom invoice templates, MIS reports, TDL development, and system integrations.",
+          serviceType: "Software customization",
+        }}
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Customization solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/customization"
 breadcrumbs={[

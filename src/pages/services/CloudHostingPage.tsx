@@ -65,6 +65,11 @@ export default function CloudHostingPage() {
       <SEO
         title="TallyPrime Cloud Hosting Kenya | Optimum Prime"
         description="Host TallyPrime on the cloud in Kenya. Access your accounting data from anywhere, with 99.9% uptime and daily backups."
+        service={{
+          name: "TallyPrime Cloud Hosting",
+          description: "Cloud hosting for TallyPrime in Kenya - access your accounting data from anywhere, with 99.9% uptime and daily backups.",
+          serviceType: "Cloud hosting",
+        }}
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. CloudHosting solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/cloud-hosting"
 breadcrumbs={[

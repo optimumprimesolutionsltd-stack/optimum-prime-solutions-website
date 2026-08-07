@@ -110,6 +110,11 @@ export default function TrainingPage() {
       <SEO
         title="TallyPrime Training Kenya | Optimum Prime"
         description="Professional TallyPrime training in Kenya — foundation, advanced, KRA compliance, and administrator courses, on-site or remote."
+        service={{
+          name: "TallyPrime Training",
+          description: "Professional TallyPrime training in Kenya - foundation, advanced, KRA compliance, and administrator courses, on-site or remote.",
+          serviceType: "Business software training",
+        }}
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Training solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/training"
 breadcrumbs={[

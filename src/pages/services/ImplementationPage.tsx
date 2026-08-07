@@ -68,6 +68,11 @@ export default function ImplementationPage() {
       <SEO
         title="TallyPrime Implementation Kenya | Optimum Prime"
         description="Professional TallyPrime implementation in Kenya — setup, KRA eTIMS integration, data migration, staff training, and go-live support."
+        service={{
+          name: "TallyPrime Implementation",
+          description: "Professional TallyPrime implementation in Kenya - setup, KRA eTIMS integration, data migration, staff training, and go-live support.",
+          serviceType: "Accounting software implementation",
+        }}
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Implementation solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/implementation"
 breadcrumbs={[

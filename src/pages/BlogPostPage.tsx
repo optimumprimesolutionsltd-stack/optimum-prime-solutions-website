@@ -129,6 +129,11 @@ export default function BlogPostPage() {
         canonical={`/blog/${getPostSlug(post)}`}
         ogType="article"
         ogImage={`${BASE_URL}/og-image.png`}
+        article={{
+          headline: post.title,
+          datePublished: post.date,
+          section: post.category,
+        }}
 breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Blog', item: 'https://www.optimumprimesolutions.co.ke/blog/' },

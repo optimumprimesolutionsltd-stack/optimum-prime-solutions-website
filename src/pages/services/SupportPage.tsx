@@ -71,6 +71,11 @@ export default function SupportPage() {
       <SEO
         title="TallyPrime Support & Maintenance | Optimum Prime"
         description="Reliable TallyPrime support in Kenya — Annual Maintenance Contracts, remote desktop support, WhatsApp helpdesk, and on-site visits."
+        service={{
+          name: "TallyPrime Support and Maintenance",
+          description: "TallyPrime support in Kenya - Annual Maintenance Contracts, remote desktop support, WhatsApp helpdesk, and on-site visits.",
+          serviceType: "Technical support",
+        }}
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Support solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/support"
 breadcrumbs={[

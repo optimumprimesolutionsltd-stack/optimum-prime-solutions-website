@@ -58,6 +58,11 @@ export default function ConsultingPage() {
       <SEO
         title="EOS Business Consulting Kenya"
         description="EOS®-informed business consulting in Kenya. Help your leadership team get aligned, gain traction, and achieve your vision."
+        service={{
+          name: "EOS Business Consulting",
+          description: "EOS-informed business consulting in Kenya, helping leadership teams get aligned, gain traction, and achieve their vision.",
+          serviceType: "Business consulting",
+        }}
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Consulting solutions for your business in Ruiru and beyond."
         canonical="/tallyprime/consulting"
 breadcrumbs={[
