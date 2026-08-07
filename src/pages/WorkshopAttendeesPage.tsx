@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react';
-import { Users, Mail, Phone, Building2, Lock } from 'lucide-react';
-import { fbSubscribe } from '../firebase/config';
+import { Link } from 'react-router-dom';
+import { Users, Mail, Phone, Building2, Lock, ShieldAlert } from 'lucide-react';
+import { fbSubscribe, fbOnAuthStateChanged, type FbUser } from '../firebase/config';
 import SEO from '../components/SEO';
-
-const PASSCODE = 'Karibu2026';
-const STORAGE_KEY = 'workshop_attendees_access';
 
 interface Registrant {
   id: string;
@@ -16,65 +14,91 @@ interface Registrant {
 }
 
 export default function WorkshopAttendeesPage() {
-  const [unlocked, setUnlocked] = useState(false);
-  const [input, setInput] = useState('');
-  const [error, setError] = useState('');
+  const [user, setUser] = useState<FbUser | null>(null);
+  const [authReady, setAuthReady] = useState(false);
   const [registrants, setRegistrants] = useState<Registrant[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [denied, setDenied] = useState(false);
+
+  // This list holds attendees' names, phone numbers and email addresses, so
+  // reading it needs a signed-in staff account — see database.rules.json.
+  // This page used to gate on a passcode compared in the browser, which was
+  // never protection: the constant shipped in the JS bundle and the read
+  // behind it was unauthenticated. Note that SiteContext signs every visitor
+  // in anonymously, so "has an auth user" is not access — the anonymous ones
+  // have to be filtered out here, and the rules reject them regardless.
+  useEffect(
+    () =>
+      fbOnAuthStateChanged((u) => {
+        setUser(u && !u.isAnonymous ? u : null);
+        setAuthReady(true);
+      }),
+    [],
+  );
 
   useEffect(() => {
-    if (localStorage.getItem(STORAGE_KEY) === PASSCODE) setUnlocked(true);
-  }, []);
+    if (!user) return;
+    setDenied(false);
+    return fbSubscribe(
+      'workshop_registrants',
+      (raw: Record<string, any> | null) => {
+        const list = raw
+          ? Object.entries(raw).map(([id, v]) => ({ id, ...(v as object) }) as Registrant)
+          : [];
+        list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        setRegistrants(list);
+        setLoaded(true);
+      },
+      () => {
+        // Signed in, but not as one of the accounts the rules allow.
+        setDenied(true);
+        setLoaded(true);
+      },
+    );
+  }, [user]);
 
-  useEffect(() => {
-    if (!unlocked) return;
-    const unsubscribe = fbSubscribe('workshop_registrants', (raw: Record<string, any> | null) => {
-      const list = raw
-        ? Object.entries(raw).map(([id, v]) => ({ id, ...(v as object) }) as Registrant)
-        : [];
-      list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      setRegistrants(list);
-      setLoaded(true);
-    });
-    return unsubscribe;
-  }, [unlocked]);
+  if (!authReady) {
+    return (
+      <main className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
+        <SEO title="Workshop Attendees | Optimum Prime" description="" canonical="/workshop-attendees" noIndex />
+        <p className="text-slate-500 text-sm">Checking access…</p>
+      </main>
+    );
+  }
 
-  const handleUnlock = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (input === PASSCODE) {
-      localStorage.setItem(STORAGE_KEY, PASSCODE);
-      setUnlocked(true);
-      setError('');
-    } else {
-      setError('Incorrect passcode. Please check with Optimum Prime Solutions.');
-    }
-  };
-
-  if (!unlocked) {
+  if (!user) {
     return (
       <main className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
         <SEO title="Workshop Attendees | Optimum Prime" description="" canonical="/workshop-attendees" noIndex />
         <div className="w-full max-w-sm bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
           <Lock className="mx-auto h-8 w-8 text-teal-400 mb-4" />
           <h1 className="text-lg font-bold text-white mb-1">Workshop Attendees</h1>
-          <p className="text-slate-400 text-sm mb-6">Enter the passcode shared with you to view the live registrant list.</p>
-          <form onSubmit={handleUnlock} className="space-y-3">
-            <input
-              type="password"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Passcode"
-              autoFocus
-              className="w-full bg-slate-700 border border-slate-600 text-white rounded-lg px-4 py-2.5 text-sm text-center placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-            {error && <p className="text-red-400 text-xs">{error}</p>}
-            <button
-              type="submit"
-              className="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-2.5 rounded-lg text-sm transition-colors"
-            >
-              View List
-            </button>
-          </form>
+          <p className="text-slate-400 text-sm mb-6">
+            This list contains attendees' personal contact details, so it is only visible to signed-in
+            Optimum Prime staff. The shared passcode no longer applies.
+          </p>
+          <Link
+            to="/admin"
+            className="block w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-2.5 rounded-lg text-sm transition-colors"
+          >
+            Sign in to view
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  if (denied) {
+    return (
+      <main className="min-h-screen bg-slate-900 flex items-center justify-center px-4">
+        <SEO title="Workshop Attendees | Optimum Prime" description="" canonical="/workshop-attendees" noIndex />
+        <div className="w-full max-w-sm bg-slate-800 border border-slate-700 rounded-2xl p-8 text-center">
+          <ShieldAlert className="mx-auto h-8 w-8 text-amber-400 mb-4" />
+          <h1 className="text-lg font-bold text-white mb-1">No access to this list</h1>
+          <p className="text-slate-400 text-sm">
+            You are signed in as {user.email || 'this account'}, which is not authorised to view workshop
+            registrants. Ask an administrator to grant your account access.
+          </p>
         </div>
       </main>
     );

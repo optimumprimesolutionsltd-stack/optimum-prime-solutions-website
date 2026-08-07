@@ -78,13 +78,27 @@ export const fbSet = async (path: string, data: any): Promise<boolean> => {
   }
 };
 
-export const fbSubscribe = (path: string, callback: (data: any) => void) => {
+export const fbSubscribe = (
+  path: string,
+  callback: (data: any) => void,
+  onError?: (error: Error) => void,
+) => {
   try {
     if (!database) return () => {};
     const dataRef = fbRef(path);
-    const unsubscribe = onValue(dataRef, (snapshot) => {
-      callback(snapshot.val());
-    });
+    // Without an error callback a rules rejection is silent: onValue simply
+    // never fires, so a caller gated on the first payload waits on "Loading…"
+    // forever instead of reporting that it lacks permission.
+    const unsubscribe = onValue(
+      dataRef,
+      (snapshot) => {
+        callback(snapshot.val());
+      },
+      (error) => {
+        console.error(`Firebase subscribe error on ${path}:`, error);
+        onError?.(error);
+      },
+    );
     return unsubscribe;
   } catch (error) {
     console.error('Firebase subscribe error:', error);
