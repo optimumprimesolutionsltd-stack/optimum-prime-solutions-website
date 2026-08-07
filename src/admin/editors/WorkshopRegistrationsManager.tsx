@@ -10,6 +10,7 @@ import {
   DEFAULT_WORKSHOP, LEGACY_WORKSHOP_ID, parseWorkshops, pickActiveWorkshop,
   regEventId, type WorkshopEvent,
 } from '../../data/workshopEvent';
+import { toWhatsAppNumber } from '../../utils/phone';
 
 interface Registrant {
   id: string;
@@ -573,10 +574,12 @@ export default function WorkshopRegistrationsManager({ data, onSave, onBookDemo 
                     Send Email
                   </a>
                 )}
-                <a href={`https://wa.me/${r.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer"
-                  className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
-                  <Phone className="h-3 w-3 inline mr-1" />WhatsApp
-                </a>
+                {toWhatsAppNumber(r.phone) && (
+                  <a href={`https://wa.me/${toWhatsAppNumber(r.phone)}`} target="_blank" rel="noopener noreferrer"
+                    className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
+                    <Phone className="h-3 w-3 inline mr-1" />WhatsApp
+                  </a>
+                )}
                 {/* Book a demo straight from a workshop attendee — opens the same
                     Book-a-Demo pop-up over in Demo Leads. */}
                 {!r.staff && !isInPipeline(r) && (

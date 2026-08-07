@@ -1,3 +1,5 @@
+import { cleanPhone } from './phone';
+
 export interface ValidationError {
   field: string;
   message: string;
@@ -8,12 +10,22 @@ export interface FormValidation {
   errors: ValidationError[];
 }
 
-// Kenyan phone number validation
+// Phone number validation — international, not Kenya-only. Clients whose head
+// office sits abroad (India, UAE, UK …) register with their own country code,
+// so anything that looks like a real number in E.164 terms is accepted.
 export const isValidPhone = (phone: string): boolean => {
-  const cleaned = phone.replace(/\s/g, '');
-  // Accept +254, 0, or 254 prefix for Kenyan numbers
-  const phoneRegex = /^(\+254|0|254)([0-9]{9})$/;
-  return phoneRegex.test(cleaned);
+  const cleaned = cleanPhone(phone);
+
+  // With a country code: + then 7–15 digits (E.164 caps the total at 15).
+  // Covers +254 712 345 678 and +91 98765 43210 alike.
+  if (cleaned.startsWith('+')) return /^\+[1-9]\d{6,14}$/.test(cleaned);
+
+  // National format with a trunk 0 and no country code — 0712345678 (KE),
+  // 09876543210 (IN), 020 1234567 (landlines).
+  if (cleaned.startsWith('0')) return /^0\d{8,12}$/.test(cleaned);
+
+  // Bare digits: assume the country code was typed without the leading +.
+  return /^[1-9]\d{7,14}$/.test(cleaned);
 };
 
 // Email validation
@@ -63,7 +75,7 @@ export const validateForm = (data: FormData): FormValidation => {
   if (!data.phone.trim()) {
     errors.push({ field: 'phone', message: 'Phone number is required' });
   } else if (!isValidPhone(data.phone)) {
-    errors.push({ field: 'phone', message: 'Please enter a valid Kenyan phone number (e.g., +254 7XX XXX XXX)' });
+    errors.push({ field: 'phone', message: 'Please enter a valid phone number with your country code (e.g., +254 712 345 678 or +91 98765 43210)' });
   }
 
   // Business type — now required
