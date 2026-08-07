@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Search, Trash2, Mail, Download, Plus, UserCheck, UserX, Users as UsersIcon, Send, Loader, CheckCircle, AlertCircle, Megaphone } from 'lucide-react';
+import { Search, Trash2, Mail, Download, Upload, Plus, UserCheck, UserX, Users as UsersIcon, Send, Loader, CheckCircle, AlertCircle, Megaphone } from 'lucide-react';
 import { fbSubscribe, fbSet } from '../../firebase/config';
+import ImportSubscribersDialog from './ImportSubscribersDialog';
 
 interface Subscriber {
   id: string;
@@ -23,6 +24,7 @@ export default function SubscribersManager() {
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [addError, setAddError] = useState('');
+  const [showImport, setShowImport] = useState(false);
 
   // Send Broadcast panel
   const [showBroadcast, setShowBroadcast] = useState(false);
@@ -158,8 +160,24 @@ export default function SubscribersManager() {
             className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-40">
             <Download className="h-4 w-4" /> Export CSV
           </button>
+          <button onClick={() => setShowImport(true)}
+            title="Add subscribers in bulk from a CSV file"
+            className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition">
+            <Upload className="h-4 w-4" /> Import CSV
+          </button>
         </div>
       </div>
+
+      {/* Import dialog — bulk-add a mailing list, the reverse of Export CSV.
+          The list itself refreshes on its own: the Firebase subscription picks
+          up the new records as they are written. */}
+      {showImport && (
+        <ImportSubscribersDialog
+          existing={deduped}
+          onClose={() => setShowImport(false)}
+          onImported={() => { setFilter('all'); setSearch(''); }}
+        />
+      )}
 
       {/* Send Broadcast panel */}
       {showBroadcast && (

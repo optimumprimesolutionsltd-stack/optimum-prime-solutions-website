@@ -3,6 +3,10 @@ import { Upload, X, AlertCircle, CheckCircle2, FileSpreadsheet, Download } from 
 import type { Lead } from '../../data/siteData';
 import { PIPELINE_ORDER } from '../crm/pipeline';
 import { OPTIMUM_STAFF, DEFAULT_STAFF, staffByName, staffEmail } from '../../data/staff';
+import {
+  parseCsv, autoMapColumns, phoneKey, emailKey, parseImportDate, downloadCsv,
+  type ImportField,
+} from '../crm/csvImport';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Bulk import of clients/leads from a CSV file — the mirror image of the
@@ -20,10 +24,8 @@ interface Props {
   onClose: () => void;
 }
 
-// The lead fields a CSV column can be mapped onto. `aliases` are the header
-// names we auto-detect — the export's own labels first, then the wording other
-// systems and hand-made spreadsheets tend to use.
-const FIELDS: { key: string; label: string; aliases: string[] }[] = [
+// The lead fields a CSV column can be mapped onto.
+const FIELDS: ImportField[] = [
   { key: 'name',            label: 'Name',             aliases: ['name', 'full name', 'client name', 'contact name', 'contact person', 'customer', 'customer name'] },
   { key: 'company',         label: 'Company',          aliases: ['company', 'company name', 'organisation', 'organization', 'business', 'business name', 'firm'] },
   { key: 'phone',           label: 'Phone',            aliases: ['phone', 'phone number', 'mobile', 'mobile number', 'tel', 'telephone', 'contact', 'cell', 'msisdn'] },
@@ -44,66 +46,6 @@ const SOURCES: { value: NonNullable<Lead['source']>; label: string }[] = [
   { value: 'direct',   label: 'Direct Contact' },
   { value: 'website',  label: 'Website' },
 ];
-
-// ── CSV parsing ─────────────────────────────────────────────────────────────
-// A hand-rolled parser rather than a dependency: it has to survive quoted
-// fields containing commas and line breaks, doubled quotes ("" → "), CRLF line
-// endings and the BOM Excel writes at the front of the file.
-function parseCsv(text: string): string[][] {
-  const src = text.replace(/^﻿/, '');
-  const rows: string[][] = [];
-  let row: string[] = [];
-  let cell = '';
-  let inQuotes = false;
-
-  for (let i = 0; i < src.length; i++) {
-    const ch = src[i];
-
-    if (inQuotes) {
-      if (ch === '"') {
-        if (src[i + 1] === '"') { cell += '"'; i++; }  // escaped quote
-        else inQuotes = false;
-      } else {
-        cell += ch;
-      }
-      continue;
-    }
-
-    if (ch === '"') { inQuotes = true; }
-    else if (ch === ',') { row.push(cell); cell = ''; }
-    else if (ch === '\r') { /* handled by the \n that follows */ }
-    else if (ch === '\n') { row.push(cell); rows.push(row); row = []; cell = ''; }
-    else cell += ch;
-  }
-  // Whatever is left when the file ends is the final cell / row.
-  if (cell !== '' || row.length) { row.push(cell); rows.push(row); }
-
-  // Drop rows that are entirely empty — trailing blank lines are the norm.
-  return rows.filter(r => r.some(c => c.trim() !== ''));
-}
-
-// Phones are compared on digits only, last 9 of them: +254 712 345 678,
-// 0712345678 and 254712345678 are the same person.
-const phoneKey = (p: string) => {
-  const digits = (p || '').replace(/\D/g, '');
-  return digits.length >= 9 ? digits.slice(-9) : digits;
-};
-const emailKey = (e: string) => (e || '').trim().toLowerCase();
-
-// Accepts ISO, yyyy-mm-dd, and the dd/mm/yyyy the exports write (en-GB).
-// Anything unreadable falls back to "now" rather than poisoning the record.
-function parseDate(raw: string): string {
-  const v = (raw || '').trim();
-  if (!v) return new Date().toISOString();
-
-  const dmy = v.match(/^(\d{1,2})[/.-](\d{1,2})[/.-](\d{4})/);
-  if (dmy) {
-    const [, d, m, y] = dmy;
-    return new Date(`${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}T12:00:00`).toISOString();
-  }
-  const t = new Date(v).getTime();
-  return Number.isNaN(t) ? new Date().toISOString() : new Date(t).toISOString();
-}
 
 // Status is only honoured when it names a real pipeline stage (case-insensitive);
 // anything else starts at New so an imported row can't sit outside the pipeline.
@@ -141,20 +83,10 @@ export default function ImportLeadsDialog({ existingLeads, onImport, onClose }: 
         return;
       }
       const head = parsed[0].map(h => h.trim());
-      // Auto-match each lead field to the first column whose header matches one
-      // of its aliases; an exact-label match always wins over a loose one.
-      const auto: Record<string, number> = {};
-      const lower = head.map(h => h.toLowerCase().trim());
-      FIELDS.forEach(f => {
-        let idx = lower.findIndex(h => h === f.label.toLowerCase());
-        if (idx === -1) idx = lower.findIndex(h => f.aliases.includes(h));
-        if (idx === -1) idx = lower.findIndex(h => h && f.aliases.some(a => h.includes(a)));
-        auto[f.key] = idx;
-      });
       setFileName(file.name);
       setHeaders(head);
       setRows(parsed.slice(1));
-      setMapping(auto);
+      setMapping(autoMapColumns(head, FIELDS));
     };
     reader.onerror = () => setError('Could not read that file. Try re-saving it as CSV.');
     reader.readAsText(file);
@@ -216,7 +148,7 @@ export default function ImportLeadsDialog({ existingLeads, onImport, onClose }: 
       currentSoftware: cell(r, 'currentSoftware'),
       message: cell(r, 'message'),
       demoDate: '',
-      createdAt: parseDate(cell(r, 'createdAt')),
+      createdAt: parseImportDate(cell(r, 'createdAt')),
       status: normaliseStatus(cell(r, 'status')),
       source,
       requestType: 'demo',
@@ -239,18 +171,10 @@ export default function ImportLeadsDialog({ existingLeads, onImport, onClose }: 
 
   // A blank file in the exact shape the importer expects, so there is never any
   // guessing about column names.
-  const downloadTemplate = () => {
-    const csv = [
-      FIELDS.map(f => f.label).join(','),
-      '"Jane Mwangi","Mwangi Hardware Ltd","+254 712 345 678","jane@mwangihardware.co.ke","Hardware & Building Materials","Manual books","Met at the Nakuru road show","New","06/08/2026"',
-    ].join('\n');
-    const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'leads-import-template.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-  };
+  const downloadTemplate = () => downloadCsv('leads-import-template.csv', [
+    FIELDS.map(f => f.label).join(','),
+    '"Jane Mwangi","Mwangi Hardware Ltd","+254 712 345 678","jane@mwangihardware.co.ke","Hardware & Building Materials","Manual books","Met at the Nakuru road show","New","06/08/2026"',
+  ].join('\n'));
 
   const reset = () => {
     setFileName(''); setHeaders([]); setRows([]); setMapping({}); setError('');
