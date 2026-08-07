@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import type { SiteData, WipJob, WipJobType, WipStatus, WipTask } from '../../data/siteData';
 import { OPTIMUM_STAFF, DEMO_TEAM, DEFAULT_STAFF, staffByName } from '../../data/staff';
+import { toWhatsAppNumber } from '../../utils/phone';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Work in Progress — what we owe clients after the sale.
@@ -684,8 +685,8 @@ export default function WorkInProgressManager({ data, onSave, openJobId, onOpenC
                           className="rounded-lg bg-slate-800 px-3 py-1.5 text-xs font-bold text-white hover:bg-slate-900 transition">
                           Edit job
                         </button>
-                        {j.phone && (
-                          <a href={`https://wa.me/${j.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer"
+                        {toWhatsAppNumber(j.phone || '') && (
+                          <a href={`https://wa.me/${toWhatsAppNumber(j.phone || '')}`} target="_blank" rel="noopener noreferrer"
                             className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
                             WhatsApp
                           </a>

@@ -27,6 +27,7 @@ import {
 import {
   googleCalendarUrl, buildIcs, downloadIcs, demoGuestList, type CalendarEvent,
 } from '../crm/calendar';
+import { toWhatsAppNumber } from '../../utils/phone';
 
 interface P {
   data: SiteData;
@@ -2089,10 +2090,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                           Send Email
                         </a>
                       )}
-                      <a href={`https://wa.me/${l.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer"
-                        className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
-                        WhatsApp
-                      </a>
+                      {toWhatsAppNumber(l.phone) && (
+                        <a href={`https://wa.me/${toWhatsAppNumber(l.phone)}`} target="_blank" rel="noopener noreferrer"
+                          className="rounded-lg bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-700 hover:bg-green-100 transition">
+                          WhatsApp
+                        </a>
+                      )}
                       <button onClick={() => removeLead(l.id)}
                         className="rounded-lg p-1.5 text-red-400 hover:bg-red-50 transition">
                         <Trash2 className="h-4 w-4" />

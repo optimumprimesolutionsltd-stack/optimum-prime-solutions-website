@@ -282,7 +282,7 @@ export default function Contact() {
                     {/* Full name */}
                     {([{ k: 'name', l: 'Full name *', t: 'text', p: 'John Doe' },
                       { k: 'company', l: 'Company name *', t: 'text', p: 'Your company' },
-                      { k: 'phone', l: 'Phone *', t: 'tel', p: '+254 700 000000' },
+                      { k: 'phone', l: 'Phone (with country code) *', t: 'tel', p: '+254 700 000000' },
                       { k: 'email', l: 'Email *', t: 'email', p: 'john@company.ke' },
                     ] as { k: keyof FormData; l: string; t: string; p: string }[]).map((field) => {
                       const error = getFieldError(errors, field.k);
