@@ -1,0 +1,33 @@
+# Line endings are LF in the repository AND in the working tree, on every
+# machine, regardless of anyone's core.autocrlf setting.
+#
+# Not just tidiness: a CRLF checkout puts carriage returns inside multi-line
+# template literals (BlogPostPage.tsx has a `className` string spanning eight
+# lines), so those \r characters end up in the built bundle. That changes the
+# chunk's content hash, which cascades through every asset filename — and the
+# committed dist/ then disagrees with a rebuild for no reason anyone can see.
+# Pinning eol=lf makes a build depend on the source alone.
+* text=auto eol=lf
+
+# Windows batch scripts are the exception — cmd.exe mis-parses LF-only files.
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Binary assets: never normalise, never diff as text.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.webp binary
+*.avif binary
+*.pdf  binary
+*.woff binary
+*.woff2 binary
+*.ttf  binary
+*.eot  binary
+*.mp4  binary
+*.zip  binary
+*.xlsx binary
+*.pptx binary
+*.docx binary
