@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import { writeFileSync, existsSync, mkdirSync, readFileSync, copyFileSync, readdirSync, statSync } from 'fs';
+import { writeFileSync, existsSync, mkdirSync, readFileSync, copyFileSync, readdirSync, statSync, rmSync } from 'fs';
 import { createRequire } from 'module';
 import { createServer } from 'http';
 import { extname } from 'path';
@@ -43,18 +43,73 @@ function formatSize(bytes) {
   return `${unit === 0 || value >= 10 ? Math.round(value) : value.toFixed(1)}${units[unit]}`;
 }
 
+// Live blog posts are stored in Firebase under /siteData (world-readable — the
+// whole public site reads it unauthenticated), and posts added through the admin
+// panel exist ONLY there, never in siteData.ts. Fetched over the REST API rather
+// than the Firebase SDK so this stays a dependency-free plain-Node script.
+const RTDB_BLOGS_URL =
+  'https://optimum-prime-website-default-rtdb.europe-west1.firebasedatabase.app/siteData/blogs.json';
+
+// Mirrors src/utils/slugify.ts. Kept in sync by hand because that file is
+// TypeScript and this script has no TS loader — if the app's slug rules change,
+// change them here too or admin posts will prerender to the wrong directory.
+function slugify(title) {
+  return title
+    .toLowerCase()
+    .replace(/[®©™]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
+function getPostSlug(post) {
+  return post.slug || slugify(post.title);
+}
+
 // siteData.ts is TypeScript and this script runs under plain Node ESM (no ts-node/tsx
 // loader configured), so it can't be imported directly. Scrape blog slugs out of the
 // source text instead — this is what silently dropped every blog post route before,
 // since the static `routes` list below never included them.
-function getBlogRoutes() {
+function getSeedBlogRoutes() {
   const source = readFileSync(join(__dirname, 'src', 'data', 'siteData.ts'), 'utf-8');
   const slugs = [...source.matchAll(/slug:\s*'([^']+)'/g)].map((m) => m[1]);
   return slugs.map((slug) => `/blog/${slug}`);
 }
-const blogRoutes = getBlogRoutes();
 
-const routes = [
+// Union of the seed posts in siteData.ts and whatever is live in Firebase. The
+// seed list is the fallback: if the fetch fails (offline, CI without network,
+// database rules changed) the build still produces every route it used to,
+// rather than silently shipping a site with no blog posts at all.
+async function getBlogRoutes() {
+  const seedRoutes = getSeedBlogRoutes();
+  try {
+    const res = await fetch(RTDB_BLOGS_URL, { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    // Firebase returns an array for integer-keyed data and an object otherwise;
+    // either way the entries can contain nulls from deleted records.
+    const posts = (Array.isArray(data) ? data : Object.values(data || {})).filter(
+      (p) => p && p.title
+    );
+    const liveRoutes = posts.map((p) => `/blog/${getPostSlug(p)}`);
+    const merged = [...new Set([...seedRoutes, ...liveRoutes])];
+    const added = merged.length - seedRoutes.length;
+    console.log(
+      `  Blog routes: ${merged.length} (${seedRoutes.length} from siteData.ts, ${added} more live in Firebase)`
+    );
+    return merged;
+  } catch (err) {
+    console.warn(
+      `  ! Could not read blog posts from Firebase (${err.message}). ` +
+        `Falling back to the ${seedRoutes.length} slugs in siteData.ts — ` +
+        `posts created in the admin panel will NOT be prerendered in this build.`
+    );
+    return seedRoutes;
+  }
+}
+
+const staticRoutes = [
   '/',
   '/about',
   '/testimonials',
@@ -99,7 +154,6 @@ const routes = [
   '/privacy-policy',
   '/admin',
   '/404',
-  ...blogRoutes,
 ];
 
 const MIME_TYPES = {
@@ -172,7 +226,11 @@ async function prerender() {
   console.log('OPTIMUM PRIME SOLUTIONS - PRE-RENDER PIPELINE');
   console.log('='.repeat(60));
   console.log(`Environment: ${isVercel ? 'Vercel CI' : 'Local'} (CI=${isCI})`);
-  
+
+  // Resolved once, up front, and shared by both the Vercel and local paths so
+  // the two can't drift out of sync the way two hardcoded lists did.
+  const routes = [...staticRoutes, ...(await getBlogRoutes())];
+
   // Save the SPA shell BEFORE prerendering (it has the SEO head)
   const spaShell = readFileSync(join(__dirname, 'dist', 'index.html'), 'utf-8');
   
@@ -205,24 +263,10 @@ async function prerender() {
       }
     }
     
-    // Create route directories from SPA shell for any missing routes
-    const routes = [
-      '/', '/about', '/testimonials', '/features', '/products', '/tallyprime', '/tally-prime-kenya',
-      '/tallyprime-small-business-kenya', '/kra-etims-compliance', '/cloud-accounting-software-kenya',
-      '/industries', '/pricing', '/contact',
-      '/faq', '/blog', '/knowledge-hub',
-      '/tallyprime/implementation', '/tallyprime/licensing', '/tallyprime/cloud-hosting',
-      '/tallyprime/training', '/tallyprime/support', '/tallyprime/customization', '/tallyprime/data-migration',
-      '/tallyprime/consulting',
-      '/industries/manufacturing', '/industries/distribution', '/industries/retail',
-      '/industries/construction', '/industries/hardware', '/industries/ngo', '/industries/ngos',
-      '/industries/schools', '/industries/sacco', '/industries/saccos',
-      '/knowledge-hub/videos',
-      '/webinar', '/workshop-rsvp', '/workshop-attendees', '/webinar-attendees', '/why-choose-us',
-      '/biz-analyst', '/privacy-policy', '/admin',
-      '/404',
-      ...blogRoutes,
-    ];
+    // Create route directories from SPA shell for any missing routes. Uses the
+    // same `routes` resolved at the top of prerender() — this used to be a
+    // second hardcoded copy of the list, which could silently fall behind the
+    // first one.
     for (const route of routes) {
       if (route !== '/') {
         // /404 is served as a flat dist/404.html by vercel.json's catch-all
@@ -301,15 +345,37 @@ async function prerender() {
           const body = document.body.innerHTML;
           return body.includes('<h1') || body.includes('<h2') || body.includes('<main');
         }, { timeout: 15000 });
-        
+
+        // Blog posts are loaded from Firebase, which resolves well after first
+        // paint. Until it does, BlogPostPage correctly renders NotFoundPage —
+        // and NotFoundPage has an <h1>, so the generic wait above sails right
+        // past it. Capturing at that moment writes a static "Page Not Found"
+        // for a live post, which is worse than not prerendering it at all.
+        // Wait for the post's own BlogPosting schema, which only renders once
+        // the post has actually been found.
+        if (route.startsWith('/blog/')) {
+          await page.waitForFunction(
+            () =>
+              [...document.querySelectorAll('script[type="application/ld+json"]')].some((s) =>
+                s.textContent.includes('"BlogPosting"')
+              ),
+            { timeout: 25000 }
+          );
+        }
+
         // Brief additional wait
         await new Promise(resolve => setTimeout(resolve, 1000));
 
         const html = await page.content();
-        
+
         const hasContent = html.includes('<h1') || html.includes('<h2') || html.includes('<main');
         if (!hasContent) {
           throw new Error('No semantic content');
+        }
+
+        // Belt and braces: never write a 404 shell over a real route.
+        if (route !== '/404' && /Page Not Found/i.test(html)) {
+          throw new Error('rendered as 404 — leaving route to the SPA fallback');
         }
 
         const outputPath = route === '/'
@@ -336,7 +402,20 @@ async function prerender() {
         successCount++;
       } catch (err) {
         console.log(`  ✗ ${route} (${err.message})`);
-        // Fallback: use SPA shell
+        // Drop any output left from an earlier run so a stale or 404 page can't
+        // survive a failed render. With the file gone the host's SPA rewrite
+        // serves the shell, which still client-renders the route correctly.
+        // (A full `vite build` empties dist/ anyway; this matters when
+        // `npm run prerender` is run on its own.)
+        const stalePath = route === '/'
+          ? join(__dirname, 'dist', 'index.html')
+          : route === '/404'
+          ? join(__dirname, 'dist', '404.html')
+          : join(__dirname, 'dist', route, 'index.html');
+        if (route !== '/' && existsSync(stalePath)) {
+          rmSync(stalePath, { force: true });
+          console.log(`    removed stale ${route}/index.html`);
+        }
         failCount++;
       }
     }
