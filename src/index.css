@@ -79,6 +79,18 @@ h6 {
 }
 
 @layer utilities {
+  /* Admin notification toast: slides in from the right, near the bell icon. */
+  @keyframes notif-slide-in {
+    from { opacity: 0; transform: translateX(1.5rem) scale(0.97); }
+    to   { opacity: 1; transform: translateX(0) scale(1); }
+  }
+  .notif-enter {
+    animation: notif-slide-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .notif-enter { animation: none; }
+  }
+
   /* Skip navigation link */
   .skip-nav {
     position: absolute;
