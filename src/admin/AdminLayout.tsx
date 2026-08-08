@@ -25,6 +25,8 @@ import SubscribersManager from './editors/SubscribersManager';
 import AccessRequestsManager from './editors/AccessRequestsManager';
 import ContactsDirectory from './editors/ContactsDirectory';
 import WorkInProgressManager from './editors/WorkInProgressManager';
+import { useAdminNotifications, type AdminNotification } from './notifications/useAdminNotifications';
+import { NotificationBell, NotificationToasts } from './notifications/NotificationCenter';
 
 const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -133,6 +135,15 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
 
   const newLeads = data.leads.filter(l => l.status === 'New').length;
 
+  // Live alerts for website enquiries and event sign-ups as they land.
+  const notifications = useAdminNotifications(data.leads);
+  const openNotification = (n: AdminNotification) => {
+    notifications.markRead([n.id]);
+    setScheduleLeadId(null);
+    setSidebar(false);
+    setTab(accessibleTabs.has(n.tab) || accessApprovals.has(n.tab) ? n.tab : 'dashboard');
+  };
+
   // Safety check: prevent rendering content for restricted tabs
   const hasAccessToCurrentTab = accessibleTabs.has(tab) || accessApprovals.has(tab);
   if (!hasAccessToCurrentTab && !showAccessRequest) {
@@ -175,7 +186,6 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
       case 'whatsapp': return <WhatsAppManager />;
       case 'blogs': return <BlogEditor data={data} onSave={d => handleSave(d, 'Blog posts saved!')} />;
       case 'subscribers': return <SubscribersManager />;
-      // case 'contacts': return <ContactsDirectory leads={data.leads} subscribers={[]} whatsappContacts={[]} />;
       case 'contact': return <ContactEditor data={data} onSave={d => handleSave(d, 'Contact info saved!')} />;
       case 'testimonials': return <TestimonialsEditor data={data} onSave={d => handleSave(d, 'Testimonials saved!')} />;
       case 'contacts': return <ContactsDirectory leads={data.leads} subscribers={[]} whatsappContacts={[]} />;
@@ -296,6 +306,17 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
                 <span className="sm:hidden">{newLeads}</span>
               </button>
             )}
+            <NotificationBell
+              items={notifications.items}
+              unreadIds={notifications.unreadIds}
+              unreadCount={notifications.unreadCount}
+              onOpen={openNotification}
+              onMarkAllRead={notifications.markAllRead}
+              soundOn={notifications.soundOn}
+              onToggleSound={notifications.toggleSound}
+              desktop={notifications.desktop}
+              onEnableDesktop={notifications.enableDesktop}
+            />
             <button className="h-10 w-10 sm:h-9 sm:w-9 rounded-full bg-gradient-to-br from-red-600 to-red-700 flex items-center justify-center text-xs font-bold text-white shadow-md shadow-red-600/20 active:scale-95 transition-transform">A</button>
           </div>
         </header>
@@ -304,6 +325,13 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
           {renderEditor()}
         </main>
       </div>
+
+      {/* Live pop-up for enquiries and sign-ups that land while you're here */}
+      <NotificationToasts
+        toasts={notifications.toasts}
+        onOpen={openNotification}
+        onDismiss={notifications.dismissToast}
+      />
 
       {/* Toast */}
       {toast && (
