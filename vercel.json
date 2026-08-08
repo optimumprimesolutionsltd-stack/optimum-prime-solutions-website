@@ -318,7 +318,6 @@
       "dest": "/dist/blog/index.html"
     },
     {
-      "// comment": "Catch-all for blog posts, after the explicit rules above so their redirects still win. prerender.mjs builds a directory for every post in siteData.ts AND every post live in Firebase, but each slug previously also needed a hand-written rule here — so a post published from the admin panel was prerendered and then served a 404. Slugs with no directory fall through to the 404 rule below as before.",
       "src": "^/blog/([^/]+)/?$",
       "dest": "/dist/blog/$1/index.html"
     },
