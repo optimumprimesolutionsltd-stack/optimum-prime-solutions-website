@@ -188,7 +188,10 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
       case 'subscribers': return <SubscribersManager />;
       case 'contact': return <ContactEditor data={data} onSave={d => handleSave(d, 'Contact info saved!')} />;
       case 'testimonials': return <TestimonialsEditor data={data} onSave={d => handleSave(d, 'Testimonials saved!')} />;
-      case 'contacts': return <ContactsDirectory leads={data.leads} subscribers={[]} whatsappContacts={[]} />;
+      // No subscribers/whatsappContacts props: the directory subscribes to
+      // Firebase itself. Passing empty arrays here would read as "already
+      // provided" and suppress that, leaving both columns permanently blank.
+      case 'contacts': return <ContactsDirectory leads={data.leads} />;
       case 'access-requests': return <AccessRequestsManager />;
       case 'bookdemo': return null; // merged into leads tab
     }
