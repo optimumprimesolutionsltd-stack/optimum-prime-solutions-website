@@ -319,13 +319,30 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   // ── Export controls: date range + whether to include closed deals ──────────
   const [exportFrom, setExportFrom]   = useState('');
   const [exportTo, setExportTo]       = useState('');
-  const [includeClosed, setIncludeClosed] = useState(false);
+  // Closed deals are part of the report by default: a Source chip reading
+  // "Direct (1)" must not produce a report saying "0 leads". Untick to send an
+  // open-pipeline-only report — the report then says so on its face.
+  const [includeClosed, setIncludeClosed] = useState(true);
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [exportFormat, setExportFormat] = useState<'csv' | 'excel' | 'pdf'>('csv');
   const [selectedFields, setSelectedFields] = useState<Set<string>>(new Set([
     'name', 'email', 'phone', 'company', 'industry', 'status', 'demoDate', 'scheduledDate', 'createdAt'
   ]));
+
+  // Defined here rather than further down because the export sets below are
+  // built from the same search-scoped list the Source chips count — otherwise a
+  // search narrows the chips but not the report, and the two disagree.
+  const matchesSearch = (l: Lead) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return l.name.toLowerCase().includes(q)
+      || l.email.toLowerCase().includes(q)
+      || (l.company || '').toLowerCase().includes(q)
+      || l.phone.includes(q);
+  };
+
+  const searchScoped = data.leads.filter(matchesSearch);
 
   const inDateRange = (iso: string) => {
     const t = new Date(iso).getTime();
@@ -337,8 +354,8 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   // The date range scopes the whole Demo Leads view — stats, tab counts and the
   // list — so the numbers always match the chosen period.
   const dateScopedLeads = useMemo(
-    () => data.leads.filter(l => inDateRange(l.createdAt)),
-    [data.leads, exportFrom, exportTo],
+    () => searchScoped.filter(l => inDateRange(l.createdAt)),
+    [data.leads, search, exportFrom, exportTo],
   );
 
   // Leads to export: the date-scoped set, open pipeline by default (New → Demo
@@ -346,14 +363,30 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const exportLeads = useMemo(
     () => {
       // When a specific source/workshop is filtered, ignore date range and show all leads from that source
-      const baseLeads = filterSource !== 'All' ? data.leads : dateScopedLeads;
+      const baseLeads = filterSource !== 'All' ? searchScoped : dateScopedLeads;
       let leads = baseLeads.filter(l => includeClosed || (l.status !== 'Closed Won' && l.status !== 'Closed Lost'));
       if (filterSource !== 'All') leads = leads.filter(l => sourceCategory(l) === filterSource);
       if (filterSource === 'workshop' && filterWorkshop !== 'all') leads = leads.filter(l => leadWorkshopId(l) === filterWorkshop);
       if (filterSource === 'webinar' && filterWebinar !== 'all') leads = leads.filter(l => leadWebinarId(l) === filterWebinar);
       return leads;
     },
-    [data.leads, dateScopedLeads, includeClosed, filterSource, filterWorkshop, filterWebinar],
+    [data.leads, search, dateScopedLeads, includeClosed, filterSource, filterWorkshop, filterWebinar],
+  );
+
+  // How many leads the "Include Closed" toggle is currently holding back. Drives
+  // the on-screen warning and the scope note printed on the report, so an empty
+  // report always explains itself instead of just saying "0".
+  const excludedClosedCount = useMemo(
+    () => {
+      if (includeClosed) return 0;
+      const baseLeads = filterSource !== 'All' ? searchScoped : dateScopedLeads;
+      let leads = baseLeads.filter(l => l.status === 'Closed Won' || l.status === 'Closed Lost');
+      if (filterSource !== 'All') leads = leads.filter(l => sourceCategory(l) === filterSource);
+      if (filterSource === 'workshop' && filterWorkshop !== 'all') leads = leads.filter(l => leadWorkshopId(l) === filterWorkshop);
+      if (filterSource === 'webinar' && filterWebinar !== 'all') leads = leads.filter(l => leadWebinarId(l) === filterWebinar);
+      return leads.length;
+    },
+    [data.leads, search, dateScopedLeads, includeClosed, filterSource, filterWorkshop, filterWebinar],
   );
 
   const exportRegistrants = useMemo(
@@ -408,7 +441,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const fileBase = reportEvent ? `crm-report-${slugify(reportEvent.title)}` : 'crm-report';
 
   const reportHtml = () => {
-    const opts = { companyName, preparedFor: 'Tally Solutions' };
+    const opts = { companyName, preparedFor: 'Tally Solutions', closedExcluded: excludedClosedCount };
     if (reportEvent?.type === 'workshop') {
       return buildCrmReportHtml(exportLeads, exportRegistrants,
         { ...opts, workshop: { title: reportEvent.title, date: reportEvent.date, venue: reportEvent.venue } });
@@ -514,17 +547,8 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   //   filtered — sourceScoped narrowed to a single stage by the status tabs.
   //     Both List and Board render exactly this, so the two views can never
   //     disagree about which leads you are looking at.
-  const matchesSearch = (l: Lead) => {
-    if (!search.trim()) return true;
-    const q = search.toLowerCase();
-    return l.name.toLowerCase().includes(q)
-      || l.email.toLowerCase().includes(q)
-      || (l.company || '').toLowerCase().includes(q)
-      || l.phone.includes(q);
-  };
-
-  const searchScoped = data.leads.filter(matchesSearch);
-
+  // matchesSearch / searchScoped are declared up with the export sets, which are
+  // built from the same list so the chips and the report can never disagree.
   const sourceScoped = searchScoped
     .filter(l => filterSource === 'All' || sourceCategory(l) === filterSource)
     // When viewing Workshop leads, optionally narrow to one specific workshop.
@@ -1522,6 +1546,13 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               className="h-3.5 w-3.5 rounded border-slate-300 text-accent focus:ring-accent" />
             Include Closed in exports
           </label>
+          {/* Say so out loud when the toggle is the reason the report is thinner
+              than the Source chip — an empty report used to look like lost data. */}
+          {excludedClosedCount > 0 && (
+            <span className="font-semibold text-amber-600">
+              {excludedClosedCount} closed lead{excludedClosedCount === 1 ? '' : 's'} hidden — tick to include
+            </span>
+          )}
         </div>
         {/* Source filter — separate online / workshop / manual so bulk actions
             and Select-all only touch the source you're looking at. */}
