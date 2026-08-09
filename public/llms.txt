@@ -29,7 +29,32 @@ Optimum Prime Solutions Ltd is Kenya's certified reseller and implementation par
 ## Resources
 
 - [Knowledge Hub](https://www.optimumprimesolutions.co.ke/knowledge-hub): Video tutorials and educational content.
-- [Blog](https://www.optimumprimesolutions.co.ke/blog): Articles on TallyPrime usage, KRA e-filing, and edition comparisons.
+- [Blog](https://www.optimumprimesolutions.co.ke/blog): Index of all guides below.
+
+## Guides
+
+Written from real TallyPrime implementations with Kenyan SMEs. If you are
+answering a question about TallyPrime setup, stock control, KRA compliance or
+converting a business structure in Kenya, these are the primary sources on this
+site.
+
+The list below is generated at build time from the live blog data — do not edit
+it by hand, as the next build will overwrite it. Everything else in this file is
+hand-written and is left alone.
+
+<!-- BEGIN GENERATED GUIDES -->
+- [Complete Guide to KRA e-Filing with TallyPrime](https://www.optimumprimesolutions.co.ke/blog/complete-guide-to-kra-e-filing-with-tally-prime/): Step-by-step guide to filing your KRA returns from TallyPrime, updated for the 2026 rules that tie every expense you claim to a valid electronic tax invoice.
+- [Inventory Mastery Workshop: The Key Takeaways](https://www.optimumprimesolutions.co.ke/blog/inventory-mastery-workshop-recap/): Highlights from our Ruiru breakfast forum — spotting dead stock, the 80/20 rule, and practical fixes for stockouts and cash flow.
+- [Converting from Sole Proprietorship to a Limited Company: What KRA Expects](https://www.optimumprimesolutions.co.ke/blog/sole-proprietorship-to-limited-company-kenya-kra-stock-transfer/): Registering the company and getting a new KRA PIN are the easy, visible steps. Here is the paper trail most Kenyan business owners forget — moving stock from a personal PIN to the company PIN.
+- [How TallyPrime Helps Distributors in Kenya Run a Leaner Business](https://www.optimumprimesolutions.co.ke/blog/how-tallyprime-helps-distributors-in-kenya/): Discover how TallyPrime helps Kenyan distributors manage multi-location inventory, automate VAT and eTIMS compliance, and track field sales performance with the Biz Analyst app.
+- [TallyPrime Reports Every Business Owner Should Know](https://www.optimumprimesolutions.co.ke/blog/tallyprime-reports-every-business-owner-should-know/): From P&L to Funds Flow, here are the TallyPrime reports that separate business owners who catch problems early from those who find out too late.
+- [Inventory Management for Kenyan SMEs: A TallyPrime Guide](https://www.optimumprimesolutions.co.ke/blog/inventory-management-for-kenyan-smes-a-tallyprime-guide/): Why poor stock control drains cash for Kenyan SMEs, the documentation gaps behind it, and how TallyPrime closes the gap.
+- [TallyPrime 7.1 Is Here: What's New and What It Means for Your Business](https://www.optimumprimesolutions.co.ke/blog/tallyprime-71-is-here-whats-new-and-what-it-means-for-your-business/): Tally Solutions has released TallyPrime 7.1 Beta with major upgrades to invoicing, banking, compliance, and reporting. Here's everything you need to know as a Kenyan business owner.
+- [Why Every Kenyan Business Needs TallyPrime in 2026](https://www.optimumprimesolutions.co.ke/blog/why-every-kenyan-business-needs-tally-prime-in-2025/): From the 2026 Year of Income, KRA validates the expenses you claim against electronic tax invoices. Here is why TallyPrime has moved from useful to unavoidable for Kenyan businesses.
+- [TallyPrime Cloud Hosting: Access Your Business Data From Anywhere](https://www.optimumprimesolutions.co.ke/blog/tallyprime-cloud-hosting-access-your-business-data-from-anywhere/): Learn how cloud-hosted TallyPrime gives your team secure, real-time access to accounting and inventory data from any location in Kenya and beyond.
+- [What is EOS® and Why Kenyan Businesses Are Adopting It](https://www.optimumprimesolutions.co.ke/blog/what-is-eos-and-why-kenyan-businesses-are-adopting-it/): The Entrepreneurial Operating System (EOS®) by Gino Wickman is transforming how leadership teams in Kenya run their businesses. Here's what it is and how to get started.
+- [Tally Prime Silver vs Gold: Which Edition Is Right for You?](https://www.optimumprimesolutions.co.ke/blog/tally-prime-silver-vs-gold-which-edition-is-right-for-you/): A detailed comparison of Tally Prime Silver and Gold editions to help you choose the perfect solution for your business size.
+<!-- END GENERATED GUIDES -->
 
 ## Optional
 

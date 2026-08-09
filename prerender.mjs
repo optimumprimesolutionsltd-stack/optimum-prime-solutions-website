@@ -101,16 +101,24 @@ async function getBlogPosts() {
       (p) => p && p.title
     );
     // Live data wins on lastmod — a post edited in the admin panel has a fresher
-    // date there than whatever siteData.ts was committed with.
-    const merged = new Map(seed.map((p) => [p.route, p.lastmod]));
+    // date there than whatever siteData.ts was committed with. Title and excerpt
+    // are available only from Firebase; the siteData scrape does not carry them,
+    // which is why llms.txt regeneration is skipped outright when this fetch
+    // fails rather than written with posts missing their descriptions.
+    const merged = new Map(seed.map((p) => [p.route, { lastmod: p.lastmod }]));
     for (const p of posts) {
-      merged.set(`/blog/${getPostSlug(p)}`, p.date || merged.get(`/blog/${getPostSlug(p)}`) || null);
+      const route = `/blog/${getPostSlug(p)}`;
+      merged.set(route, {
+        lastmod: p.date || merged.get(route)?.lastmod || null,
+        title: p.title,
+        excerpt: p.excerpt,
+      });
     }
     const added = merged.size - seed.length;
     console.log(
       `  Blog routes: ${merged.size} (${seed.length} from siteData.ts, ${added} more live in Firebase)`
     );
-    return [...merged].map(([route, lastmod]) => ({ route, lastmod }));
+    return [...merged].map(([route, meta]) => ({ route, ...meta }));
   } catch (err) {
     console.warn(
       `  ! Could not read blog posts from Firebase (${err.message}). ` +
@@ -199,6 +207,48 @@ const SITEMAP_EXCLUDE = new Set([
 // are static design values in the markup and are left exactly as they are.
 function normaliseAnimationNoise(html) {
   return html.replace(/rotate\(-?\d+\.\d+deg\)/g, 'rotate(0deg)');
+}
+
+// llms.txt is the file AI engines read to work out what a site is and which
+// pages are worth citing. Everything in it is hand-written except the guide
+// list between these markers — that had drifted to listing /blog and none of
+// the eleven posts under it, which is exactly the content most worth citing.
+//
+// Only the marked block is touched; the positioning prose, service descriptions
+// and company details around it are left exactly as written.
+const LLMS_BEGIN = '<!-- BEGIN GENERATED GUIDES -->';
+const LLMS_END = '<!-- END GENERATED GUIDES -->';
+
+function buildLlmsGuides(blogPosts) {
+  // Newest first — the same order a reader would see on /blog.
+  const sorted = [...blogPosts]
+    .filter((p) => p.title)
+    .sort((a, b) => String(b.lastmod || '').localeCompare(String(a.lastmod || '')));
+  return sorted
+    .map((p) => {
+      // Excerpts are author-written and occasionally span lines; collapse them
+      // so each guide stays one bullet, which is the format llms.txt expects.
+      const desc = (p.excerpt || '').replace(/\s+/g, ' ').trim();
+      const title = p.title.replace(/\s+/g, ' ').trim();
+      return `- [${title}](${SITE_ORIGIN}${p.route}/)${desc ? `: ${desc}` : ''}`;
+    })
+    .join('\n');
+}
+
+function updateLlmsTxt(path, blogPosts) {
+  if (!existsSync(path)) return { ok: false, reason: 'public/llms.txt not found' };
+  const current = readFileSync(path, 'utf-8');
+  const start = current.indexOf(LLMS_BEGIN);
+  const end = current.indexOf(LLMS_END);
+  if (start === -1 || end === -1 || end < start) {
+    return { ok: false, reason: 'generated-guides markers missing — left untouched' };
+  }
+  const guides = buildLlmsGuides(blogPosts);
+  const next =
+    current.slice(0, start + LLMS_BEGIN.length) + '\n' + guides + '\n' + current.slice(end);
+  const changed = next !== current;
+  if (changed) writeFileSync(path, next);
+  return { ok: true, changed, count: guides ? guides.split('\n').length : 0 };
 }
 
 function routeToLoc(route) {
@@ -425,7 +475,7 @@ async function prerender() {
 
   // Copy public assets
   console.log('\nPhase 1: Copying public assets...');
-  const publicFiles = ['sitemap.xml', 'robots.txt', '3fd67103052cd75b3b1146cf0670b20e.txt', 'manifest.json'];
+  const publicFiles = ['sitemap.xml', 'robots.txt', 'llms.txt', '3fd67103052cd75b3b1146cf0670b20e.txt', 'manifest.json'];
   for (const file of publicFiles) {
     const src = join(__dirname, 'public', file);
     const dst = join(__dirname, 'dist', file);
@@ -434,7 +484,8 @@ async function prerender() {
     // prerender` on its own (no vite build to empty dist/ first) keeps shipping
     // the previous build's copy, and an edit to public/robots.txt silently
     // never reaches the site.
-    const mustOverwrite = file === 'sitemap.xml' || file === 'robots.txt';
+    const mustOverwrite =
+      file === 'sitemap.xml' || file === 'robots.txt' || file === 'llms.txt';
     if (existsSync(src) && (mustOverwrite || !existsSync(dst))) {
       copyFileSync(src, dst);
       console.log(`  Copied: ${file}`);
@@ -448,7 +499,7 @@ async function prerender() {
     
     // Copy public assets
     console.log('\nPhase 3: Copying public assets to dist...');
-    const publicFiles = ['sitemap.xml', 'robots.txt', '3fd67103052cd75b3b1146cf0670b20e.txt', 'manifest.json'];
+    const publicFiles = ['sitemap.xml', 'robots.txt', 'llms.txt', '3fd67103052cd75b3b1146cf0670b20e.txt', 'manifest.json'];
     for (const file of publicFiles) {
       const src = join(__dirname, 'public', file);
       const dst = join(__dirname, 'dist', file);
@@ -667,6 +718,28 @@ async function prerender() {
     for (const loc of dropped) console.log(`  - dropped: ${loc}`);
     for (const s of skipped) console.log(`  · skipped ${s.route} (${s.reason})`);
     if (!added.length && !dropped.length) console.log('  no additions or removals');
+  }
+
+  // Refresh the guide list in llms.txt from the same blog data. Skipped when
+  // the Firebase fetch failed, because titles and excerpts come from there and
+  // a partial list is worse than a stale one.
+  console.log('\nPhase 2d: Updating llms.txt guide list...');
+  {
+    const llmsPath = join(__dirname, 'public', 'llms.txt');
+    const havePostMeta = blogPosts.some((p) => p.title);
+    if (!havePostMeta) {
+      console.log('  Skipped: no post titles available (Firebase fetch failed)');
+    } else {
+      const res = updateLlmsTxt(llmsPath, blogPosts);
+      if (!res.ok) {
+        console.log(`  Skipped: ${res.reason}`);
+      } else {
+        copyFileSync(llmsPath, join(__dirname, 'dist', 'llms.txt'));
+        console.log(
+          res.changed ? `  Updated: ${res.count} guides listed` : `  Unchanged: ${res.count} guides listed`
+        );
+      }
+    }
   }
 
   // Push the pages that changed to IndexNow, which is how Bing (and so
