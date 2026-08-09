@@ -5,17 +5,27 @@ import * as path from 'path';
 const args = process.argv.slice(2);
 
 if (args.length < 2) {
-  console.error('Usage: node scripts/set-admin-claim.mjs <grant|revoke> <email>');
+  console.error('Usage: node scripts/set-admin-claim.mjs <grant|revoke> <email> [admin|staff]');
   console.error('Example: node scripts/set-admin-claim.mjs grant user@example.com');
+  console.error('Example: node scripts/set-admin-claim.mjs grant user@example.com staff');
+  console.error('');
+  console.error('Roles mirror the split in database.rules.json:');
+  console.error('  admin  full access, including write to /siteData (the public site content)');
+  console.error('  staff  the CRM and registrant nodes, but NOT /siteData');
   console.error('');
   console.error('Environment: Set GOOGLE_APPLICATION_CREDENTIALS to your service account key path');
   process.exit(1);
 }
 
-const [action, email] = args;
+const [action, email, role = 'admin'] = args;
 
 if (!['grant', 'revoke'].includes(action)) {
   console.error('Action must be "grant" or "revoke"');
+  process.exit(1);
+}
+
+if (!['admin', 'staff'].includes(role)) {
+  console.error('Role must be "admin" or "staff"');
   process.exit(1);
 }
 
@@ -50,13 +60,21 @@ const auth = admin.auth();
     const user = await auth.getUserByEmail(email);
     console.log(`Found user: ${user.email} (UID: ${user.uid})`);
 
-    if (action === 'grant') {
-      await auth.setCustomUserClaims(user.uid, { admin: true });
-      console.log(`✓ Granted admin claim to ${email}`);
-    } else {
-      await auth.setCustomUserClaims(user.uid, { admin: false });
-      console.log(`✓ Revoked admin claim from ${email}`);
-    }
+    // setCustomUserClaims replaces the whole claims object rather than merging,
+    // so carry over the role we are not touching. Without this, granting staff
+    // to someone who is already an admin would silently strip their admin.
+    const existing = user.customClaims || {};
+    const claims = {
+      admin: existing.admin === true,
+      staff: existing.staff === true,
+      [role]: action === 'grant',
+    };
+
+    await auth.setCustomUserClaims(user.uid, claims);
+    console.log(
+      `✓ ${action === 'grant' ? 'Granted' : 'Revoked'} ${role} for ${email} — claims now ${JSON.stringify(claims)}`,
+    );
+    console.log('  They must sign out and back in before the new token takes effect.');
 
     process.exit(0);
   } catch (error) {
