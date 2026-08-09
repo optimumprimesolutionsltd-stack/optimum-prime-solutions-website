@@ -4,6 +4,7 @@ import { writeFileSync, existsSync, mkdirSync, readFileSync, copyFileSync, readd
 import { createRequire } from 'module';
 import { createServer } from 'http';
 import { extname } from 'path';
+import { execFileSync } from 'child_process';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
@@ -122,6 +123,57 @@ async function getBlogPosts() {
 
 const SITE_ORIGIN = 'https://www.optimumprimesolutions.co.ke';
 
+// IndexNow pushes changed URLs straight to Bing (and Yandex, Seznam, Naver)
+// without an account. The key is the file already sitting in public/ — its name
+// and its contents must match, which is how the receiving engine proves the
+// submitter controls the domain.
+const INDEXNOW_KEY = '3fd67103052cd75b3b1146cf0670b20e';
+const INDEXNOW_ENDPOINT = 'https://api.indexnow.org/IndexNow';
+
+// Which prerendered pages actually changed in this build. IndexNow is for
+// changed URLs — resubmitting the whole site on every build is what gets a
+// submitter throttled or ignored — so ask git rather than guessing. If this
+// isn't a git checkout, or git errors, return null and let the caller skip
+// submission entirely rather than fall back to blasting all 49 URLs.
+function changedDistPages() {
+  try {
+    const out = execFileSync('git', ['status', '--porcelain', '--', 'dist'], {
+      cwd: __dirname,
+      encoding: 'utf-8',
+    });
+    const paths = out
+      .split('\n')
+      .filter(Boolean)
+      // Index and worktree status columns: take anything added or modified,
+      // skip deletions — a deleted page is not a URL worth announcing.
+      .filter((line) => /^[AM ?][AM ?]\s/.test(line) && !line.includes('D'))
+      .map((line) => line.slice(3).trim().replace(/^"|"$/g, ''))
+      .filter((p) => p.endsWith('/index.html'));
+    return paths.map((p) => {
+      const route = p.replace(/^dist/, '').replace(/\/index\.html$/, '');
+      return route === '' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${route}/`;
+    });
+  } catch {
+    return null;
+  }
+}
+
+async function submitToIndexNow(urls) {
+  const body = JSON.stringify({
+    host: new URL(SITE_ORIGIN).host,
+    key: INDEXNOW_KEY,
+    keyLocation: `${SITE_ORIGIN}/${INDEXNOW_KEY}.txt`,
+    urlList: urls,
+  });
+  const res = await fetch(INDEXNOW_ENDPOINT, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    body,
+    signal: AbortSignal.timeout(20000),
+  });
+  return res.status;
+}
+
 // Never list these. /admin and /404 are not content; the two attendee pages
 // render with noIndex. A sitemap entry for a noindex URL is a direct
 // contradiction and Search Console reports it as an error.
@@ -131,6 +183,23 @@ const SITEMAP_EXCLUDE = new Set([
   '/workshop-attendees',
   '/webinar-attendees',
 ]);
+
+// The floating chat widget runs a perpetual framer-motion wobble, and Puppeteer
+// snapshots whatever rotation it happens to hold — so every build wrote a
+// different `transform: rotate(-7.63214deg)` into all 54 pages. That is pure
+// noise in every dist/ commit, and it makes it impossible to tell which pages
+// genuinely changed.
+//
+// Normalised here in Node rather than in the page: framer-motion caches its own
+// requestAnimationFrame reference at import time, so overriding the global from
+// page.evaluate does not stop the loop, and any DOM edit gets overwritten before
+// the snapshot is taken.
+//
+// Only fractional angles are pinned. Whole-degree rotations like rotate(520deg)
+// are static design values in the markup and are left exactly as they are.
+function normaliseAnimationNoise(html) {
+  return html.replace(/rotate\(-?\d+\.\d+deg\)/g, 'rotate(0deg)');
+}
 
 function routeToLoc(route) {
   return route === '/' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${route}/`;
@@ -492,7 +561,16 @@ async function prerender() {
         // Brief additional wait
         await new Promise(resolve => setTimeout(resolve, 1000));
 
-        const html = await page.content();
+        // Freeze animations before capturing. The floating chat widget runs a
+        // perpetual framer-motion wobble that writes an inline
+        // `transform: rotate(-7.63214deg)` — whatever value it happened to hold
+        // at snapshot time. Left alone that makes every build differ on every
+        // page for no reason: pure noise in each dist/ commit, and it defeats
+        // any attempt to work out which pages genuinely changed.
+        //
+        // framer-motion drives this from JS, so disabling CSS animation is not
+        // enough; the inline transform has to be normalised after the fact.
+        const html = normaliseAnimationNoise(await page.content());
 
         const hasContent = html.includes('<h1') || html.includes('<h2') || html.includes('<main');
         if (!hasContent) {
@@ -571,6 +649,7 @@ async function prerender() {
   // because it reads each page's canonical out of the built HTML to decide
   // whether that URL belongs in the sitemap at all.
   console.log('\nPhase 2b: Generating sitemap from route list...');
+  let sitemapLocs = new Set();
   {
     const distDir = join(__dirname, 'dist');
     const sitemapPath = join(__dirname, 'public', 'sitemap.xml');
@@ -582,11 +661,51 @@ async function prerender() {
     const dropped = [...existing.keys()].filter((loc) => !entries.some((e) => e.loc === loc));
     writeFileSync(sitemapPath, xml);
     writeFileSync(join(distDir, 'sitemap.xml'), xml);
+    sitemapLocs = new Set(entries.map((e) => e.loc));
     console.log(`  ${entries.length} URLs listed`);
     for (const e of added) console.log(`  + added: ${e.loc} (lastmod ${e.lastmod})`);
     for (const loc of dropped) console.log(`  - dropped: ${loc}`);
     for (const s of skipped) console.log(`  · skipped ${s.route} (${s.reason})`);
     if (!added.length && !dropped.length) console.log('  no additions or removals');
+  }
+
+  // Push the pages that changed to IndexNow, which is how Bing (and so
+  // ChatGPT's search, which leans on Bing's index) hears about them without
+  // waiting to be crawled. Filtered against the sitemap so an excluded or
+  // non-canonical route can never be submitted.
+  //
+  // NOTE ON TIMING: this fires at BUILD time, but the site goes live only after
+  // dist/ is committed and pushed. Bing takes far longer than a deploy to act on
+  // a submission, so in practice the content is live well before it looks — but
+  // if a build is never deployed, its URLs will have been announced anyway.
+  // Set INDEXNOW_SKIP=1 to suppress, or run `npm run indexnow` by hand after a
+  // deploy instead.
+  console.log('\nPhase 2c: IndexNow submission...');
+  if (process.env.INDEXNOW_SKIP === '1') {
+    console.log('  Skipped (INDEXNOW_SKIP=1)');
+  } else {
+    const changed = changedDistPages();
+    if (changed === null) {
+      console.log('  Skipped: not a git checkout, cannot tell what changed');
+    } else {
+      const submittable = [...new Set(changed)].filter((u) => sitemapLocs.has(u));
+      const ignored = changed.length - submittable.length;
+      if (!submittable.length) {
+        console.log(`  Nothing to submit (${changed.length} changed page(s), none listed in sitemap)`);
+      } else {
+        try {
+          const status = await submitToIndexNow(submittable);
+          const ok = status === 200 || status === 202;
+          console.log(`  ${ok ? 'Submitted' : 'FAILED'}: ${submittable.length} URL(s), HTTP ${status}`);
+          for (const u of submittable.slice(0, 10)) console.log(`    ${u}`);
+          if (submittable.length > 10) console.log(`    …and ${submittable.length - 10} more`);
+          if (ignored) console.log(`  (${ignored} changed page(s) not in sitemap, not submitted)`);
+          if (!ok) console.log('  Non-fatal — the build is fine, only the ping failed.');
+        } catch (err) {
+          console.log(`  Submission failed: ${err.message} (non-fatal)`);
+        }
+      }
+    }
   }
 
   // Verify the main index.html
