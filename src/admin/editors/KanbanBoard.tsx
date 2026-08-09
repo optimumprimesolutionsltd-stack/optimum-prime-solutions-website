@@ -5,11 +5,17 @@ import { PIPELINE_ORDER, stageColor, stageReportLabel } from '../crm/pipeline';
 
 interface Props {
   data: SiteData;
+  /** The leads to show — already narrowed by the source / status / search
+   *  filters above the board. The board used to read `data.leads` directly and
+   *  so ignored every filter, which meant List and Board disagreed: picking
+   *  "Online / Website" filtered the list but left the board showing all 66.
+   *  Drag-and-drop and delete still write back through the full `data`. */
+  leads: Lead[];
   onSave: (d: SiteData) => void;
   onEditLead?: (leadId: string) => void;
 }
 
-export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
+export default function KanbanBoard({ data, leads, onSave, onEditLead }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [draggedLead, setDraggedLead] = useState<Lead | null>(null);
 
@@ -83,7 +89,13 @@ export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
         >
           <ChevronLeft className="h-6 w-6" />
         </button>
-        <p className="text-xs text-slate-500">Drag to scroll or use arrows</p>
+        {/* Say out loud how many leads the board is showing, so a board that
+            looks emptier than expected reads as "filtered", not "missing". */}
+        <p className="text-xs text-slate-500">
+          {leads.length === data.leads.length
+            ? `${leads.length} lead${leads.length === 1 ? '' : 's'} · drag to scroll or use arrows`
+            : `Showing ${leads.length} of ${data.leads.length} leads · drag to scroll or use arrows`}
+        </p>
         <button
           onClick={() => scroll('right')}
           className="flex items-center justify-center h-10 w-10 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition shadow-md"
@@ -97,7 +109,7 @@ export default function KanbanBoard({ data, onSave, onEditLead }: Props) {
       <div className="overflow-x-auto pb-4" ref={scrollContainerRef}>
         <div className="flex gap-4 min-w-full">
         {PIPELINE_ORDER.map(stage => {
-          const stageLeads = data.leads.filter(l => l.status === stage);
+          const stageLeads = leads.filter(l => l.status === stage);
           const color = stageColor(stage);
 
           return (

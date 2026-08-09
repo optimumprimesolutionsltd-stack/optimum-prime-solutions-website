@@ -482,22 +482,37 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   // The working list always shows every lead (subject to status / source /
   // search). The date range only scopes the report + CSV exports — it must
   // never silently hide leads from the person working the pipeline.
-  const filtered = data.leads
-    .filter(l => filterStatus === 'All' || l.status === filterStatus)
+  //
+  // Filtering happens in three named steps so every count on screen is measured
+  // against the same set the view below it renders:
+  //   searchScoped — the search box only. What the Source chips count, so
+  //     "Online / Website (6)" is a promise: pick it and you get those six.
+  //   sourceScoped — one source (and one workshop/webinar), every pipeline
+  //     stage. What the stats strip and the status tabs count, so the tabs
+  //     always add up to the number on the Source chip.
+  //   filtered — sourceScoped narrowed to a single stage by the status tabs.
+  //     Both List and Board render exactly this, so the two views can never
+  //     disagree about which leads you are looking at.
+  const matchesSearch = (l: Lead) => {
+    if (!search.trim()) return true;
+    const q = search.toLowerCase();
+    return l.name.toLowerCase().includes(q)
+      || l.email.toLowerCase().includes(q)
+      || (l.company || '').toLowerCase().includes(q)
+      || l.phone.includes(q);
+  };
+
+  const searchScoped = data.leads.filter(matchesSearch);
+
+  const sourceScoped = searchScoped
     .filter(l => filterSource === 'All' || sourceCategory(l) === filterSource)
     // When viewing Workshop leads, optionally narrow to one specific workshop.
     .filter(l => filterSource !== 'workshop' || filterWorkshop === 'all' || leadWorkshopId(l) === filterWorkshop)
     // When viewing Webinar leads, optionally narrow to one specific webinar.
     .filter(l => filterSource !== 'webinar' || filterWebinar === 'all' || leadWebinarId(l) === filterWebinar)
-    .filter(l => {
-      if (!search.trim()) return true;
-      const q = search.toLowerCase();
-      return l.name.toLowerCase().includes(q)
-        || l.email.toLowerCase().includes(q)
-        || (l.company || '').toLowerCase().includes(q)
-        || l.phone.includes(q);
-    })
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+
+  const filtered = sourceScoped.filter(l => filterStatus === 'All' || l.status === filterStatus);
 
   // ── Opening the booking pop-up ───────────────────────────────────────────
   // Opening the form is NOT the same as booking. This only fills the pop-up and
@@ -1411,14 +1426,17 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       )}
 
       {/* ── Stats Strip ── */}
+      {/* Measured on sourceScoped, not filtered: this is the breakdown of where
+          the chosen source's leads sit, so picking a status tab must not make
+          the other five tiles collapse to zero. */}
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-3">
         {[
-          { label: 'Total',     value: filtered.length,                                          color: 'bg-slate-50 text-slate-700' },
-          { label: 'New',       value: filtered.filter(l => l.status === 'New').length,          color: 'bg-accent/10 text-accent' },
-          { label: 'Contacted', value: filtered.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
-          { label: 'Qualified', value: filtered.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
-          { label: 'Demo Set',  value: filtered.filter(l => l.status === 'Schedule a Demo').length, color: 'bg-red-50 text-red-600' },
-          { label: 'Won',       value: filtered.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
+          { label: 'Total',     value: sourceScoped.length,                                          color: 'bg-slate-50 text-slate-700' },
+          { label: 'New',       value: sourceScoped.filter(l => l.status === 'New').length,          color: 'bg-accent/10 text-accent' },
+          { label: 'Contacted', value: sourceScoped.filter(l => l.status === 'Contacted').length,    color: 'bg-blue-50 text-blue-600' },
+          { label: 'Qualified', value: sourceScoped.filter(l => l.status === 'Qualified').length,    color: 'bg-purple-50 text-purple-600' },
+          { label: 'Demo Set',  value: sourceScoped.filter(l => l.status === 'Schedule a Demo').length, color: 'bg-red-50 text-red-600' },
+          { label: 'Won',       value: sourceScoped.filter(l => l.status === 'Closed Won').length,   color: 'bg-green-50 text-green-700' },
         ].map(s => (
           <div key={s.label} className={`rounded-xl p-3 text-center ${s.color}`}>
             <p className="text-xl font-bold">{s.value}</p>
@@ -1484,12 +1502,16 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           <span className="text-xs font-semibold text-slate-500 mr-1">Source:</span>
           {([['All', 'All sources'], ['online', 'Online / Website'], ['field', '📣 Field / Marketing'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['email', 'Email'], ['whatsapp', 'WhatsApp'], ['referral', 'Referral'], ['phone', 'Phone'], ['direct', 'Direct']] as [typeof filterSource, string][]).map(([val, label]) => {
             const isActive = filterSource === val;
+            // Counted across every pipeline stage — "Online / Website (6)" means
+            // six leads came in that way, wherever they've since got to. Picking
+            // a source therefore also clears the status tab, so the list and the
+            // board show all six rather than just the ones in one stage.
             const count = val === 'All'
-              ? data.leads.length
-              : data.leads.filter(l => sourceCategory(l) === val).length;
+              ? searchScoped.length
+              : searchScoped.filter(l => sourceCategory(l) === val).length;
             return (
               <button key={val}
-                onClick={() => { setFilterSource(val); if (val !== 'workshop') setFilterWorkshop('all'); if (val !== 'webinar') setFilterWebinar('all'); }}
+                onClick={() => { setFilterSource(val); setFilterStatus('All'); if (val !== 'workshop') setFilterWorkshop('all'); if (val !== 'webinar') setFilterWebinar('all'); }}
                 className="rounded-full border px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap"
                 style={isActive
                   ? { backgroundColor: '#1e3a5f', color: '#fff', borderColor: '#1e3a5f' }
@@ -1509,12 +1531,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                 title="Show leads from a specific workshop"
                 className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 outline-none focus:border-accent cursor-pointer">
                 <option value="all">
-                  All workshops ({data.leads.filter(l => sourceCategory(l) === 'workshop').length})
+                  All workshops ({searchScoped.filter(l => sourceCategory(l) === 'workshop').length})
                 </option>
                 {(() => {
                   // List every workshop that actually has leads, most recent first,
                   // plus a catch-all for legacy leads with no resolvable event.
-                  const wsLeads = data.leads.filter(l => sourceCategory(l) === 'workshop');
+                  const wsLeads = searchScoped.filter(l => sourceCategory(l) === 'workshop');
                   const counts = new Map<string, number>();
                   wsLeads.forEach(l => {
                     const id = leadWorkshopId(l);
@@ -1545,10 +1567,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                 title="Show leads from a specific webinar"
                 className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-semibold text-slate-700 outline-none focus:border-accent cursor-pointer">
                 <option value="all">
-                  All webinars ({data.leads.filter(l => sourceCategory(l) === 'webinar').length})
+                  All webinars ({searchScoped.filter(l => sourceCategory(l) === 'webinar').length})
                 </option>
                 {(() => {
-                  const wbLeads = data.leads.filter(l => sourceCategory(l) === 'webinar');
+                  const wbLeads = searchScoped.filter(l => sourceCategory(l) === 'webinar');
                   const counts = new Map<string, number>();
                   wbLeads.forEach(l => {
                     const id = leadWebinarId(l);
@@ -1579,7 +1601,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             const isActive = filterStatus === s;
             const color = s === 'All' ? '#1e3a5f' : stageColor(s);
             const tint = s === 'All' ? '#f1f5f9' : stageTint(s);
-            const count = s === 'All' ? data.leads.length : data.leads.filter(l => l.status === s).length;
+            // Scoped to the chosen source, so the tabs add up to the number on
+            // the active Source chip instead of quietly counting all 66 leads.
+            const count = s === 'All' ? sourceScoped.length : sourceScoped.filter(l => l.status === s).length;
             return (
               <button
                 key={s}
@@ -1916,6 +1940,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       {viewMode === 'kanban' ? (
         <KanbanBoard
           data={data}
+          leads={filtered}
           onSave={onSave}
           onEditLead={(leadId) => {
             const lead = data.leads.find(l => l.id === leadId);
