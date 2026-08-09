@@ -1,4 +1,18 @@
 # Robots.txt for Optimum Prime Solutions
+#
+# One group, deliberately. A crawler obeys only the single most specific group
+# that names it — rules are NOT inherited from the wildcard group. Googlebot and
+# Bingbot used to have their own groups containing just "Allow: /", which meant
+# the two crawlers that matter most were the only ones exempt from every
+# Disallow below, and free to fetch /admin and /api/. Removing those redundant
+# groups puts everyone under the same rules.
+#
+# AI crawlers (GPTBot, OAI-SearchBot, PerplexityBot, ClaudeBot, Bravebot and the
+# rest) are covered by the wildcard and are intentionally allowed — the site is
+# meant to be found and cited. Do not give any of them a group of their own
+# unless it needs different rules, or it will be exempted from the list below
+# exactly the way Googlebot was.
+
 User-agent: *
 Allow: /
 Disallow: /admin
@@ -7,17 +21,8 @@ Disallow: /*?*sort=
 Disallow: /*?*filter=
 Disallow: /api/
 Disallow: /.well-known/
-
-# Sitemaps
-Sitemap: https://www.optimumprimesolutions.co.ke/sitemap.xml
-
-# Google
-User-agent: Googlebot
-Allow: /
-
-# Bing
-User-agent: Bingbot
-Allow: /
-
-# Crawl delay to prevent overloading server
+# Honoured by Bing and most other crawlers. Google ignores Crawl-delay entirely
+# and paces itself; set the rate in Search Console if it ever needs limiting.
 Crawl-delay: 1
+
+Sitemap: https://www.optimumprimesolutions.co.ke/sitemap.xml
