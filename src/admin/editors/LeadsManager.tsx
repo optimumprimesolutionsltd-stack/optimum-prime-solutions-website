@@ -84,6 +84,33 @@ const emptyBooking: BookingForm = {
 // ── Team member entry ───────────────────────────────────────────────────────
 interface TeamMember { name: string; phone: string; }
 
+// ── Lead source buckets ──────────────────────────────────────────────────────
+// The categories the Source chips filter by. 'other' is the honest home for a
+// lead whose source is blank or something we don't recognise — these used to be
+// swept into 'email', so a lead with no source at all was reported to Tally as
+// an email enquiry.
+type SourceCategory =
+  'workshop' | 'webinar' | 'online' | 'field' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'other';
+
+// Sources that arrive as a one-to-one contact rather than through an event.
+// Kept as data so the mapper below can't drift from the chip list.
+const DIRECT_SOURCES = ['email', 'whatsapp', 'referral', 'phone', 'direct'] as const;
+
+// Which chip a lead belongs under. Pure and module-level so the chips, the
+// stats strip, the on-screen chart and the exports all bin leads through this
+// one function — and so it can be tested without mounting the panel.
+export const sourceCategory = (l: Lead): SourceCategory =>
+  l.source === 'workshop' ? 'workshop'
+  : l.source === 'webinar' ? 'webinar'
+  : l.source === 'website' ? 'online'
+  : l.source === 'field' ? 'field'
+  // Only a recognised direct source keeps its own bucket. Anything else —
+  // blank, legacy 'manual', a value from an import — lands in 'other' rather
+  // than being mislabelled as an email enquiry.
+  : (DIRECT_SOURCES as readonly string[]).includes(l.source || '')
+    ? (l.source as typeof DIRECT_SOURCES[number])
+    : 'other';
+
 // ── Schedule panel state ─────────────────────────────────────────────────────
 interface ScheduleForm {
   scheduledDate: string; scheduledTime: string;
@@ -164,7 +191,7 @@ function StaffPicker({ value, onPick, accent = 'accent' }: {
 export default function LeadsManager({ data, onSave, openScheduleLeadId, onScheduleConsumed, onStartWork }: P) {
   const [search, setSearch]           = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
-  const [filterSource, setFilterSource] = useState<'All' | 'workshop' | 'webinar' | 'online' | 'field' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct'>('All');
+  const [filterSource, setFilterSource] = useState<'All' | SourceCategory>('All');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
   const [showAddLead, setShowAddLead] = useState(false);
   // Scroll anchor for the modal's error banner — the form is taller than the
@@ -307,13 +334,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     return true;
   };
 
-  const sourceCategory = (l: Lead): 'workshop' | 'webinar' | 'online' | 'field' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' =>
-    l.source === 'workshop' ? 'workshop'
-    : l.source === 'webinar' ? 'webinar'
-    : l.source === 'website' ? 'online'
-    : l.source === 'field' ? 'field'
-    : (l.source as 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | undefined) || 'email';
-
   // The date range scopes the whole Demo Leads view — stats, tab counts and the
   // list — so the numbers always match the chosen period.
   const dateScopedLeads = useMemo(
@@ -375,6 +395,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       referral: 'Referrals',
       phone: 'Phone Enquiries',
       direct: 'Direct Contacts',
+      other: 'Other / Unclassified Leads',
     };
     if (directTitles[filterSource]) {
       return { type: 'manual' as const, title: directTitles[filterSource] };
@@ -1294,16 +1315,22 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
       {/* ── Source Distribution Graph ── */}
       {(() => {
+        // Counted through sourceCategory, not raw l.source, so this chart bins
+        // leads exactly the way the Source chips do — including the 'other'
+        // bucket, which keeps unclassified leads from dropping out of the
+        // total and inflating everyone else's share.
+        const countIn = (c: SourceCategory) => data.leads.filter(l => sourceCategory(l) === c).length;
         const sourceData = {
-          website: data.leads.filter(l => l.source === 'website').length,
-          workshop: data.leads.filter(l => l.source === 'workshop').length,
-          webinar: data.leads.filter(l => l.source === 'webinar').length,
-          field: data.leads.filter(l => l.source === 'field').length,
-          email: data.leads.filter(l => l.source === 'email').length,
-          whatsapp: data.leads.filter(l => l.source === 'whatsapp').length,
-          referral: data.leads.filter(l => l.source === 'referral').length,
-          phone: data.leads.filter(l => l.source === 'phone').length,
-          direct: data.leads.filter(l => l.source === 'direct').length,
+          website: countIn('online'),
+          workshop: countIn('workshop'),
+          webinar: countIn('webinar'),
+          field: countIn('field'),
+          email: countIn('email'),
+          whatsapp: countIn('whatsapp'),
+          referral: countIn('referral'),
+          phone: countIn('phone'),
+          direct: countIn('direct'),
+          other: countIn('other'),
         };
         const totalBySource = Object.values(sourceData).reduce((a, b) => a + b, 0);
         const sources = Object.entries(sourceData).filter(([_, count]) => count > 0);
@@ -1321,7 +1348,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   website: 'bg-blue-500', workshop: 'bg-amber-500', webinar: 'bg-purple-500',
                   field: 'bg-yellow-500',
                   email: 'bg-green-500', whatsapp: 'bg-emerald-600', referral: 'bg-pink-500',
-                  phone: 'bg-orange-500', direct: 'bg-indigo-500',
+                  phone: 'bg-orange-500', direct: 'bg-indigo-500', other: 'bg-slate-400',
                 };
                 return (
                   <div key={source}>
@@ -1500,7 +1527,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             and Select-all only touch the source you're looking at. */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-slate-500 mr-1">Source:</span>
-          {([['All', 'All sources'], ['online', 'Online / Website'], ['field', '📣 Field / Marketing'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['email', 'Email'], ['whatsapp', 'WhatsApp'], ['referral', 'Referral'], ['phone', 'Phone'], ['direct', 'Direct']] as [typeof filterSource, string][]).map(([val, label]) => {
+          {([['All', 'All sources'], ['online', 'Online / Website'], ['field', '📣 Field / Marketing'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['email', 'Email'], ['whatsapp', 'WhatsApp'], ['referral', 'Referral'], ['phone', 'Phone'], ['direct', 'Direct'], ['other', 'Other']] as [typeof filterSource, string][]).map(([val, label]) => {
             const isActive = filterSource === val;
             // Counted across every pipeline stage — "Online / Website (6)" means
             // six leads came in that way, wherever they've since got to. Picking
