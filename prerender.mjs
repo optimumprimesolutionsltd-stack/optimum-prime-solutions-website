@@ -71,18 +71,25 @@ function getPostSlug(post) {
 // loader configured), so it can't be imported directly. Scrape blog slugs out of the
 // source text instead — this is what silently dropped every blog post route before,
 // since the static `routes` list below never included them.
-function getSeedBlogRoutes() {
+function getSeedBlogPosts() {
   const source = readFileSync(join(__dirname, 'src', 'data', 'siteData.ts'), 'utf-8');
-  const slugs = [...source.matchAll(/slug:\s*'([^']+)'/g)].map((m) => m[1]);
-  return slugs.map((slug) => `/blog/${slug}`);
+  // `date` follows `slug` in each post object, separated by the excerpt, so pair
+  // them with a bounded non-greedy gap rather than matching each field alone.
+  const paired = [...source.matchAll(/slug:\s*'([^']+)'[\s\S]{0,2000}?date:\s*'([^']+)'/g)];
+  const byslug = new Map(paired.map((m) => [m[1], m[2]]));
+  // Any slug the pairing missed still gets a route, just without a lastmod.
+  for (const m of source.matchAll(/slug:\s*'([^']+)'/g)) {
+    if (!byslug.has(m[1])) byslug.set(m[1], null);
+  }
+  return [...byslug].map(([slug, date]) => ({ route: `/blog/${slug}`, lastmod: date }));
 }
 
 // Union of the seed posts in siteData.ts and whatever is live in Firebase. The
 // seed list is the fallback: if the fetch fails (offline, CI without network,
 // database rules changed) the build still produces every route it used to,
 // rather than silently shipping a site with no blog posts at all.
-async function getBlogRoutes() {
-  const seedRoutes = getSeedBlogRoutes();
+async function getBlogPosts() {
+  const seed = getSeedBlogPosts();
   try {
     const res = await fetch(RTDB_BLOGS_URL, { signal: AbortSignal.timeout(15000) });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -92,21 +99,133 @@ async function getBlogRoutes() {
     const posts = (Array.isArray(data) ? data : Object.values(data || {})).filter(
       (p) => p && p.title
     );
-    const liveRoutes = posts.map((p) => `/blog/${getPostSlug(p)}`);
-    const merged = [...new Set([...seedRoutes, ...liveRoutes])];
-    const added = merged.length - seedRoutes.length;
+    // Live data wins on lastmod — a post edited in the admin panel has a fresher
+    // date there than whatever siteData.ts was committed with.
+    const merged = new Map(seed.map((p) => [p.route, p.lastmod]));
+    for (const p of posts) {
+      merged.set(`/blog/${getPostSlug(p)}`, p.date || merged.get(`/blog/${getPostSlug(p)}`) || null);
+    }
+    const added = merged.size - seed.length;
     console.log(
-      `  Blog routes: ${merged.length} (${seedRoutes.length} from siteData.ts, ${added} more live in Firebase)`
+      `  Blog routes: ${merged.size} (${seed.length} from siteData.ts, ${added} more live in Firebase)`
     );
-    return merged;
+    return [...merged].map(([route, lastmod]) => ({ route, lastmod }));
   } catch (err) {
     console.warn(
       `  ! Could not read blog posts from Firebase (${err.message}). ` +
-        `Falling back to the ${seedRoutes.length} slugs in siteData.ts — ` +
+        `Falling back to the ${seed.length} slugs in siteData.ts — ` +
         `posts created in the admin panel will NOT be prerendered in this build.`
     );
-    return seedRoutes;
+    return seed;
   }
+}
+
+const SITE_ORIGIN = 'https://www.optimumprimesolutions.co.ke';
+
+// Never list these. /admin and /404 are not content; the two attendee pages
+// render with noIndex. A sitemap entry for a noindex URL is a direct
+// contradiction and Search Console reports it as an error.
+const SITEMAP_EXCLUDE = new Set([
+  '/admin',
+  '/404',
+  '/workshop-attendees',
+  '/webinar-attendees',
+]);
+
+function routeToLoc(route) {
+  return route === '/' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${route}/`;
+}
+
+// The committed sitemap carries hand-tuned <priority> and <changefreq> values,
+// and <lastmod> dates that reflect real edits. Regenerating from scratch would
+// throw all of that away and stamp today's date on every page, which is both
+// untrue and a signal Google discounts. So: read what's there, keep it, and
+// only add what's missing.
+function readExistingSitemap(path) {
+  const existing = new Map();
+  if (!existsSync(path)) return existing;
+  const xml = readFileSync(path, 'utf-8');
+  for (const block of xml.matchAll(/<url>([\s\S]*?)<\/url>/g)) {
+    const get = (tag) => (block[1].match(new RegExp(`<${tag}>([^<]*)</${tag}>`)) || [])[1];
+    const loc = get('loc');
+    if (loc) {
+      existing.set(loc.trim(), {
+        lastmod: get('lastmod'),
+        changefreq: get('changefreq'),
+        priority: get('priority'),
+      });
+    }
+  }
+  return existing;
+}
+
+// A route is only listed if the page it renders claims that URL as its own
+// canonical. /industries/ngos and /industries/saccos are alias routes that
+// canonicalise to the singular form — listing them would put non-canonical URLs
+// in the sitemap, which Search Console reports as an error. Reading the built
+// HTML means new aliases are handled automatically instead of via a hardcoded
+// list that someone has to remember to update.
+function isCanonicalRoute(distDir, route) {
+  const file = route === '/'
+    ? join(distDir, 'index.html')
+    : join(distDir, route, 'index.html');
+  if (!existsSync(file)) return { ok: true, reason: 'no prerendered file — listing anyway' };
+  const html = readFileSync(file, 'utf-8');
+  const m = html.match(/rel="canonical"\s+href="([^"]+)"/);
+  if (!m) return { ok: true, reason: 'no canonical tag' };
+  const canonical = m[1].trim();
+  const own = routeToLoc(route);
+  return canonical === own
+    ? { ok: true }
+    : { ok: false, reason: `canonical -> ${canonical}` };
+}
+
+function buildSitemapXml(routes, blogLastmod, existing, todayIso, distDir) {
+  const entries = [];
+  const skipped = [];
+  for (const route of routes) {
+    if (SITEMAP_EXCLUDE.has(route)) continue;
+    const canon = isCanonicalRoute(distDir, route);
+    if (!canon.ok) {
+      skipped.push({ route, reason: canon.reason });
+      continue;
+    }
+    const loc = routeToLoc(route);
+    const prev = existing.get(loc);
+    const isBlogPost = route.startsWith('/blog/');
+    entries.push({
+      loc,
+      // Prefer what was already published; fall back to the post's own date for
+      // a blog entry, and only then to the build date.
+      lastmod: prev?.lastmod || (isBlogPost ? blogLastmod.get(route) : null) || todayIso,
+      changefreq: prev?.changefreq || (isBlogPost ? 'yearly' : 'monthly'),
+      priority: prev?.priority || (isBlogPost ? '0.7' : '0.8'),
+      isNew: !prev,
+    });
+  }
+  const body = entries
+    .map(
+      (e) =>
+        `  <url>\n    <loc>${e.loc}</loc>\n    <lastmod>${e.lastmod}</lastmod>\n` +
+        `    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n  </url>`
+    )
+    .join('\n');
+  const xml =
+    `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<!--\n` +
+    `  Generated by prerender.mjs from the same route list used to prerender the\n` +
+    `  site, so a blog post published through the admin panel appears here without\n` +
+    `  anyone remembering to add it.\n` +
+    `\n` +
+    `  Editing priority, changefreq and lastmod by hand IS safe — those values are\n` +
+    `  read back in and preserved on every rebuild. Adding or removing url blocks\n` +
+    `  by hand is not: the URL set comes from the route list each time.\n` +
+    `\n` +
+    `  Alias routes are omitted automatically when the page they render points its\n` +
+    `  canonical somewhere else.\n` +
+    `-->\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
+  return { xml, entries, skipped };
 }
 
 const staticRoutes = [
@@ -229,18 +348,23 @@ async function prerender() {
 
   // Resolved once, up front, and shared by both the Vercel and local paths so
   // the two can't drift out of sync the way two hardcoded lists did.
-  const routes = [...staticRoutes, ...(await getBlogRoutes())];
+  const blogPosts = await getBlogPosts();
+  const routes = [...staticRoutes, ...blogPosts.map((p) => p.route)];
 
   // Save the SPA shell BEFORE prerendering (it has the SEO head)
   const spaShell = readFileSync(join(__dirname, 'dist', 'index.html'), 'utf-8');
-  
+
   // Copy public assets
   console.log('\nPhase 1: Copying public assets...');
   const publicFiles = ['sitemap.xml', 'robots.txt', '3fd67103052cd75b3b1146cf0670b20e.txt', 'manifest.json'];
   for (const file of publicFiles) {
     const src = join(__dirname, 'public', file);
     const dst = join(__dirname, 'dist', file);
-    if (existsSync(src) && !existsSync(dst)) {
+    // sitemap.xml was just regenerated, so it must overwrite whatever is in
+    // dist/ — otherwise `npm run prerender` on its own (no vite build to empty
+    // dist/ first) would keep shipping the previous build's sitemap.
+    const mustOverwrite = file === 'sitemap.xml';
+    if (existsSync(src) && (mustOverwrite || !existsSync(dst))) {
       copyFileSync(src, dst);
       console.log(`  Copied: ${file}`);
     }
@@ -440,6 +564,29 @@ async function prerender() {
     }
   }
   
+  // Regenerate the sitemap from the same route list that was just prerendered,
+  // so a post that gets a page gets an entry. Runs here, after prerendering,
+  // because it reads each page's canonical out of the built HTML to decide
+  // whether that URL belongs in the sitemap at all.
+  console.log('\nPhase 2b: Generating sitemap from route list...');
+  {
+    const distDir = join(__dirname, 'dist');
+    const sitemapPath = join(__dirname, 'public', 'sitemap.xml');
+    const existing = readExistingSitemap(sitemapPath);
+    const blogLastmod = new Map(blogPosts.map((p) => [p.route, p.lastmod]));
+    const today = new Date().toISOString().slice(0, 10);
+    const { xml, entries, skipped } = buildSitemapXml(routes, blogLastmod, existing, today, distDir);
+    const added = entries.filter((e) => e.isNew);
+    const dropped = [...existing.keys()].filter((loc) => !entries.some((e) => e.loc === loc));
+    writeFileSync(sitemapPath, xml);
+    writeFileSync(join(distDir, 'sitemap.xml'), xml);
+    console.log(`  ${entries.length} URLs listed`);
+    for (const e of added) console.log(`  + added: ${e.loc} (lastmod ${e.lastmod})`);
+    for (const loc of dropped) console.log(`  - dropped: ${loc}`);
+    for (const s of skipped) console.log(`  · skipped ${s.route} (${s.reason})`);
+    if (!added.length && !dropped.length) console.log('  no additions or removals');
+  }
+
   // Verify the main index.html
   console.log('\nPhase 3: Verifying prerendered output...');
   const finalHtml = readFileSync(join(__dirname, 'dist', 'index.html'), 'utf-8');
