@@ -94,6 +94,21 @@ interface ScheduleForm {
   demoNotes: string;
 }
 
+// ── When a lead came in ─────────────────────────────────────────────────────
+// Leads that land from the website carry a full timestamp, so we can show the
+// clock time — useful for knowing how fresh an enquiry is and how fast we
+// responded. Leads typed in by hand only carry a date (no 'T' in the value);
+// for those we show the date alone rather than a made-up midnight.
+const leadReceived = (createdAt: string): { date: string; time: string | null } => {
+  const d = new Date(createdAt);
+  if (isNaN(d.getTime())) return { date: createdAt, time: null };
+  const hasClock = createdAt.includes('T');
+  return {
+    date: (hasClock ? d : new Date(createdAt + 'T12:00:00')).toLocaleDateString(),
+    time: hasClock ? d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) : null,
+  };
+};
+
 // ── Staff picker ────────────────────────────────────────────────────────────
 // Kenneth and John Mark do the demos, consultations and client work, so they
 // are one-tap buttons; everyone else is a click deeper in the dropdown. Picking
@@ -484,6 +499,86 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     })
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
+  // ── Opening the booking pop-up ───────────────────────────────────────────
+  // Opening the form is NOT the same as booking. This only fills the pop-up and
+  // shows it — nothing is written to the lead until the booking is confirmed.
+  // A mis-clicked 📅 Book is therefore harmless: close the pop-up and the lead
+  // is exactly where it was. (The forward-only guard still applies, so a lead
+  // that can't move to "Schedule a Demo" can't open the pop-up either.)
+  const openScheduling = (lead: Lead): boolean => {
+    if (!isValidTransition(lead.status, 'Schedule a Demo')) {
+      setEscalationError(`Cannot move "${lead.name}" from "${lead.status}" back to "Schedule a Demo". Leads can only escalate forward or to Closed Lost.`);
+      setTimeout(() => setEscalationError(null), 5000);
+      return false;
+    }
+    setEscalationError(null);
+    setSchedulingId(lead.id);
+    setSchedForm({
+      // Pre-fill with already-saved schedule details first,
+      // then fall back to the client's requested preferences
+      scheduledDate: lead.scheduledDate || lead.demoDate || '',
+      scheduledTime: lead.scheduledTime || lead.demoTime || '',
+      demoType: lead.demoType || 'online',
+      demoLocation: lead.demoLocation || '',
+      // Pre-fill the demo team so the form opens ready to send; one tap
+      // switches between Kenneth and John Mark.
+      teamMemberName: lead.teamMemberName || DEFAULT_STAFF.name,
+      teamMemberPhone: lead.teamMemberPhone || DEFAULT_STAFF.phone,
+      tallyStaff1: '', tallyStaff2: '',
+      extraTeam: (lead as any)?.extraTeam || [],
+      demoNotes: lead.demoNotes || lead.message || '',
+    });
+    setSchedError('');
+    return true;
+  };
+
+  // ── Repairing mis-clicked bookings ───────────────────────────────────────
+  // The 📅 Book button used to move a lead to "Schedule a Demo" the instant it
+  // was pressed, before any date was entered — so a stray tap parked leads in
+  // the booking stage with nothing booked, and the forward-only rule meant they
+  // couldn't be put back by hand. The button no longer does that, but leads
+  // stranded by the old behaviour need rescuing.
+  //
+  // A stranded lead is one sitting in "Schedule a Demo" with no booking at all:
+  // no date, and no confirmation ever sent. If a date was entered the booking is
+  // real work in progress, so it is left alone.
+  const strandedLeads = data.leads.filter(l =>
+    l.status === 'Schedule a Demo' && !l.meetSent && !l.scheduledDate && !l.demoDate
+  );
+  const [showRepair, setShowRepair] = useState(false);
+  // Which stage each stranded lead should go back to. Unknowable from the record
+  // — nothing stores the previous stage — so "New" is the default and the admin
+  // corrects any that were further along.
+  const [repairStages, setRepairStages] = useState<Record<string, string>>({});
+  const [repairDone, setRepairDone] = useState(0);
+
+  const openRepair = () => {
+    setRepairStages(Object.fromEntries(strandedLeads.map(l => [l.id, 'New'])));
+    setShowRepair(true);
+  };
+
+  // Deliberately bypasses the forward-only guard in updateStatus — walking these
+  // leads back is the whole point, and it's the same exemption confirmRestart
+  // uses for reopening a lost deal.
+  const confirmRepair = () => {
+    const picks = strandedLeads
+      .map(l => ({ lead: l, stage: repairStages[l.id] }))
+      .filter(p => p.stage && p.stage !== 'Schedule a Demo');
+    if (picks.length === 0) { setShowRepair(false); return; }
+    const byIdPick = new Map(picks.map(p => [p.lead.id, p.stage]));
+    onSave({
+      ...data,
+      leads: data.leads.map(l => {
+        const stage = byIdPick.get(l.id);
+        return stage ? { ...l, status: stage, nextStep: defaultNextStep(stage) } : l;
+      }),
+    });
+    setShowRepair(false);
+    setEscalationError(null);
+    setRepairDone(picks.length);
+    setTimeout(() => setRepairDone(0), 6000);
+  };
+
   // ── Status update ────────────────────────────────────────────────────────
   const updateStatus = (id: string, status: string) => {
     const lead = data.leads.find(l => l.id === id);
@@ -503,23 +598,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     setEscalationError(null);
 
     if (status === 'Schedule a Demo') {
-      setSchedulingId(id);
-      setSchedForm({
-        // Pre-fill with already-saved schedule details first,
-        // then fall back to the client's requested preferences
-        scheduledDate: lead.scheduledDate || lead.demoDate || '',
-        scheduledTime: lead.scheduledTime || lead.demoTime || '',
-        demoType: lead.demoType || 'online',
-        demoLocation: lead.demoLocation || '',
-        // Pre-fill the demo team so the form opens ready to send; one tap
-        // switches between Kenneth and John Mark.
-        teamMemberName: lead.teamMemberName || DEFAULT_STAFF.name,
-        teamMemberPhone: lead.teamMemberPhone || DEFAULT_STAFF.phone,
-        tallyStaff1: '', tallyStaff2: '',
-        extraTeam: (lead as any)?.extraTeam || [],
-        demoNotes: lead.demoNotes || lead.message || '',
-      });
-      setSchedError('');
+      openScheduling(lead);
     } else {
       if (schedulingId === id) setSchedulingId(null);
     }
@@ -542,7 +621,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     setSearch('');
     setExpandedId(openScheduleLeadId);
     if (lead.meetSent) openEdit(lead);
-    else updateStatus(openScheduleLeadId, 'Schedule a Demo');
+    else openScheduling(lead);
     onScheduleConsumed?.();
   }, [openScheduleLeadId, data.leads]);
 
@@ -939,10 +1018,13 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     setSchedSubmitting(true);
 
     try {
-      // Update lead record with schedule details
+      // Update lead record with schedule details. This confirmed booking is the
+      // point where the lead actually moves to "Schedule a Demo" — never on the
+      // click that merely opened this form. A lead already further down the
+      // pipeline keeps its stage, since the forward-only rule still holds.
       const updated: Lead = {
         ...lead,
-        status: 'Schedule a Demo',
+        status: isValidTransition(lead.status, 'Schedule a Demo') ? 'Schedule a Demo' : lead.status,
         scheduledDate: schedForm.scheduledDate,
         scheduledTime: schedForm.scheduledTime,
         demoType: schedForm.demoType,
@@ -1743,6 +1825,93 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         </div>
       )}
 
+      {/* ── Stranded bookings: clean up after the old 📅 Book behaviour ── */}
+      {repairDone > 0 && (
+        <div className="rounded-2xl border border-green-200 bg-green-50 p-4 flex items-center gap-3">
+          <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+          <p className="text-sm font-semibold text-green-900">
+            Moved {repairDone} lead{repairDone === 1 ? '' : 's'} back out of “Schedule a Demo”.
+          </p>
+        </div>
+      )}
+      {strandedLeads.length > 0 && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4 flex items-start gap-3 flex-wrap">
+          <AlertCircle className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="flex-1 min-w-[220px]">
+            <p className="text-sm font-semibold text-amber-900">
+              {strandedLeads.length} lead{strandedLeads.length === 1 ? ' is' : 's are'} sitting in “Schedule a Demo” with nothing actually booked
+            </p>
+            <p className="text-xs text-amber-700 mt-1">
+              The 📅 Book button used to move a lead the moment it was pressed, so a mis-tap could park it here.
+              No demo was ever sent for {strandedLeads.length === 1 ? 'this one' : 'these'} — put {strandedLeads.length === 1 ? 'it' : 'them'} back where {strandedLeads.length === 1 ? 'it belongs' : 'they belong'}.
+            </p>
+          </div>
+          <button onClick={openRepair}
+            className="inline-flex items-center gap-2 rounded-lg bg-amber-600 hover:bg-amber-700 px-4 py-2 text-xs font-bold text-white shadow-md transition shrink-0">
+            <RotateCcw className="h-3.5 w-3.5" /> Review &amp; fix
+          </button>
+        </div>
+      )}
+
+      {showRepair && (
+        <div className="fixed inset-0 z-50 flex justify-center bg-slate-900/60 backdrop-blur-sm p-4 sm:p-6 overflow-y-auto pt-20">
+          <div className="rounded-2xl border border-amber-300 bg-white shadow-lg overflow-hidden w-full max-w-2xl h-fit">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-amber-50">
+              <div className="flex items-center gap-2">
+                <RotateCcw className="h-5 w-5 text-amber-600" />
+                <h3 className="font-bold text-slate-900">Put mis-booked leads back</h3>
+              </div>
+              <button onClick={() => setShowRepair(false)} title="Close"
+                className="text-slate-400 hover:text-slate-600"><X className="h-5 w-5" /></button>
+            </div>
+            <div className="p-6 space-y-4">
+              <p className="text-xs text-slate-500">
+                Nothing records which stage these leads were on before, so each one starts at
+                <strong className="text-slate-700"> New</strong>. Change any that were further along, or set one back to
+                “Schedule a Demo” to leave it exactly as it is.
+              </p>
+              <div className="space-y-2 max-h-[45vh] overflow-y-auto pr-1">
+                {strandedLeads.map(l => (
+                  <div key={l.id} className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 flex-wrap">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-bold text-slate-900 truncate">{l.name}</p>
+                      <p className="text-xs text-slate-500 truncate">
+                        {l.company || 'No company'} · came in {leadReceived(l.createdAt).date}
+                      </p>
+                    </div>
+                    <select
+                      value={repairStages[l.id] || 'New'}
+                      onChange={e => setRepairStages(prev => ({ ...prev, [l.id]: e.target.value }))}
+                      className="rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs font-semibold text-slate-700 outline-none focus:border-accent cursor-pointer shrink-0">
+                      {PIPELINE_ORDER.map(s => (
+                        <option key={s} value={s}>{s === 'Schedule a Demo' ? 'Leave as is' : `Move back to ${s}`}</option>
+                      ))}
+                    </select>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-between gap-3 border-t border-slate-100 pt-4 flex-wrap">
+                <button
+                  onClick={() => setRepairStages(Object.fromEntries(strandedLeads.map(l => [l.id, 'New'])))}
+                  className="text-xs font-semibold text-slate-500 hover:text-slate-700 underline">
+                  Set all back to New
+                </button>
+                <div className="flex items-center gap-2">
+                  <button onClick={() => setShowRepair(false)}
+                    className="rounded-lg px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition">
+                    Cancel
+                  </button>
+                  <button onClick={confirmRepair}
+                    className="rounded-lg bg-amber-600 hover:bg-amber-700 px-4 py-2 text-xs font-bold text-white shadow-md transition">
+                    Apply
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Leads View (List or Kanban) ── */}
       {viewMode === 'kanban' ? (
         <KanbanBoard
@@ -1841,12 +2010,29 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                     {l.scheduledTime && ` · ${l.scheduledTime}`}
                   </span>
                 )}
-                <span className="text-[10px] text-slate-400 hidden sm:block whitespace-nowrap">
-                  {new Date(l.createdAt).toLocaleDateString()}
-                </span>
+                {/* When the enquiry landed — date over time, so you can see at a
+                    glance how fresh a new lead is. */}
+                {(() => {
+                  const received = leadReceived(l.createdAt);
+                  return (
+                    <span className="text-[10px] text-slate-400 hidden sm:block whitespace-nowrap text-right leading-tight"
+                      title={received.time ? `Received ${received.date} at ${received.time}` : `Received ${received.date}`}>
+                      {received.date}
+                      {received.time && (
+                        <>
+                          <br />
+                          <span className={l.status === 'New' ? 'font-semibold text-accent' : ''}>{received.time}</span>
+                        </>
+                      )}
+                    </span>
+                  );
+                })()}
                 {/* One-click demo action. If a demo is already booked, this
                     edits the existing one (never creates a duplicate); otherwise
-                    it opens the scheduling pop-up. */}
+                    it opens the scheduling pop-up. Opening the pop-up changes
+                    nothing on the lead — the stage only moves to "Schedule a
+                    Demo" once the booking is actually confirmed — so a
+                    mis-click here costs nothing. */}
                 {l.meetSent ? (
                   <button
                     onClick={e => { e.stopPropagation(); setExpandedId(l.id); openEdit(l); }}
@@ -1856,7 +2042,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   </button>
                 ) : (
                   <button
-                    onClick={e => { e.stopPropagation(); setExpandedId(l.id); updateStatus(l.id, 'Schedule a Demo'); setSchedulingId(l.id); }}
+                    onClick={e => { e.stopPropagation(); if (openScheduling(l)) setExpandedId(l.id); }}
                     title="Book / schedule a demo for this lead"
                     className="inline-flex items-center gap-2 rounded-lg bg-accent hover:bg-accent/90 px-3 py-1.5 text-xs font-bold text-white shadow-md hover:shadow-lg transition whitespace-nowrap shrink-0">
                     📅 Book
@@ -2405,7 +2591,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                     </div>
                   )}
 
-                  <p className="text-[10px] text-slate-400">Submitted: {new Date(l.createdAt).toLocaleString()}</p>
+                  <p className="text-[10px] text-slate-400">
+                    Submitted: {leadReceived(l.createdAt).date}
+                    {leadReceived(l.createdAt).time && ` at ${leadReceived(l.createdAt).time}`}
+                  </p>
                 </div>
               )}
             </div>
