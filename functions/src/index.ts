@@ -115,7 +115,24 @@ export const onAccessRequestApproved = functions.region('europe-west1').firestor
  * HTTP endpoint to test email sending
  */
 export const sendTestEmail = functions.region('europe-west1').https.onRequest(async (req, res) => {
-  if (req.query.token !== process.env.TEST_EMAIL_TOKEN) {
+  // Fail closed. Comparing straight against process.env.TEST_EMAIL_TOKEN meant
+  // that with the variable unset, a request carrying no token compared
+  // undefined !== undefined — false — so the guard passed and this became a
+  // public endpoint that emails arbitrary addresses from the Resend account.
+  const expectedToken = process.env.TEST_EMAIL_TOKEN;
+  if (!expectedToken) {
+    functions.logger.error('sendTestEmail called but TEST_EMAIL_TOKEN is not set; refusing.');
+    res.status(503).json({ error: 'Endpoint not configured' });
+    return;
+  }
+
+  // Accept the token from a header so it stays out of URLs, server logs and
+  // proxy logs; the query parameter is still honoured for existing callers.
+  const provided =
+    (typeof req.get === 'function' ? req.get('x-test-email-token') : undefined) ||
+    (typeof req.query.token === 'string' ? req.query.token : undefined);
+
+  if (provided !== expectedToken) {
     res.status(403).json({ error: 'Unauthorized' });
     return;
   }
