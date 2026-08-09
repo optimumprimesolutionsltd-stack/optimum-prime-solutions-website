@@ -110,3 +110,32 @@ export const onAccessRequestApproved = functions.region('europe-west1').firestor
       }
     }
   });
+
+/**
+ * HTTP endpoint to test email sending
+ */
+export const sendTestEmail = functions.region('europe-west1').https.onRequest(async (req, res) => {
+  if (req.query.token !== process.env.TEST_EMAIL_TOKEN) {
+    res.status(403).json({ error: 'Unauthorized' });
+    return;
+  }
+
+  const toEmail = typeof req.query.to === 'string' ? req.query.to : undefined;
+  if (!toEmail) {
+    res.status(400).json({ error: 'Missing email parameter' });
+    return;
+  }
+
+  try {
+    await resend.emails.send({
+      from: 'Optimum Prime <onboarding@resend.dev>',
+      to: toEmail,
+      subject: 'Test Email',
+      html: '<p>This is a test email from Optimum Prime Solutions Cloud Functions.</p>',
+    });
+
+    res.json({ success: true, message: 'Email sent' });
+  } catch (error) {
+    res.status(500).json({ error: String(error) });
+  }
+});
