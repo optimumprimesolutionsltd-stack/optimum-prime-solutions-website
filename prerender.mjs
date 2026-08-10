@@ -534,8 +534,11 @@ async function prerender() {
     console.log('\nPhase 4: Verifying prerendered output...');
     const finalHtml = readFileSync(join(__dirname, 'dist', 'index.html'), 'utf-8');
     const checks = {
-      hasHeadSEO: finalHtml.includes('<title>') && finalHtml.includes('name="description"'),
-      hasNoDuplicateHead: (finalHtml.match(/<title>/g) || []).length === 1,
+      // Match the opening tag, not the literal "<title>": the tag now carries
+      // data-rh so Helmet adopts it on hydration instead of appending a second
+      // one, and an exact-string check silently reported that fix as a failure.
+      hasHeadSEO: /<title[\s>]/.test(finalHtml) && finalHtml.includes('name="description"'),
+      hasNoDuplicateHead: (finalHtml.match(/<title[\s>]/g) || []).length === 1,
       hasBodyContent: finalHtml.includes('<h1') || finalHtml.includes('<h2'),
       hasSemanticMain: finalHtml.includes('<main'),
       hasSchema: finalHtml.includes('application/ld+json'),
@@ -621,6 +624,50 @@ async function prerender() {
         //
         // framer-motion drives this from JS, so disabling CSS animation is not
         // enough; the inline transform has to be normalised after the fact.
+        // Tag the SEO head tags so the client can remove them before React
+        // renders — see the matching block at the top of src/main.tsx.
+        //
+        // React 19 hoists <title>, <meta> and <link> rendered anywhere in the
+        // tree into <head> itself, and has no way to adopt DOM nodes it did not
+        // create. So these prerendered tags survived alongside React's own and
+        // every page served two <title>, two meta descriptions and two
+        // canonicals once JavaScript ran. Bing reports that as an error.
+        //
+        // They still have to be in the static HTML for crawlers that never run
+        // JavaScript, hence tag-then-remove rather than simply omitting them.
+        // (Marking them data-rh so react-helmet-async would adopt them does not
+        // work: React is doing the hoisting here, not Helmet.)
+        //
+        // Deliberately narrow, and scoped to <head>: only the tags SEO.tsx
+        // renders. Tagging anything static from index.html — charset, viewport,
+        // favicons, the site-verification meta, or the LocalBusiness / WebSite /
+        // SiteNavigationElement JSON-LD — would delete it on load and nothing
+        // would put it back.
+        //
+        // The SEO component's JSON-LD is excluded on purpose: React puts it in
+        // <body>, so it is outside this query, and it is not duplicated the way
+        // the head tags are. JSON-LD is valid anywhere in the document.
+        const markedTags = await page.evaluate(() => {
+          const selectors = [
+            'title',
+            'meta[name="description"]',
+            'meta[name="robots"]',
+            'link[rel="canonical"]',
+            'meta[property^="og:"]',
+            'meta[property^="article:"]',
+            'meta[name^="twitter:"]',
+          ].join(',');
+          let n = 0;
+          for (const el of document.head.querySelectorAll(selectors)) {
+            el.setAttribute('data-prerendered-seo', '');
+            n += 1;
+          }
+          return n;
+        });
+        if (markedTags === 0) {
+          throw new Error('no SEO head tags found to tag for client-side removal');
+        }
+
         const html = normaliseAnimationNoise(await page.content());
 
         const hasContent = html.includes('<h1') || html.includes('<h2') || html.includes('<main');
@@ -785,8 +832,11 @@ async function prerender() {
   console.log('\nPhase 3: Verifying prerendered output...');
   const finalHtml = readFileSync(join(__dirname, 'dist', 'index.html'), 'utf-8');
   const checks = {
-    hasHeadSEO: finalHtml.includes('<title>') && finalHtml.includes('name="description"'),
-    hasNoDuplicateHead: (finalHtml.match(/<title>/g) || []).length === 1,
+    // Match the opening tag, not the literal "<title>": the tag now carries
+    // data-rh so Helmet adopts it on hydration instead of appending a second
+    // one, and an exact-string check silently reported that fix as a failure.
+    hasHeadSEO: /<title[\s>]/.test(finalHtml) && finalHtml.includes('name="description"'),
+    hasNoDuplicateHead: (finalHtml.match(/<title[\s>]/g) || []).length === 1,
     hasBodyContent: finalHtml.includes('<h1') || finalHtml.includes('<h2'),
     hasSemanticMain: finalHtml.includes('<main'),
     hasSchema: finalHtml.includes('application/ld+json'),
