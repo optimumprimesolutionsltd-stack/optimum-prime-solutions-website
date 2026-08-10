@@ -898,44 +898,46 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     setSelectedFields(newSet);
   };
 
+  // One place that turns a lead + field key into a cell, so the custom export
+  // dialog and the one-click "download this view" button can never drift apart.
+  const leadFieldValue = (l: Lead, key: string): string => {
+    switch (key) {
+      case 'name': return l.name;
+      case 'email': return l.email;
+      case 'phone': return l.phone;
+      case 'company': return l.company;
+      case 'industry': return l.industry || l.businessType || '';
+      case 'demoDate': return l.demoDate;
+      case 'scheduledDate': return l.scheduledDate || '';
+      case 'scheduledTime': return l.scheduledTime || '';
+      case 'demoType': return l.demoType || '';
+      case 'demoLocation': return l.demoLocation || '';
+      case 'teamMemberName': return l.teamMemberName || '';
+      case 'status': return l.status;
+      case 'source': return l.source || 'website';
+      case 'message': return l.message;
+      case 'currentSoftware': return l.currentSoftware;
+      case 'createdAt': return l.createdAt;
+      default: return '';
+    }
+  };
+
+  const toCsv = (headers: string[], rows: string[][]) =>
+    [headers, ...rows]
+      .map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(','))
+      .join('\n');
+
   // ── Export with selected format and fields ──────────────────────────────
   const performExport = () => {
     const visibleFields = allFields.filter(f => selectedFields.has(f.key));
     const headers = visibleFields.map(f => f.label);
 
-    const rows = exportLeads.map(l => visibleFields.map(f => {
-      switch(f.key) {
-        case 'name': return l.name;
-        case 'email': return l.email;
-        case 'phone': return l.phone;
-        case 'company': return l.company;
-        case 'industry': return l.industry || l.businessType || '';
-        case 'demoDate': return l.demoDate;
-        case 'scheduledDate': return l.scheduledDate || '';
-        case 'scheduledTime': return l.scheduledTime || '';
-        case 'demoType': return l.demoType || '';
-        case 'demoLocation': return l.demoLocation || '';
-        case 'teamMemberName': return l.teamMemberName || '';
-        case 'status': return l.status;
-        case 'source': return l.source || 'website';
-        case 'message': return l.message;
-        case 'currentSoftware': return l.currentSoftware;
-        case 'createdAt': return l.createdAt;
-        default: return '';
-      }
-    }));
+    const rows = exportLeads.map(l => visibleFields.map(f => leadFieldValue(l, f.key)));
 
     const date = new Date().toISOString().split('T')[0];
 
     if (exportFormat === 'csv') {
-      const csv = [headers, ...rows].map(r => r.map(c => `"${(c || '').replace(/"/g, '""')}"`).join(',')).join('\n');
-      const blob = new Blob([csv], { type: 'text/csv' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `demo-leads-${date}.csv`;
-      a.click();
-      URL.revokeObjectURL(url);
+      downloadFile(`demo-leads-${date}.csv`, toCsv(headers, rows), 'text/csv');
     } else if (exportFormat === 'excel') {
       // Use the unified Excel export
       downloadFile(`demo-leads-${date}.xls`, buildUnifiedXls(exportLeads, exportRegistrants), 'application/vnd.ms-excel');
@@ -969,6 +971,51 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     }
 
     setShowExportDialog(false);
+  };
+
+  // ── One-click download of the current status tab ─────────────────────────
+  // The CRM Report and the custom export both span every stage, so neither
+  // could ever give you just "Schedule a Demo". This one starts from `filtered`
+  // — the very rows the list and board render — so the active status tab,
+  // source chip, workshop pick and search box all carry through, then applies
+  // the report date range so a period download agrees with the period report.
+  const VIEW_EXPORT_FIELDS = [
+    'name', 'company', 'phone', 'email', 'industry',
+    'status', 'scheduledDate', 'scheduledTime', 'teamMemberName', 'source', 'createdAt',
+  ];
+
+  // What the current view is narrowed to, for the button label and file name.
+  const viewScopeLabel = (() => {
+    if (filterSource === 'workshop' && filterWorkshop !== 'all') return workshopTitleById(filterWorkshop);
+    if (filterSource === 'webinar' && filterWebinar !== 'all') return webinarTitleById(filterWebinar);
+    if (filterSource === 'All') return 'all sources';
+    return filterSource;
+  })();
+
+  // The list itself is never date-scoped, so the download can be thinner than
+  // what's on screen. The button carries this count rather than filtered.length
+  // so the number on it is always the number of rows you actually get.
+  const viewExportLeads = filtered.filter(l => inDateRange(l.createdAt));
+  const viewExcludedByDate = filtered.length - viewExportLeads.length;
+
+  const downloadCurrentView = () => {
+    if (viewExportLeads.length === 0) return;
+    const cols = VIEW_EXPORT_FIELDS
+      .map(key => allFields.find(f => f.key === key))
+      .filter((f): f is { key: string; label: string } => !!f);
+    const rows = viewExportLeads.map(l => cols.map(f => leadFieldValue(l, f.key)));
+    const today = new Date().toISOString().split('T')[0];
+    const stagePart = slugify(filterStatus === 'All' ? 'all-stages' : filterStatus);
+    // Name the file after the period it covers when a range is set, so two
+    // downloads of the same stage don't overwrite each other in Downloads.
+    const periodPart = (exportFrom || exportTo)
+      ? `${exportFrom || 'start'}_to_${exportTo || today}`
+      : today;
+    downloadFile(
+      `leads-${stagePart}-${slugify(viewScopeLabel)}-${periodPart}.csv`,
+      toCsv(cols.map(f => f.label), rows),
+      'text/csv',
+    );
   };
 
   // ── Manual booking submit ────────────────────────────────────────────────
@@ -1406,7 +1453,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             <select
               defaultValue=""
               onChange={e => { const v = e.target.value; e.target.value = ''; if (v) downloadReport(v); }}
-              title="Download the CRM status report for Tally Solutions"
+              title="The formatted stage-by-stage status report for Tally Solutions — covers every stage in the chosen source and date range, plus workshop registrants. For one stage only, use the download button on the status tabs."
               className="bg-transparent text-sm font-semibold text-slate-700 outline-none cursor-pointer">
               <option value="" disabled>CRM Report…</option>
               <option value="pdf">Download as PDF</option>
@@ -1507,9 +1554,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               className="w-full rounded-lg border border-slate-200 bg-white pl-10 pr-4 py-2.5 text-sm outline-none focus:border-accent" />
           </div>
           <button onClick={() => setShowExportDialog(true)} disabled={exportLeads.length === 0}
-            title={exportLeads.length === 0 ? "No leads to export" : "Export leads with custom fields"}
+            title={exportLeads.length === 0
+              ? "No leads to export"
+              : "Pick your own columns and format (CSV / Excel / PDF). Covers every stage in the chosen source and date range — for one stage only, use the download button on the status tabs."}
             className="flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-50 transition disabled:opacity-40">
-            <Download className="h-4 w-4" /> Leads CSV
+            <Download className="h-4 w-4" /> Custom export…
           </button>
           <button onClick={() => setShowImportDialog(true)}
             title="Add clients in bulk from a CSV file"
@@ -1520,7 +1569,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         {/* Report/export date range only — this NEVER hides leads from the list
             above; it just scopes what the CRM Report and CSV downloads contain. */}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-2 rounded-xl border border-slate-100 bg-slate-50/50 px-3 py-2.5 text-xs"
-          title="This range only scopes the CRM Report and CSV downloads — your lead list above always shows everyone.">
+          title="This range scopes all three downloads — the CRM Report, the custom export and the status-tab download. Your lead list above always shows everyone.">
           <span className="font-semibold text-slate-500">Report date range:</span>
           <label className="flex items-center gap-1.5 text-slate-600">
             From
@@ -1683,7 +1732,44 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               </button>
             );
           })}
+
+          {/* Download just this stage. Sits at the end of the tabs on purpose:
+              it downloads whatever the tabs are currently showing, which is the
+              one thing the CRM Report and the custom export can't do. */}
+          <button
+            onClick={downloadCurrentView}
+            disabled={viewExportLeads.length === 0}
+            title={viewExportLeads.length === 0
+              ? (viewExcludedByDate > 0
+                  ? 'Every lead in this tab falls outside the report date range'
+                  : 'Nothing in this tab to download')
+              : `Download these ${viewExportLeads.length} lead${viewExportLeads.length === 1 ? '' : 's'} as CSV`
+                + ` — this tab, standard columns${(exportFrom || exportTo) ? ', within the report date range' : ''}`}
+            className="ml-1 flex items-center gap-1.5 rounded-full border border-dashed px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap disabled:opacity-40"
+            style={{
+              borderColor: filterStatus === 'All' ? '#1e3a5f' : stageColor(filterStatus),
+              color: filterStatus === 'All' ? '#1e3a5f' : stageColor(filterStatus),
+              backgroundColor: '#fff',
+            }}
+          >
+            <Download className="h-3.5 w-3.5" />
+            Download {filterStatus === 'All' ? 'this view' : `“${filterStatus}”`} ({viewExportLeads.length})
+          </button>
         </div>
+        {/* The list is never date-scoped, so a range can make the download
+            thinner than the tab count. Say so instead of letting the two
+            numbers disagree in silence. */}
+        {viewExcludedByDate > 0 && (
+          <p className="text-[11px] font-semibold text-amber-600">
+            {viewExcludedByDate} of these {filtered.length} {viewExcludedByDate === 1 ? 'falls' : 'fall'} outside the report
+            date range and {viewExcludedByDate === 1 ? 'is' : 'are'} left out of the download — clear the dates to include {viewExcludedByDate === 1 ? 'it' : 'them'}.
+          </p>
+        )}
+        <p className="text-[11px] text-slate-400">
+          The tab download gives you this stage only, within the report date range.
+          {' '}<span className="font-medium text-slate-500">Custom export…</span> lets you pick columns and format across every stage, and
+          {' '}<span className="font-medium text-slate-500">CRM Report…</span> is the formatted stage-by-stage report for Tally Solutions.
+        </p>
       </div>
 
       {/* ── Manual Booking Panel (slide-in) ── */}
@@ -2797,7 +2883,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
           <div className="relative w-full max-w-2xl max-h-[90vh] flex flex-col rounded-xl bg-white shadow-2xl">
             <div className="border-b border-slate-200 px-6 py-4 flex items-center justify-between flex-shrink-0">
-              <h3 className="text-lg font-bold text-slate-900">Export Leads</h3>
+              <h3 className="text-lg font-bold text-slate-900">Custom export</h3>
               <button onClick={() => setShowExportDialog(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="h-5 w-5" />
               </button>
@@ -2809,6 +2895,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                 <p className="text-sm text-blue-900">
                   <span className="font-semibold">{exportLeads.length} leads</span> will be exported
                   {(exportFrom || exportTo) && ` (${exportFrom ? 'from ' + exportFrom : ''} ${exportTo ? 'to ' + exportTo : ''})`.trim()}
+                </p>
+                {/* Say out loud that this one spans every stage — otherwise the
+                    "Schedule a Demo" tab looks like it should have narrowed it. */}
+                <p className="mt-1 text-xs text-blue-700">
+                  Every stage in {viewScopeLabel === 'all sources' ? 'all sources' : `“${viewScopeLabel}”`} — the status tabs don't narrow this.
+                  {filterStatus !== 'All' && ` For “${filterStatus}” only (${viewExportLeads.length}), use the download button on the status tabs.`}
                 </p>
               </div>
 
