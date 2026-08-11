@@ -38,7 +38,7 @@ export default function Testimonials() {
             >
               <img
                 src="/ujenzi-video-thumbnail.webp?v=2"
-                alt="Frederick Chege — Ujenzi Distributors Ltd"
+                alt={`Client video testimonial — ${featured.company}`}
                 className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-50 transition-opacity duration-500"
                 width={854}
                 height={480}
@@ -55,7 +55,7 @@ export default function Testimonials() {
                 </motion.div>
               </div>
               <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between">
-                <p className="text-xs font-semibold text-white/80">Watch Frederick Chege's Story</p>
+                <p className="text-xs font-semibold text-white/80">Watch the {featured.company} story</p>
                 <a
                   href="https://www.facebook.com/TallySolutions"
                   target="_blank"
@@ -107,20 +107,6 @@ export default function Testimonials() {
                   "{featured.text}"
                 </p>
               </div>
-              <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 border-t border-white/10 pt-5">
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-red-400">The Problem</p>
-                  <p className="mt-1.5 text-xs text-slate-300 leading-relaxed">Manual accounting processes were eating up hours — especially around KRA compliance.</p>
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-red-400">Our Solution</p>
-                  <p className="mt-1.5 text-xs text-slate-300 leading-relaxed">TallyPrime implementation with the built-in KRA compliance module, backed by responsive support.</p>
-                </div>
-                <div>
-                  <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-red-400">The Result</p>
-                  <p className="mt-1.5 text-xs text-slate-300 leading-relaxed">Countless hours saved on compliance and a fully transformed accounting process.</p>
-                </div>
-              </div>
               <div className="mt-6 pt-5 border-t border-white/10">
                 <p className="text-sm font-bold text-white">{featured.name}</p>
                 <p className="text-xs text-slate-400 mt-0.5">{featured.role}, {featured.company}</p>
@@ -153,20 +139,6 @@ export default function Testimonials() {
               <p className="text-sm text-slate-300 italic leading-relaxed">
                 "With the current economic situation and government requirements for small businesses, Optimum has been very helpful. Their customer service is excellent — they responded quickly, were very professional and always willing to help. I highly recommend them to any company looking for a Tally partner."
               </p>
-              <div className="mt-4 space-y-2">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-red-400">The Problem</p>
-                  <p className="text-xs text-slate-400 leading-relaxed">Tough economic conditions and new government compliance requirements for a small business.</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-red-400">Our Solution</p>
-                  <p className="text-xs text-slate-400 leading-relaxed">Fast, professional, hands-on customer support tailored to her business.</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-red-400">The Result</p>
-                  <p className="text-xs text-slate-400 leading-relaxed">A trusted, responsive Tally partner she highly recommends to other businesses.</p>
-                </div>
-              </div>
             </div>
             <div className="mt-4 pt-4 border-t border-white/10">
               <p className="text-sm font-bold text-white">Njoki Gathua</p>
@@ -194,20 +166,6 @@ export default function Testimonials() {
               <p className="text-sm text-slate-300 italic leading-relaxed">
                 "Excellent service from Optimum Prime Solutions. TallyPrime has streamlined our accounting and completely resolved our inventory management issues. Reliable, easy to use and highly recommended for any business."
               </p>
-              <div className="mt-4 space-y-2">
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-red-400">The Problem</p>
-                  <p className="text-xs text-slate-400 leading-relaxed">Inefficient accounting processes and ongoing inventory management issues.</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-red-400">Our Solution</p>
-                  <p className="text-xs text-slate-400 leading-relaxed">A reliable, easy-to-use TallyPrime implementation from Optimum Prime Solutions.</p>
-                </div>
-                <div>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.15em] text-red-400">The Result</p>
-                  <p className="text-xs text-slate-400 leading-relaxed">Streamlined accounting and inventory issues completely resolved.</p>
-                </div>
-              </div>
             </div>
             <div className="mt-4 pt-4 border-t border-white/10">
               <p className="text-sm font-bold text-white">Avyla Ventures Ltd</p>

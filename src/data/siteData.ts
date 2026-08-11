@@ -143,12 +143,14 @@ export const defaultData: SiteData = {
     {id:'4',name:'EOS®',edition:'Implementation',price:'Contact for Quote',period:'per engagement',features:['Full EOS® implementation program','Vision/Traction Organizer (V/TO)','Rocks & 90-day priority setting','L10 weekly leadership meetings','People Analyser & accountability','Quarterly & annual planning days','Delivered using EOS® tools & principles'],cta:'Book EOS Session'},
   ],
   testimonials: [
-    {id:'1',name:'Frederick Chege',role:'CEO',company:'Ujenzi Distributors Ltd',text:'Optimum Prime Solutions transformed our accounting. The KRA compliance module alone has saved us countless hours. Their team is professional and responsive.',rating:5},
-    {id:'2',name:'Grace Wanjiku',role:'Finance Director',company:'Wanjiku Manufacturing',text:'The manufacturing module is a game-changer. Real-time production cost tracking and BOM management have improved our margins by 18%.',rating:5},
-    {id:'3',name:'Peter Ochieng',role:'Managing Director',company:'Ochieng Trading Co.',text:'Complete visibility of stock across 5 locations. Inventory discrepancies dropped by 95% after implementing their solution.',rating:5},
-    {id:'4',name:'Mary Njeri',role:'HR Manager',company:'Njeri Group',text:'Payroll processing that used to take 3 days now takes 2 hours. The PAYE, NHIF, and NSSF calculations are always accurate.',rating:5},
-    {id:'5',name:'David Kamau',role:'Owner',company:'Kamau Pharmacy',text:'From POS to inventory to KRA returns — everything runs on Tally Prime now. Best investment we\'ve made for our pharmacy chain.',rating:5},
-    {id:'6',name:'Sarah Achieng',role:'Operations Manager',company:'Lake Victoria SACCO',text:'Their SACCO solution handles member accounts, loan tracking, and dividends seamlessly. Support response time is incredible.',rating:5},
+    // Intentionally empty. The six entries here were placeholder names invented
+    // during the original build (Frederick Chege, Grace Wanjiku, Peter Ochieng,
+    // Mary Njeri, David Kamau, Sarah Achieng) and were being served as real client
+    // testimonials on a live commercial site.
+    //
+    // Only add real, attributable testimonials here or via the admin panel. The
+    // genuine Google reviews are rendered separately in components/Testimonials.tsx
+    // and are credited to their actual authors.
   ],
   faqs: [
     {id:'1',q:'What is Tally Prime?',a:'Tally Prime is a complete business management software for accounting, inventory, payroll, manufacturing, taxation, and more. It\'s used by millions of businesses worldwide and is the leading ERP solution in East Africa.',cat:'General'},
