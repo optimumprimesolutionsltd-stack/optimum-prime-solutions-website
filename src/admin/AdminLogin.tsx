@@ -46,7 +46,13 @@ export default function AdminLogin({ onLogin }: Props) {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex items-center gap-2 mb-3">
-            <div className="h-10 w-10 rounded-lg bg-accent flex items-center justify-center font-black text-sm text-white">OP</div>
+            <img
+              src="/optimum-mark-knockout.png"
+              alt="Optimum Prime Solutions"
+              width={40}
+              height={40}
+              className="h-10 w-10 object-contain"
+            />
           </div>
           <h1 className="text-xl font-bold text-white">Admin Panel</h1>
           <p className="text-sm text-slate-400">Sign in to manage your website content</p>
