@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
 import { load, save, type SiteData, type Lead, defaultData } from '../data/siteData';
 import { fbGet, fbSet, fbSubscribe } from '../firebase/config';
-import { signInAnonymously, getAuth } from 'firebase/auth';
+import { signInAnonymously, getAuth, onAuthStateChanged } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 
 // New Firebase project: optimum-prime-website (migrated July 2026)
@@ -19,7 +19,21 @@ const firebaseConfig = {
 try {
   initializeApp(firebaseConfig);
   const auth = getAuth();
-  signInAnonymously(auth).catch(() => {});
+  // The RTDB rules require auth != null for the contact-form inbox and the
+  // chatbot history, so ordinary visitors need an anonymous session. But this
+  // used to call signInAnonymously() unconditionally at module load, and
+  // auth.currentUser is null synchronously at that point even when a signed-in
+  // admin's session is about to be restored from persistence. The anonymous
+  // user then replaced the admin, App.tsx gates /admin on !isAnonymous, and the
+  // panel logged itself out mid-session — taking any unsaved editor changes.
+  //
+  // Waiting for onAuthStateChanged means the decision is made with the real
+  // answer in hand. The listener is deliberately left subscribed rather than
+  // unsubscribed after the first emission, so signing out of /admin drops the
+  // visitor back to an anonymous session instead of no session at all.
+  onAuthStateChanged(auth, (user) => {
+    if (!user) signInAnonymously(auth).catch(() => {});
+  });
 } catch (e) {
   console.log('Firebase not configured yet');
 }
