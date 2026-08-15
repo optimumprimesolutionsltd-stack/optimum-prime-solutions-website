@@ -250,14 +250,14 @@ export default function Contact() {
                 </div>
                 <h3 className="text-xl font-bold text-white">
                   {requestType === 'consultation'
-                    ? 'Book a free EOS® Business Consultation'
+                    ? 'Book a free business consultation'
                     : requestType === 'bizanalyst'
                     ? 'Enquire about Biz Analyst'
                     : 'Book your free TallyPrime demo'}
                 </h3>
                 <p className="mt-1 text-sm text-slate-300">
                   {requestType === 'consultation'
-                    ? 'Complete the form and our EOS® consultant will confirm your session within 24 hours.'
+                    ? 'Complete the form and our consultant will confirm your session within 24 hours.'
                     : requestType === 'bizanalyst'
                     ? 'Tell us about your business and we will show you how Biz Analyst works with TallyPrime.'
                     : 'Complete the form and our team will confirm your demo within 24 hours.'}

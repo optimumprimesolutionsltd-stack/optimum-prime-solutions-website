@@ -56,7 +56,7 @@ export default function Hero3D() {
                 '✓ Certified Tally Partner',
                 '✓ KRA eTIMS Approved',
                 '✓ 2.5M+ TallyPrime Users Worldwide',
-                '✓ EOS®-Informed Consulting',
+                '✓ Cloud Hosting Available',
                 '✓ < 1hr Support Response',
               ].map((badge) => (
                 <span key={badge} className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 backdrop-blur-sm">

@@ -82,7 +82,7 @@ Join 2.5 million+ businesses worldwide already running on TallyPrime. Get a free
               <span>Powered by Optimum Prime Solutions</span>
             </div>
             <p className="mt-6 text-xs text-slate-100">
-              ✓ Certified TallyPrime Partner · ✓ Cloud Hosting Available · ✓ EOS® Consulting · ✓ KRA & eTIMS Ready
+              ✓ Certified TallyPrime Partner · ✓ Cloud Hosting Available · ✓ Biz Analyst Partner · ✓ KRA & eTIMS Ready
             </p>
           </div>
         </motion.div>

@@ -214,7 +214,7 @@ export default function EcosystemOrbit() {
                 One Partner. A Complete Solution.
               </h2>
               <p className="mt-4 text-lg text-slate-300 leading-relaxed">
-                We bring together the best-in-class tools — TallyPrime for accounting, the Biz Analyst mobile app for real-time data, EOS® for leadership, and secure cloud infrastructure — so you get everything you need in one trusted partnership.
+                We bring together the best-in-class tools — TallyPrime for accounting, the Biz Analyst mobile app for real-time data, and secure cloud infrastructure — so you get everything you need in one trusted partnership.
               </p>
             </div>
 

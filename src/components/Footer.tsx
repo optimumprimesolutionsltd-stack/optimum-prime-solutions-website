@@ -127,7 +127,7 @@ export default function Footer() {
               <span className="h-0.5 w-7 rounded-full bg-blue-600" aria-hidden="true" />
             </div>
             <p className="max-w-md text-sm leading-relaxed text-slate-500">
-              {data.company.tagline}. Kenya's certified TallyPrime reseller, cloud hosting provider & EOS® implementer.
+              {data.company.tagline}. Kenya's certified TallyPrime reseller, cloud hosting provider & business systems consultant.
             </p>
             <div className="grid gap-3 text-sm">
               <a href={`tel:${c.phones[0]?.replace(/\s/g, '')}`} className="flex items-center gap-2 text-slate-600 hover:text-red-600 transition">
@@ -261,7 +261,7 @@ export default function Footer() {
           {/* Newsletter */}
           <div className="rounded-3xl bg-slate-50 p-6 flex-1">
             <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Stay updated</h3>
-            <p className="text-sm text-slate-700 mb-4">Receive TallyPrime tips, cloud hosting guides, and EOS® business insights.</p>
+            <p className="text-sm text-slate-700 mb-4">Receive TallyPrime tips, cloud hosting guides, and practical business insights.</p>
             {submitted ? (
               <div className="rounded-2xl bg-green-50 border border-green-200 px-4 py-4 text-sm text-green-700 font-medium text-center">
                 🎉 Congratulations — you're subscribed! We'll be in touch with updates.
