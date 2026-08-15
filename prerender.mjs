@@ -185,11 +185,17 @@ async function submitToIndexNow(urls) {
 // Never list these. /admin and /404 are not content; the two attendee pages
 // render with noIndex. A sitemap entry for a noindex URL is a direct
 // contradiction and Search Console reports it as an error.
+//
+// The EOS blog post is the same contradiction by a different route: vercel.json
+// 301s that URL to /blog/, but the post is still in the RTDB so it still
+// prerenders and the generated sitemap kept advertising a redirect. Excluding
+// it here holds whether or not the post is ever deleted from the database.
 const SITEMAP_EXCLUDE = new Set([
   '/admin',
   '/404',
   '/workshop-attendees',
   '/webinar-attendees',
+  '/blog/what-is-eos-and-why-kenyan-businesses-are-adopting-it',
 ]);
 
 // The floating chat widget runs a perpetual framer-motion wobble, and Puppeteer
