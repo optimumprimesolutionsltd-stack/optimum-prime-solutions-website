@@ -276,7 +276,8 @@
     },
     {
       "src": "^/blog/what\\-is\\-eos\\-and\\-why\\-kenyan\\-businesses\\-are\\-adopting\\-it(/)?$",
-      "dest": "/dist/blog/what-is-eos-and-why-kenyan-businesses-are-adopting-it/index.html"
+      "status": 301,
+      "headers": { "Location": "/blog/" }
     },
     {
       "src": "^/blog/tallyprime\\-cloud\\-hosting\\-access\\-your\\-business\\-data\\-from\\-anywhere(/)?$",
