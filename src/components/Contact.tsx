@@ -74,6 +74,10 @@ export default function Contact() {
         id: Date.now().toString(),
         createdAt: new Date().toISOString(),
         status: 'New',
+        // Say so explicitly. This form used to write no source at all and rely
+        // on the admin defaulting a blank one to 'website' — which meant every
+        // OTHER blank source was counted as a website enquiry too.
+        source: 'website',
       };
 
       await fbSet(`leads/${lead.id}`, {
@@ -88,6 +92,7 @@ export default function Contact() {
         message: form.message,
         createdAt: lead.createdAt,
         status: 'New',
+        source: 'website',
         requestType,
       });
 

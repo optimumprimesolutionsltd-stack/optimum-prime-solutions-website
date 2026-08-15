@@ -57,7 +57,12 @@ export function SiteProvider({ children }: { children: ReactNode }) {
             message: v.message || '',
             createdAt: v.createdAt || v.timestamp || new Date().toISOString(),
             status: v.status || 'New',
-            source: v.source === 'Zawadi Chatbot Handoff' ? 'website' : (v.source || 'website'),
+            // An inbox entry that doesn't say where it came from is NOT a
+            // website lead — it is an unattributed one. Defaulting it to
+            // 'website' quietly credited the site for chatbot handoffs, tools
+            // posting into the inbox, and anything else that forgot to say.
+            // 'unknown' puts it in the admin's "needs a source" queue instead.
+            source: v.source === 'Zawadi Chatbot Handoff' ? 'website' : (v.source || 'unknown'),
             industry: v.industry || v.businessType || '',
           } as Lead))
       : [];

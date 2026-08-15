@@ -6,7 +6,7 @@ import {
   RotateCcw, CalendarPlus, Briefcase,
 } from 'lucide-react';
 import type { SiteData, Lead, WipJob } from '../../data/siteData';
-import { fbSubscribe, fbSet } from '../../firebase/config';
+import { fbSubscribe, fbSet, fbAuth } from '../../firebase/config';
 import KanbanBoard from './KanbanBoard';
 import ImportLeadsDialog from './ImportLeadsDialog';
 import {
@@ -15,6 +15,13 @@ import {
 } from '../crm/crmExport';
 import { PIPELINE_ORDER, stageColor, stageTint, defaultNextStep, isValidTransition, getValidNextStages } from '../crm/pipeline';
 import {
+  MANUAL_SOURCES, ALL_SOURCES, sourceOption, sourceLabel, sourceDetail,
+  attributionGap, needsAttribution, validateSourcePick, sourceFields,
+  sourceCategory, matchesSourceFilter, knownDetails,
+  type LeadSource, type SourceCategory, type SourceFilter,
+} from '../crm/leadSource';
+import { sourcePerformance, formatKes, formatWinRate } from '../crm/sourcePerformance';
+import {
   LEGACY_WORKSHOP_ID, parseWorkshops, regEventId, type WorkshopEvent,
 } from '../../data/workshopEvent';
 import {
@@ -22,7 +29,7 @@ import {
 } from '../../data/webinarEvent';
 import { getDayOfWeek, isDateBlocked, generateTimeSlots } from '../../data/demoTimings';
 import {
-  OPTIMUM_STAFF, DEMO_TEAM, DEFAULT_STAFF, COMPANY_EMAIL, staffByName, staffEmail,
+  OPTIMUM_STAFF, DEMO_TEAM, DEFAULT_STAFF, COMPANY_EMAIL, staffByName, staffEmail, staffByEmail,
 } from '../../data/staff';
 import {
   googleCalendarUrl, buildIcs, downloadIcs, demoGuestList, type CalendarEvent,
@@ -64,7 +71,11 @@ const statusBadgeStyle = (status: string) => ({ backgroundColor: stageColor(stat
 interface BookingForm {
   clientName: string; clientPhone: string; clientEmail: string;
   clientCompany: string; clientIndustry: string;
-  sourceOfEnquiry: 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'website';
+  // Where the enquiry came from. This form always asked — and then threw the
+  // answer away, writing source:'manual' on the lead instead. Same shape as
+  // the Add Lead form now, and it actually reaches the lead.
+  source: '' | LeadSource;
+  sourceDetail: string;
   demoType: 'online' | 'physical';
   demoDate: string; demoTime: string; demoLocation: string; demoNotes: string;
   teamMemberName: string; teamMemberPhone: string;
@@ -74,7 +85,7 @@ interface BookingForm {
 const emptyBooking: BookingForm = {
   clientName: '', clientPhone: '', clientEmail: '',
   clientCompany: '', clientIndustry: '',
-  sourceOfEnquiry: 'website',
+  source: '', sourceDetail: '',
   demoType: 'online', demoDate: '', demoTime: '', demoLocation: '', demoNotes: '',
   teamMemberName: '', teamMemberPhone: '',
   extraTeam: [],
@@ -84,32 +95,9 @@ const emptyBooking: BookingForm = {
 // ── Team member entry ───────────────────────────────────────────────────────
 interface TeamMember { name: string; phone: string; }
 
-// ── Lead source buckets ──────────────────────────────────────────────────────
-// The categories the Source chips filter by. 'other' is the honest home for a
-// lead whose source is blank or something we don't recognise — these used to be
-// swept into 'email', so a lead with no source at all was reported to Tally as
-// an email enquiry.
-type SourceCategory =
-  'workshop' | 'webinar' | 'online' | 'field' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'other';
-
-// Sources that arrive as a one-to-one contact rather than through an event.
-// Kept as data so the mapper below can't drift from the chip list.
-const DIRECT_SOURCES = ['email', 'whatsapp', 'referral', 'phone', 'direct'] as const;
-
-// Which chip a lead belongs under. Pure and module-level so the chips, the
-// stats strip, the on-screen chart and the exports all bin leads through this
-// one function — and so it can be tested without mounting the panel.
-export const sourceCategory = (l: Lead): SourceCategory =>
-  l.source === 'workshop' ? 'workshop'
-  : l.source === 'webinar' ? 'webinar'
-  : l.source === 'website' ? 'online'
-  : l.source === 'field' ? 'field'
-  // Only a recognised direct source keeps its own bucket. Anything else —
-  // blank, legacy 'manual', a value from an import — lands in 'other' rather
-  // than being mislabelled as an email enquiry.
-  : (DIRECT_SOURCES as readonly string[]).includes(l.source || '')
-    ? (l.source as typeof DIRECT_SOURCES[number])
-    : 'other';
+// Source bucketing (SourceCategory, sourceCategory, matchesSourceFilter) now
+// lives in ../crm/leadSource alongside the canonical source list, so the chips,
+// the performance panel and the exports all bin leads through one definition.
 
 // ── Schedule panel state ─────────────────────────────────────────────────────
 interface ScheduleForm {
@@ -188,19 +176,152 @@ function StaffPicker({ value, onPick, accent = 'accent' }: {
   );
 }
 
+// ── Lead source, on the lead itself ─────────────────────────────────────────
+// The panel could always FILTER by source but never SET one, so a lead that
+// arrived without an attribution — or landed on the wrong one because the add
+// form came pre-selected — could not be corrected at all. This is that missing
+// control: it sits on every expanded lead, and turns amber while the
+// attribution is incomplete.
+function SourceFixer({ lead, suggestions, signedInStaff, onSet }: {
+  lead: Lead;
+  /** Drives / referrers already used, so a repeat entry is a pick not a retype. */
+  suggestions: (key: 'fieldCampaign' | 'referredBy') => string[];
+  /** The signed-in team member, or '' when the account is the shared office login. */
+  signedInStaff: string;
+  onSet: (source: LeadSource, detail: string, confirmedBy: string) => void;
+}) {
+  const gap = attributionGap(lead);
+  const known = sourceOption(lead.source);
+  // A recognised source is kept so a field lead missing only its drive doesn't
+  // have to be re-picked from scratch; an unrecognised one starts blank so the
+  // staff member has to answer rather than confirm a guess.
+  const [source, setSource] = useState<'' | LeadSource>(known ? known.value : '');
+  const [detail, setDetail] = useState(sourceDetail(lead));
+  // Only asked for when the signed-in account isn't a person — see below.
+  const [confirmedBy, setConfirmedBy] = useState(signedInStaff);
+  const [err, setErr] = useState('');
+  const [saved, setSaved] = useState(false);
+
+  const opt = sourceOption(source);
+  const listId = `src-detail-${lead.id}`;
+  const options = opt?.detailKey ? suggestions(opt.detailKey) : [];
+  const dirty = source !== (known?.value || '') || detail.trim() !== sourceDetail(lead);
+
+  const save = () => {
+    const problem = validateSourcePick(source, detail);
+    if (problem) { setErr(problem); return; }
+    // Without a name against it, "recorded by" would be a guess — and a
+    // wrong name is worse than no name when someone queries the source later.
+    if (!confirmedBy) { setErr('Say who is confirming this, so the source can be queried later.'); return; }
+    setErr('');
+    onSet(source as LeadSource, detail, confirmedBy);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+  };
+
+  return (
+    <div className={`rounded-xl border p-4 space-y-3 ${gap ? 'border-amber-300 bg-amber-50' : 'border-slate-200 bg-slate-50'}`}>
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        <p className={`text-sm font-bold ${gap ? 'text-amber-900' : 'text-slate-700'}`}>
+          {gap ? `⚠️ Where did this lead come from? — ${gap}` : `Lead source — ${sourceLabel(lead.source)}`}
+        </p>
+        {saved && (
+          <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-700">
+            <CheckCircle2 className="h-3.5 w-3.5" /> Saved
+          </span>
+        )}
+      </div>
+
+      <div className="grid sm:grid-cols-2 gap-3">
+        <select
+          value={source}
+          onChange={e => { setSource(e.target.value as '' | LeadSource); setDetail(''); setErr(''); }}
+          className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-accent">
+          <option value="">— Select a source —</option>
+          {ALL_SOURCES.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+        {opt?.detailKey && (
+          <>
+            {/* Offers the drives and referrers already on file. Still free
+                text, so a genuinely new one needs no setup — but the common
+                case is one keystroke and a pick, which is what keeps a
+                compulsory box from filling up with "x". */}
+            <input
+              type="text"
+              list={listId}
+              value={detail}
+              onChange={e => { setDetail(e.target.value); setErr(''); }}
+              placeholder={`${opt.detailLabel} ${opt.detailPlaceholder}`}
+              className="w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-accent"
+            />
+            <datalist id={listId}>
+              {options.map(v => <option key={v} value={v} />)}
+            </datalist>
+          </>
+        )}
+      </div>
+
+      {/* The office login (optimumprimesolutionsltd@…) is a mailbox, not a
+          person. When that is who is signed in, ask — rather than stamping
+          whoever happens to own the lead and calling it a confirmation. */}
+      {!signedInStaff && (
+        <label className="flex items-center gap-2">
+          <span className="shrink-0 text-xs font-medium text-slate-600">Confirmed by</span>
+          <select
+            value={confirmedBy}
+            onChange={e => { setConfirmedBy(e.target.value); setErr(''); }}
+            className="flex-1 min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-accent">
+            <option value="">— Who is confirming this? —</option>
+            {OPTIMUM_STAFF.map(s => <option key={s.email} value={s.name}>{s.name}</option>)}
+          </select>
+        </label>
+      )}
+
+      {err && (
+        <p className="flex items-center gap-1.5 text-xs font-semibold text-red-600">
+          <AlertCircle className="h-3.5 w-3.5 shrink-0" />{err}
+        </p>
+      )}
+
+      <div className="flex items-center justify-between gap-3 flex-wrap">
+        {/* Who stood behind this answer, so a source can be queried later. */}
+        <p className="text-[11px] text-slate-500">
+          {lead.sourceSetBy
+            ? `Recorded by ${lead.sourceSetBy}${lead.sourceSetAt ? ` on ${new Date(lead.sourceSetAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}` : ''}`
+            : 'Not yet confirmed by anyone.'}
+        </p>
+        <button
+          onClick={save}
+          disabled={!dirty}
+          className={`rounded-lg px-4 py-2 text-xs font-bold text-white transition ${
+            dirty ? (gap ? 'bg-amber-600 hover:bg-amber-700' : 'bg-slate-700 hover:bg-slate-800') : 'bg-slate-300 cursor-not-allowed'
+          }`}>
+          {gap ? 'Save source' : 'Update source'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function LeadsManager({ data, onSave, openScheduleLeadId, onScheduleConsumed, onStartWork }: P) {
   const [search, setSearch]           = useState('');
   const [filterStatus, setFilterStatus] = useState('All');
-  const [filterSource, setFilterSource] = useState<'All' | SourceCategory>('All');
+  const [filterSource, setFilterSource] = useState<SourceFilter>('All');
+  // What the Source performance bars measure — value won, or leads received.
+  const [sourceMetric, setSourceMetric] = useState<'value' | 'leads'>('value');
   const [expandedId, setExpandedId]   = useState<string | null>(null);
   const [showAddLead, setShowAddLead] = useState(false);
   // Scroll anchor for the modal's error banner — the form is taller than the
   // pop-up, so an error at the top is invisible from the submit button.
   const addLeadTopRef = useRef<HTMLDivElement>(null);
+  // Source starts BLANK on purpose. A pre-selected source is not an answer —
+  // it is whatever the form was left on, and it is why Field / Marketing had
+  // collected leads that were really referrals and phone calls. The form
+  // refuses to save until someone picks one.
   const [addLeadForm, setAddLeadForm] = useState({
     name: '', email: '', phone: '', company: '', businessType: '', currentSoftware: '', message: '', industry: '',
-    source: 'field' as 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'field',
-    fieldCampaign: '',
+    source: '' as '' | LeadSource,
+    sourceDetail: '',
     capturedBy: DEFAULT_STAFF.name,
     createdAt: new Date().toISOString().split('T')[0],
     requestType: 'demo' as 'demo' | 'consultation' | 'bizanalyst' | 'customization' | 'other',
@@ -365,7 +486,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       // When a specific source/workshop is filtered, ignore date range and show all leads from that source
       const baseLeads = filterSource !== 'All' ? searchScoped : dateScopedLeads;
       let leads = baseLeads.filter(l => includeClosed || (l.status !== 'Closed Won' && l.status !== 'Closed Lost'));
-      if (filterSource !== 'All') leads = leads.filter(l => sourceCategory(l) === filterSource);
+      if (filterSource !== 'All') leads = leads.filter(l => matchesSourceFilter(l, filterSource));
       if (filterSource === 'workshop' && filterWorkshop !== 'all') leads = leads.filter(l => leadWorkshopId(l) === filterWorkshop);
       if (filterSource === 'webinar' && filterWebinar !== 'all') leads = leads.filter(l => leadWebinarId(l) === filterWebinar);
       return leads;
@@ -381,7 +502,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       if (includeClosed) return 0;
       const baseLeads = filterSource !== 'All' ? searchScoped : dateScopedLeads;
       let leads = baseLeads.filter(l => l.status === 'Closed Won' || l.status === 'Closed Lost');
-      if (filterSource !== 'All') leads = leads.filter(l => sourceCategory(l) === filterSource);
+      if (filterSource !== 'All') leads = leads.filter(l => matchesSourceFilter(l, filterSource));
       if (filterSource === 'workshop' && filterWorkshop !== 'all') leads = leads.filter(l => leadWorkshopId(l) === filterWorkshop);
       if (filterSource === 'webinar' && filterWebinar !== 'all') leads = leads.filter(l => leadWebinarId(l) === filterWebinar);
       return leads.length;
@@ -550,7 +671,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   // matchesSearch / searchScoped are declared up with the export sets, which are
   // built from the same list so the chips and the report can never disagree.
   const sourceScoped = searchScoped
-    .filter(l => filterSource === 'All' || sourceCategory(l) === filterSource)
+    .filter(l => matchesSourceFilter(l, filterSource))
     // When viewing Workshop leads, optionally narrow to one specific workshop.
     .filter(l => filterSource !== 'workshop' || filterWorkshop === 'all' || leadWorkshopId(l) === filterWorkshop)
     // When viewing Webinar leads, optionally narrow to one specific webinar.
@@ -640,6 +761,40 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   };
 
   // ── Status update ────────────────────────────────────────────────────────
+  // ── Closing a deal as Won ────────────────────────────────────────────────
+  // Held in a small confirmation rather than applied straight away, so the
+  // deal value can be asked for while someone is looking at it. "Not known
+  // yet" is a real answer — blocking the pipeline on a figure nobody has to
+  // hand would just teach people to type 1. What it must never do is record a
+  // guess: a skipped value counts as unrecorded in the reports, never as zero.
+  const [wonLead, setWonLead] = useState<Lead | null>(null);
+  const [wonAmount, setWonAmount] = useState('');
+  const [wonError, setWonError] = useState('');
+
+  const confirmWon = (withValue: boolean) => {
+    if (!wonLead) return;
+    const raw = wonAmount.replace(/[,\s]/g, '');
+    const amount = Number(raw);
+    if (withValue && (!raw || !Number.isFinite(amount) || amount <= 0)) {
+      setWonError('Enter the deal value in KES, or choose "Not known yet".');
+      return;
+    }
+    onSave({
+      ...data,
+      leads: data.leads.map(l => l.id === wonLead.id
+        ? ({
+            ...l,
+            status: 'Closed Won',
+            wonAt: new Date().toISOString(),
+            ...(withValue ? { amount } : {}),
+          } as Lead)
+        : l),
+    });
+    setWonLead(null);
+    setWonAmount('');
+    setWonError('');
+  };
+
   const updateStatus = (id: string, status: string) => {
     const lead = data.leads.find(l => l.id === id);
     if (!lead) return;
@@ -648,6 +803,17 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     if (!isValidTransition(lead.status, status)) {
       setEscalationError(`Cannot move "${lead.name}" from "${lead.status}" back to "${status}". Leads can only escalate forward or to Closed Lost.`);
       setTimeout(() => setEscalationError(null), 5000);
+      return;
+    }
+
+    // Winning a deal is the one moment its value is known and someone is
+    // looking at it. Ask then, or the figure is never captured and "which
+    // source is actually worth the most" stays unanswerable.
+    if (status === 'Closed Won') {
+      setWonLead(lead);
+      setWonAmount(lead.amount ? String(lead.amount) : '');
+      setWonError('');
+      setEscalationError(null);
       return;
     }
 
@@ -1024,6 +1190,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     if (!booking.clientPhone.trim()) return 'Client phone is required';
     if (!booking.clientCompany.trim()) return 'Company name is required';
     if (!booking.clientIndustry) return 'Please select an industry';
+    // Same rule as the Add Lead form — a demo booked by hand is still a lead,
+    // and it has to say where the customer came from.
+    const srcErr = validateSourcePick(booking.source, booking.sourceDetail);
+    if (srcErr) return srcErr;
     if (!booking.demoDate) return 'Demo date is required';
     if (!booking.demoTime) return 'Demo time is required';
     if (isDateBlocked(booking.demoDate)) return 'This date is a Sunday or public holiday — please choose another day';
@@ -1054,7 +1224,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         message: booking.demoNotes,
         createdAt: new Date().toISOString(),
         status: 'Schedule a Demo',
-        source: 'manual',
+        // The answer the form collects, written to the lead. It used to be
+        // discarded in favour of 'manual', which meant every hand-booked demo
+        // arrived with no usable attribution.
+        ...sourceFields(booking.source as LeadSource, booking.sourceDetail, booking.teamMemberName),
         scheduledDate: booking.demoDate,
         scheduledTime: booking.demoTime,
         demoType: booking.demoType,
@@ -1317,6 +1490,27 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   // Edit form uses the same schedForm state — slots computed from schedForm.scheduledDate
   // (editSlots reuse schedSlots since they share the same form state)
 
+  // The signed-in team member, or '' when the shared office mailbox is what is
+  // logged in — in which case anything stamped "recorded by" has to ask.
+  const signedInStaff = staffByEmail(fbAuth().currentUser?.email)?.name || '';
+
+  // Drives and referrers already on file, offered as suggestions so a repeat
+  // entry is a pick rather than a retype.
+  const detailSuggestions = useMemo(() => ({
+    fieldCampaign: knownDetails(data.leads, 'fieldCampaign'),
+    referredBy: knownDetails(data.leads, 'referredBy'),
+  }), [data.leads]);
+
+  // ── Record / correct where a lead came from ──────────────────────────────
+  const setLeadSource = (id: string, source: LeadSource, detail: string, confirmedBy: string) => {
+    onSave({
+      ...data,
+      leads: data.leads.map(l =>
+        l.id === id ? ({ ...l, ...sourceFields(source, detail, confirmedBy) } as Lead) : l,
+      ),
+    });
+  };
+
   // ── Add new lead ─────────────────────────────────────────────────────────
   const handleAddLeadSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1329,6 +1523,15 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       setAddLeadError('Name and phone are required');
       // The form scrolls, so the message at the top can sit off-screen above
       // the button that was just clicked. Bring it into view.
+      addLeadTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      return;
+    }
+
+    // Where it came from is as compulsory as the phone number. A lead saved
+    // without it is a lead nobody can report on afterwards.
+    const sourceError = validateSourcePick(addLeadForm.source, addLeadForm.sourceDetail);
+    if (sourceError) {
+      setAddLeadError(sourceError);
       addLeadTopRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       return;
     }
@@ -1349,9 +1552,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         ? new Date(`${addLeadForm.createdAt}T12:00:00`).toISOString()
         : new Date().toISOString(),
       status: 'New',
-      source: addLeadForm.source,
-      ...(addLeadForm.source === 'field' && addLeadForm.fieldCampaign.trim()
-        ? { fieldCampaign: addLeadForm.fieldCampaign.trim() } : {}),
+      // Source, its detail, and who recorded it — written together so a lead
+      // always carries the story of where it came from and who vouched for it.
+      ...sourceFields(addLeadForm.source as LeadSource, addLeadForm.sourceDetail, addLeadForm.capturedBy),
       requestType: addLeadForm.requestType,
       industry: addLeadForm.industry.trim(),
       // Whoever captured it owns the follow-up until it is reassigned.
@@ -1366,7 +1569,8 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     setAddLeadSuccess(true);
     setAddLeadForm({
       name: '', email: '', phone: '', company: '', businessType: '', currentSoftware: '', message: '', industry: '',
-      source: 'field', fieldCampaign: '', capturedBy: DEFAULT_STAFF.name,
+      // Blank again, not "the last one used" — the next lead gets its own answer.
+      source: '', sourceDetail: '', capturedBy: DEFAULT_STAFF.name,
       createdAt: new Date().toISOString().split('T')[0],
       requestType: 'demo',
     });
@@ -1384,61 +1588,115 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   return (
     <div className="mx-auto max-w-4xl space-y-5">
 
-      {/* ── Source Distribution Graph ── */}
+      {/* ── Attribution queue ──────────────────────────────────────────────
+          Every lead that can't say where it came from, counted across the
+          whole CRM rather than the current filter. Source reporting is only
+          honest once this is zero, so it sits above the panel it distorts. */}
       {(() => {
-        // Counted through sourceCategory, not raw l.source, so this chart bins
-        // leads exactly the way the Source chips do — including the 'other'
-        // bucket, which keeps unclassified leads from dropping out of the
-        // total and inflating everyone else's share.
-        const countIn = (c: SourceCategory) => data.leads.filter(l => sourceCategory(l) === c).length;
-        const sourceData = {
-          website: countIn('online'),
-          workshop: countIn('workshop'),
-          webinar: countIn('webinar'),
-          field: countIn('field'),
-          email: countIn('email'),
-          whatsapp: countIn('whatsapp'),
-          referral: countIn('referral'),
-          phone: countIn('phone'),
-          direct: countIn('direct'),
-          other: countIn('other'),
-        };
-        const totalBySource = Object.values(sourceData).reduce((a, b) => a + b, 0);
-        const sources = Object.entries(sourceData).filter(([_, count]) => count > 0);
+        const gaps = data.leads.filter(needsAttribution);
+        if (gaps.length === 0) return null;
+        return (
+          <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 flex items-start justify-between gap-3 flex-wrap">
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-amber-900">
+                ⚠️ {gaps.length} lead{gaps.length === 1 ? '' : 's'} still {gaps.length === 1 ? 'does' : 'do'}n't say where {gaps.length === 1 ? 'it' : 'they'} came from
+              </p>
+              <p className="text-xs text-amber-800 mt-0.5">
+                Until these are confirmed, the figures below understate every channel they belong to.
+                Open a lead and set its source — it takes a few seconds each.
+              </p>
+            </div>
+            <button
+              onClick={() => { setFilterSource('needs-source'); setFilterStatus('All'); setSearch(''); }}
+              className="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-xs font-bold text-white hover:bg-amber-700 transition shrink-0">
+              Work through them
+            </button>
+          </div>
+        );
+      })()}
 
-        return sources.length > 0 ? (
+      {/* ── Source performance ──────────────────────────────────────────────
+          Was "Leads by Source", a plain count. A count rewards whichever
+          channel produces the most names: 32 field leads outrank the one
+          referral that actually closed, so the chart pointed at the busiest
+          channel rather than the best one. Same leads, binned the same way —
+          but showing what became of them, worth first. */}
+      {(() => {
+        const perf = sourcePerformance(data.leads);
+        if (perf.rows.length === 0) return null;
+
+        const colors: Record<string, string> = {
+          online: 'bg-blue-500', workshop: 'bg-amber-500', webinar: 'bg-purple-500',
+          field: 'bg-yellow-500', email: 'bg-green-500', whatsapp: 'bg-emerald-600',
+          referral: 'bg-pink-500', phone: 'bg-orange-500', direct: 'bg-indigo-500',
+          other: 'bg-slate-400',
+        };
+        const rowLabel = (k: SourceCategory) =>
+          k === 'online' ? 'Website'
+          : k === 'other' ? '⚠️ No source recorded'
+          : sourceLabel(k);
+
+        // Bars measure won value once there is any to measure — that is the
+        // ranking that answers "where should the effort go?". Until a deal
+        // value has been recorded there is nothing to rank, so they fall back
+        // to volume and the panel says so rather than drawing an empty chart.
+        const byValue = perf.hasValues && sourceMetric === 'value';
+        const maxBar = Math.max(...perf.rows.map(r => (byValue ? r.wonValue : r.leads)), 1);
+
+        return (
           <div className="rounded-xl border border-slate-200 bg-white p-5">
-            <h3 className="text-sm font-bold text-slate-900 mb-4">📊 Leads by Source</h3>
+            <div className="flex items-center justify-between gap-3 flex-wrap mb-1">
+              <h3 className="text-sm font-bold text-slate-900">📊 Source performance</h3>
+              {perf.hasValues && (
+                <div className="flex rounded-lg border border-slate-200 p-0.5">
+                  {([['value', 'Won value'], ['leads', 'Lead count']] as const).map(([m, label]) => (
+                    <button key={m} onClick={() => setSourceMetric(m)}
+                      className={`rounded-md px-2.5 py-1 text-[11px] font-semibold transition ${
+                        sourceMetric === m ? 'bg-slate-800 text-white' : 'text-slate-500 hover:text-slate-700'
+                      }`}>
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            <p className="text-[11px] text-slate-500 mb-4">
+              {perf.hasValues
+                ? `Bars show ${byValue ? 'the value of deals won' : 'how many leads came in'}. Win rate counts decided deals only.`
+                : 'No deal values recorded yet — bars show lead count. Enter the value when you mark a deal Closed Won and this ranks by revenue instead.'}
+            </p>
             <div className="space-y-3">
-              {sources.map(([source, count]) => {
-                const pct = totalBySource > 0 ? Math.round((count / totalBySource) * 100) : 0;
-                const label = source === 'whatsapp' ? 'WhatsApp'
-                  : source === 'field' ? 'Field / Marketing'
-                  : source.charAt(0).toUpperCase() + source.slice(1);
-                const colors: Record<string, string> = {
-                  website: 'bg-blue-500', workshop: 'bg-amber-500', webinar: 'bg-purple-500',
-                  field: 'bg-yellow-500',
-                  email: 'bg-green-500', whatsapp: 'bg-emerald-600', referral: 'bg-pink-500',
-                  phone: 'bg-orange-500', direct: 'bg-indigo-500', other: 'bg-slate-400',
-                };
+              {perf.rows.map(r => {
+                const pct = Math.round(((byValue ? r.wonValue : r.leads) / maxBar) * 100);
                 return (
-                  <div key={source}>
-                    <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-semibold text-slate-600">{label}</span>
-                      <span className="text-xs font-bold text-slate-500">{count} ({pct}%)</span>
+                  <div key={r.key}>
+                    <div className="flex items-baseline justify-between gap-2 mb-1.5 flex-wrap">
+                      <span className="text-xs font-semibold text-slate-600">{rowLabel(r.key)}</span>
+                      <span className="text-[11px] text-slate-500">
+                        <b className="text-slate-700">{r.leads}</b> lead{r.leads === 1 ? '' : 's'}
+                        {' · '}<b className="text-green-700">{r.won}</b> won
+                        {r.winRate !== null && <>{' · '}{formatWinRate(r.winRate)} win rate</>}
+                        {r.wonValue > 0 && <>{' · '}<b className="text-slate-800">{formatKes(r.wonValue)}</b></>}
+                      </span>
                     </div>
                     <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full ${colors[source] || 'bg-slate-400'} transition-all`}
-                        style={{ width: `${pct}%` }}
-                      />
+                      <div className={`h-full ${colors[r.key] || 'bg-slate-400'} transition-all`}
+                        style={{ width: `${pct}%` }} />
                     </div>
                   </div>
                 );
               })}
             </div>
+            {/* Say what the total cannot see, rather than quietly understating it. */}
+            {perf.totalWonWithoutValue > 0 && (
+              <p className="mt-4 rounded-lg bg-slate-50 px-3 py-2 text-[11px] text-slate-600">
+                {formatKes(perf.totalWonValue)} across {perf.totalWon - perf.totalWonWithoutValue} of {perf.totalWon} won
+                deal{perf.totalWon === 1 ? '' : 's'} — {perf.totalWonWithoutValue} ha{perf.totalWonWithoutValue === 1 ? 's' : 've'} no
+                value recorded, so the real figure is higher.
+              </p>
+            )}
           </div>
-        ) : null;
+        );
       })()}
 
       {/* ── Header ── */}
@@ -1607,7 +1865,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             and Select-all only touch the source you're looking at. */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-slate-500 mr-1">Source:</span>
-          {([['All', 'All sources'], ['online', 'Online / Website'], ['field', '📣 Field / Marketing'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['email', 'Email'], ['whatsapp', 'WhatsApp'], ['referral', 'Referral'], ['phone', 'Phone'], ['direct', 'Direct'], ['other', 'Other']] as [typeof filterSource, string][]).map(([val, label]) => {
+          {([['All', 'All sources'], ['online', 'Online / Website'], ['field', '📣 Field / Marketing'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['email', 'Email'], ['whatsapp', 'WhatsApp'], ['referral', 'Referral'], ['phone', 'Phone'], ['direct', 'Direct'], ['needs-source', '⚠️ Needs a source']] as [SourceFilter, string][]).map(([val, label]) => {
             const isActive = filterSource === val;
             // Counted across every pipeline stage — "Online / Website (6)" means
             // six leads came in that way, wherever they've since got to. Picking
@@ -1615,14 +1873,22 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             // board show all six rather than just the ones in one stage.
             const count = val === 'All'
               ? searchScoped.length
-              : searchScoped.filter(l => sourceCategory(l) === val).length;
+              : searchScoped.filter(l => matchesSourceFilter(l, val)).length;
+            // The attribution queue is amber, not navy — it is a to-do list,
+            // not another way of slicing the pipeline. Hidden once it is empty,
+            // but kept while it is the active filter, or clearing the last one
+            // would leave an empty list and no chip explaining why.
+            const isQueue = val === 'needs-source';
+            if (isQueue && count === 0 && !isActive) return null;
             return (
               <button key={val}
                 onClick={() => { setFilterSource(val); setFilterStatus('All'); if (val !== 'workshop') setFilterWorkshop('all'); if (val !== 'webinar') setFilterWebinar('all'); }}
                 className="rounded-full border px-3 py-1.5 text-xs font-semibold transition whitespace-nowrap"
                 style={isActive
-                  ? { backgroundColor: '#1e3a5f', color: '#fff', borderColor: '#1e3a5f' }
-                  : { backgroundColor: '#fff', color: '#475569', borderColor: '#e2e8f0' }}>
+                  ? { backgroundColor: isQueue ? '#b45309' : '#1e3a5f', color: '#fff', borderColor: isQueue ? '#b45309' : '#1e3a5f' }
+                  : isQueue
+                    ? { backgroundColor: '#fffbeb', color: '#b45309', borderColor: '#fcd34d' }
+                    : { backgroundColor: '#fff', color: '#475569', borderColor: '#e2e8f0' }}>
                 {label} <span style={{ opacity: 0.7 }}>({count})</span>
               </button>
             );
@@ -1812,16 +2078,31 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   <option value="">Select industry *</option>
                   {INDUSTRIES.map(i => <option key={i} value={i}>{i}</option>)}
                 </select>
-                <select value={booking.sourceOfEnquiry} onChange={e => setB('sourceOfEnquiry', e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-white">
-                  <option value="">Source of Enquiry *</option>
-                  <option value="website">Website</option>
-                  <option value="email">Email</option>
-                  <option value="whatsapp">WhatsApp</option>
-                  <option value="referral">Referral</option>
-                  <option value="phone">Phone Call</option>
-                  <option value="direct">Direct Contact</option>
+                {/* Blank until answered, like the Add Lead form — and the
+                    answer now reaches the lead instead of being discarded. */}
+                <select value={booking.source}
+                  onChange={e => { setB('source', e.target.value); setB('sourceDetail', ''); }}
+                  className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-white ${
+                    booking.source ? 'border-slate-200' : 'border-amber-400'
+                  }`}>
+                  <option value="">— Where did this enquiry come from? *</option>
+                  {ALL_SOURCES.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
+                {(() => {
+                  const opt = sourceOption(booking.source);
+                  if (!opt?.detailKey) return null;
+                  return (
+                    <>
+                      <input value={booking.sourceDetail} onChange={e => setB('sourceDetail', e.target.value)}
+                        list="booking-source-detail"
+                        placeholder={`${opt.detailLabel} *`}
+                        className="w-full rounded-xl border border-amber-400 bg-amber-50 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                      <datalist id="booking-source-detail">
+                        {detailSuggestions[opt.detailKey].map(v => <option key={v} value={v} />)}
+                      </datalist>
+                    </>
+                  );
+                })()}
               </div>
 
               {/* Demo Schedule */}
@@ -2144,6 +2425,14 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                         📣 FIELD
                       </span>
                     )}
+                    {/* Visible without opening the card, so an unattributed lead
+                        can't sit unnoticed in the middle of the list. */}
+                    {needsAttribution(l) && (
+                      <span className="rounded-full bg-amber-500 px-2 py-0.5 text-[9px] font-semibold text-white"
+                        title={`Attribution incomplete — ${attributionGap(l)}. Open the lead to set it.`}>
+                        ⚠ NO SOURCE
+                      </span>
+                    )}
                     {(l.reopenCount || 0) > 0 && (
                       <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[9px] font-semibold text-white"
                         title={`Restarted after being closed lost${l.reopenedAt ? ` on ${new Date(l.reopenedAt).toLocaleDateString()}` : ''}`}>
@@ -2415,6 +2704,14 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                       </button>
                     </div>
                   )}
+
+                  {/* Where this lead came from — set it here, or fix it here. */}
+                  <SourceFixer
+                    lead={l}
+                    signedInStaff={signedInStaff}
+                    suggestions={key => detailSuggestions[key]}
+                    onSet={(src, det, by) => setLeadSource(l.id, src, det, by)}
+                  />
 
                   {/* Auto next step — derived from the stage, shown in the CRM report */}
                   <div className="flex items-center gap-2 text-xs text-slate-500">
@@ -2771,6 +3068,64 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         </div>
       )}
 
+      {/* ── Closing a deal as Won: what was it worth? ──────────────────────
+          The one moment the figure is known and someone is looking at the
+          deal. Without it, "which source is worth the most" can never be
+          answered — but a figure nobody has to hand must not block the
+          pipeline, so "Not known yet" is a first-class answer that records
+          the win and leaves the value genuinely unrecorded. */}
+      {wonLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-slate-100 bg-green-50 px-6 py-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-green-700" />
+                <h3 className="font-bold text-green-900">Deal won — {wonLead.name}</h3>
+              </div>
+              <button onClick={() => { setWonLead(null); setWonError(''); }}
+                className="rounded-lg p-1.5 hover:bg-green-100 transition">
+                <X className="h-4 w-4 text-green-700" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1">Deal value (KES)</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  autoFocus
+                  value={wonAmount}
+                  onChange={e => { setWonAmount(e.target.value); setWonError(''); }}
+                  onKeyDown={e => { if (e.key === 'Enter') confirmWon(true); }}
+                  placeholder="e.g. 185000"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
+                />
+                <p className="mt-1.5 text-[11px] text-slate-500">
+                  What {wonLead.company || wonLead.name} is paying. This is what makes the Source
+                  performance panel rank channels by revenue instead of by headcount.
+                </p>
+              </div>
+              {wonError && (
+                <p className="flex items-center gap-1.5 text-xs font-semibold text-red-600">
+                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />{wonError}
+                </p>
+              )}
+              <div className="flex items-center justify-between gap-3 flex-wrap">
+                <button onClick={() => confirmWon(false)}
+                  title="Records the win now; the value stays blank and shows as unrecorded in the reports"
+                  className="text-xs font-semibold text-slate-500 underline hover:text-slate-700">
+                  Not known yet
+                </button>
+                <button onClick={() => confirmWon(true)}
+                  className="rounded-lg bg-green-700 px-4 py-2 text-xs font-bold text-white hover:bg-green-800 transition">
+                  Save & mark won
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Restart a Closed Lost lead ── */}
       {restartLead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
@@ -3068,29 +3423,48 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-slate-700 mb-1">Lead Source</label>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">
+                      Lead Source <span className="text-red-500">*</span>
+                    </label>
                     <select
                       value={addLeadForm.source}
-                      onChange={e => setAddLeadForm({...addLeadForm, source: e.target.value as any})}
-                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
-                      <option value="field">📣 Field storming / Marketing</option>
-                      <option value="email">Email Inquiry</option>
-                      <option value="whatsapp">WhatsApp</option>
-                      <option value="referral">Referral</option>
-                      <option value="phone">Phone Call</option>
-                      <option value="direct">Direct Contact</option>
+                      required
+                      onChange={e => setAddLeadForm({...addLeadForm, source: e.target.value as '' | LeadSource, sourceDetail: ''})}
+                      className={`w-full rounded-lg border px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-blue-500/20 ${
+                        addLeadForm.source ? 'border-slate-200 focus:border-blue-500' : 'border-amber-400 bg-amber-50 focus:border-amber-500'
+                      }`}>
+                      {/* Nothing is pre-selected — the blank option is what
+                          forces a real answer instead of a default. */}
+                      <option value="">— Where did this lead come from? —</option>
+                      {MANUAL_SOURCES.map(o => (
+                        <option key={o.value} value={o.value}>{o.label}</option>
+                      ))}
                     </select>
-                    {/* Which drive the lead came off, so a storming round can
-                        be reported on as a unit. */}
-                    {addLeadForm.source === 'field' && (
-                      <input
-                        type="text"
-                        value={addLeadForm.fieldCampaign}
-                        onChange={e => setAddLeadForm({...addLeadForm, fieldCampaign: e.target.value})}
-                        placeholder="Which drive / area? e.g. Industrial Area storming"
-                        className="mt-2 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-                      />
-                    )}
+                    {/* Field and Referral mean nothing without the detail —
+                        which drive, or who sent them. Offered as a list of the
+                        drives and referrers already on file, so entering a
+                        round of leads is a pick rather than twenty retypes. */}
+                    {(() => {
+                      const opt = sourceOption(addLeadForm.source);
+                      if (!opt?.detailKey) return null;
+                      const options = detailSuggestions[opt.detailKey];
+                      return (
+                        <>
+                          <input
+                            type="text"
+                            required
+                            list="add-lead-source-detail"
+                            value={addLeadForm.sourceDetail}
+                            onChange={e => setAddLeadForm({...addLeadForm, sourceDetail: e.target.value})}
+                            placeholder={`${opt.detailLabel} ${opt.detailPlaceholder}`}
+                            className="mt-2 w-full rounded-lg border border-amber-400 bg-amber-50 px-3 py-2 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20"
+                          />
+                          <datalist id="add-lead-source-detail">
+                            {options.map(v => <option key={v} value={v} />)}
+                          </datalist>
+                        </>
+                      );
+                    })()}
                   </div>
                   <div>
                     <label className="block text-sm font-semibold text-slate-700 mb-1">Request Type</label>
@@ -3169,7 +3543,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   <Plus className="h-4 w-4" />
                   Add Lead
                 </button>
-                <p className="text-center text-xs text-slate-400">Only a name and phone number are required.</p>
+                <p className="text-center text-xs text-slate-400">Name, phone number and lead source are required.</p>
               </form>
             </div>
           </div>

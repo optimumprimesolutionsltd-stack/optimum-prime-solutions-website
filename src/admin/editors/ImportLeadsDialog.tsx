@@ -2,6 +2,9 @@ import { useMemo, useRef, useState } from 'react';
 import { Upload, X, AlertCircle, CheckCircle2, FileSpreadsheet, Download } from 'lucide-react';
 import type { Lead } from '../../data/siteData';
 import { PIPELINE_ORDER } from '../crm/pipeline';
+import {
+  ALL_SOURCES, sourceOption, validateSourcePick, sourceFields, type LeadSource,
+} from '../crm/leadSource';
 import { OPTIMUM_STAFF, DEFAULT_STAFF, staffByName, staffEmail } from '../../data/staff';
 import {
   parseCsv, autoMapColumns, phoneKey, emailKey, parseImportDate, downloadCsv,
@@ -37,15 +40,9 @@ const FIELDS: ImportField[] = [
   { key: 'createdAt',       label: 'Date Added',       aliases: ['date submitted', 'created', 'created at', 'createdat', 'date', 'date added', 'last interaction'] },
 ];
 
-const SOURCES: { value: NonNullable<Lead['source']>; label: string }[] = [
-  { value: 'field',    label: '📣 Field / Marketing' },
-  { value: 'referral', label: 'Referral' },
-  { value: 'email',    label: 'Email' },
-  { value: 'whatsapp', label: 'WhatsApp' },
-  { value: 'phone',    label: 'Phone' },
-  { value: 'direct',   label: 'Direct Contact' },
-  { value: 'website',  label: 'Website' },
-];
+// The same canonical list the capture form uses — an import stamps every row
+// with one source, so getting it wrong mislabels the whole file at once. It
+// therefore starts blank and the Import button stays disabled until it is set.
 
 // Status is only honoured when it names a real pipeline stage (case-insensitive);
 // anything else starts at New so an imported row can't sit outside the pipeline.
@@ -66,8 +63,11 @@ export default function ImportLeadsDialog({ existingLeads, onImport, onClose }: 
   // field key → CSV column index (-1 = not mapped)
   const [mapping, setMapping] = useState<Record<string, number>>({});
   const [skipDuplicates, setSkipDuplicates] = useState(true);
-  const [source, setSource] = useState<NonNullable<Lead['source']>>('field');
+  const [source, setSource] = useState<'' | LeadSource>('');
+  const [sourceDetail, setSourceDetail] = useState('');
   const [capturedBy, setCapturedBy] = useState(DEFAULT_STAFF.name);
+
+  const sourceProblem = validateSourcePick(source, sourceDetail);
 
   const readFile = (file: File) => {
     setError('');
@@ -150,7 +150,7 @@ export default function ImportLeadsDialog({ existingLeads, onImport, onClose }: 
       demoDate: '',
       createdAt: parseImportDate(cell(r, 'createdAt')),
       status: normaliseStatus(cell(r, 'status')),
-      source,
+      ...sourceFields(source as LeadSource, sourceDetail, capturedBy),
       requestType: 'demo',
       industry,
       // Whoever runs the import owns the follow-up until it is reassigned —
@@ -163,7 +163,7 @@ export default function ImportLeadsDialog({ existingLeads, onImport, onClose }: 
 
   const runImport = () => {
     const leads = analysis.ready.map(toLead);
-    if (!leads.length) return;
+    if (!leads.length || sourceProblem) return;
     onImport(leads);
     setDone(leads.length);
     setTimeout(onClose, 1600);
@@ -275,12 +275,32 @@ export default function ImportLeadsDialog({ existingLeads, onImport, onClose }: 
               {/* ── Step 3: what to stamp on every imported row ── */}
               <div className="grid sm:grid-cols-2 gap-3 rounded-lg border border-slate-100 bg-slate-50/60 p-3">
                 <label className="flex items-center gap-2">
-                  <span className="w-32 shrink-0 text-xs font-medium text-slate-600">Lead source</span>
-                  <select value={source} onChange={e => setSource(e.target.value as NonNullable<Lead['source']>)}
-                    className="flex-1 min-w-0 rounded-lg border border-slate-200 bg-white px-2 py-1.5 text-xs outline-none focus:border-accent">
-                    {SOURCES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
+                  <span className="w-32 shrink-0 text-xs font-medium text-slate-600">
+                    Lead source <span className="text-red-500">*</span>
+                  </span>
+                  <select value={source}
+                    onChange={e => { setSource(e.target.value as '' | LeadSource); setSourceDetail(''); }}
+                    className={`flex-1 min-w-0 rounded-lg border bg-white px-2 py-1.5 text-xs outline-none focus:border-accent ${
+                      source ? 'border-slate-200' : 'border-amber-400 bg-amber-50'
+                    }`}>
+                    <option value="">— Where did these leads come from? —</option>
+                    {ALL_SOURCES.map(s => <option key={s.value} value={s.value}>{s.label}</option>)}
                   </select>
                 </label>
+                {/* Field and Referral carry a detail; asked for once and stamped
+                    on every row in the file. */}
+                {(() => {
+                  const opt = sourceOption(source);
+                  if (!opt?.detailKey) return null;
+                  return (
+                    <label className="flex items-center gap-2">
+                      <span className="w-32 shrink-0 text-xs font-medium text-slate-600">{opt.detailLabel}</span>
+                      <input type="text" value={sourceDetail} onChange={e => setSourceDetail(e.target.value)}
+                        placeholder={opt.detailPlaceholder}
+                        className="flex-1 min-w-0 rounded-lg border border-amber-400 bg-amber-50 px-2 py-1.5 text-xs outline-none focus:border-accent" />
+                    </label>
+                  );
+                })()}
                 <label className="flex items-center gap-2">
                   <span className="w-32 shrink-0 text-xs font-medium text-slate-600">Assign to</span>
                   <select value={capturedBy} onChange={e => setCapturedBy(e.target.value)}
@@ -348,11 +368,17 @@ export default function ImportLeadsDialog({ existingLeads, onImport, onClose }: 
         </div>
 
         <div className="flex items-center justify-end gap-3 border-t border-slate-200 px-6 py-4 flex-shrink-0">
+          {/* A disabled Import button has to say why it is disabled. */}
+          {!!rows.length && !!sourceProblem && (
+            <p className="mr-auto flex items-center gap-1.5 text-xs font-semibold text-amber-700">
+              <AlertCircle className="h-3.5 w-3.5 shrink-0" />{sourceProblem}
+            </p>
+          )}
           <button onClick={onClose} className="rounded-lg border border-slate-200 px-4 py-2.5 text-sm font-medium text-slate-600 hover:bg-slate-50 transition">
             Cancel
           </button>
-          <button onClick={runImport} disabled={!analysis.ready.length || done > 0}
-            title={analysis.ready.length ? '' : 'Nothing to import yet'}
+          <button onClick={runImport} disabled={!analysis.ready.length || done > 0 || !!sourceProblem}
+            title={!analysis.ready.length ? 'Nothing to import yet' : sourceProblem || ''}
             className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition disabled:opacity-40">
             <Upload className="h-4 w-4" />
             Import {analysis.ready.length || ''} client{analysis.ready.length === 1 ? '' : 's'}

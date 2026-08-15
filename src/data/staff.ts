@@ -35,3 +35,10 @@ export const staffByName = (name?: string): StaffMember | undefined =>
 
 export const staffEmail = (name?: string): string => staffByName(name)?.email || '';
 export const staffPhone = (name?: string): string => staffByName(name)?.phone || '';
+
+// Resolve the signed-in admin account back to a team member, so a record can be
+// stamped with who actually did it rather than whoever a picker defaulted to.
+// The shared optimumprimesolutionsltd@gmail.com login isn't a person, so it
+// resolves to nothing and the caller falls back to asking.
+export const staffByEmail = (email?: string | null): StaffMember | undefined =>
+  email ? OPTIMUM_STAFF.find(s => s.email.toLowerCase() === email.toLowerCase()) : undefined;
