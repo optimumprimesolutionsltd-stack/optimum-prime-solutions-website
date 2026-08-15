@@ -124,7 +124,7 @@ python3 /home/ubuntu/send_webinar_invite.py
 **Approved upgrade plan:**
 1. Add `/chat` endpoint to Render server (proxies LLM calls securely — API key stays server-side)
 2. Replace mock responses in `getChatGPTReply` with real LLM calls via the Render proxy
-3. Write comprehensive Zawadi system prompt (TallyPrime, Cloud, EOS®, Kenya context, eTIMS, pricing)
+3. Write comprehensive Zawadi system prompt (TallyPrime, Cloud, Biz Analyst, Kenya context, eTIMS, pricing)
 4. Update "Talk to an Expert" buttons to open Zawadi chatbot first
 5. Smart WhatsApp handoff — when user wants a human, Zawadi opens WhatsApp with conversation summary
 
@@ -168,7 +168,7 @@ python3 /home/ubuntu/send_webinar_invite.py
 ## 9. Company Details
 
 - **Name:** Optimum Prime Solutions Ltd
-- **Tagline:** TallyPrime · Cloud · EOS® · HubSpot CRM · Biz Analyst
+- **Tagline:** Certified TallyPrime Partner · Cloud Hosting · Biz Analyst
 - **Phone:** +254 116 246 074
 - **Email:** optimumprimesolutionsltd@gmail.com
 - **Location:** Gacheru House, Ruiru Town, Ruiru, Kenya

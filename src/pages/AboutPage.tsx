@@ -2,7 +2,7 @@ import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import {
   Award, Target, Eye, MapPin, Phone, ArrowRight,
-  CheckCircle, Users, Clock, Zap, Shield, BookOpen,
+  Users, Clock, Zap, Shield, BookOpen, Cloud,
 } from 'lucide-react';
 import SEO from '../components/SEO';
 import About from '../components/About';
@@ -18,9 +18,9 @@ const certifications = [
     color: '#e53e3e',
   },
   {
-    icon: Target,
-    title: 'EOS\u00ae Principles & Framework',
-    body: 'We apply the Entrepreneurial Operating System (EOS\u00ae) by Gino Wickman — using its tools and principles to help leadership teams get aligned and gain traction.',
+    icon: Cloud,
+    title: 'TSplus Cloud Partner',
+    body: 'We deploy and manage TSplus infrastructure — giving your team secure remote desktop access to TallyPrime from any device, anywhere.',
     color: '#3182ce',
   },
   {
