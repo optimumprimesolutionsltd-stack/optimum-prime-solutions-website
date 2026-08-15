@@ -16,7 +16,7 @@ const resources = [
   {
     icon: HelpCircle,
     title: 'FAQ & Troubleshooting',
-    desc: 'Answers to the most common TallyPrime, cloud hosting, KRA compliance, and EOS® questions.',
+    desc: 'Answers to the most common TallyPrime, cloud hosting, and KRA compliance questions.',
     href: '/faq',
     cta: 'Browse FAQs',
     color: 'bg-orange-50 text-orange-600',
@@ -47,7 +47,7 @@ const featuredTopics = [
   'KRA eTIMS Compliance: What Every Kenyan Business Must Know',
   'How to Set Up TallyPrime Cloud Hosting in Kenya',
   'TallyPrime Payroll: PAYE, NHIF, NSSF & Housing Levy Guide',
-  'What Is EOS® and Why Kenyan Businesses Are Adopting It',
+
   'TallyPrime 7.1 — New Features and What They Mean for Your Business',
 ];
 

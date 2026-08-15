@@ -193,6 +193,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://www.optimumprimesolutions.co.ke/industries/ngos/</loc>
+    <lastmod>2026-08-15</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://www.optimumprimesolutions.co.ke/industries/schools/</loc>
     <lastmod>2026-07-08</lastmod>
     <changefreq>monthly</changefreq>
@@ -201,6 +207,12 @@
   <url>
     <loc>https://www.optimumprimesolutions.co.ke/industries/sacco/</loc>
     <lastmod>2026-07-08</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://www.optimumprimesolutions.co.ke/industries/saccos/</loc>
+    <lastmod>2026-08-15</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

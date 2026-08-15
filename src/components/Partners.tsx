@@ -13,15 +13,6 @@ const partners = [
     logoClass: 'h-10 object-contain',
   },
   {
-    name: 'EOS Worldwide',
-    logo: '/partner-eos.png',
-    description: 'We apply EOS® (Entrepreneurial Operating System) principles to help leadership teams get aligned, gain traction, and achieve their vision. EOS® strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. EOS® is a registered trademark of EOS Worldwide, LLC.',
-    badge: 'EOS-Inspired Consulting',
-    badgeColor: 'bg-orange-100 text-orange-700',
-    url: 'https://www.eosworldwide.com',
-    logoClass: 'h-10 object-contain',
-  },
-  {
     name: 'Biz Analyst',
     logo: '/partner-biz-analyst.png',
     description: 'Biz Analyst is the official TallyPrime mobile app that brings your accounting data to your fingertips. Monitor sales, expenses, inventory, and KRA compliance in real-time from your phone — no computer needed.',

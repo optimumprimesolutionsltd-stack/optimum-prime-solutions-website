@@ -35,7 +35,7 @@ const themeConfig: Record<ShowcaseTheme, {
     tagRing: 'ring-amber-500/30',
     dotColor: '#f59e0b',
     imageUrl: '/images/about-team-collaboration.webp',
-    imageCaption: "Kenya's certified TallyPrime & EOS® team",
+    imageCaption: "Kenya's certified TallyPrime team",
     stat: '10+ Years',
     statLabel: 'Business expertise',
     alt: 'Optimum Prime Solutions professional business team collaboration Kenya',

@@ -1,70 +1,94 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, CheckCircle2, Target, Users, BarChart3, Compass, Phone, MessageSquare, TrendingUp, Layers } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { ArrowRight } from 'lucide-react';
 import SEO from '../../components/SEO';
 import Breadcrumb from '../../components/Breadcrumb';
-
-const sixComponents = [
-  { icon: Compass, title: 'Vision', desc: 'Get every person in your organisation aligned on where you\'re going, how you\'ll get there, and who is responsible for what.' },
-  { icon: Users, title: 'People', desc: 'Put the right people in the right seats. Use the People Analyser and RPRS tools to build a team that shares your values and delivers results.' },
-  { icon: BarChart3, title: 'Data', desc: 'Run your business on a weekly scorecard of 5–15 measurable numbers — so you always know the health of your business at a glance.' },
-  { icon: Target, title: 'Issues', desc: 'Identify, discuss, and solve issues permanently using the IDS (Identify, Discuss, Solve) process. Stop the same problems recurring.' },
-  { icon: Layers, title: 'Process', desc: 'Document and follow your core processes consistently. When everyone follows the same proven way, your business scales without chaos.' },
-  { icon: TrendingUp, title: 'Traction', desc: 'Execute your vision through quarterly Rocks, weekly L10 meetings, and a clear 90-day world. Turn plans into results.' },
-];
-
-const eosTools = [
-  'Vision/Traction Organizer (V/TO) — your one-page business plan',
-  'Rocks — 90-day priorities for every leader',
-  'Level 10 (L10) Meeting™ — weekly team meeting that actually works',
-  'Scorecard — 5–15 weekly numbers that run your business',
-  'People Analyser — objective tool for evaluating your team',
-  'Issues List — your organisation\'s parking lot for problems',
-  'Process Documentation — your company\'s "way" written down',
-  'Quarterly and Annual Planning sessions',
-];
-
-const whoIsItFor = [
-  'You have 10–250 employees and feel like you\'ve hit a ceiling',
-  'Your leadership team is not aligned on the vision',
-  'The same issues keep coming up in every meeting',
-  'You\'re working in the business instead of on it',
-  'You want to scale but don\'t have the systems to support it',
-  'Your team is talented but not pulling in the same direction',
-];
-
-const faqs = [
-  {
-    q: 'What is EOS® and how does it work?',
-    a: 'EOS® (Entrepreneurial Operating System) is a complete business operating system developed by Gino Wickman and detailed in his bestselling book "Traction". It strengthens the Six Key Components of any business — Vision, People, Data, Issues, Process, and Traction — through a set of practical tools and a disciplined meeting cadence. Applying its tools and principles, we guide your leadership team through the full EOS journey.',
-  },
-  {
-    q: 'How does EOS® work with TallyPrime?',
-    a: 'EOS® provides the operating system for your leadership team — clarity on vision, accountability, and meeting rhythms. TallyPrime provides the financial and operational data that feeds into your EOS Scorecard and dashboards. Together, they give your business both the management discipline and the real-time numbers to make better decisions faster.',
-  },
-  {
-    q: 'How long does EOS® implementation take?',
-    a: 'A full EOS® implementation typically runs over 12–24 months, starting with a 90-minute introductory session, then a full-day Focus Day™, followed by quarterly and annual sessions. Most leadership teams start seeing results within the first 90 days.',
-  },
-  {
-    q: 'Is EOS® right for my business size?',
-    a: 'EOS® is designed for entrepreneurial businesses with 10–250 employees. If you have a leadership team of 2–10 people and feel the business is not running as smoothly as it should, EOS® is likely a strong fit.',
-  },
-];
 
 export default function ConsultingPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title="EOS Business Consulting Kenya"
-        description="EOS®-informed business consulting in Kenya. Help your leadership team get aligned, gain traction, and achieve your vision."
-        service={{
-          name: "EOS Business Consulting",
-          description: "EOS-informed business consulting in Kenya, helping leadership teams get aligned, gain traction, and achieve their vision.",
-          serviceType: "Business consulting",
-        }}
-        socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Consulting solutions for your business in Ruiru and beyond."
+        title="Business Consulting Services"
+        description="Optimum Prime Solutions offers TallyPrime implementation and business solutions for Kenyan businesses."
         canonical="/tallyprime/consulting"
+      />
+
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <Breadcrumb className="mb-6 [&_a]:text-slate-400 [&_a:hover]:text-red-400 [&_span]:text-slate-300" />
+          <div className="max-w-3xl">
+            <h1 className="text-4xl sm:text-5xl font-bold tracking-tight mb-6">
+              Business Solutions
+            </h1>
+            <p className="text-lg text-slate-300 leading-relaxed mb-8 max-w-2xl">
+              We are Kenya's certified TallyPrime partner, focused on helping businesses streamline their operations through TallyPrime implementation, cloud hosting, and comprehensive business automation solutions.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link
+                to="/contact#demo-form"
+                className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 px-6 py-3 text-sm font-semibold text-white shadow-lg transition"
+              >
+                Book a Free Demo <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                to="/tallyprime"
+                className="inline-flex items-center gap-2 rounded-full bg-slate-700 hover:bg-slate-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition"
+              >
+                Explore TallyPrime Solutions <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">Our Core Services</h2>
+              <ul className="space-y-3 text-slate-700">
+                <li className="flex items-start gap-3">
+                  <span className="text-red-600 font-bold">✓</span>
+                  <span><strong>TallyPrime Implementation</strong> - Installation, configuration, and training for Silver, Gold, and Enterprise editions</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-red-600 font-bold">✓</span>
+                  <span><strong>Cloud Hosting</strong> - Secure remote access and automated backups from KES 3,000/month</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-red-600 font-bold">✓</span>
+                  <span><strong>KRA Compliance</strong> - Full eTIMS integration and VAT compliance setup</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-red-600 font-bold">✓</span>
+                  <span><strong>Payroll Processing</strong> - Automated payroll with PAYE, NHIF, NSSF, and Housing Levy</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-red-600 font-bold">✓</span>
+                  <span><strong>Support & Training</strong> - Business-hours remote support with under 1-hour response time</span>
+                </li>
+              </ul>
+            </div>
+
+            <div className="border-t pt-6">
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Ready to Get Started?</h3>
+              <p className="text-slate-600 mb-6">
+                Contact our team today to discuss which TallyPrime solution is right for your business.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <Link to="/contact#demo-form" className="inline-flex items-center gap-2 rounded-full bg-red-600 hover:bg-red-700 text-white px-6 py-3 text-sm font-semibold">
+                  Book Free Demo <ArrowRight className="h-4 w-4" />
+                </Link>
+                <Link to="/tallyprime" className="inline-flex items-center gap-2 rounded-full border border-slate-300 hover:border-red-400 text-slate-700 hover:text-red-600 px-6 py-3 text-sm font-semibold">
+                  Explore All Services <ArrowRight className="h-4 w-4" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
 breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'TallyPrime Solutions', item: 'https://www.optimumprimesolutions.co.ke/tallyprime/' },

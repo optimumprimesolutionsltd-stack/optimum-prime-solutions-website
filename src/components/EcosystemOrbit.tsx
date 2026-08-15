@@ -3,16 +3,14 @@ import { ArrowRight } from 'lucide-react';
 
 const partners = [
   { name: 'TallyPrime',  logo: '/tally-solutions-new-logo.png', angle: 0,   color: '#dc2626', invertOnDark: false },
-  { name: 'EOS®',        logo: '/partner-eos.png',        angle: 60,  color: '#0ea5e9', invertOnDark: false },
-  { name: 'Biz Analyst', logo: '/partner-biz-analyst.png', angle: 120, color: '#34d399', invertOnDark: false },
-  { name: 'TSplus',      logo: '/partner-tsplus.png',     angle: 240, color: '#8b5cf6', invertOnDark: false },
-  { name: 'KRA eTIMS',   logo: '/kra-logo-official.png', angle: 300, color: '#16a34a', invertOnDark: true },
+  { name: 'Biz Analyst', logo: '/partner-biz-analyst.png', angle: 90, color: '#34d399', invertOnDark: false },
+  { name: 'TSplus',      logo: '/partner-tsplus.png',     angle: 180, color: '#8b5cf6', invertOnDark: false },
+  { name: 'KRA eTIMS',   logo: '/kra-logo-official.png', angle: 270, color: '#16a34a', invertOnDark: true },
 ];
 
 const cards = [
   { label: 'TallyPrime',      desc: 'Accounting, inventory & KRA compliance',         border: 'border-red-500/30',    bg: 'bg-red-500/10',    text: 'text-red-400' },
   { label: 'Biz Analyst App', desc: 'Real-time Tally data on your mobile phone',       border: 'border-emerald-500/30', bg: 'bg-emerald-500/10', text: 'text-emerald-400' },
-  { label: 'EOS® Consulting', desc: 'Business operating system for leadership teams', border: 'border-sky-500/30',    bg: 'bg-sky-500/10',    text: 'text-sky-400' },
   { label: 'Cloud Hosting',   desc: 'Secure remote access & daily backups',           border: 'border-violet-500/30', bg: 'bg-violet-500/10', text: 'text-violet-400' },
 ];
 

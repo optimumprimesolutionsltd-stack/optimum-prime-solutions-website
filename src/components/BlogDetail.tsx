@@ -10,7 +10,6 @@ const categoryStyles: Record<string, { badge: string; shadow: string }> = {
   Insights: { badge: 'from-red-500 to-orange-400 text-white', shadow: 'shadow-red-500/20' },
   Tutorial: { badge: 'from-emerald-500 to-teal-400 text-white', shadow: 'shadow-emerald-500/20' },
   Comparison: { badge: 'from-sky-600 to-indigo-500 text-white', shadow: 'shadow-sky-500/20' },
-  EOS: { badge: 'from-amber-500 to-yellow-400 text-white', shadow: 'shadow-amber-500/20' },
   Cloud: { badge: 'from-cyan-500 to-teal-400 text-white', shadow: 'shadow-cyan-500/20' },
   'Product Update': { badge: 'from-violet-600 to-purple-500 text-white', shadow: 'shadow-violet-500/20' },
   Compliance: { badge: 'from-rose-600 to-red-500 text-white', shadow: 'shadow-rose-500/20' },

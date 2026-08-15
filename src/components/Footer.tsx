@@ -30,7 +30,7 @@ const tallyPrimeLinks = [
   { l: 'Support', h: '/tallyprime/support' },
   { l: 'Customization (TDL)', h: '/tallyprime/customization' },
   { l: 'Data Migration', h: '/tallyprime/data-migration' },
-  { l: 'Business Consulting (EOS®)', h: '/tallyprime/consulting' },
+  { l: 'Business Consulting', h: '/tallyprime/consulting' },
 ];
 
 const coreServices = [

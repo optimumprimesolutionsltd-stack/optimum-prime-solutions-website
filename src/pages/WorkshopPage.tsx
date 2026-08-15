@@ -59,7 +59,7 @@ export default function WorkshopPage() {
         `We look forward to seeing you there. Breakfast will be served — please arrive by 6:45 AM.\n\n` +
         `📞 *+254 116 246 074*\n` +
         `🌐 *www.optimumprimesolutions.co.ke*\n\n` +
-        `_Optimum Prime Solutions — TallyPrime · Cloud · EOS® · Biz Analyst_`;
+        `_Optimum Prime Solutions — TallyPrime · Cloud · Biz Analyst_`;
       const payload = {
         ...form,
         eventId: workshop.id,

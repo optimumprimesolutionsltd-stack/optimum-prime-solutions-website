@@ -15,7 +15,7 @@ def generate_social(description: str, filename: str) -> str:
         'Blog': "Stay informed with the latest insights on TallyPrime, KRA eTIMS compliance, and business automation in Kenya.",
         'Pricing': "Transparent pricing for TallyPrime in Kenya. Get genuine licences, cloud hosting, and expert support — no hidden fees.",
         'Industries': "TallyPrime solutions for every industry in Kenya — manufacturing, retail, construction, NGOs, schools, and more.",
-        'Products': "Discover our full range of business solutions — TallyPrime, cloud hosting, EOS consulting, and business automation.",
+        'Products': "Discover our full range of business solutions — TallyPrime, cloud hosting, and business automation.",
         'Testimonials': "See what Kenyan businesses say about working with Optimum Prime Solutions — your trusted TallyPrime partner.",
         'Webinar': "Join our free webinars on TallyPrime best practices, KRA compliance, and business growth in Kenya.",
         'KnowledgeHub': "Access guides, templates, case studies, and resources for TallyPrime and business management in Kenya.",

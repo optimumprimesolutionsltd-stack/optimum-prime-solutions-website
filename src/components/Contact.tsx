@@ -131,7 +131,7 @@ export default function Contact() {
           demoDate: formData.demoDate,
           demoTime: formData.demoTime,
           message: formData.message,
-          interest: reqType === 'consultation' ? 'EOS® Business Consultation' : reqType === 'bizanalyst' ? 'Biz Analyst Enquiry' : 'TallyPrime Demo',
+          interest: reqType === 'consultation' ? 'Business Consultation' : reqType === 'bizanalyst' ? 'Biz Analyst Enquiry' : 'TallyPrime Demo',
           requestType: reqType,
           source: 'Website — Contact Form',
         }),

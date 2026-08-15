@@ -92,12 +92,12 @@ export interface SiteData {
 export const defaultData: SiteData = {
   company: {
     name:'Optimum Prime Solutions',
-    tagline:'Certified TallyPrime Partner · Cloud Hosting · EOS® Consulting · Biz Analyst',
-    mission:'To empower Kenyan businesses with world-class TallyPrime solutions, secure cloud infrastructure, and the Entrepreneurial Operating System (EOS®) — helping leadership teams get aligned, gain traction, and achieve sustainable growth.',
-    vision:'To be the leading TallyPrime partner and EOS® consulting firm in East Africa, transforming how businesses manage their finances, operations, and leadership systems.',
+    tagline:'Certified TallyPrime Partner · Cloud Hosting · Business Solutions · Biz Analyst',
+    mission:'To empower Kenyan businesses with world-class TallyPrime solutions, secure cloud infrastructure, and comprehensive business automation — helping teams achieve sustainable growth and operational excellence.',
+    vision:'To be the leading TallyPrime partner in East Africa, transforming how businesses manage their finances, operations, and growth through technology and expertise.',
     about:[
       'Optimum Prime Solutions is Kenya\'s certified TallyPrime partner, delivering end-to-end business automation and cloud solutions. With over 15 years of combined experience, our certified team helps Kenyan businesses join the 2.5 million+ companies worldwide already running on TallyPrime — across Silver, Gold, and Enterprise editions.',
-      'Beyond accounting software, we apply the principles of the Entrepreneurial Operating System (EOS®) — helping entrepreneurial leadership teams run their businesses on the framework created by Gino Wickman. EOS strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. We combine TallyPrime\'s financial power with EOS® operational discipline to give your business both the numbers and the systems to grow.',
+      'Beyond accounting software, we help entrepreneurial leadership teams run their businesses with clear vision, strong systems, and reliable data. We combine TallyPrime\'s financial power with business automation and operational discipline to give your business both the numbers and the systems needed to grow sustainably.',
     ],
     stats:[{label:'TallyPrime Users Worldwide',value:'2.5M+'},{label:'Years Experience',value:'15+'},{label:'Uptime Guarantee',value:'99.9%'},{label:'Support Response',value:'< 1hr'}],
   },
@@ -133,14 +133,14 @@ export const defaultData: SiteData = {
     {id:'5',title:'KRA Compliance',desc:'Stay 100% compliant with KRA. Automated VAT, income tax, PAYE calculations, and e-filing integration.',icon:'FileCheck',features:['VAT management','e-Filing integration','Tax reports','Audit trail'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
     {id:'6',title:'TDL Customization',desc:'Custom Tally Definition Language development to tailor Tally Prime to your exact business workflows.',icon:'Code',features:['Custom reports','Workflow automation','Integration APIs','Module extensions'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
     {id:'7',title:'Remote & On-site Support',desc:'Remote assistance during business hours plus scheduled on-site visits. Average response time under 1 hour.',icon:'Headphones',features:['Business-hours remote support','On-site visits','Software updates','Troubleshooting'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
-    {id:'8',title:'EOS® Business Operating System',desc:'We apply EOS® tools and principles. Help your leadership team get aligned, gain traction, and achieve your vision using the Entrepreneurial Operating System by Gino Wickman.',icon:'BarChart3',features:['EOS® full implementation','Vision/Traction Organizer (V/TO)','Rocks & accountability meetings','L10 meeting cadence','People Analyser & RPRS','Quarterly & annual planning'],link:'/contact'},
+
     {id:'9',title:'TallyPrime Cloud Hosting',desc:'Access your TallyPrime data securely from anywhere. We set up and manage cloud infrastructure so your team can work remotely without compromising data security.',icon:'Cloud',features:['Cloud server setup','Remote access configuration','Automated daily backups','99.9% uptime SLA','Multi-user concurrent access','Disaster recovery planning'],link:'/contact'},
   ],
   products: [
     {id:'1',name:'TallyPrime',edition:'Silver',price:'KES 57,600 +VAT',period:'one-time license',features:['Single user license','Full accounting & invoicing','Inventory & stock reports','KRA VAT & eTIMS ready','Payroll — PAYE, NHIF, NSSF','Free updates for 1 year','Email & remote support'],cta:'Get Silver'},
     {id:'2',name:'TallyPrime',edition:'Gold',price:'KES 172,800 +VAT',period:'one-time license',popular:true,features:['Unlimited multi-user access','All Silver features included','Multi-location inventory control','Advanced user roles & security','Remote data access setup','Priority implementation support','On-site team training included'],cta:'Get Gold — Best Value'},
     {id:'3',name:'TallyPrime',edition:'Cloud Hosting',price:'From as low as KES 3,000',period:'per month',features:['Secure cloud server setup','Remote access from any device','Automated daily backups','99.9% uptime SLA guarantee','Multi-user concurrent access','Disaster recovery planning','Monthly system health checks'],cta:'Start Cloud Hosting'},
-    {id:'4',name:'EOS®',edition:'Implementation',price:'Contact for Quote',period:'per engagement',features:['Full EOS® implementation program','Vision/Traction Organizer (V/TO)','Rocks & 90-day priority setting','L10 weekly leadership meetings','People Analyser & accountability','Quarterly & annual planning days','Delivered using EOS® tools & principles'],cta:'Book EOS Session'},
+
   ],
   testimonials: [
     // Intentionally empty. The six entries here were placeholder names invented
@@ -168,11 +168,8 @@ export const defaultData: SiteData = {
     {id:'13',q:'How do you train our staff on Tally Prime?',a:'We provide tailored training sessions for accountants, managers, and operations teams. Training is available on-site or remote and includes real-world workflows, compliance reports, and support best practices.',cat:'Training'},
     {id:'14',q:'What support options do you offer after implementation?',a:'We offer support plans covering remote assistance, regular health checks, software updates, and on-site visits. Our support response is typically under 1 hour for urgent issues.',cat:'Support'},
     {id:'15',q:'How can I access Tally Prime remotely?',a:'Tally Prime Gold supports remote access. We can also set up secure cloud hosting so your team accesses Tally Prime from multiple locations while keeping your data centralized and backed up.',cat:'Remote Access'},
-    {id:'16',q:'What is EOS® and how can it help my business?',a:'EOS® (Entrepreneurial Operating System) is a complete business operating system developed by Gino Wickman and detailed in his book \"Traction\". It strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. Applying its tools and principles, we help your leadership team get aligned on where the business is going, who is doing what, and how you will get there — through proven tools like the Vision/Traction Organizer (V/TO), Rocks, L10 meetings, and the People Analyser.',cat:'EOS'},
-    {id:'17',q:'How does EOS® work with TallyPrime?',a:'EOS® provides the operating system for your leadership team — clarity on vision, accountability, and meeting rhythms. TallyPrime provides the financial and operational data that feeds into your EOS scorecards and dashboards. Together, they give your business both the management discipline and the real-time numbers to make better decisions faster.',cat:'EOS'},
-    {id:'18',q:'What is the EOS® implementation process?',a:'Our EOS® implementation typically runs over 12–24 months. We start with a 90-minute meeting to introduce the tools, then a Focus Day to align the leadership team, followed by quarterly and annual planning sessions. Between sessions, we coach your team on running L10 meetings, setting 90-day Rocks, and using the People Analyser. The result is a business that runs on a consistent, proven rhythm.',cat:'EOS'},
-    {id:'19',q:'Do you offer TallyPrime cloud hosting?',a:'Yes! We set up and manage secure cloud servers for TallyPrime so your team can access data from anywhere. Our cloud hosting includes automated daily backups, 99.9% uptime SLA, multi-user concurrent access, and disaster recovery planning. Pricing starts from as low as KES 3,000 per month depending on the number of users and data volume.',cat:'Cloud'},
-    {id:'20',q:'What is the difference between TallyPrime on-premise and cloud?',a:'On-premise TallyPrime runs on your local computer or office server — fast and secure but limited to your physical location. Cloud-hosted TallyPrime runs on a remote server managed by us, allowing your team to access it from anywhere with an internet connection. Cloud hosting is ideal for businesses with multiple branches, remote workers, or owners who need visibility on the go.',cat:'Cloud'},
+    {id:'16',q:'Do you offer TallyPrime cloud hosting?',a:'Yes! We set up and manage secure cloud servers for TallyPrime so your team can access data from anywhere. Our cloud hosting includes automated daily backups, 99.9% uptime SLA, multi-user concurrent access, and disaster recovery planning. Pricing starts from as low as KES 3,000 per month depending on the number of users and data volume.',cat:'Cloud'},
+    {id:'17',q:'What is the difference between TallyPrime on-premise and cloud?',a:'On-premise TallyPrime runs on your local computer or office server — fast and secure but limited to your physical location. Cloud-hosted TallyPrime runs on a remote server managed by us, allowing your team to access it from anywhere with an internet connection. Cloud hosting is ideal for businesses with multiple branches, remote workers, or owners who need visibility on the go.',cat:'Cloud'},
   ],
   industries: [
     {id:'1',name:'Retail & Shops',icon:'ShoppingBag',desc:'POS integration, stock management, and multi-branch retail solutions.'},
@@ -463,45 +460,6 @@ The Bottom Line
 Don't overthink it. Both Silver and Gold are excellent investments. Silver gets you started affordably. Gold is when you've outgrown single-user limitations. Many successful businesses started with Silver and upgraded—that's perfectly normal.
 
 Ready to get started? Our team can help you choose and implement the right edition for your situation.`},
-    {id:'4',title:'What is EOS® and Why Kenyan Businesses Are Adopting It',slug:'what-is-eos-and-why-kenyan-businesses-are-adopting-it',excerpt:'The Entrepreneurial Operating System (EOS®) by Gino Wickman is transforming how leadership teams in Kenya run their businesses. Here\'s what it is and how to get started.',date:'2025-03-01',category:'EOS',readTime:'7 min',content:`The Entrepreneurial Operating System (EOS®) is a complete, practical system for running a business. Developed by Gino Wickman and detailed in his bestselling book \"Traction\", EOS is used by over 280,000 companies worldwide to get more of what they want from their businesses.
-
-What Problem Does EOS Solve?
-
-Most entrepreneurial businesses struggle with the same issues:
-- Lack of clear vision shared by the whole team
-- The wrong people in the wrong seats
-- No reliable data to make decisions
-- Issues that keep coming back without resolution
-- Inconsistent processes
-- Lack of execution and accountability
-
-EOS addresses all six of these through its Six Key Components framework.
-
-The Six Key Components of EOS®
-
-1. Vision — Where are you going and how will you get there? EOS uses the Vision/Traction Organizer (V/TO) to capture your 10-year target, 3-year picture, 1-year plan, and 90-day Rocks.
-
-2. People — The right people in the right seats. EOS uses the People Analyser and the GWC (Get it, Want it, Capacity to do it) framework to evaluate your team.
-
-3. Data — A handful of numbers that give you a pulse on the business. Your EOS Scorecard tracks weekly metrics so you always know where you stand.
-
-4. Issues — Identify, discuss, and solve issues permanently. The IDS (Identify, Discuss, Solve) process ensures problems don\'t recur.
-
-5. Process — Document and follow your core processes. When everyone follows the same way, you get consistent, scalable results.
-
-6. Traction — Execution. Rocks (90-day priorities), L10 meetings (weekly leadership meetings), and a meeting pulse that keeps the team focused and accountable.
-
-How EOS Works with TallyPrime
-
-TallyPrime gives you the financial and operational data. EOS gives you the management system to act on it. Your EOS Scorecard can pull key metrics directly from TallyPrime — sales, collections, inventory levels, payroll costs — giving your leadership team a real-time view of the business every week.
-
-Getting Started with EOS in Kenya
-
-Applying EOS® tools and principles, Optimum Prime Solutions can guide your leadership team through the full EOS journey. We start with a 90-minute introductory meeting, then a Focus Day, followed by quarterly and annual planning sessions over 12-24 months.
-
-The result: a business where everyone is aligned, accountable, and moving in the same direction.
-
-Ready to gain traction? Contact us to book your first EOS session.`},
     {id:'5',title:'TallyPrime Cloud Hosting: Access Your Business Data From Anywhere',slug:'tallyprime-cloud-hosting-access-your-business-data-from-anywhere',excerpt:'Learn how cloud-hosted TallyPrime gives your team secure, real-time access to accounting and inventory data from any location in Kenya and beyond.',date:'2025-03-15',category:'Cloud',readTime:'5 min',content:`One of the most common challenges for growing Kenyan businesses is data access. Your accountant is at the office, your sales manager is in the field, and you\'re at a client meeting — but the TallyPrime data is locked on one computer.
 
 Cloud hosting solves this completely.

@@ -239,7 +239,7 @@ breadcrumbs={[
               <div className="grid grid-cols-2 gap-4">
                 {[
                   { value: '100+', label: 'Businesses Served', sub: 'Across Kenya' },
-                  { value: '5+', label: 'Years Experience', sub: 'TallyPrime & EOS®' },
+                  { value: '5+', label: 'Years Experience', sub: 'TallyPrime & Business Solutions' },
                   { value: '99.9%', label: 'Cloud Uptime', sub: 'Guaranteed SLA' },
                   { value: '< 4hrs', label: 'Support Response', sub: 'Business hours' },
                 ].map((stat) => (

@@ -45,7 +45,7 @@ A long-term content strategy is essential for building topical authority and cap
 
 ### Priority Content Pillars
 - **Compliance & KRA:** Guides on eTIMS integration, VAT compliance, and changes in Kenyan tax law.
-- **Business Management:** Best practices for inventory control, cash flow management, and utilizing EOS®.
+- **Business Management:** Best practices for inventory control, cash flow management, and operational efficiency.
 - **TallyPrime Tutorials:** "How-to" guides for specific features (e.g., "How to generate an eTIMS compliant invoice in TallyPrime").
 
 ### Linking Strategy

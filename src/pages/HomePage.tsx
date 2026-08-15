@@ -36,7 +36,7 @@ export default function HomePage() {
         {/* 4. Stats — 500+ businesses, 15+ years, 99.9% uptime, 1hr response */}
         <TrustBanner />
 
-        {/* 5. Partner logos — TallyPrime, EOS, Biz Analyst, KRA */}
+        {/* 5. Partner logos — TallyPrime, Biz Analyst, KRA */}
         <Partners />
 
         {/* 6. Industries — 4-column grid */}

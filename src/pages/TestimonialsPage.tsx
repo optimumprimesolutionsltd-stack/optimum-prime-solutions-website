@@ -28,7 +28,7 @@ export default function TestimonialsPage() {
     <main className="min-h-screen">
       <SEO
         title="Client Reviews & Testimonials | Optimum Prime Solutions"
-        description="Read what Kenyan business owners say about Optimum Prime Solutions. Real testimonials from TallyPrime, cloud hosting, and EOS consulting clients across Kenya."
+        description="Read what Kenyan business owners say about Optimum Prime Solutions. Real testimonials from TallyPrime and cloud hosting clients across Kenya."
         socialDescription="See what Kenyan businesses say about working with Optimum Prime Solutions — your trusted TallyPrime partner."
         canonical="/testimonials"
 breadcrumbs={[

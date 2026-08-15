@@ -60,7 +60,7 @@ export default function WebinarPage() {
         `We'll send you a reminder before we go live. See you online!\n\n` +
         `📞 *+254 116 246 074*\n` +
         `🌐 *www.optimumprimesolutions.co.ke*\n\n` +
-        `_Optimum Prime Solutions — TallyPrime · Cloud · EOS® · Biz Analyst_`;
+        `_Optimum Prime Solutions — TallyPrime · Cloud · Biz Analyst_`;
       const payload = {
         ...form,
         eventId: webinar.id,

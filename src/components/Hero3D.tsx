@@ -28,10 +28,10 @@ export default function Hero3D() {
               <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
                 TallyPrime Partner
               </span>{' '}
-              — Cloud Hosting, EOS® Consulting &amp; Business Automation
+              — Cloud Hosting &amp; Business Automation
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-400">
-              We sell and implement TallyPrime (Silver, Gold &amp; Enterprise), provide secure cloud hosting for remote access, and help leadership teams run their businesses on the Entrepreneurial Operating System (EOS®) — the proven framework by Gino Wickman used by 280,000+ companies worldwide.
+              We sell and implement TallyPrime (Silver, Gold &amp; Enterprise), provide secure cloud hosting for remote access, and deliver comprehensive business automation solutions — helping Kenyan businesses streamline operations and achieve sustainable growth.
             </p>
             <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
               <Link

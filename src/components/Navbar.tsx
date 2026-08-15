@@ -31,7 +31,7 @@ const links: NavLink[] = [
       { label: 'Support', href: '/tallyprime/support', desc: 'Business-hours remote & on-site support' },
       { label: 'Customization', href: '/tallyprime/customization', desc: 'TDL & workflow customization' },
       { label: 'Data Migration', href: '/tallyprime/data-migration', desc: 'Migrate from any system' },
-      { label: 'Business Consulting', href: '/tallyprime/consulting', desc: 'EOS® for business growth' },
+
       { label: 'Industries We Serve', href: '/industries', desc: 'Solutions for every sector' },
       { label: 'Biz Analyst App', href: '/biz-analyst', desc: 'Real-time TallyPrime data on your phone' },
       { label: 'Pricing', href: '/pricing', desc: 'Silver, Gold & Enterprise plans' },

@@ -47,11 +47,6 @@ const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: str
     { label: 'View Pricing', href: '/pricing', desc: 'Compare edition prices side by side.' },
     { label: 'Cloud Hosting', href: '/tallyprime/cloud-hosting', desc: 'Host Gold on the cloud — access from anywhere.' },
   ],
-  'what-is-eos-and-why-kenyan-businesses-are-adopting-it': [
-    { label: 'EOS® Business Consulting', href: '/tallyprime/consulting', desc: 'EOS®-informed consulting in Kenya.' },
-    { label: 'Why Choose Us', href: '/why-choose-us', desc: 'See why Kenyan businesses choose Optimum Prime Solutions.' },
-    { label: 'Book a Free Session', href: '/contact#demo-form', desc: 'Free introductory EOS® session — no commitment.' },
-  ],
   'tallyprime-cloud-hosting-access-your-business-data-from-anywhere': [
     { label: 'Cloud Hosting Plans', href: '/tallyprime/cloud-hosting', desc: 'KES 3,000/mo — 99.9% uptime, daily backups included.' },
     { label: 'TallyPrime for Distribution', href: '/industries/distribution', desc: 'Multi-location access for distributors & wholesalers.' },

@@ -15,7 +15,7 @@ The company provides:
 * Workflow structuring
 * Financial visibility & decision support
 
-The website should reflect a business transformation approach inspired by EOS / Traction principles — helping businesses gain operational traction, not just install accounting software.
+The website should reflect a business transformation approach — helping businesses gain operational traction, improve financial visibility, and achieve sustainable growth.
 
 BRAND POSITIONING:
 Optimum Prime Solutions helps businesses gain clarity, control, connectivity, and growth through integrated business systems, cloud technology, and operational excellence.

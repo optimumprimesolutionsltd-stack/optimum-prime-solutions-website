@@ -8,7 +8,7 @@ export default function FeaturesPage() {
     <main className="min-h-screen">
       <SEO
         title="TallyPrime & Cloud Hosting Services | Optimum Prime"
-        description="Explore our services: TallyPrime installation, payroll, KRA compliance, cloud hosting, and EOS business consulting for Kenyan businesses."
+        description="Explore our services: TallyPrime installation, payroll, KRA compliance, and cloud hosting for Kenyan businesses."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Features solutions for your business in Ruiru and beyond."
         canonical="/features"
 breadcrumbs={[
@@ -18,10 +18,10 @@ breadcrumbs={[
       />
       <AfricanLaptopShowcase
         tag="Our Services"
-        title="TallyPrime Implementation, Cloud Hosting & EOS® Consulting"
-        description="From TallyPrime installation and KRA compliance to secure cloud hosting and Entrepreneurial Operating System (EOS®) implementation — we provide the full stack of tools and systems your business needs to grow."
+        title="TallyPrime Implementation & Cloud Hosting Services"
+        description="From TallyPrime installation and KRA compliance to secure cloud hosting — we provide the full stack of tools and systems your business needs to grow."
         socialDescription="Optimum Prime Solutions — Kenya's trusted TallyPrime partner. Features solutions for your business in Ruiru and beyond."
-        features={['TallyPrime Silver, Gold & Enterprise setup', 'Cloud hosting & remote access', 'EOS® business operating system', 'KRA, eTIMS & payroll compliance']}
+        features={['TallyPrime Silver, Gold & Enterprise setup', 'Cloud hosting & remote access', 'Business automation solutions', 'KRA, eTIMS & payroll compliance']}
         theme="features"
       />
       <Features />

@@ -39,7 +39,7 @@ const certifications = [
 
 const values = [
   { icon: Users, title: 'Client-First', body: 'Every engagement starts with understanding your business — not selling software.' },
-  { icon: CheckCircle, title: 'Certified Expertise', body: 'Our team holds official certification from Tally Solutions Africa and applies the EOS\u00ae framework in our consulting work.' },
+
   { icon: Clock, title: 'Responsive Support', body: 'Sub-1-hour support response during business hours. We are always reachable when you need us.' },
   { icon: Zap, title: 'Fast Delivery', body: 'Most implementations go live within 5 business days — minimal disruption, maximum impact.' },
 ];
@@ -322,7 +322,7 @@ export default function AboutPage() {
               Ready to Transform Your Business?
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-base text-red-100">
-              Book a free demo today and see how TallyPrime and EOS\u00ae can help your business get organised, compliant, and growing — with Kenya's most trusted business technology partner.
+              Book a free demo today and see how TallyPrime can help your business get organised, compliant, and growing — with Kenya's most trusted business technology partner.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
               <Link

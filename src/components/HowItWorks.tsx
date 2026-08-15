@@ -24,7 +24,7 @@ export default function HowItWorks() {
 From Discovery to Operational Traction — Our 4-Step Implementation Approach
           </h2>
           <p className="mt-4 text-slate-400">
-We implement TallyPrime, set up cloud hosting, and help your leadership team adopt EOS® — delivering faster reporting, accountability, and scalable operations across all your locations.
+We implement TallyPrime, set up cloud hosting, and provide comprehensive business automation — delivering faster reporting, accountability, and scalable operations across all your locations.
           </p>
         </motion.div>
 

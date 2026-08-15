@@ -29,7 +29,7 @@ export default function PrivacyPolicyPage() {
           <section>
             <p>
               Optimum Prime Solutions Ltd ("we", "us", "our") is Kenya's Certified TallyPrime Partner,
-              also providing cloud hosting, EOS® consulting, and business analytics services. This
+              also providing cloud hosting, and business analytics services. This
               policy explains what personal information we collect, how we use it, and the choices you
               have.
             </p>

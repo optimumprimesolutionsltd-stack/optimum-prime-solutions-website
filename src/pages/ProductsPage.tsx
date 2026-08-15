@@ -6,8 +6,8 @@ export default function ProductsPage() {
     <main className="min-h-screen">
       <SEO
         title="TallyPrime Products & Pricing Kenya | Optimum Prime"
-        description="Buy TallyPrime Silver, Gold or Enterprise in Kenya. Official pricing, cloud hosting from KES 3,000/month, and EOS consulting."
-        socialDescription="Discover our full range of business solutions — TallyPrime, cloud hosting, EOS consulting, and business automation."
+        description="Buy TallyPrime Silver, Gold or Enterprise in Kenya. Official pricing, cloud hosting from KES 3,000/month."
+        socialDescription="Discover our full range of business solutions — TallyPrime, cloud hosting, and business automation."
         canonical="/products"
 breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
@@ -24,19 +24,19 @@ breadcrumbs={[
           <div className="grid gap-10 lg:grid-cols-2 lg:items-center">
             <div className="max-w-3xl">
               <span className="inline-flex rounded-full bg-red-600/15 px-4 py-2 text-xs font-semibold uppercase tracking-[0.28em] text-red-400 ring-1 ring-red-500/30">
-                TallyPrime · Cloud · EOS®
+                TallyPrime · Cloud
               </span>
               <h1 className="mt-6 text-4xl sm:text-5xl font-extrabold tracking-tight text-white">
-                TallyPrime Editions, Cloud Hosting & EOS® Consulting Packages
+                TallyPrime Editions & Cloud Hosting
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">
-                Kenya's certified TallyPrime partner. Choose from Silver, Gold, or Enterprise editions. Add cloud hosting for remote access, or engage us for EOS® (Entrepreneurial Operating System) consulting to strengthen your leadership team.
+                Kenya's certified TallyPrime partner. Choose from Silver, Gold, or Enterprise editions with cloud hosting for remote access and seamless multi-location operations.
               </p>
               <div className="mt-10 grid gap-3 sm:grid-cols-2">
                 {[
                   'Official TallyPrime Silver, Gold & Enterprise',
                   'Cloud hosting from KES 3,000/month',
-                  'EOS® implementation by certified implementer',
+                  'Cloud hosting & remote access from anywhere',
                   'KRA & eTIMS compliance built in',
                 ].map((feature) => (
                   <div key={feature} className="rounded-3xl bg-red-600/10 border border-red-500/30 px-4 py-4 text-sm text-red-300 ring-1 ring-red-500/20">
@@ -49,9 +49,9 @@ breadcrumbs={[
             <div className="flex items-center justify-center rounded-[2rem] border border-white/10 bg-slate-800/60 p-8 shadow-2xl shadow-black/40 ring-1 ring-white/5 backdrop-blur-sm">
               <div className="text-center">
                 <p className="text-sm uppercase tracking-[0.28em] text-slate-400">Certified TallyPrime Partner</p>
-                <h2 className="mt-4 text-2xl font-semibold text-white">Official TallyPrime reseller · Cloud · EOS®</h2>
+                <h2 className="mt-4 text-2xl font-semibold text-white">Official TallyPrime reseller · Cloud Hosting</h2>
                 <p className="mt-3 text-sm leading-6 text-slate-300">
-                  We are Kenya's certified TallyPrime partner and EOS®-informed business consultant. Contact us for the right package for your business.
+                  We are Kenya's certified TallyPrime partner. Contact us for the right package for your business.
                 </p>
               </div>
             </div>
