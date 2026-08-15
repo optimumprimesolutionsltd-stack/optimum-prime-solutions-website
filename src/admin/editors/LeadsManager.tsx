@@ -3,9 +3,14 @@ import {
   Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown, ChevronUp,
   Download, Upload, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
   User, Send, AlertCircle, FileText, Video, LayoutGrid, List,
-  RotateCcw, CalendarPlus, Briefcase,
+  RotateCcw, CalendarPlus, Briefcase, KeyRound, Trophy,
 } from 'lucide-react';
-import type { SiteData, Lead, WipJob } from '../../data/siteData';
+import type {
+  SiteData, Lead, WipJob, Client, TallyEdition, LicenceTerm, DealType,
+} from '../../data/siteData';
+import {
+  DEAL_TYPES, EXISTING_LICENCE_DEALS, isValidSerial, findClientBySerial,
+} from '../../data/siteData';
 import { fbSubscribe, fbSet, fbAuth } from '../../firebase/config';
 import KanbanBoard from './KanbanBoard';
 import ImportLeadsDialog from './ImportLeadsDialog';
@@ -562,7 +567,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const fileBase = reportEvent ? `crm-report-${slugify(reportEvent.title)}` : 'crm-report';
 
   const reportHtml = () => {
-    const opts = { companyName, preparedFor: 'Tally Solutions', closedExcluded: excludedClosedCount };
+    const opts = {
+      companyName, preparedFor: 'Tally Solutions', closedExcluded: excludedClosedCount,
+      clients: data.clients,
+    };
     if (reportEvent?.type === 'workshop') {
       return buildCrmReportHtml(exportLeads, exportRegistrants,
         { ...opts, workshop: { title: reportEvent.title, date: reportEvent.date, venue: reportEvent.venue } });
@@ -726,6 +734,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const strandedLeads = data.leads.filter(l =>
     l.status === 'Schedule a Demo' && !l.meetSent && !l.scheduledDate && !l.demoDate
   );
+  // Deals won before serials were captured. They stay perfectly valid — the gate
+  // only applies to new wins — but the serial is what renewals and TSS reminders
+  // key off, so they're surfaced here to be completed as the numbers come to hand.
+  const wonMissingSerial = data.leads.filter(l => l.status === 'Closed Won' && !l.serialNo);
+
   const [showRepair, setShowRepair] = useState(false);
   // Which stage each stranded lead should go back to. Unknowable from the record
   // — nothing stores the previous stage — so "New" is the default and the admin
@@ -762,39 +775,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
   // ── Status update ────────────────────────────────────────────────────────
   // ── Closing a deal as Won ────────────────────────────────────────────────
-  // Held in a small confirmation rather than applied straight away, so the
-  // deal value can be asked for while someone is looking at it. "Not known
-  // yet" is a real answer — blocking the pipeline on a figure nobody has to
-  // hand would just teach people to type 1. What it must never do is record a
-  // guess: a skipped value counts as unrecorded in the reports, never as zero.
-  const [wonLead, setWonLead] = useState<Lead | null>(null);
-  const [wonAmount, setWonAmount] = useState('');
-  const [wonError, setWonError] = useState('');
-
-  const confirmWon = (withValue: boolean) => {
-    if (!wonLead) return;
-    const raw = wonAmount.replace(/[,\s]/g, '');
-    const amount = Number(raw);
-    if (withValue && (!raw || !Number.isFinite(amount) || amount <= 0)) {
-      setWonError('Enter the deal value in KES, or choose "Not known yet".');
-      return;
-    }
-    onSave({
-      ...data,
-      leads: data.leads.map(l => l.id === wonLead.id
-        ? ({
-            ...l,
-            status: 'Closed Won',
-            wonAt: new Date().toISOString(),
-            ...(withValue ? { amount } : {}),
-          } as Lead)
-        : l),
-    });
-    setWonLead(null);
-    setWonAmount('');
-    setWonError('');
-  };
-
   const updateStatus = (id: string, status: string) => {
     const lead = data.leads.find(l => l.id === id);
     if (!lead) return;
@@ -806,14 +786,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       return;
     }
 
-    // Winning a deal is the one moment its value is known and someone is
-    // looking at it. Ask then, or the figure is never captured and "which
-    // source is actually worth the most" stays unanswerable.
+    // Winning a deal is the one moment both its value and its licence serial
+    // are known and someone is looking at them. The win dialog asks for both,
+    // and the status only changes once the serial is captured.
     if (status === 'Closed Won') {
-      setWonLead(lead);
-      setWonAmount(lead.amount ? String(lead.amount) : '');
-      setWonError('');
-      setEscalationError(null);
+      openWin(lead);
       return;
     }
 
@@ -900,6 +877,131 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     setExpandedId(lead.id);
   };
 
+  // ── Closing a deal won ───────────────────────────────────────────────────
+  // Every Tally licence has a serial number, so a won deal without one is an
+  // incomplete record. Moving a lead to Closed Won opens this dialog and the
+  // status only changes once a valid serial is captured — the same shape as the
+  // Schedule-a-Demo pop-up, which also intercepts a stage change.
+  //
+  // Typing a serial that already exists links the deal to that client instead of
+  // creating a duplicate, which is what makes next year's TSS renewal attach to
+  // the same customer record.
+  const [winLead, setWinLead] = useState<Lead | null>(null);
+  const [winError, setWinError] = useState<string | null>(null);
+  const [winForm, setWinForm] = useState({
+    serialNo: '', edition: 'Silver' as TallyEdition, term: 'Annual' as LicenceTerm,
+    dealType: 'New Licence' as DealType, amount: '', wonDate: '',
+    licenceExpiry: '', tssExpiry: '',
+  });
+
+  const today = () => new Date().toISOString().split('T')[0];
+  // Licences and TSS both run a year from activation, so that's the sensible
+  // default — the admin can correct it if the paperwork says otherwise.
+  const plusOneYear = (d: string): string => {
+    if (!d) return '';
+    const dt = new Date(d);
+    if (Number.isNaN(dt.getTime())) return '';
+    dt.setFullYear(dt.getFullYear() + 1);
+    return dt.toISOString().split('T')[0];
+  };
+
+  // The client a typed serial resolves to, if we already know it.
+  const winMatchedClient = useMemo(
+    () => findClientBySerial(data.clients, winForm.serialNo),
+    [data.clients, winForm.serialNo],
+  );
+
+  const openWin = (lead: Lead) => {
+    const existing = lead.serialNo ? findClientBySerial(data.clients, lead.serialNo) : undefined;
+    const won = lead.wonAt ? lead.wonAt.split('T')[0] : today();
+    setWinForm({
+      serialNo: lead.serialNo || '',
+      edition: existing?.edition || 'Silver',
+      term: existing?.term || 'Annual',
+      dealType: lead.dealType || 'New Licence',
+      amount: lead.amount != null ? String(lead.amount) : '',
+      wonDate: won,
+      licenceExpiry: existing?.licenceExpiry || '',
+      tssExpiry: existing?.tssExpiry || '',
+    });
+    setWinError(null);
+    setWinLead(lead);
+  };
+
+  // Pull licence details across as soon as a known serial is recognised, so a
+  // renewal doesn't ask for details we already hold.
+  useEffect(() => {
+    if (!winLead || !winMatchedClient) return;
+    setWinForm(f => ({
+      ...f,
+      edition: winMatchedClient.edition,
+      term: winMatchedClient.term,
+      licenceExpiry: f.licenceExpiry || winMatchedClient.licenceExpiry || '',
+      tssExpiry: f.tssExpiry || winMatchedClient.tssExpiry || '',
+    }));
+  }, [winMatchedClient?.id, winLead?.id]);
+
+  const confirmWin = () => {
+    const lead = winLead;
+    if (!lead) return;
+    const serial = winForm.serialNo.trim();
+    if (!isValidSerial(serial)) {
+      setWinError('A Tally serial number is exactly 9 digits. Every licence has one — the deal can\'t be closed won without it.');
+      return;
+    }
+    const now = new Date().toISOString();
+    // Keep the admin's chosen win date but retain a real timestamp's precision
+    // when they've left it at today.
+    const wonAt = winForm.wonDate === today() ? now : new Date(winForm.wonDate).toISOString();
+    const amount = winForm.amount.trim() ? Number(winForm.amount.replace(/[^\d.]/g, '')) : undefined;
+
+    const matched = findClientBySerial(data.clients, serial);
+    const clientId = matched?.id || `cl_${Date.now()}`;
+    const clientRecord: Client = {
+      id: clientId,
+      serialNo: serial,
+      company: lead.company || matched?.company || lead.name,
+      contactName: lead.name || matched?.contactName,
+      phone: lead.phone || matched?.phone,
+      email: lead.email || matched?.email,
+      edition: winForm.edition,
+      term: winForm.term,
+      activatedOn: matched?.activatedOn || winForm.wonDate,
+      // Perpetual licences never lapse, so a licence expiry on one would be
+      // misleading — only Annual carries the top-up deadline.
+      licenceExpiry: winForm.term === 'Annual' ? (winForm.licenceExpiry || undefined) : undefined,
+      tssExpiry: winForm.tssExpiry || undefined,
+      leadId: matched?.leadId || lead.id,
+      notes: matched?.notes,
+      createdAt: matched?.createdAt || now,
+      updatedAt: now,
+    };
+
+    const clients = matched
+      ? (data.clients || []).map(c => c.id === matched.id ? clientRecord : c)
+      : [clientRecord, ...(data.clients || [])];
+
+    onSave({
+      ...data,
+      clients,
+      leads: data.leads.map(l => l.id === lead.id
+        ? {
+            ...l,
+            status: 'Closed Won',
+            wonAt,
+            serialNo: serial,
+            clientId,
+            dealType: winForm.dealType,
+            ...(amount != null && !Number.isNaN(amount) ? { amount } : {}),
+          }
+        : l),
+    });
+    setWinLead(null);
+    setWinError(null);
+    setEscalationError(null);
+    setExpandedId(lead.id);
+  };
+
   // ── Won deal → delivery job ──────────────────────────────────────────────
   // A won deal still has to be delivered. This opens the work (training,
   // implementation…) in the Work in Progress tab, pre-filled from the lead.
@@ -921,6 +1023,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       progress: 0,
       notes: lead.demoNotes || lead.message || '',
       leadId: lead.id,
+      // Carry the licence through, so delivery knows which serial it's working on.
+      serialNo: lead.serialNo,
+      clientId: lead.clientId,
       createdAt: new Date().toISOString(),
     };
     onSave({
@@ -2131,7 +2236,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                     <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(booking.demoDate) === 0 ? 'Sundays are not available' : 'This is a public holiday'} — please choose another date.</p>
                   )}
                   {booking.demoDate && getDayOfWeek(booking.demoDate) === 6 && !isDateBlocked(booking.demoDate) && (
-                    <p className="mt-1 text-xs text-red-600">⚠️ Saturday — available slots: 8:00 AM – 1:00 PM only.</p>
+                    <p className="mt-1 text-xs text-red-600">⚠️ Saturday — available slots: 9:00 AM – 12:00 PM only.</p>
                   )}
                 </div>
 
@@ -2299,6 +2404,33 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             className="inline-flex items-center gap-2 rounded-lg bg-amber-600 hover:bg-amber-700 px-4 py-2 text-xs font-bold text-white shadow-md transition shrink-0">
             <RotateCcw className="h-3.5 w-3.5" /> Review &amp; fix
           </button>
+        </div>
+      )}
+
+      {/* Won deals still waiting on a serial number. Nothing is blocked — this is
+          a to-do list, worked through whenever the numbers are available. */}
+      {wonMissingSerial.length > 0 && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+          <div className="flex items-start gap-3">
+            <KeyRound className="h-5 w-5 text-amber-600 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-[220px]">
+              <p className="text-sm font-semibold text-amber-900">
+                {wonMissingSerial.length} won deal{wonMissingSerial.length === 1 ? '' : 's'} without a licence serial number
+              </p>
+              <p className="text-xs text-amber-700 mt-1">
+                Every Tally licence has one, and it's what TSS renewals and the Annual → Perpetual
+                top-up window are tracked against. Add them as they come to hand — nothing is blocked in the meantime.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {wonMissingSerial.map(l => (
+                  <button key={l.id} onClick={() => openWin(l)}
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300 bg-white px-3 py-1.5 text-xs font-bold text-amber-800 hover:bg-amber-100 transition">
+                    <KeyRound className="h-3 w-3" /> {l.company || l.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
@@ -2673,23 +2805,77 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                     </div>
                   )}
 
-                  {/* ── Closed Won: hand over to delivery ── */}
-                  {l.status === 'Closed Won' && (
-                    <div className="rounded-xl border border-green-300 bg-green-50 p-4 flex items-start justify-between gap-3 flex-wrap">
-                      <div>
-                        <p className="text-sm font-bold text-green-800">🎉 Deal won — what happens next?</p>
-                        <p className="text-xs text-green-700 mt-0.5">
-                          {l.wipJobId
-                            ? 'Delivery is already open in Work in Progress.'
-                            : 'Open the training / implementation job so the delivery is tracked to completion.'}
-                        </p>
+                  {/* ── Closed Won: licence details + hand over to delivery ── */}
+                  {l.status === 'Closed Won' && (() => {
+                    const client = l.serialNo ? findClientBySerial(data.clients, l.serialNo) : undefined;
+                    return (
+                      <div className="rounded-xl border border-green-300 bg-green-50 p-4 space-y-3">
+                        <div className="flex items-start justify-between gap-3 flex-wrap">
+                          <div>
+                            <p className="text-sm font-bold text-green-800">🎉 Deal won — what happens next?</p>
+                            <p className="text-xs text-green-700 mt-0.5">
+                              {l.wonAt ? `Won ${new Date(l.wonAt).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}. ` : ''}
+                              {l.wipJobId
+                                ? 'Delivery is already open in Work in Progress.'
+                                : 'Open the training / implementation job so the delivery is tracked to completion.'}
+                            </p>
+                          </div>
+                          <button onClick={() => startWork(l)}
+                            className="inline-flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-xs font-bold text-white hover:bg-green-800 transition shrink-0">
+                            <Briefcase className="h-3.5 w-3.5" /> {l.wipJobId ? 'Open the job' : 'Start work'}
+                          </button>
+                        </div>
+
+                        {/* The licence itself. Deals won before serials were captured
+                            show a prompt rather than a blank — they stay valid and can
+                            be completed whenever the number is to hand. */}
+                        <div className="rounded-lg border border-green-200 bg-white p-3">
+                          {l.serialNo ? (
+                            <div className="flex items-start justify-between gap-3 flex-wrap">
+                              <div className="space-y-1">
+                                <p className="text-[10px] font-semibold text-green-700 uppercase tracking-wide">
+                                  <KeyRound className="h-3.5 w-3.5 inline mr-1" />Licence
+                                </p>
+                                <p className="text-sm font-bold text-slate-900 font-mono tracking-wide">{l.serialNo}</p>
+                                <p className="text-xs text-slate-600">
+                                  {client ? `TallyPrime ${client.edition} ${client.term}` : 'Licence details on the client record'}
+                                  {l.dealType ? ` · ${l.dealType}` : ''}
+                                  {l.amount != null ? ` · KES ${l.amount.toLocaleString()}` : ''}
+                                </p>
+                                {client && (client.tssExpiry || client.licenceExpiry) && (
+                                  <p className="text-xs text-slate-500">
+                                    {client.tssExpiry ? `TSS expires ${new Date(client.tssExpiry).toLocaleDateString('en-GB')}` : ''}
+                                    {client.tssExpiry && client.licenceExpiry ? ' · ' : ''}
+                                    {client.licenceExpiry ? `Top-up window closes ${new Date(client.licenceExpiry).toLocaleDateString('en-GB')}` : ''}
+                                  </p>
+                                )}
+                              </div>
+                              <button onClick={() => openWin(l)}
+                                className="rounded-lg border border-green-300 bg-white px-3 py-1.5 text-xs font-bold text-green-700 hover:bg-green-50 transition shrink-0">
+                                Edit licence
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex items-start justify-between gap-3 flex-wrap">
+                              <div>
+                                <p className="text-xs font-bold text-amber-700">
+                                  <AlertCircle className="h-3.5 w-3.5 inline mr-1" />No serial number on this licence
+                                </p>
+                                <p className="text-xs text-slate-500 mt-0.5">
+                                  Every Tally licence has one. Add it whenever it's to hand — renewals and
+                                  TSS reminders key off the serial.
+                                </p>
+                              </div>
+                              <button onClick={() => openWin(l)}
+                                className="inline-flex items-center gap-1.5 rounded-lg bg-amber-500 px-3 py-1.5 text-xs font-bold text-white hover:bg-amber-600 transition shrink-0">
+                                <KeyRound className="h-3.5 w-3.5" /> Add serial
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <button onClick={() => startWork(l)}
-                        className="inline-flex items-center gap-2 rounded-lg bg-green-700 px-4 py-2 text-xs font-bold text-white hover:bg-green-800 transition shrink-0">
-                        <Briefcase className="h-3.5 w-3.5" /> {l.wipJobId ? 'Open the job' : 'Start work'}
-                      </button>
-                    </div>
-                  )}
+                    );
+                  })()}
 
                   {/* Show edit button even for non-scheduled demos in Schedule a Demo status */}
                   {l.status === 'Schedule a Demo' && (!l.scheduledDate || !l.meetSent) && editingId !== l.id && (
@@ -2802,7 +2988,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                             <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(schedForm.scheduledDate) === 0 ? 'Sundays not available' : 'Public holiday'} — choose another date.</p>
                           )}
                           {schedForm.scheduledDate && getDayOfWeek(schedForm.scheduledDate) === 6 && !isDateBlocked(schedForm.scheduledDate) && (
-                            <p className="mt-1 text-xs text-red-600">⚠️ Saturday — 8:00 AM–1:00 PM only.</p>
+                            <p className="mt-1 text-xs text-red-600">⚠️ Saturday — 9:00 AM–12:00 PM only.</p>
                           )}
                         </div>
 
@@ -2959,7 +3145,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                             <p className="mt-1 text-xs text-red-600">⛔ {getDayOfWeek(schedForm.scheduledDate) === 0 ? 'Sundays not available' : 'Public holiday'} — choose another date.</p>
                           )}
                           {schedForm.scheduledDate && getDayOfWeek(schedForm.scheduledDate) === 6 && !isDateBlocked(schedForm.scheduledDate) && (
-                            <p className="mt-1 text-xs text-red-600">⚠️ Saturday — 8:00 AM–1:00 PM only.</p>
+                            <p className="mt-1 text-xs text-red-600">⚠️ Saturday — 9:00 AM–12:00 PM only.</p>
                           )}
                         </div>
 
@@ -3068,65 +3254,167 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         </div>
       )}
 
-      {/* ── Closing a deal as Won: what was it worth? ──────────────────────
-          The one moment the figure is known and someone is looking at the
-          deal. Without it, "which source is worth the most" can never be
-          answered — but a figure nobody has to hand must not block the
-          pipeline, so "Not known yet" is a first-class answer that records
-          the win and leaves the value genuinely unrecorded. */}
-      {wonLead && (
+      {/* ── Restart a Closed Lost lead ── */}
+      {/* ── Close the deal: the serial gate ── */}
+      {winLead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
-          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between border-b border-slate-100 bg-green-50 px-6 py-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-green-100 bg-green-50 px-6 py-4">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-5 w-5 text-green-700" />
-                <h3 className="font-bold text-green-900">Deal won — {wonLead.name}</h3>
+                <Trophy className="h-5 w-5 text-green-700" />
+                <h3 className="font-bold text-slate-900">Close the deal — {winLead.name}</h3>
               </div>
-              <button onClick={() => { setWonLead(null); setWonError(''); }}
+              <button onClick={() => { setWinLead(null); setWinError(null); }}
                 className="rounded-lg p-1.5 hover:bg-green-100 transition">
-                <X className="h-4 w-4 text-green-700" />
+                <X className="h-4 w-4 text-slate-500" />
               </button>
             </div>
-            <div className="px-6 py-5 space-y-4">
+
+            <div className="px-6 py-5 space-y-5 max-h-[70vh] overflow-y-auto">
+              <p className="text-xs text-slate-500">
+                Every Tally licence carries a 9-digit serial number, so it's captured here rather
+                than chased later. A serial we already hold links this deal to that client instead
+                of creating a second record.
+              </p>
+
+              {/* Serial — the gate */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1">Deal value (KES)</label>
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  autoFocus
-                  value={wonAmount}
-                  onChange={e => { setWonAmount(e.target.value); setWonError(''); }}
-                  onKeyDown={e => { if (e.key === 'Enter') confirmWon(true); }}
-                  placeholder="e.g. 185000"
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-green-500 focus:ring-2 focus:ring-green-500/20"
-                />
-                <p className="mt-1.5 text-[11px] text-slate-500">
-                  What {wonLead.company || wonLead.name} is paying. This is what makes the Source
-                  performance panel rank channels by revenue instead of by headcount.
-                </p>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                  Tally serial number <span className="text-red-500">*</span>
+                </label>
+                <input value={winForm.serialNo}
+                  onChange={e => { setWinForm(f => ({ ...f, serialNo: e.target.value })); setWinError(null); }}
+                  inputMode="numeric" maxLength={9} placeholder="9 digits, e.g. 790012345"
+                  className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-mono tracking-wide outline-none focus:border-accent" />
+                {winMatchedClient ? (
+                  <p className="mt-1.5 text-xs font-semibold text-green-700">
+                    <CheckCircle2 className="h-3.5 w-3.5 inline mr-1" />
+                    Existing client — {winMatchedClient.company} (TallyPrime {winMatchedClient.edition} {winMatchedClient.term}).
+                    This deal will attach to them.
+                  </p>
+                ) : (
+                  <p className="mt-1.5 text-xs text-slate-400">
+                    A new serial creates a client record you can track renewals against.
+                  </p>
+                )}
               </div>
-              {wonError && (
-                <p className="flex items-center gap-1.5 text-xs font-semibold text-red-600">
-                  <AlertCircle className="h-3.5 w-3.5 shrink-0" />{wonError}
-                </p>
+
+              {/* What was sold */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">What was sold</label>
+                  <select value={winForm.dealType}
+                    onChange={e => setWinForm(f => ({ ...f, dealType: e.target.value as DealType }))}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-accent">
+                    {DEAL_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                  {EXISTING_LICENCE_DEALS.includes(winForm.dealType) && !winMatchedClient && (
+                    <p className="mt-1.5 text-xs text-amber-600">
+                      Sold against a licence that already exists — check the serial is the client's own.
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Value (KES)</label>
+                  <input value={winForm.amount}
+                    onChange={e => setWinForm(f => ({ ...f, amount: e.target.value }))}
+                    inputMode="numeric" placeholder="e.g. 57600"
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-accent" />
+                </div>
+              </div>
+
+              {/* Licence shape */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Edition</label>
+                  <select value={winForm.edition}
+                    onChange={e => setWinForm(f => ({ ...f, edition: e.target.value as TallyEdition }))}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-accent">
+                    <option value="Silver">Silver — single user</option>
+                    <option value="Gold">Gold — multi user</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Term</label>
+                  <select value={winForm.term}
+                    onChange={e => {
+                      const term = e.target.value as LicenceTerm;
+                      setWinForm(f => ({
+                        ...f, term,
+                        // An Annual licence's year-end is the top-up deadline; default
+                        // it a year out so the window is never left unset.
+                        licenceExpiry: term === 'Annual' ? (f.licenceExpiry || plusOneYear(f.wonDate)) : '',
+                      }));
+                    }}
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm outline-none focus:border-accent">
+                    <option value="Annual">Annual</option>
+                    <option value="Perpetual">Perpetual</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Dates */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Date won</label>
+                  <input type="date" value={winForm.wonDate}
+                    onChange={e => setWinForm(f => ({ ...f, wonDate: e.target.value }))}
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-accent" />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
+                    TSS expires
+                  </label>
+                  <input type="date" value={winForm.tssExpiry}
+                    onChange={e => setWinForm(f => ({ ...f, tssExpiry: e.target.value }))}
+                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-accent" />
+                  <button type="button"
+                    onClick={() => setWinForm(f => ({ ...f, tssExpiry: plusOneYear(f.wonDate) }))}
+                    className="mt-1 text-[11px] font-semibold text-accent hover:underline">
+                    Set a year from the win date
+                  </button>
+                </div>
+              </div>
+
+              {/* The top-up window — Annual only. Perpetual has no licence expiry,
+                  so showing the field there would invite a misleading date. */}
+              {winForm.term === 'Annual' && (
+                <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+                  <label className="block text-xs font-bold text-amber-700 uppercase tracking-wider mb-1.5">
+                    Licence year ends — top-up deadline
+                  </label>
+                  <input type="date" value={winForm.licenceExpiry}
+                    onChange={e => setWinForm(f => ({ ...f, licenceExpiry: e.target.value }))}
+                    className="w-full rounded-xl border border-amber-200 px-3 py-2.5 text-sm outline-none focus:border-amber-400" />
+                  <p className="mt-1.5 text-xs text-amber-700">
+                    Up to this date the client can top up to Perpetual. After it, they have to buy afresh.
+                  </p>
+                </div>
               )}
-              <div className="flex items-center justify-between gap-3 flex-wrap">
-                <button onClick={() => confirmWon(false)}
-                  title="Records the win now; the value stays blank and shows as unrecorded in the reports"
-                  className="text-xs font-semibold text-slate-500 underline hover:text-slate-700">
-                  Not known yet
-                </button>
-                <button onClick={() => confirmWon(true)}
-                  className="rounded-lg bg-green-700 px-4 py-2 text-xs font-bold text-white hover:bg-green-800 transition">
-                  Save & mark won
-                </button>
-              </div>
+
+              {winError && (
+                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                  <p className="text-xs font-semibold text-red-700">
+                    <AlertCircle className="h-3.5 w-3.5 inline mr-1" />{winError}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 border-t border-slate-100 bg-slate-50 px-6 py-4">
+              <button onClick={confirmWin}
+                className="flex-1 rounded-xl bg-green-700 px-4 py-2.5 text-sm font-bold text-white hover:bg-green-800 transition">
+                {winLead.status === 'Closed Won' ? 'Save licence details' : 'Mark won'}
+              </button>
+              <button onClick={() => { setWinLead(null); setWinError(null); }}
+                className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-50 transition">
+                Cancel
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Restart a Closed Lost lead ── */}
       {restartLead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
