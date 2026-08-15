@@ -1,7 +1,7 @@
 import { Building2, Briefcase, ShoppingCart, Globe, HelpCircle, Users, FileText, Phone, Star, MessageCircle, CalendarDays, Video, Mail, Wrench } from 'lucide-react';
 import type { SiteData } from '../data/siteData';
 
-export type TabId = 'dashboard' | 'company' | 'services' | 'products' | 'industries' | 'faqs' | 'leads' | 'blogs' | 'contact' | 'testimonials' | 'bookdemo' | 'whatsapp' | 'workshop' | 'webinar' | 'subscribers' | 'contacts' | 'access-requests' | 'wip';
+export type TabId = 'dashboard' | 'company' | 'services' | 'products' | 'industries' | 'faqs' | 'leads' | 'blogs' | 'contact' | 'testimonials' | 'bookdemo' | 'whatsapp' | 'workshop' | 'webinar' | 'subscribers' | 'contacts' | 'access-requests' | 'wip' | 'renewals';
 
 interface P { data: SiteData; onNav: (t: TabId) => void }
 
