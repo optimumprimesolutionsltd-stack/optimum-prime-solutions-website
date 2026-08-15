@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { load, save, type SiteData, type Lead, defaultData } from '../data/siteData';
-import { fbGet, fbSet, fbSubscribe } from '../firebase/config';
+import { fbGet, fbSet, fbSubscribe, fbOnAuthStateChanged } from '../firebase/config';
 import { signInAnonymously, getAuth, onAuthStateChanged } from 'firebase/auth';
 import { initializeApp } from 'firebase/app';
 
@@ -44,6 +44,11 @@ const C = createContext<Ctx | undefined>(undefined);
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<SiteData>(() => load());
   const [synced, setSynced] = useState(false);
+  // Whether /crm/leads has ever been read successfully in this session. Saves
+  // write the WHOLE leads array, so until we know we can read the node we can't
+  // tell an empty CRM from one we simply weren't allowed to see — and writing
+  // the empty in-memory list would destroy every lead. See `update` below.
+  const crmReadable = useRef(false);
 
   // siteData.leads is the single source of truth for leads. The public contact
   // form drops NEW leads into the /leads "inbox" node (it can't safely write the
@@ -183,6 +188,10 @@ export function SiteProvider({ children }: { children: ReactNode }) {
             applyMerge();
           });
           unsubscribeCrm = fbSubscribe('crm/leads', (crmLeads) => {
+            // Only fires when the read is actually permitted, so it's the one
+            // trustworthy signal that the CRM node is readable — fbGet returns
+            // null for "denied" and "empty" alike and can't tell them apart.
+            crmReadable.current = true;
             latestCrmLeads = Array.isArray(crmLeads) ? crmLeads : null;
             applyMerge();
           });
@@ -193,12 +202,37 @@ export function SiteProvider({ children }: { children: ReactNode }) {
       }
     };
 
-    syncData();
+    const teardown = () => {
+      if (unsubscribeSite) { unsubscribeSite(); unsubscribeSite = null; }
+      if (unsubscribeLeads) { unsubscribeLeads(); unsubscribeLeads = null; }
+      if (unsubscribeCrm) { unsubscribeCrm(); unsubscribeCrm = null; }
+    };
+
+    // Sync is driven by auth, not by mount. Two things happen after this
+    // provider first renders: Firebase restores a persisted session from
+    // IndexedDB asynchronously, and — on /admin — the user signs in a while
+    // later, which is a client-side route change, not a remount.
+    //
+    // Syncing once on mount therefore read /crm and /leads while still
+    // unauthenticated. The rules correctly rejected it, onValue cancelled the
+    // cancelled listeners for good, and the panel sat on an empty list until
+    // the operator pressed refresh — which is exactly the "starts at zero,
+    // shows the figures after a reload" behaviour. Re-syncing whenever the
+    // signed-in account changes makes the data appear on login instead.
+    let currentUid: string | null | undefined;
+    let started = false;
+    const unsubscribeAuth = fbOnAuthStateChanged((user) => {
+      const uid = user?.uid ?? null;
+      if (started && uid === currentUid) return; // same account — nothing to redo
+      currentUid = uid;
+      started = true;
+      teardown();
+      syncData();
+    });
 
     return () => {
-      if (unsubscribeSite) unsubscribeSite();
-      if (unsubscribeLeads) unsubscribeLeads();
-      if (unsubscribeCrm) unsubscribeCrm();
+      unsubscribeAuth();
+      teardown();
     };
   }, []);
 
@@ -213,8 +247,22 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     // read rule safe.
     const { leads, wipJobs, ...content } = d;
     fbSet('siteData', stripUndefined(content)).catch(() => {});
-    fbSet('crm/leads', stripUndefined(leads || [])).catch(() => {});
-    if (wipJobs) fbSet('crm/wipJobs', stripUndefined(wipJobs)).catch(() => {});
+
+    // These writes replace the WHOLE array rather than a delta, so saving while
+    // the CRM was never readable would replace every lead with the empty list
+    // this session happens to be holding. Refuse that specific case: no
+    // successful read, and nothing to write. Any real edit — which necessarily
+    // has leads in it — still saves normally.
+    if (crmReadable.current || (leads && leads.length > 0)) {
+      fbSet('crm/leads', stripUndefined(leads || [])).catch(() => {});
+      if (wipJobs) fbSet('crm/wipJobs', stripUndefined(wipJobs)).catch(() => {});
+    } else {
+      console.warn(
+        '[SiteContext] Skipped writing crm/leads: the CRM was never read successfully ' +
+        'this session, so the empty in-memory list is not trustworthy. Reload once ' +
+        'the leads are visible, then save again.',
+      );
+    }
     // Note: we deliberately no longer mirror leads back into the /leads inbox.
     // /crm/leads is the single source of truth; writing to /leads here used
     // to resurrect deleted leads and make the two stores drift apart.
