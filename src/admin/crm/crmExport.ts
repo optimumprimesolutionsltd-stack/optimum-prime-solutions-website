@@ -6,6 +6,8 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import type { Lead } from '../../data/siteData';
 import { PIPELINE_ORDER, defaultNextStep, stageColor, stageReportLabel } from './pipeline';
+import { sourceLabel, sourceDetail } from './leadSource';
+import { sourcePerformance, formatKes, formatWinRate } from './sourcePerformance';
 
 export interface WorkshopRegistrant {
   id: string;
@@ -54,17 +56,15 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
   const leadRows = leads.map(l => {
     const eventName = l.source === 'workshop' ? (l.workshopTitle || '')
       : l.source === 'webinar' ? (l.webinarTitle || '')
-      // Which storming drive / campaign the lead was picked up on.
-      : l.source === 'field' ? (l.fieldCampaign || '')
-      : '';
+      // The detail that goes with the channel — which storming drive it came
+      // off, or who sent the referral over.
+      : sourceDetail(l);
     return [
       l.name, l.company, l.phone, l.email, l.industry || l.businessType || '',
-      // Source is just the channel (website, workshop, webinar, field), not the
-      // event name
-      l.source === 'workshop' ? 'Workshop'
-        : l.source === 'webinar' ? 'Webinar'
-        : l.source === 'field' ? 'Field / Marketing'
-        : 'Website',
+      // Source is just the channel, not the event name. Read off the canonical
+      // list rather than falling back to 'Website': that fallback exported
+      // every referral, phone call and unattributed lead as a website enquiry.
+      sourceLabel(l.source),
       // Event name goes in its own column
       eventName,
       // Attended indicates if they actually showed up
@@ -162,48 +162,56 @@ export function buildCrmReportHtml(
   // Closed Lost only appears here when the export includes closed deals.
   const lost = leads.filter(l => l.status === 'Closed Lost').length;
 
-  // Count leads by source for the graph. Every source the admin panel can set
-  // must have a bucket here, and anything unrecognised falls into "other" —
-  // otherwise those leads vanish from the chart AND drop out of the percentage
-  // denominator, which silently inflates every other source's share. Field was
-  // missing for exactly that reason.
-  const sourceData = {
-    website: leads.filter(l => l.source === 'website').length,
-    workshop: leads.filter(l => l.source === 'workshop').length,
-    webinar: leads.filter(l => l.source === 'webinar').length,
-    field: leads.filter(l => l.source === 'field').length,
-    email: leads.filter(l => l.source === 'email').length,
-    whatsapp: leads.filter(l => l.source === 'whatsapp').length,
-    referral: leads.filter(l => l.source === 'referral').length,
-    phone: leads.filter(l => l.source === 'phone').length,
-    direct: leads.filter(l => l.source === 'direct').length,
-    other: 0,
-  };
-  sourceData.other = leads.length - Object.values(sourceData).reduce((a, b) => a + b, 0);
-  const totalBySource = Object.values(sourceData).reduce((a, b) => a + b, 0);
-  const sourceChartBars = Object.entries(sourceData)
-    .filter(([_, count]) => count > 0)
-    .map(([source, count]) => {
-      const pct = totalBySource > 0 ? (count / totalBySource * 100) : 0;
-      const label = source === 'whatsapp' ? 'WhatsApp'
-        : source === 'field' ? 'Field / Marketing'
-        : source.charAt(0).toUpperCase() + source.slice(1);
-      const color = {
-        website: '#3b82f6', workshop: '#f59e0b', webinar: '#8b5cf6',
+  // Source performance for the report. Binned through sourceCategory, so every
+  // source the panel can set has a bucket and anything unrecognised falls into
+  // "other" — otherwise those leads vanish from the chart AND drop out of the
+  // denominator, silently inflating every other source's share.
+  //
+  // Bars are the VALUE won per source, not the number of leads. A lead count
+  // ranks channels by how busy they are; this ranks them by what they brought
+  // in, which is the question the report is read to answer. Until deal values
+  // have been recorded there is nothing to rank, so it falls back to volume and
+  // says so.
+  const perf = sourcePerformance(leads);
+  const perfByValue = perf.hasValues;
+  const maxPerfBar = Math.max(...perf.rows.map(r => (perfByValue ? r.wonValue : r.leads)), 1);
+  const sourceChartBars = perf.rows
+    .map(r => {
+      const pct = ((perfByValue ? r.wonValue : r.leads) / maxPerfBar) * 100;
+      const label = r.key === 'online' ? 'Website'
+        // The residual bucket, named for what it is. Calling it "Other" made an
+        // attribution gap look like a channel we actually sell through.
+        : r.key === 'other' ? 'No source recorded'
+        : sourceLabel(r.key);
+      const color: string = ({
+        online: '#3b82f6', workshop: '#f59e0b', webinar: '#8b5cf6',
         field: '#eab308',
         email: '#10b981', whatsapp: '#059669', referral: '#ec4899',
         phone: '#f97316', direct: '#6366f1',
-      }[source] || '#64748b';
+      } as Record<string, string>)[r.key] || '#64748b';
+      const detail = [
+        `${r.leads} lead${r.leads === 1 ? '' : 's'}`,
+        `${r.won} won`,
+        r.winRate !== null ? `${formatWinRate(r.winRate)} win rate` : '',
+        r.wonValue > 0 ? formatKes(r.wonValue) : '',
+      ].filter(Boolean).join(' · ');
       return `<div style="margin-bottom: 12px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+        <div style="display: flex; justify-content: space-between; gap: 12px; margin-bottom: 4px;">
           <span style="font-size: 12px; font-weight: 600; color: #1e3a5f;">${esc(label)}</span>
-          <span style="font-size: 12px; font-weight: 700; color: #1e3a5f;">${count}</span>
+          <span style="font-size: 11px; color: #475569;">${esc(detail)}</span>
         </div>
         <div style="height: 24px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-          <div style="height: 100%; width: ${pct}%; background: ${color}; transition: width 0.3s;"></div>
+          <div style="height: 100%; width: ${pct}%; background: ${color};"></div>
         </div>
       </div>`;
     }).join('');
+
+  // What the totals cannot see, stated rather than silently absorbed.
+  const perfNote = !perf.hasValues
+    ? 'Bars show lead count — no deal values recorded yet. Enter the value when a deal is marked Closed Won and this ranks by revenue instead.'
+    : perf.totalWonWithoutValue > 0
+      ? `Bars show value won. ${formatKes(perf.totalWonValue)} across ${perf.totalWon - perf.totalWonWithoutValue} of ${perf.totalWon} won deals — ${perf.totalWonWithoutValue} ${perf.totalWonWithoutValue === 1 ? 'has' : 'have'} no value recorded, so the real figure is higher.`
+      : 'Bars show value won. Win rate counts decided deals only.';
 
   // Group leads by pipeline stage in canonical order.
   const grouped = PIPELINE_ORDER
@@ -337,7 +345,8 @@ export function buildCrmReportHtml(
   </div>
 
   ${sourceChartBars ? `<section class="stage" style="margin-bottom: 28px;">
-    <h3 style="margin-bottom: 18px;">📊 Leads by Source</h3>
+    <h3 style="margin-bottom: 6px;">📊 Source performance</h3>
+    <p style="margin: 0 0 16px; font-size: 11px; color: #64748b;">${esc(perfNote)}</p>
     <div style="padding: 0 8px;">
       ${sourceChartBars}
     </div>

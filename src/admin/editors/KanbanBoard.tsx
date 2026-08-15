@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { GripVertical, Mail, Phone, Building2, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Lead, SiteData } from '../../data/siteData';
 import { PIPELINE_ORDER, stageColor, stageReportLabel } from '../crm/pipeline';
+import { sourceOption, sourceLabel } from '../crm/leadSource';
 
 interface Props {
   data: SiteData;
@@ -56,6 +57,9 @@ export default function KanbanBoard({ data, leads, onSave, onEditLead }: Props) 
     }
   };
 
+  // A lead with no source used to be badged "Direct", which is a channel we
+  // actually sell through — so an attribution gap was indistinguishable from a
+  // walk-in. Unrecognised sources now show amber and say what they are.
   const getSourceBadgeColor = (source?: string) => {
     const colors: Record<string, string> = {
       website: 'bg-blue-100 text-blue-700',
@@ -68,14 +72,14 @@ export default function KanbanBoard({ data, leads, onSave, onEditLead }: Props) 
       phone: 'bg-orange-100 text-orange-700',
       direct: 'bg-indigo-100 text-indigo-700',
     };
-    return colors[source || 'direct'] || 'bg-gray-100 text-gray-700';
+    return colors[source || ''] || 'bg-amber-500 text-white';
   };
 
   const getSourceLabel = (source?: string) => {
-    if (!source) return 'Direct';
+    if (!sourceOption(source)) return '⚠ No source';
     if (source === 'whatsapp') return 'WhatsApp';
     if (source === 'field') return '📣 Field';
-    return source.charAt(0).toUpperCase() + source.slice(1);
+    return sourceLabel(source);
   };
 
   return (

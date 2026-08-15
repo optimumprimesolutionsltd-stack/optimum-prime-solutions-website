@@ -22,8 +22,17 @@ export interface Lead {
   meetLink?: string; meetSent?: boolean;
   // Where the lead came from. 'field' = met on the road — field storming,
   // road shows, market visits and other outbound marketing.
-  source?: 'website' | 'manual' | 'workshop' | 'webinar' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'field';
+  //
+  // 'unknown' is written deliberately: it is what a lead that arrived without
+  // an attribution gets, so it shows up in the "needs a source" queue for a
+  // human to confirm instead of being quietly counted as a website enquiry.
+  // 'manual' is legacy and means the same thing — someone typed it in, but
+  // nobody said where it came from.
+  source?: 'website' | 'manual' | 'unknown' | 'workshop' | 'webinar' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'field';
   fieldCampaign?: string;         // which drive/area a field lead was captured on
+  referredBy?: string;            // who sent a referral over — the person or company
+  sourceSetBy?: string;           // staff member who recorded/confirmed the source
+  sourceSetAt?: string;           // ISO, when the source was last recorded/confirmed
   industry?: string; demoNotes?: string;
   requestType?: 'demo' | 'consultation' | 'bizanalyst' | 'customization' | 'other'; // demo, consultation, biz analyst, customization/add-on/TDL, or other enquiry
   // CRM follow-up fields
@@ -42,6 +51,14 @@ export interface Lead {
   reopenedAt?: string;            // when the pipeline was last restarted
   reopenCount?: number;           // how many times this lead has been restarted
   originalCreatedAt?: string;     // the first period it was domiciled in, kept when re-dated
+  // ── Closed Won ───────────────────────────────────────────────────────────
+  // Asked for at the moment the deal is marked won, because that is the only
+  // moment the figure is known and someone is looking at it. `amount` is
+  // deliberately optional and never defaulted to 0: a deal whose value nobody
+  // had to hand is UNRECORDED, and the reports say so rather than averaging a
+  // zero into the totals.
+  wonAt?: string;                 // ISO, stamped when the deal is marked Closed Won
+  amount?: number;                // deal value in KES — numeric so it can be summed
   // Link to the delivery job created once the deal is won.
   wipJobId?: string;
 }
