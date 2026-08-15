@@ -10,16 +10,6 @@ const partners = [
     badge: 'Certified Partner',
     badgeColor: 'bg-blue-100 text-blue-700',
     url: 'https://tallysolutions.com',
-    logoClass: 'h-10 object-contain',
-  },
-  {
-    name: 'EOS Worldwide',
-    logo: '/partner-eos.png',
-    description: 'We apply EOS® (Entrepreneurial Operating System) principles to help leadership teams get aligned, gain traction, and achieve their vision. EOS® strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. EOS® is a registered trademark of EOS Worldwide, LLC.',
-    badge: 'EOS-Inspired Consulting',
-    badgeColor: 'bg-orange-100 text-orange-700',
-    url: 'https://www.eosworldwide.com',
-    logoClass: 'h-10 object-contain',
   },
   {
     name: 'Biz Analyst',
@@ -28,16 +18,15 @@ const partners = [
     badge: 'Mobile App Partner',
     badgeColor: 'bg-emerald-100 text-emerald-700',
     url: 'https://www.bizanalyst.in',
-    logoClass: 'h-10 object-contain',
   },
   {
     name: 'TSplus',
     logo: '/partner-tsplus.png',
     description: 'TSplus enables secure remote desktop access to TallyPrime from any device, anywhere. We deploy and manage TSplus infrastructure so your team can access business data remotely without complex VPN setups or expensive Citrix licensing.',
     badge: 'Deployment Partner',
-    badgeColor: 'bg-slate-100 text-slate-300',
+    // was slate-300 on slate-100 — about 1.3:1, effectively invisible
+    badgeColor: 'bg-slate-200 text-slate-700',
     url: 'https://tsplus.net',
-    logoClass: 'h-10 object-contain',
   },
 ];
 
@@ -59,7 +48,7 @@ export default function Partners() {
         </div>
 
         {/* Partner cards */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {partners.map((partner, i) => (
             <motion.a
               key={partner.name}
@@ -70,16 +59,16 @@ export default function Partners() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="group flex flex-col rounded-2xl border border-white/10 bg-slate-900 p-6 hover:border-red-200 hover:bg-red-50/30 hover:shadow-md transition-all duration-200"
+              className="group flex flex-col rounded-2xl border border-white/10 bg-slate-900 p-6 hover:border-red-500/40 hover:bg-slate-800 hover:shadow-lg hover:shadow-red-900/20 transition-all duration-200"
             >
-              {/* Logo */}
-              <div className="flex items-center justify-center h-16 mb-4">
+              {/* Logo, on a white plate. Two of these three assets carry an
+                  opaque white background and the third is dark-on-transparent,
+                  so none of them survive being dropped straight onto slate-900. */}
+              <div className="flex items-center justify-center h-16 mb-4 rounded-xl bg-white p-3">
                 <img
                   src={partner.logo}
                   alt={`${partner.name} logo`}
-                  className={partner.logoClass}
-                  width={160}
-                  height={64}
+                  className="max-h-full max-w-full object-contain"
                   loading="lazy"
                 />
               </div>
@@ -97,7 +86,7 @@ export default function Partners() {
               </p>
 
               {/* Link */}
-              <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-red-600 group-hover:text-red-700">
+              <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-red-400 group-hover:text-red-300">
                 Learn more
                 <ExternalLink className="h-3 w-3" />
               </div>
@@ -108,15 +97,20 @@ export default function Partners() {
         {/* Bottom trust bar */}
         <div className="mt-12 rounded-2xl bg-slate-900 border border-white/10 px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <div className="flex -space-x-3">
+            {/* Plates, not overlapping avatar circles. Every partner logo here
+                is a wordmark 2-3x wider than it is tall, so a 40px circle showed
+                them about 9px tall. */}
+            <div className="flex flex-wrap items-center justify-center gap-2">
               {partners.map((p) => (
-                <div key={p.name} className="h-10 w-10 rounded-full bg-slate-800 border-2 border-white shadow-sm flex items-center justify-center overflow-hidden">
-                  <img src={p.logo} alt={p.name} className="h-7 w-7 object-contain" width={28} height={28} loading="lazy" />
+                <div key={p.name} className="h-12 w-24 rounded-lg bg-white p-2 shadow-sm ring-1 ring-white/10 flex items-center justify-center">
+                  <img src={p.logo} alt={p.name} className="max-h-full max-w-full object-contain" loading="lazy" />
                 </div>
               ))}
             </div>
             <p className="text-sm text-slate-400">
-              <span className="font-semibold text-white">Certified across 4 platforms.</span>{' '}
+              {/* Counted off the array so the claim cannot drift from the
+                  logos beside it — it read "4 platforms" above three plates. */}
+              <span className="font-semibold text-white">Certified across {partners.length} platforms.</span>{' '}
               One trusted partner to implement, integrate, and support them all for your business.
             </p>
           </div>

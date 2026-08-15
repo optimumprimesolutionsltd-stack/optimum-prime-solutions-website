@@ -30,7 +30,7 @@ const tallyPrimeLinks = [
   { l: 'Support', h: '/tallyprime/support' },
   { l: 'Customization (TDL)', h: '/tallyprime/customization' },
   { l: 'Data Migration', h: '/tallyprime/data-migration' },
-  { l: 'Business Consulting (EOS®)', h: '/tallyprime/consulting' },
+  { l: 'TallyPrime Consulting', h: '/tallyprime/consulting' },
 ];
 
 const coreServices = [
@@ -113,21 +113,19 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="space-y-5">
             <div className="flex flex-col items-start gap-4">
-              <div className="w-full max-w-[160px]">
-                <img
-                  src="/tally-solutions-new-logo.png"
-                  alt="TallyPrime accounting software logo — official partner Optimum Prime Solutions Kenya"
-                  className="h-auto w-full max-h-14 object-contain object-left"
-                  width={160}
-                  height={56}
-                  loading="lazy"
-                />
-              </div>
+              <img
+                src="/tally-solutions-new-logo.png"
+                alt="TallyPrime accounting software logo — official partner Optimum Prime Solutions Kenya"
+                className="h-14 w-auto object-contain object-left"
+                width={129}
+                height={56}
+                loading="lazy"
+              />
               <Logo className="h-12 w-auto" loading="lazy" />
               <span className="h-0.5 w-7 rounded-full bg-blue-600" aria-hidden="true" />
             </div>
             <p className="max-w-md text-sm leading-relaxed text-slate-500">
-              {data.company.tagline}. Kenya's certified TallyPrime reseller, cloud hosting provider & EOS® implementer.
+              {data.company.tagline}. Kenya's certified TallyPrime partner for licensing, implementation, cloud hosting and ongoing support.
             </p>
             <div className="grid gap-3 text-sm">
               <a href={`tel:${c.phones[0]?.replace(/\s/g, '')}`} className="flex items-center gap-2 text-slate-600 hover:text-red-600 transition">
@@ -139,6 +137,16 @@ export default function Footer() {
               <div className="flex items-center gap-2 text-slate-600">
                 <MapPin className="h-4 w-4" /> {c.location}
               </div>
+              {/* Service area, kept deliberately separate from {c.location}
+                  above. That line is the registered address and has to stay
+                  byte-identical to the Google Business Profile and every
+                  directory citation, so it must not absorb marketing copy.
+                  This sits on all 49 pages, which is the point: body copy
+                  sitewide said Ruiru 36 times to Nairobi's 3, and four of the
+                  six main pages never said Nairobi at all. */}
+              <p className="text-sm text-slate-500">
+                Serving Nairobi, Kiambu and businesses across Kenya
+              </p>
             </div>
             {/* Social Media Links */}
             <div className="flex items-center gap-3 pt-2">
@@ -261,7 +269,7 @@ export default function Footer() {
           {/* Newsletter */}
           <div className="rounded-3xl bg-slate-50 p-6 flex-1">
             <h3 className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-900 mb-5">Stay updated</h3>
-            <p className="text-sm text-slate-700 mb-4">Receive TallyPrime tips, cloud hosting guides, and EOS® business insights.</p>
+            <p className="text-sm text-slate-700 mb-4">Receive TallyPrime tips, cloud hosting guides, and Kenyan business software insights.</p>
             {submitted ? (
               <div className="rounded-2xl bg-green-50 border border-green-200 px-4 py-4 text-sm text-green-700 font-medium text-center">
                 🎉 Congratulations — you're subscribed! We'll be in touch with updates.
@@ -346,8 +354,8 @@ export default function Footer() {
               <img
                 src="/tally-solutions-new-logo.png"
                 alt="TallyPrime accounting software logo — official partner Optimum Prime Solutions Kenya"
-                className="h-16 w-auto rounded-xl object-contain bg-white/10 p-2 shadow-lg shadow-black/10"
-                width={64}
+                className="h-16 w-auto rounded-xl object-contain bg-white p-2 shadow-lg shadow-black/10"
+                width={126}
                 height={64}
                 loading="lazy"
               />
