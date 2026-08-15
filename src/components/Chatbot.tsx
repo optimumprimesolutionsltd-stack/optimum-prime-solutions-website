@@ -195,6 +195,8 @@ export default function Chatbot() {
         role: 'bot',
         text: aiReplyContent,
         time: getTime(),
+        // When Zawadi is unreachable, give the visitor a live route instead of a dead end.
+        action: chatResult.offline ? 'whatsapp' : undefined,
       };
 
       setTimeout(() => {
@@ -208,8 +210,9 @@ export default function Chatbot() {
       const errorMsg: Msg = {
         id: Date.now().toString(),
         role: 'bot',
-        text: "Oops! I'm having a little trouble connecting right now. Please try again in a moment, or you can reach us directly on WhatsApp at +254 116 246 074.",
+        text: "Sorry — something went wrong on my end. 🙏 Tap below to reach us on WhatsApp and a real person will pick it up.",
         time: getTime(),
+        action: 'whatsapp',
       };
       setMsgs((p) => [...p, errorMsg]);
       setShowTypingIndicator(false);
