@@ -108,5 +108,5 @@ export async function getChatGPTReply(
   _leadProfile?: Record<string, string | undefined>
 ): Promise<string> {
   const result = await getChatResponse(userText, history);
-  return result.reply || "I'm sorry, I didn't get a response. Please try again or reach us on WhatsApp at +254 116 246 074.";
+  return result.reply || "I'm sorry, I didn't get a response. Please try again or reach us on WhatsApp at +254 727 209 720.";
 }
