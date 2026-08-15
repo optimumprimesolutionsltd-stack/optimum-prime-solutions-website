@@ -19,6 +19,8 @@ export interface ChatResponse {
   phone?: string;
   interest?: string;
   whatsapp_url?: string;
+  /** Set when the reply is a local fallback because the backend was unreachable. */
+  offline?: boolean;
 }
 
 const CHAT_API_URL = 'https://optimum-prime-lead-notifier.onrender.com/chat';
@@ -60,12 +62,16 @@ export async function getChatResponse(
   };
 
   let lastError: unknown;
+  // Tracks whether the server answered at all. A status code means the service is
+  // reachable but refusing to serve (down/suspended/erroring) — not a cold start.
+  let lastStatus: number | undefined;
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
       const response = await fetchWithTimeout(CHAT_API_URL, fetchOptions, TIMEOUT_MS);
 
       if (!response.ok) {
+        lastStatus = response.status;
         throw new Error(`Chat API error: ${response.status}`);
       }
 
@@ -73,6 +79,10 @@ export async function getChatResponse(
     } catch (error) {
       lastError = error;
       console.warn(`Zawadi attempt ${attempt} failed:`, error);
+      // A 4xx is a request we got wrong — retrying sends the same body again.
+      if (lastStatus && lastStatus >= 400 && lastStatus < 500) {
+        break;
+      }
       // Short pause before retry
       if (attempt < MAX_RETRIES) {
         await new Promise(resolve => setTimeout(resolve, 2000));
@@ -82,8 +92,11 @@ export async function getChatResponse(
 
   console.error('Zawadi chat error after retries:', lastError);
   return {
-    reply: "I'm just waking up — give me one more moment! ☕ If this keeps happening, you can reach us directly on WhatsApp at **+254 116 246 074** 😊",
+    reply: lastStatus
+      ? "Sorry — I'm offline at the moment while our team sorts out a technical issue on our side. 🙏 You'll get a faster answer on WhatsApp right now — tap below, and a real person will reply."
+      : "Sorry — I can't reach our servers from your connection right now. 🙏 Do try again in a moment, or tap below to reach us on WhatsApp instead.",
     handoff: false,
+    offline: true,
   };
 }
 
@@ -95,5 +108,5 @@ export async function getChatGPTReply(
   _leadProfile?: Record<string, string | undefined>
 ): Promise<string> {
   const result = await getChatResponse(userText, history);
-  return result.reply || "I'm sorry, I didn't get a response. Please try again or reach us on WhatsApp at +254 116 246 074.";
+  return result.reply || "I'm sorry, I didn't get a response. Please try again or reach us on WhatsApp at +254 727 209 720.";
 }
