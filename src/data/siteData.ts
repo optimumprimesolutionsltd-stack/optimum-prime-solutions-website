@@ -42,9 +42,81 @@ export interface Lead {
   reopenedAt?: string;            // when the pipeline was last restarted
   reopenCount?: number;           // how many times this lead has been restarted
   originalCreatedAt?: string;     // the first period it was domiciled in, kept when re-dated
+  // ── Closed Won / licensing ───────────────────────────────────────────────
+  // Every Tally licence carries a 9-digit serial number, so a won deal without
+  // one is an incomplete record — updateStatus gates the move to Closed Won on
+  // it. Deals won before this was introduced keep their status and can have the
+  // serial filled in later; nothing is invalidated retroactively.
+  wonAt?: string;                 // ISO, stamped when the deal is marked Closed Won
+  serialNo?: string;              // the Tally serial this deal relates to
+  clientId?: string;              // the Client record that serial resolves to
+  dealType?: DealType;            // new licence, TSS renewal, upgrade, …
+  amount?: number;                // deal value in KES — numeric so it can be summed
   // Link to the delivery job created once the deal is won.
   wipJobId?: string;
 }
+
+// ── Tally licensing ─────────────────────────────────────────────────────────
+// Licences come in four combinations: Silver/Gold × Annual/Perpetual. An Annual
+// licence can be topped up to Perpetual, but only before its licence year ends
+// — after that the customer has to buy afresh, so the window is real money with
+// a deadline on it.
+export type TallyEdition = 'Silver' | 'Gold';
+export type LicenceTerm = 'Annual' | 'Perpetual';
+
+// What a deal actually sells. Renewals and upgrades are sold against a licence
+// that already exists, so they carry a serial from the moment they're created;
+// a brand-new licence only gets its serial once it's bought and activated.
+export type DealType =
+  | 'New Licence'
+  | 'TSS Renewal'
+  | 'Term Upgrade'      // Annual → Perpetual top-up
+  | 'Edition Upgrade'   // Silver → Gold
+  | 'Customization'
+  | 'Training'
+  | 'Other';
+
+export const DEAL_TYPES: DealType[] = [
+  'New Licence', 'TSS Renewal', 'Term Upgrade', 'Edition Upgrade',
+  'Customization', 'Training', 'Other',
+];
+
+// Deal types sold against an existing licence — these need a serial up front.
+export const EXISTING_LICENCE_DEALS: DealType[] = ['TSS Renewal', 'Term Upgrade', 'Edition Upgrade'];
+
+// ── Client register ─────────────────────────────────────────────────────────
+// Keyed on the Tally serial number, which is the client's real identity: it's
+// what ties licence upgrades, TSS renewals and support back to one customer.
+// Deals point at a Client rather than repeating the licence details, so next
+// year's renewal attaches to the same record instead of creating a duplicate.
+export interface Client {
+  id: string;
+  serialNo: string;               // 9-digit Tally serial — unique across clients
+  company: string;
+  contactName?: string;
+  phone?: string;
+  email?: string;
+  edition: TallyEdition;
+  term: LicenceTerm;
+  activatedOn?: string;           // YYYY-MM-DD
+  // Annual licences only: the end of the licence year, and therefore the last
+  // day the Annual → Perpetual top-up can be taken.
+  licenceExpiry?: string;         // YYYY-MM-DD
+  // TSS runs on every licence, Perpetual included — owning the licence outright
+  // does not keep updates and remote access alive.
+  tssExpiry?: string;             // YYYY-MM-DD
+  notes?: string;
+  leadId?: string;                // the deal that first won this client
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// A Tally serial is exactly 9 digits.
+export const isValidSerial = (s: string): boolean => /^\d{9}$/.test(s.trim());
+
+// Find an existing client by serial, so a renewal links instead of duplicating.
+export const findClientBySerial = (clients: Client[] | undefined, serial: string): Client | undefined =>
+  (clients || []).find(c => c.serialNo === serial.trim());
 
 // ── Work in progress ────────────────────────────────────────────────────────
 // Client work being delivered after the sale — training, implementation,
@@ -73,6 +145,8 @@ export interface WipJob {
   notes?: string;
   tasks?: WipTask[];              // simple delivery checklist
   leadId?: string;                // the won lead this came from, if any
+  serialNo?: string;              // the licence being delivered against
+  clientId?: string;              // the Client record for that serial
   createdAt: string;
   updatedAt?: string;
 }
@@ -83,6 +157,8 @@ export interface SiteData {
   company: CompanyInfo; contact: ContactInfo; services: ServiceItem[]; products: ProductItem[];
   testimonials: TestimonialItem[]; faqs: FaqItem[]; industries: IndustryItem[];
   blogs: BlogPost[]; leads: Lead[];
+  // Won customers and their licences, keyed on the Tally serial number.
+  clients?: Client[];
   // Client work being delivered (training, implementation, …)
   wipJobs?: WipJob[];
   // Optional mapping of page/theme -> hero image URL (use real photos of African users)
@@ -92,12 +168,12 @@ export interface SiteData {
 export const defaultData: SiteData = {
   company: {
     name:'Optimum Prime Solutions',
-    tagline:'Certified TallyPrime Partner · Cloud Hosting · EOS® Consulting · Biz Analyst',
-    mission:'To empower Kenyan businesses with world-class TallyPrime solutions, secure cloud infrastructure, and the Entrepreneurial Operating System (EOS®) — helping leadership teams get aligned, gain traction, and achieve sustainable growth.',
-    vision:'To be the leading TallyPrime partner and EOS® consulting firm in East Africa, transforming how businesses manage their finances, operations, and leadership systems.',
+    tagline:'Certified TallyPrime Partner · Implementation · Cloud Hosting · Biz Analyst',
+    mission:'To empower Kenyan businesses with practical TallyPrime solutions, secure cloud infrastructure, and responsive local support for accounting, inventory and KRA eTIMS compliance.',
+    vision:'To be a trusted TallyPrime implementation specialist in Kenya, helping businesses manage their finances, inventory and operations with confidence.',
     about:[
       'Optimum Prime Solutions is Kenya\'s certified TallyPrime partner, delivering end-to-end business automation and cloud solutions. With over 15 years of combined experience, our certified team helps Kenyan businesses join the 2.5 million+ companies worldwide already running on TallyPrime — across Silver, Gold, and Enterprise editions.',
-      'Beyond accounting software, we apply the principles of the Entrepreneurial Operating System (EOS®) — helping entrepreneurial leadership teams run their businesses on the framework created by Gino Wickman. EOS strengthens the Six Key Components of any business: Vision, People, Data, Issues, Process, and Traction. We combine TallyPrime\'s financial power with EOS® operational discipline to give your business both the numbers and the systems to grow.',
+      'We work alongside finance, operations and leadership teams to configure TallyPrime around the workflows that matter: invoicing, inventory, multi-branch reporting, eTIMS compliance, data migration and practical user adoption.',
     ],
     stats:[{label:'TallyPrime Users Worldwide',value:'2.5M+'},{label:'Years Experience',value:'15+'},{label:'Uptime Guarantee',value:'99.9%'},{label:'Support Response',value:'< 1hr'}],
   },
@@ -133,14 +209,12 @@ export const defaultData: SiteData = {
     {id:'5',title:'KRA Compliance',desc:'Stay 100% compliant with KRA. Automated VAT, income tax, PAYE calculations, and e-filing integration.',icon:'FileCheck',features:['VAT management','e-Filing integration','Tax reports','Audit trail'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
     {id:'6',title:'TDL Customization',desc:'Custom Tally Definition Language development to tailor Tally Prime to your exact business workflows.',icon:'Code',features:['Custom reports','Workflow automation','Integration APIs','Module extensions'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
     {id:'7',title:'Remote & On-site Support',desc:'Remote assistance during business hours plus scheduled on-site visits. Average response time under 1 hour.',icon:'Headphones',features:['Business-hours remote support','On-site visits','Software updates','Troubleshooting'],link:'https://tallysolutions.com/ssa/download/?srsltid=AfmBOooMSwVbv50rP24g8n8IKqi92cdz3NFhSuqpfprrxIcgj7DZLXym'},
-    {id:'8',title:'EOS® Business Operating System',desc:'We apply EOS® tools and principles. Help your leadership team get aligned, gain traction, and achieve your vision using the Entrepreneurial Operating System by Gino Wickman.',icon:'BarChart3',features:['EOS® full implementation','Vision/Traction Organizer (V/TO)','Rocks & accountability meetings','L10 meeting cadence','People Analyser & RPRS','Quarterly & annual planning'],link:'/contact'},
-    {id:'9',title:'TallyPrime Cloud Hosting',desc:'Access your TallyPrime data securely from anywhere. We set up and manage cloud infrastructure so your team can work remotely without compromising data security.',icon:'Cloud',features:['Cloud server setup','Remote access configuration','Automated daily backups','99.9% uptime SLA','Multi-user concurrent access','Disaster recovery planning'],link:'/contact'},
+    {id:'8',title:'TallyPrime Cloud Hosting',desc:'Access your TallyPrime data securely from anywhere. We set up and manage cloud infrastructure so your team can work remotely without compromising data security.',icon:'Cloud',features:['Cloud server setup','Remote access configuration','Automated daily backups','99.9% uptime SLA','Multi-user concurrent access','Disaster recovery planning'],link:'/contact'},
   ],
   products: [
     {id:'1',name:'TallyPrime',edition:'Silver',price:'KES 57,600 +VAT',period:'one-time license',features:['Single user license','Full accounting & invoicing','Inventory & stock reports','KRA VAT & eTIMS ready','Payroll — PAYE, NHIF, NSSF','Free updates for 1 year','Email & remote support'],cta:'Get Silver'},
     {id:'2',name:'TallyPrime',edition:'Gold',price:'KES 172,800 +VAT',period:'one-time license',popular:true,features:['Unlimited multi-user access','All Silver features included','Multi-location inventory control','Advanced user roles & security','Remote data access setup','Priority implementation support','On-site team training included'],cta:'Get Gold — Best Value'},
     {id:'3',name:'TallyPrime',edition:'Cloud Hosting',price:'From as low as KES 3,000',period:'per month',features:['Secure cloud server setup','Remote access from any device','Automated daily backups','99.9% uptime SLA guarantee','Multi-user concurrent access','Disaster recovery planning','Monthly system health checks'],cta:'Start Cloud Hosting'},
-    {id:'4',name:'EOS®',edition:'Implementation',price:'Contact for Quote',period:'per engagement',features:['Full EOS® implementation program','Vision/Traction Organizer (V/TO)','Rocks & 90-day priority setting','L10 weekly leadership meetings','People Analyser & accountability','Quarterly & annual planning days','Delivered using EOS® tools & principles'],cta:'Book EOS Session'},
   ],
   testimonials: [
     {id:'1',name:'Frederick Chege',role:'CEO',company:'Ujenzi Distributors Ltd',text:'Optimum Prime Solutions transformed our accounting. The KRA compliance module alone has saved us countless hours. Their team is professional and responsive.',rating:5},
@@ -152,7 +226,7 @@ export const defaultData: SiteData = {
   ],
   faqs: [
     {id:'1',q:'What is Tally Prime?',a:'Tally Prime is a complete business management software for accounting, inventory, payroll, manufacturing, taxation, and more. It\'s used by millions of businesses worldwide and is the leading ERP solution in East Africa.',cat:'General'},
-    {id:'2',q:'How much does Tally Prime cost?',a:'Tally Prime Silver (single user) costs KES 54,000 and Tally Prime Gold (multi-user) costs KES 162,000. Both are one-time purchases with 1 year of free updates. Contact us for volume discounts.',cat:'Pricing'},
+    {id:'2',q:'How much does Tally Prime cost?',a:'Tally Prime Silver (single user) costs KES 57,600 +VAT and Tally Prime Gold (multi-user) costs KES 172,800 +VAT. Both are one-time purchases with 1 year of free updates. Contact us for volume discounts.',cat:'Pricing'},
     {id:'3',q:'Do you provide training?',a:'Yes! We provide comprehensive training covering all Tally Prime modules — accounting, inventory, payroll, manufacturing, and KRA compliance. Training can be on-site or remote.',cat:'Services'},
     {id:'4',q:'How does Tally handle KRA compliance?',a:'Tally Prime is fully configured for KRA including VAT computation, PAYE calculations, income tax reports, and supports e-filing integration for iTax returns.',cat:'KRA & Tax'},
     {id:'5',q:'Can I access Tally Prime remotely?',a:'Yes! Tally Prime Gold supports remote access. With our cloud setup, you can access your data from anywhere — perfect for teams working across multiple locations.',cat:'General'},

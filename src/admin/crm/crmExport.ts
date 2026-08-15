@@ -4,7 +4,7 @@
 // Both outputs are pure functions returning strings, so they are easy to test
 // and are triggered from the admin panel as file downloads.
 // ─────────────────────────────────────────────────────────────────────────────
-import type { Lead } from '../../data/siteData';
+import type { Lead, Client } from '../../data/siteData';
 import { PIPELINE_ORDER, defaultNextStep, stageColor, stageReportLabel } from './pipeline';
 
 export interface WorkshopRegistrant {
@@ -49,6 +49,8 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
     'Name', 'Company', 'Phone', 'Email', 'Industry',
     'Source', 'Event', 'Attended', 'Stage', 'Next Step',
     'Demo Contact Person', 'Demo Contact Phone', 'Scheduled Demo (EAT)', 'Date Added (EAT)',
+    // Licensing — populated on won deals.
+    'Serial No.', 'Deal Type', 'Value (KES)', 'Date Won (EAT)',
   ];
 
   const leadRows = leads.map(l => {
@@ -74,6 +76,11 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
       // Demo contact person (assigned team member)
       l.teamMemberName || '', l.teamMemberPhone || '',
       fmtDateTime(l.scheduledDate, l.scheduledTime), fmtDateTime(l.createdAt),
+      // Serial is written as text so Excel doesn't strip a leading zero or turn a
+      // 9-digit number into scientific notation.
+      l.serialNo || '', l.dealType || '',
+      l.amount != null ? String(l.amount) : '',
+      l.wonAt ? fmtDateTime(l.wonAt.split('T')[0]) : '',
     ];
   });
 
@@ -90,6 +97,7 @@ function unifiedRows(leads: Lead[], registrants: WorkshopRegistrant[]): { header
       'Not in pipeline', 'Add to follow-up if qualified',
       '', '', // Demo contact person columns (not yet assigned)
       '', fmtDateTime(r.createdAt),
+      '', '', '', '', // Licensing columns — nothing sold yet
     ]);
 
   return { headers, rows: [...leadRows, ...registrantRows] };
@@ -129,6 +137,8 @@ export function buildCrmReportHtml(
     // report so a thin or empty section reads as a deliberate scope, not as
     // missing data.
     closedExcluded?: number;
+    // Client register, so won deals can report the licence they sold.
+    clients?: Client[];
   },
 ): string {
   const companyName = opts?.companyName || 'Optimum Prime Solutions';
@@ -158,7 +168,12 @@ export function buildCrmReportHtml(
   const manualLeads = leads.filter(l => l.source === 'manual').length;
   // Leads picked up on the road — field storming, road shows, market visits.
   const fieldLeads = leads.filter(l => l.source === 'field').length;
-  const won = leads.filter(l => l.status === 'Closed Won').length;
+  const wonLeads = leads.filter(l => l.status === 'Closed Won');
+  const won = wonLeads.length;
+  // Revenue actually closed, and how much of it is backed by a licence serial —
+  // an unsourced win can't be renewed, so the gap is worth showing.
+  const wonValue = wonLeads.reduce((sum, l) => sum + (l.amount || 0), 0);
+  const wonWithSerial = wonLeads.filter(l => l.serialNo).length;
   // Closed Lost only appears here when the export includes closed deals.
   const lost = leads.filter(l => l.status === 'Closed Lost').length;
 
@@ -210,13 +225,37 @@ export function buildCrmReportHtml(
     .map(stage => ({ stage, items: leads.filter(l => l.status === stage) }))
     .filter(g => g.items.length > 0);
 
-  const stageSections = grouped.map(g => `
-    <section class="stage">
-      <h3><span class="dot" style="background:${stageColor(g.stage)}"></span>${esc(stageReportLabel(g.stage))} <span class="count">${g.items.length}</span></h3>
+  // Won deals answer different questions from open ones — what was sold, for how
+  // much, against which licence, and when — so that section gets its own columns
+  // rather than being forced through the demo-scheduling ones.
+  const clientBySerial = new Map((opts?.clients || []).map(c => [c.serialNo, c]));
+  const wonSection = (items: Lead[]) => `
+      <table>
+        <thead><tr><th>Contact</th><th>Company</th><th>Serial No.</th><th>Licence</th><th>Sold</th><th>Value (KES)</th><th>Date Won</th></tr></thead>
+        <tbody>
+          ${items.map(l => {
+            const c = l.serialNo ? clientBySerial.get(l.serialNo) : undefined;
+            return `
+            <tr>
+              <td><strong>${esc(l.name)}</strong></td>
+              <td>${esc(l.company || '—')}</td>
+              <td>${l.serialNo
+                ? `<code>${esc(l.serialNo)}</code>`
+                : '<span style="color:#b45309">⚠ missing</span>'}</td>
+              <td>${c ? esc(`${c.edition} ${c.term}`) : '—'}</td>
+              <td>${esc(l.dealType || '—')}</td>
+              <td>${l.amount != null ? esc(l.amount.toLocaleString()) : '—'}</td>
+              <td><small>${esc(l.wonAt ? fmtDateTime(l.wonAt.split('T')[0]) : '—')}</small></td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>`;
+
+  const openSection = (items: Lead[]) => `
       <table>
         <thead><tr><th>Contact</th><th>Company</th><th>Phone</th><th>Breakfast</th><th>Demo Contact</th><th>Scheduled Demo (EAT)</th><th>Next Step</th></tr></thead>
         <tbody>
-          ${g.items.map(l => `
+          ${items.map(l => `
             <tr>
               <td><strong>${esc(l.name)}</strong>${l.source === 'workshop' ? ' <span class="tag">🥐 workshop</span>' : ''}</td>
               <td>${esc(l.company || '—')}</td>
@@ -227,7 +266,12 @@ export function buildCrmReportHtml(
               <td>${esc(l.nextStep || defaultNextStep(l.status))}</td>
             </tr>`).join('')}
         </tbody>
-      </table>
+      </table>`;
+
+  const stageSections = grouped.map(g => `
+    <section class="stage">
+      <h3><span class="dot" style="background:${stageColor(g.stage)}"></span>${esc(stageReportLabel(g.stage))} <span class="count">${g.items.length}</span></h3>
+      ${g.stage === 'Closed Won' ? wonSection(g.items) : openSection(g.items)}
     </section>`).join('');
 
   // Workshop attendees still awaiting a follow-up decision (staff excluded).
@@ -333,6 +377,8 @@ export function buildCrmReportHtml(
     ${fieldLeads > 0 ? `<div class="kpi"><b>${fieldLeads}</b><span>Field / Marketing → Pipeline</span></div>` : ''}
     ${manualLeads > 0 ? `<div class="kpi"><b>${manualLeads}</b><span>Manual → Pipeline</span></div>` : ''}
     ${closedExcluded > 0 ? '' : `<div class="kpi"><b>${won}</b><span>Closed Won</span></div>`}
+    ${closedExcluded === 0 && wonValue > 0 ? `<div class="kpi"><b>${wonValue.toLocaleString()}</b><span>Won Value (KES)</span></div>` : ''}
+    ${closedExcluded === 0 && won > 0 && wonWithSerial < won ? `<div class="kpi"><b>${won - wonWithSerial}</b><span>Won — Serial Missing</span></div>` : ''}
     ${lost > 0 ? `<div class="kpi"><b>${lost}</b><span>Closed Lost</span></div>` : ''}
   </div>
 
