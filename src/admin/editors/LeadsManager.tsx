@@ -71,7 +71,11 @@ const statusBadgeStyle = (status: string) => ({ backgroundColor: stageColor(stat
 interface BookingForm {
   clientName: string; clientPhone: string; clientEmail: string;
   clientCompany: string; clientIndustry: string;
-  sourceOfEnquiry: 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'website';
+  // Where the enquiry came from. This form always asked — and then threw the
+  // answer away, writing source:'manual' on the lead instead. Same shape as
+  // the Add Lead form now, and it actually reaches the lead.
+  source: '' | LeadSource;
+  sourceDetail: string;
   demoType: 'online' | 'physical';
   demoDate: string; demoTime: string; demoLocation: string; demoNotes: string;
   teamMemberName: string; teamMemberPhone: string;
@@ -81,7 +85,7 @@ interface BookingForm {
 const emptyBooking: BookingForm = {
   clientName: '', clientPhone: '', clientEmail: '',
   clientCompany: '', clientIndustry: '',
-  sourceOfEnquiry: 'website',
+  source: '', sourceDetail: '',
   demoType: 'online', demoDate: '', demoTime: '', demoLocation: '', demoNotes: '',
   teamMemberName: '', teamMemberPhone: '',
   extraTeam: [],
@@ -1186,6 +1190,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     if (!booking.clientPhone.trim()) return 'Client phone is required';
     if (!booking.clientCompany.trim()) return 'Company name is required';
     if (!booking.clientIndustry) return 'Please select an industry';
+    // Same rule as the Add Lead form — a demo booked by hand is still a lead,
+    // and it has to say where the customer came from.
+    const srcErr = validateSourcePick(booking.source, booking.sourceDetail);
+    if (srcErr) return srcErr;
     if (!booking.demoDate) return 'Demo date is required';
     if (!booking.demoTime) return 'Demo time is required';
     if (isDateBlocked(booking.demoDate)) return 'This date is a Sunday or public holiday — please choose another day';
@@ -1216,7 +1224,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         message: booking.demoNotes,
         createdAt: new Date().toISOString(),
         status: 'Schedule a Demo',
-        source: 'manual',
+        // The answer the form collects, written to the lead. It used to be
+        // discarded in favour of 'manual', which meant every hand-booked demo
+        // arrived with no usable attribution.
+        ...sourceFields(booking.source as LeadSource, booking.sourceDetail, booking.teamMemberName),
         scheduledDate: booking.demoDate,
         scheduledTime: booking.demoTime,
         demoType: booking.demoType,
@@ -2067,16 +2078,31 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   <option value="">Select industry *</option>
                   {INDUSTRIES.map(i => <option key={i} value={i}>{i}</option>)}
                 </select>
-                <select value={booking.sourceOfEnquiry} onChange={e => setB('sourceOfEnquiry', e.target.value)}
-                  className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-white">
-                  <option value="">Source of Enquiry *</option>
-                  <option value="website">Website</option>
-                  <option value="email">Email</option>
-                  <option value="whatsapp">WhatsApp</option>
-                  <option value="referral">Referral</option>
-                  <option value="phone">Phone Call</option>
-                  <option value="direct">Direct Contact</option>
+                {/* Blank until answered, like the Add Lead form — and the
+                    answer now reaches the lead instead of being discarded. */}
+                <select value={booking.source}
+                  onChange={e => { setB('source', e.target.value); setB('sourceDetail', ''); }}
+                  className={`w-full rounded-xl border px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent bg-white ${
+                    booking.source ? 'border-slate-200' : 'border-amber-400'
+                  }`}>
+                  <option value="">— Where did this enquiry come from? *</option>
+                  {ALL_SOURCES.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                 </select>
+                {(() => {
+                  const opt = sourceOption(booking.source);
+                  if (!opt?.detailKey) return null;
+                  return (
+                    <>
+                      <input value={booking.sourceDetail} onChange={e => setB('sourceDetail', e.target.value)}
+                        list="booking-source-detail"
+                        placeholder={`${opt.detailLabel} *`}
+                        className="w-full rounded-xl border border-amber-400 bg-amber-50 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
+                      <datalist id="booking-source-detail">
+                        {detailSuggestions[opt.detailKey].map(v => <option key={v} value={v} />)}
+                      </datalist>
+                    </>
+                  );
+                })()}
               </div>
 
               {/* Demo Schedule */}

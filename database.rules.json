@@ -41,7 +41,24 @@
     "leads": {
       ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
       "$leadId": {
-        ".write": "auth != null && (!data.exists() || auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+        ".write": "auth != null && (!data.exists() || auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+
+        // Where the lead came from, kept to the values the admin panel can
+        // actually read back (src/admin/crm/leadSource.ts).
+        //
+        // This validates the source when one IS sent; it does not require one.
+        // That distinction matters: visitors keep running a cached copy of the
+        // site for days after a deploy, and the older bundle sends no source at
+        // all. Rejecting those writes would silently drop real customer
+        // enquiries. An absent source is caught on the way in instead — the
+        // admin records it as 'unknown', which puts it in the "needs a source"
+        // queue for a human to confirm.
+        //
+        // 'Zawadi Chatbot Handoff' is a legacy value SiteContext still maps to
+        // 'website'; it stays permitted so nothing historical starts failing.
+        "source": {
+          ".validate": "newData.isString() && (newData.val().matches(/^(website|workshop|webinar|email|whatsapp|referral|phone|direct|field|manual|unknown)$/) || newData.val() === 'Zawadi Chatbot Handoff')"
+        }
       }
     },
 
