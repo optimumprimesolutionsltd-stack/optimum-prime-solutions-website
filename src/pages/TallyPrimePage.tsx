@@ -93,7 +93,7 @@ breadcrumbs={[
           <Breadcrumb className="mb-6 [&_a]:text-slate-400 [&_a:hover]:text-red-400 [&_span]:text-slate-300" />
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 rounded-full bg-red-600/20 border border-red-500/30 px-4 py-1.5 text-sm font-semibold text-red-400 mb-6">
-              <img src="/tally-solutions-new-logo.png" alt="TallyPrime" className="h-4 w-auto brightness-200 opacity-80" width={80} height={16} loading="lazy" />
+              <img src="/tally-solutions-new-logo.png" alt="TallyPrime" className="h-5 w-auto rounded-sm object-contain" width={46} height={20} loading="lazy" />
               Official TallyPrime Partner — Kenya
             </span>
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6">

@@ -113,16 +113,14 @@ export default function Footer() {
           {/* Brand Column */}
           <div className="space-y-5">
             <div className="flex flex-col items-start gap-4">
-              <div className="w-full max-w-[160px]">
-                <img
-                  src="/tally-solutions-new-logo.png"
-                  alt="TallyPrime accounting software logo — official partner Optimum Prime Solutions Kenya"
-                  className="h-auto w-full max-h-14 object-contain object-left"
-                  width={160}
-                  height={56}
-                  loading="lazy"
-                />
-              </div>
+              <img
+                src="/tally-solutions-new-logo.png"
+                alt="TallyPrime accounting software logo — official partner Optimum Prime Solutions Kenya"
+                className="h-14 w-auto object-contain object-left"
+                width={129}
+                height={56}
+                loading="lazy"
+              />
               <Logo className="h-12 w-auto" loading="lazy" />
               <span className="h-0.5 w-7 rounded-full bg-blue-600" aria-hidden="true" />
             </div>
@@ -346,8 +344,8 @@ export default function Footer() {
               <img
                 src="/tally-solutions-new-logo.png"
                 alt="TallyPrime accounting software logo — official partner Optimum Prime Solutions Kenya"
-                className="h-16 w-auto rounded-xl object-contain bg-white/10 p-2 shadow-lg shadow-black/10"
-                width={64}
+                className="h-16 w-auto rounded-xl object-contain bg-white p-2 shadow-lg shadow-black/10"
+                width={126}
                 height={64}
                 loading="lazy"
               />

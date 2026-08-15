@@ -40,7 +40,7 @@ export default function TallyLogo({
           src="/tally-solutions-new-logo.png"
           alt="TallyPrime accounting software logo — official partner Optimum Prime Solutions Kenya"
           className={imageClass}
-          width={220}
+          width={92}
           height={40}
           loading="lazy"
         />
