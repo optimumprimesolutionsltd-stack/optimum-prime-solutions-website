@@ -10,7 +10,6 @@ const categoryStyles: Record<string, { badge: string; shadow: string }> = {
   Tutorial: { badge: 'from-emerald-500 to-teal-400 text-white', shadow: 'shadow-emerald-500/20' },
   Comparison: { badge: 'from-sky-600 to-indigo-500 text-white', shadow: 'shadow-sky-500/20' },
   'Product Update': { badge: 'from-violet-600 to-purple-500 text-white', shadow: 'shadow-violet-500/20' },
-  EOS: { badge: 'from-amber-500 to-yellow-400 text-white', shadow: 'shadow-amber-500/20' },
   Cloud: { badge: 'from-cyan-500 to-teal-400 text-white', shadow: 'shadow-cyan-500/20' },
   Compliance: { badge: 'from-rose-600 to-red-500 text-white', shadow: 'shadow-rose-500/20' },
 };
@@ -19,11 +18,12 @@ export default function Blog() {
   const { data } = useSite();
   const [showAll, setShowAll] = useState(false);
 
-  if (!data.blogs.length) return null;
+  const publicBlogs = data.blogs.filter((blog) => blog.category !== 'EOS');
+  if (!publicBlogs.length) return null;
 
   // Newest first — falls back to numeric id when two posts share a date, so
   // ordering stays deterministic instead of depending on array position.
-  const sortedBlogs = [...data.blogs].sort((a, b) => {
+  const sortedBlogs = [...publicBlogs].sort((a, b) => {
     const dateDiff = new Date(b.date).getTime() - new Date(a.date).getTime();
     return dateDiff !== 0 ? dateDiff : Number(b.id) - Number(a.id);
   });
@@ -100,7 +100,7 @@ export default function Blog() {
           viewport={{ once: true }}
           className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-3"
         >
-          {data.blogs.length > 3 && (
+          {publicBlogs.length > 3 && (
             <button
               onClick={() => setShowAll(prev => !prev)}
               className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-8 py-3 text-sm font-semibold text-white hover:bg-white/10 transition"

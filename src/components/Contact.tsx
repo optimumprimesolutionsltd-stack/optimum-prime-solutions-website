@@ -131,7 +131,7 @@ export default function Contact() {
           demoDate: formData.demoDate,
           demoTime: formData.demoTime,
           message: formData.message,
-          interest: reqType === 'consultation' ? 'EOS® Business Consultation' : reqType === 'bizanalyst' ? 'Biz Analyst Enquiry' : 'TallyPrime Demo',
+          interest: reqType === 'consultation' ? 'TallyPrime Implementation Consultation' : reqType === 'bizanalyst' ? 'Biz Analyst Enquiry' : 'TallyPrime Demo',
           requestType: reqType,
           source: 'Website — Contact Form',
         }),
@@ -145,8 +145,22 @@ export default function Contact() {
     }
   };
 
+  // "Visit Us" is the registered address and comes from Firebase — it has to
+  // stay byte-identical to the Google Business Profile and every directory
+  // citation, so coverage claims go in their own entry rather than being
+  // appended to it. This page previously never said "Nairobi" once, which is a
+  // large part of why search and AI engines placed the company in Kiambu only.
   const info = [
     { icon: MapPin, title: 'Visit Us', lines: [c.location] },
+    {
+      icon: CheckCircle,
+      title: 'Areas We Cover',
+      lines: [
+        'On-site across Nairobi — Westlands, Industrial Area, CBD & Mombasa Road',
+        'Ruiru, Thika, Juja and wider Kiambu County',
+        'Remote support countrywide, same day',
+      ],
+    },
     { icon: Phone, title: 'Call Us', lines: c.phones },
     { icon: Mail, title: 'Email Us', lines: c.emails },
     { icon: Clock, title: 'Hours', lines: c.workingHours },
@@ -250,14 +264,14 @@ export default function Contact() {
                 </div>
                 <h3 className="text-xl font-bold text-white">
                   {requestType === 'consultation'
-                    ? 'Book a free EOS® Business Consultation'
+                    ? 'Request a TallyPrime Consultation'
                     : requestType === 'bizanalyst'
                     ? 'Enquire about Biz Analyst'
                     : 'Book your free TallyPrime demo'}
                 </h3>
                 <p className="mt-1 text-sm text-slate-300">
                   {requestType === 'consultation'
-                    ? 'Complete the form and our EOS® consultant will confirm your session within 24 hours.'
+                    ? 'Complete the form and a TallyPrime specialist will confirm your consultation within 24 hours.'
                     : requestType === 'bizanalyst'
                     ? 'Tell us about your business and we will show you how Biz Analyst works with TallyPrime.'
                     : 'Complete the form and our team will confirm your demo within 24 hours.'}

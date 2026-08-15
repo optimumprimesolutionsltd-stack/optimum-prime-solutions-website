@@ -36,6 +36,22 @@ interface SEOProps {
     description: string;
     serviceType?: string;
   };
+  /**
+   * Purchasable licences, emitted as Product nodes with an Offer each. The
+   * pricing page already prints these figures as prose, which Google reads as
+   * text; competitors selling the same licences through e-commerce product
+   * pages get them read as commerce instead. This closes that gap.
+   *
+   * `price` is the bare number as a string — no currency symbol, no thousands
+   * separator, and ex-VAT to match what the page displays.
+   */
+  products?: {
+    name: string;
+    description: string;
+    price: string;
+    priceCurrency?: string;
+    brand?: string;
+  }[];
 }
 
 const BASE_URL = 'https://www.optimumprimesolutions.co.ke';
@@ -47,6 +63,22 @@ const DEFAULT_OG_IMAGE = `${BASE_URL}/og-image.png`;
 // than a scattering of unlinked blocks.
 const ORG_ID = `${BASE_URL}/#organization`;
 const SITE_ID = `${BASE_URL}/#website`;
+
+// Mirrors the areaServed on the organisation node in index.html. Nairobi leads
+// deliberately: the company is in Ruiru and the body copy said so far more
+// often than it said Nairobi, so search and AI engines placed it in Kiambu
+// rather than the capital it actually sells into. Keep the two lists in step.
+const AREA_SERVED = [
+  { '@type': 'City', name: 'Nairobi' },
+  { '@type': 'City', name: 'Ruiru' },
+  { '@type': 'City', name: 'Thika' },
+  { '@type': 'City', name: 'Mombasa' },
+  { '@type': 'City', name: 'Kisumu' },
+  { '@type': 'City', name: 'Nakuru' },
+  { '@type': 'AdministrativeArea', name: 'Nairobi County' },
+  { '@type': 'AdministrativeArea', name: 'Kiambu County' },
+  { '@type': 'Country', name: 'Kenya' },
+];
 
 export default function SEO({
   title,
@@ -60,6 +92,7 @@ export default function SEO({
   faqs,
   article,
   service,
+  products,
 }: SEOProps) {
   const fullTitle = title.includes('Optimum Prime')
     ? title
@@ -67,8 +100,21 @@ export default function SEO({
 
   const finalSocialDescription = socialDescription || description;
 
-  // Ensure canonical URL has trailing slash for consistency
-  const rawCanonical = canonical ? canonical.replace(/\/?$/, '/') : '/';
+  // No trailing slash, except on the root.
+  //
+  // These used to end in "/" while every internal <Link> pointed at the
+  // slashless form, so Google crawled /about, read a canonical naming /about/,
+  // and had to fetch both. Search Console showed the result: the slashless URLs
+  // indexed and ranking (/about alone drew 430 impressions) while all 29
+  // trailing-slash URLs sat in "Discovered - currently not indexed" with Last
+  // crawled: N/A. The site was pointing at URLs Google had never fetched.
+  //
+  // Aligning to the slashless form matches what already ranks, so no earning
+  // URL gets redirected. vercel.json 308s the trailing-slash form here, and
+  // routeToLoc() in prerender.mjs emits the same shape into the sitemap. All
+  // four layers — links, canonical, sitemap, redirect — must agree; changing
+  // one alone recreates exactly this split.
+  const rawCanonical = canonical ? canonical.replace(/\/+$/, '') || '/' : '/';
   const canonicalUrl = `${BASE_URL}${rawCanonical}`;
 
   const pageId = `${canonicalUrl}#webpage`;
@@ -98,7 +144,11 @@ export default function SEO({
         '@type': 'ListItem',
         position: i + 1,
         name: crumb.name,
-        item: crumb.item,
+        // Normalised here rather than in the 35 pages that hardcode these
+        // URLs with a trailing slash. A breadcrumb pointing at /about/ while
+        // the canonical says /about names a URL Google would have to fetch
+        // separately — the same split this alignment exists to remove.
+        item: crumb.item.replace(/^(https?:\/\/[^/]+\/.+?)\/+$/, '$1'),
       })),
     });
   }
@@ -134,8 +184,29 @@ export default function SEO({
       description: service.description,
       url: canonicalUrl,
       provider: { '@id': ORG_ID },
-      areaServed: { '@type': 'Country', name: 'Kenya' },
+      areaServed: AREA_SERVED,
       ...(service.serviceType ? { serviceType: service.serviceType } : {}),
+    });
+  }
+
+  if (products && products.length > 0) {
+    products.forEach((p, i) => {
+      graph.push({
+        '@type': 'Product',
+        '@id': `${canonicalUrl}#product-${i + 1}`,
+        name: p.name,
+        description: p.description,
+        category: 'Accounting Software',
+        ...(p.brand ? { brand: { '@type': 'Brand', name: p.brand } } : {}),
+        offers: {
+          '@type': 'Offer',
+          price: p.price,
+          priceCurrency: p.priceCurrency || 'KES',
+          availability: 'https://schema.org/InStock',
+          url: canonicalUrl,
+          seller: { '@id': ORG_ID },
+        },
+      });
     });
   }
 

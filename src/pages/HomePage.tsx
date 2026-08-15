@@ -12,8 +12,13 @@ import Blog from '../components/Blog';
 export default function HomePage() {
   return (
     <div className="min-h-screen">
+      {/* SEO.tsx appends " | Optimum Prime Solutions" (26 chars), so the title
+          prop has to stay short: the old value rendered at 91 chars and Google
+          truncated the brand name off the end — the one thing we can't afford
+          to lose while the brand competes with several other Kenyan "Optimum"
+          companies in search. 24 + 26 = 50 fits. */}
       <SEO
-        title="TallyPrime Implementation & Support Kenya | Certified Partner"
+        title="TallyPrime Partner Kenya"
         description="Official TallyPrime partner in Kenya. Get KRA eTIMS compliance, cloud hosting, and expert training for your business in Nairobi, Ruiru, and beyond."
         socialDescription="Empower your business with Kenya's trusted TallyPrime experts. From KRA eTIMS compliance to cloud hosting, we help you grow with confidence."
         canonical="/"

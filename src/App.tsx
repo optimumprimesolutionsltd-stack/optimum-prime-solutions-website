@@ -97,6 +97,7 @@ function SiteRoutes() {
             <Route path="/about" element={<AboutPage />} />
             <Route path="/testimonials" element={<TestimonialsPage />} />
             <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/what-is-eos-and-why-kenyan-businesses-are-adopting-it" element={<Navigate to="/blog" replace />} />
             <Route path="/blog/:slug" element={<BlogPostPage />} />
             <Route path="/faq" element={<FAQPage />} />
             <Route path="/contact" element={<ContactPage />} />

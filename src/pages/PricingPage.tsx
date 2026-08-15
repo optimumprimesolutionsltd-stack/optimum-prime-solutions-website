@@ -14,6 +14,27 @@ breadcrumbs={[
           { name: 'Home', item: 'https://www.optimumprimesolutions.co.ke/' },
           { name: 'Pricing', item: 'https://www.optimumprimesolutions.co.ke/pricing/' },
         ]}
+        products={[
+          // Prices are ex-VAT and must stay identical to what <Products />
+          // renders from siteData.products — markup that disagrees with the
+          // visible price is a spam signal, not a rich result. Cloud hosting is
+          // deliberately excluded: "from KES 3,000" is a starting rate, and an
+          // Offer with a single price would misstate it.
+          {
+            name: 'TallyPrime Silver (Single User)',
+            description:
+              'Single-user TallyPrime licence covering accounting, invoicing, inventory, KRA VAT and eTIMS, and payroll. One-time purchase including one year of updates.',
+            price: '57600',
+            brand: 'Tally Solutions',
+          },
+          {
+            name: 'TallyPrime Gold (Multi User)',
+            description:
+              'Unlimited multi-user TallyPrime licence for one LAN, adding multi-location inventory, advanced user roles and remote data access. One-time purchase including one year of updates.',
+            price: '172800',
+            brand: 'Tally Solutions',
+          },
+        ]}
       />
 
       {/* Hero */}

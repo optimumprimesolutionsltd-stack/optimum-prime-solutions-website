@@ -21,10 +21,10 @@ export default function HowItWorks() {
           className="text-center max-w-3xl mx-auto">
           <span className="inline-block rounded-full bg-red-600/10 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-red-400">Our Process</span>
           <h2 className="mt-4 text-3xl sm:text-4xl font-bold text-white">
-From Discovery to Operational Traction — Our 4-Step Implementation Approach
+From Discovery to Go-Live — Our 4-Step Implementation Approach
           </h2>
           <p className="mt-4 text-slate-400">
-We implement TallyPrime, set up cloud hosting, and help your leadership team adopt EOS® — delivering faster reporting, accountability, and scalable operations across all your locations.
+We implement TallyPrime, configure cloud or local access, migrate your data and train your team — delivering practical accounting, inventory and compliance workflows for Kenyan businesses.
           </p>
         </motion.div>
 
@@ -82,7 +82,7 @@ Join 2.5 million+ businesses worldwide already running on TallyPrime. Get a free
               <span>Powered by Optimum Prime Solutions</span>
             </div>
             <p className="mt-6 text-xs text-slate-100">
-              ✓ Certified TallyPrime Partner · ✓ Cloud Hosting Available · ✓ EOS® Consulting · ✓ KRA & eTIMS Ready
+              ✓ Certified TallyPrime Partner · ✓ Cloud Hosting Available · ✓ Data Migration & Training · ✓ KRA & eTIMS Ready
             </p>
           </div>
         </motion.div>

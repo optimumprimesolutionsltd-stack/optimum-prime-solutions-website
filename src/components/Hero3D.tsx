@@ -28,10 +28,10 @@ export default function Hero3D() {
               <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
                 TallyPrime Partner
               </span>{' '}
-              — Cloud Hosting, EOS® Consulting &amp; Business Automation
+              — Implementation, Training &amp; Support
             </h2>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-400">
-              We sell and implement TallyPrime (Silver, Gold &amp; Enterprise), provide secure cloud hosting for remote access, and help leadership teams run their businesses on the Entrepreneurial Operating System (EOS®) — the proven framework by Gino Wickman used by 280,000+ companies worldwide.
+              We license and implement TallyPrime (Silver, Gold &amp; Enterprise), provide secure cloud hosting for remote access, and support Kenyan businesses with data migration, training, customisation and KRA eTIMS readiness.
             </p>
             <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4">
               <Link
@@ -56,7 +56,7 @@ export default function Hero3D() {
                 '✓ Certified Tally Partner',
                 '✓ KRA eTIMS Approved',
                 '✓ 2.5M+ TallyPrime Users Worldwide',
-                '✓ EOS®-Informed Consulting',
+                '✓ Implementation & Data Migration',
                 '✓ < 1hr Support Response',
               ].map((badge) => (
                 <span key={badge} className="inline-flex items-center rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-medium text-slate-300 backdrop-blur-sm">

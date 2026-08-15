@@ -94,20 +94,31 @@ export default function TallyLanding() {
         >
           {/* Badge */}
           <div className="mx-auto inline-block rounded-full border border-white/20 bg-slate-800/10 px-5 py-2 text-xs uppercase tracking-[0.3em] text-slate-100/80 shadow-sm backdrop-blur-sm">
-            Certified TallyPrime Partner · Ruiru &amp; Nationwide
+            Certified TallyPrime Partner · Nairobi, Ruiru &amp; Nationwide
           </div>
 
-          {/* H1 — primary keyword target */}
+          {/* H1 — brand first, then the primary keyword.
+              "Partner" not "Experts" or "Specialists": partner is the term the
+              target queries actually use ("TallyPrime partner Kenya") and the
+              word Tally's own certification uses. Neither of the others is
+              searched, and both drop the credential.
+              Leading with the brand costs the keyword the strongest position,
+              but buys entity clarity: Search Console shows "optimum" drawing 32
+              impressions and zero clicks, the company competing against Optimum
+              ERP Systems, Optimum Computer Systems and others for its own name.
+              Nairobi moved to the badge directly above rather than being lost —
+              the site still says Ruiru far more often than the capital it
+              sells into. */}
           <h1 className="mx-auto max-w-4xl text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl drop-shadow-lg">
-            Grow Your Business with{' '}
+            Optimum Prime Solutions{' '}
             <span className="bg-gradient-to-r from-red-400 via-orange-400 to-amber-400 bg-clip-text text-transparent">
-              Kenya's Certified TallyPrime Experts
+              — Certified TallyPrime Partner in Kenya
             </span>
           </h1>
 
           {/* Sub-headline */}
           <p className="mx-auto max-w-2xl text-lg leading-relaxed text-slate-200/90">
-            Kenya’s certified TallyPrime partner — part of a global network trusted by 2.5 million+ businesses in 100+ countries. Genuine licences, hands-on training, KRA eTIMS compliance, and local support in Ruiru, Nairobi, and nationwide.
+            Kenya’s certified TallyPrime partner — part of a global network trusted by 2.5 million+ businesses in 100+ countries. Genuine licences, hands-on training, KRA eTIMS compliance, and local support across Nairobi, Ruiru and nationwide.
           </p>
 
           {/* CTA buttons */}

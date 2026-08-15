@@ -27,7 +27,7 @@ export default function ContactPage() {
     <main className="min-h-screen bg-slate-900">
       <SEO
         title="Contact Us | Optimum Prime Solutions — TallyPrime Kenya"
-        description="Get in touch with Optimum Prime Solutions. Book a TallyPrime demo or ask about cloud hosting, KRA compliance, or EOS® consulting in Ruiru, Kenya."
+        description="Get in touch with Optimum Prime Solutions. Book a TallyPrime demo or ask about implementation, cloud hosting, KRA eTIMS compliance and training in Nairobi, Ruiru and across Kenya."
         socialDescription="Ready to modernize your business? Contact Optimum Prime Solutions — Kenya's certified TallyPrime partner in Ruiru."
         canonical="/contact"
 breadcrumbs={[

@@ -5,8 +5,20 @@
 //
 // Rules (Kenya / EAT):
 //   • Closed on Sundays and Kenyan public holidays.
-//   • Weekdays 8:00 AM–5:00 PM, with a 1:00–2:00 PM lunch break.
-//   • Saturdays 8:00 AM–1:00 PM (no lunch break).
+//   • Weekdays 9:00 AM–4:00 PM, with a 1:00–2:00 PM lunch break.
+//   • Saturdays 9:00 AM–12:00 PM (no lunch break).
+//
+// These are DEMO BOOKING hours, deliberately narrower than the office hours
+// published on the site and in Google Business Profile (Mon–Fri 8:00–17:00,
+// Sat 8:00–12:00). On weekdays the office opens before and closes after the
+// last bookable slot, so don't "correct" one to match the other. Saturday is
+// the one day where booking and closing coincide at noon — the last slot runs
+// 11:30–12:00 and must not extend past it.
+//
+// Blocks are minutes from midnight rather than whole hours. Every boundary
+// currently lands on the hour, but the previous integer-hour model silently
+// rounded half-hour closings away instead of failing, so a future "closes at
+// 12:30" would be lost rather than reported. Minutes keep that honest.
 // ─────────────────────────────────────────────────────────────────────────────
 
 // Recurring annual holidays as MM-DD.
@@ -47,15 +59,18 @@ export function isDateBlocked(dateStr: string): boolean {
   return getDayOfWeek(dateStr) === 0 || isKenyaHoliday(dateStr);
 }
 
-// Bookable hour blocks [startHour, endHour) for a date, lunch already removed.
-// Empty when the day is closed. This is the one place the hours are defined.
+// Bookable blocks [startMinute, endMinute) for a date, lunch already removed.
+// Minutes from midnight. Empty when the day is closed. This is the one place
+// the hours are defined.
 export function workingBlocks(dateStr: string): [number, number][] {
   if (isDateBlocked(dateStr)) return [];
-  if (isSaturday(dateStr)) return [[8, 13]];   // 8am–1pm
-  return [[8, 13], [14, 17]];                  // 8–1, lunch, 2–5
+  if (isSaturday(dateStr)) return [[9 * 60, 12 * 60]];             // 9:00–12:00
+  return [[9 * 60, 13 * 60], [14 * 60, 16 * 60]];                  // 9–1, lunch, 2–4
 }
 
-const label12 = (h: number, m: number): string => {
+const label12 = (mins: number): string => {
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
   const ampm = h < 12 ? 'AM' : 'PM';
   const h12 = h % 12 === 0 ? 12 : h % 12;
   return `${h12}:${String(m).padStart(2, '0')} ${ampm}`;
@@ -66,29 +81,35 @@ const label12 = (h: number, m: number): string => {
 export function generateTimeSlots(dateStr: string): { value: string; label: string; blocked: boolean }[] {
   const slots: { value: string; label: string; blocked: boolean }[] = [];
   for (const [start, end] of workingBlocks(dateStr)) {
-    for (let h = start; h < end; h++) {
-      for (const m of [0, 30]) {
-        slots.push({
-          value: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
-          label: label12(h, m),
-          blocked: false,
-        });
-      }
+    // Step by 30 only while a whole slot still fits inside the block, so the
+    // last Saturday offer is 11:30 (running to the noon close) and never one
+    // that would overrun it.
+    for (let t = start; t + 30 <= end; t += 30) {
+      slots.push({
+        value: `${String(Math.floor(t / 60)).padStart(2, '0')}:${String(t % 60).padStart(2, '0')}`,
+        label: label12(t),
+        blocked: false,
+      });
     }
   }
   return slots;
 }
 
-// 1-hour range strings for the public request form, e.g. "8:00 AM – 9:00 AM".
+// 1-hour range strings for the public request form, e.g. "9:00 AM – 10:00 AM".
+// A block that doesn't divide into whole hours yields a short final range
+// rather than being truncated, so a half-hour tail would show as e.g.
+// "12:00 PM – 12:30 PM" instead of vanishing.
 function hourRanges(blocks: [number, number][]): string[] {
   const out: string[] = [];
   for (const [start, end] of blocks) {
-    for (let h = start; h < end; h++) out.push(`${label12(h, 0)} – ${label12(h + 1, 0)}`);
+    for (let t = start; t < end; t += 60) {
+      out.push(`${label12(t)} – ${label12(Math.min(t + 60, end))}`);
+    }
   }
   return out;
 }
 
-// Static lists used by the public form (kept identical to what it showed before,
-// now derived from the shared rules above so they can never drift).
-export const WEEKDAY_HOUR_RANGES = hourRanges([[8, 13], [14, 17]]);
-export const SATURDAY_HOUR_RANGES = hourRanges([[8, 13]]);
+// Static lists used by the public form. Derived from the same block definitions
+// as workingBlocks() above so the form and the admin pop-up can't drift apart.
+export const WEEKDAY_HOUR_RANGES = hourRanges([[9 * 60, 13 * 60], [14 * 60, 16 * 60]]);
+export const SATURDAY_HOUR_RANGES = hourRanges([[9 * 60, 12 * 60]]);

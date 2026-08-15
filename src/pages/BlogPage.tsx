@@ -7,7 +7,7 @@ export default function BlogPage() {
     <main className="min-h-screen bg-slate-900">
       <SEO
         title="Blog | TallyPrime & KRA Compliance Tips | Optimum Prime"
-        description="Practical guides and expert insights on TallyPrime, KRA compliance, eTIMS, cloud hosting, payroll, and EOS® for Kenyan business owners."
+        description="Practical guides and expert insights on TallyPrime, KRA compliance, eTIMS, cloud hosting, inventory and payroll for Kenyan business owners."
         socialDescription="Stay informed with the latest insights on TallyPrime, KRA eTIMS compliance, and business automation in Kenya."
         canonical="/blog"
 breadcrumbs={[
@@ -17,10 +17,10 @@ breadcrumbs={[
       />
       <AfricanLaptopShowcase
         tag="Insights & Articles"
-        title="TallyPrime, Cloud Hosting & EOS® Insights for Kenyan Businesses"
-        description="Practical guides, case studies, and expert insights on TallyPrime implementation, KRA compliance, cloud hosting, and the Entrepreneurial Operating System (EOS®) — all tailored for Kenyan business owners."
+        title="TallyPrime, eTIMS & Cloud Hosting Insights for Kenyan Businesses"
+        description="Practical guides, case studies and expert insights on TallyPrime implementation, KRA compliance, inventory, cloud hosting and business reporting for Kenyan owners."
         socialDescription="Stay informed with the latest insights on TallyPrime, KRA eTIMS compliance, and business automation in Kenya."
-        features={['TallyPrime tips & tutorials', 'EOS® business operating system guides', 'Cloud hosting & remote access advice', 'KRA compliance & eTIMS updates']}
+        features={['TallyPrime tips & tutorials', 'Inventory & reporting guidance', 'Cloud hosting & remote access advice', 'KRA compliance & eTIMS updates']}
         theme="blog"
       />
       <Blog />

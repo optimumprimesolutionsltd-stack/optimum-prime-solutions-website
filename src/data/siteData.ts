@@ -535,45 +535,6 @@ The Bottom Line
 Don't overthink it. Both Silver and Gold are excellent investments. Silver gets you started affordably. Gold is when you've outgrown single-user limitations. Many successful businesses started with Silver and upgraded—that's perfectly normal.
 
 Ready to get started? Our team can help you choose and implement the right edition for your situation.`},
-    {id:'4',title:'What is EOS® and Why Kenyan Businesses Are Adopting It',slug:'what-is-eos-and-why-kenyan-businesses-are-adopting-it',excerpt:'The Entrepreneurial Operating System (EOS®) by Gino Wickman is transforming how leadership teams in Kenya run their businesses. Here\'s what it is and how to get started.',date:'2025-03-01',category:'EOS',readTime:'7 min',content:`The Entrepreneurial Operating System (EOS®) is a complete, practical system for running a business. Developed by Gino Wickman and detailed in his bestselling book \"Traction\", EOS is used by over 280,000 companies worldwide to get more of what they want from their businesses.
-
-What Problem Does EOS Solve?
-
-Most entrepreneurial businesses struggle with the same issues:
-- Lack of clear vision shared by the whole team
-- The wrong people in the wrong seats
-- No reliable data to make decisions
-- Issues that keep coming back without resolution
-- Inconsistent processes
-- Lack of execution and accountability
-
-EOS addresses all six of these through its Six Key Components framework.
-
-The Six Key Components of EOS®
-
-1. Vision — Where are you going and how will you get there? EOS uses the Vision/Traction Organizer (V/TO) to capture your 10-year target, 3-year picture, 1-year plan, and 90-day Rocks.
-
-2. People — The right people in the right seats. EOS uses the People Analyser and the GWC (Get it, Want it, Capacity to do it) framework to evaluate your team.
-
-3. Data — A handful of numbers that give you a pulse on the business. Your EOS Scorecard tracks weekly metrics so you always know where you stand.
-
-4. Issues — Identify, discuss, and solve issues permanently. The IDS (Identify, Discuss, Solve) process ensures problems don\'t recur.
-
-5. Process — Document and follow your core processes. When everyone follows the same way, you get consistent, scalable results.
-
-6. Traction — Execution. Rocks (90-day priorities), L10 meetings (weekly leadership meetings), and a meeting pulse that keeps the team focused and accountable.
-
-How EOS Works with TallyPrime
-
-TallyPrime gives you the financial and operational data. EOS gives you the management system to act on it. Your EOS Scorecard can pull key metrics directly from TallyPrime — sales, collections, inventory levels, payroll costs — giving your leadership team a real-time view of the business every week.
-
-Getting Started with EOS in Kenya
-
-Applying EOS® tools and principles, Optimum Prime Solutions can guide your leadership team through the full EOS journey. We start with a 90-minute introductory meeting, then a Focus Day, followed by quarterly and annual planning sessions over 12-24 months.
-
-The result: a business where everyone is aligned, accountable, and moving in the same direction.
-
-Ready to gain traction? Contact us to book your first EOS session.`},
     {id:'5',title:'TallyPrime Cloud Hosting: Access Your Business Data From Anywhere',slug:'tallyprime-cloud-hosting-access-your-business-data-from-anywhere',excerpt:'Learn how cloud-hosted TallyPrime gives your team secure, real-time access to accounting and inventory data from any location in Kenya and beyond.',date:'2025-03-15',category:'Cloud',readTime:'5 min',content:`One of the most common challenges for growing Kenyan businesses is data access. Your accountant is at the office, your sales manager is in the field, and you\'re at a client meeting — but the TallyPrime data is locked on one computer.
 
 Cloud hosting solves this completely.

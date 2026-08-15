@@ -40,10 +40,10 @@ export default function Products() {
             Products & Packages
           </span>
           <h2 className="mt-6 text-4xl sm:text-5xl font-extrabold text-white leading-tight">
-            TallyPrime Editions, Cloud Hosting & EOS® Consulting Packages
+            TallyPrime Editions & Cloud Hosting Packages
           </h2>
           <p className="mt-6 text-lg text-slate-400 leading-relaxed">
-            Choose the right TallyPrime edition for your business — Silver, Gold, or Enterprise. Add cloud hosting for remote access, or engage us for EOS® implementation to strengthen your leadership operating system.
+            Choose the right TallyPrime edition for your business — Silver, Gold, or Enterprise. Add secure cloud hosting for remote access and get local implementation, training and support from our Kenyan team.
           </p>
         </motion.div>
 

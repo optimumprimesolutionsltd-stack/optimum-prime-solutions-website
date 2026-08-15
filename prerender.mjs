@@ -85,11 +85,14 @@ function getSeedBlogPosts() {
   return [...byslug].map(([slug, date]) => ({ route: `/blog/${slug}`, lastmod: date }));
 }
 
-// Union of the seed posts in siteData.ts and whatever is live in Firebase. The
-// seed list is the fallback: if the fetch fails (offline, CI without network,
-// database rules changed) the build still produces every route it used to,
-// rather than silently shipping a site with no blog posts at all.
-async function getBlogPosts() {
+// Union of the seed posts in siteData.ts and whatever is live in Firebase.
+//
+// `regeneratingDist` says whether this run is about to REWRITE dist/ (a local or
+// CI build) or merely read the copy already committed to git (Vercel). It decides
+// what a failed fetch means: when dist/ is being rewritten a fallback silently
+// deletes pages, so the build must stop; on Vercel nothing is regenerated, so the
+// same failure is harmless and a transient blip must not break the deploy.
+async function getBlogPosts({ regeneratingDist }) {
   const seed = getSeedBlogPosts();
   try {
     const res = await fetch(RTDB_BLOGS_URL, { signal: AbortSignal.timeout(15000) });
@@ -120,10 +123,35 @@ async function getBlogPosts() {
     );
     return [...merged].map(([route, meta]) => ({ route, ...meta }));
   } catch (err) {
+    // A failed fetch is NOT a soft degradation. dist/ is committed wholesale and
+    // Vercel serves whatever is in it, so a build that quietly falls back to the
+    // seed list doesn't just "miss" the admin-panel posts — it removes their
+    // directories from dist/, and the next deploy DELETES those pages from the
+    // live site. That very nearly shipped once: the fetch failed, the build
+    // still printed "55/55 pages prerendered" and "7/7 checks passed", and only
+    // an HTML file count that dropped by one gave it away.
+    //
+    // So stop, loudly, and make continuing a deliberate act. The escape hatch is
+    // for genuinely offline builds where nobody intends to commit the result.
+    const detail =
+      `Could not read blog posts from Firebase (${err.message}). ` +
+      `Only the ${seed.length} seed slugs in siteData.ts are available, so any ` +
+      `post created in the admin panel would be dropped from dist/ — and deleted ` +
+      `from the live site on the next deploy.`;
+    if (regeneratingDist && process.env.ALLOW_STALE_BLOGS !== '1') {
+      throw new Error(
+        `${detail}\n` +
+          `  Re-run once the database is reachable. To build anyway, set ` +
+          `ALLOW_STALE_BLOGS=1 — but do NOT commit the dist/ it produces.`
+      );
+    }
+    console.warn(`  ! ${detail}`);
     console.warn(
-      `  ! Could not read blog posts from Firebase (${err.message}). ` +
-        `Falling back to the ${seed.length} slugs in siteData.ts — ` +
-        `posts created in the admin panel will NOT be prerendered in this build.`
+      regeneratingDist
+        ? '  ! ALLOW_STALE_BLOGS=1 is set, continuing with the seed list. ' +
+            'This dist/ is incomplete and must not be committed.'
+        : '  ! Not regenerating dist/, so the committed pages are unaffected — ' +
+            'only the sitemap and llms.txt lose their Firebase-only entries.'
     );
     return seed;
   }
@@ -251,8 +279,12 @@ function updateLlmsTxt(path, blogPosts) {
   return { ok: true, changed, count: guides ? guides.split('\n').length : 0 };
 }
 
+// Sitemap <loc> values. No trailing slash except on the root, matching the
+// canonical emitted by SEO.tsx, the internal <Link> hrefs, and the 308 in
+// vercel.json. These previously carried a trailing slash that nothing else
+// used, so every URL in the sitemap was one Google had never crawled.
 function routeToLoc(route) {
-  return route === '/' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${route}/`;
+  return route === '/' ? `${SITE_ORIGIN}/` : `${SITE_ORIGIN}${route}`;
 }
 
 // The committed sitemap carries hand-tuned <priority> and <changefreq> values,
@@ -467,7 +499,7 @@ async function prerender() {
 
   // Resolved once, up front, and shared by both the Vercel and local paths so
   // the two can't drift out of sync the way two hardcoded lists did.
-  const blogPosts = await getBlogPosts();
+  const blogPosts = await getBlogPosts({ regeneratingDist: !isVercel });
   const routes = [...staticRoutes, ...blogPosts.map((p) => p.route)];
 
   // Save the SPA shell BEFORE prerendering (it has the SEO head)
@@ -847,7 +879,16 @@ async function prerender() {
   const total = Object.keys(checks).length;
   console.log(`  Verification: ${passed}/${total} checks passed`);
   Object.entries(checks).filter(([, v]) => !v).forEach(([k]) => console.log(`  FAILED: ${k}`));
-  
+  // A verification step that only prints "FAILED" and then exits 0 is not
+  // verification — the CI rebuild would commit the broken dist/ regardless.
+  // This path is the one that rewrites dist/, so a failure here must stop it.
+  if (passed !== total) {
+    throw new Error(
+      `Prerender verification failed ${total - passed} of ${total} checks (see FAILED lines above). ` +
+        `dist/ has NOT been verified and must not be committed.`
+    );
+  }
+
   // Stats
   const { htmlFiles, bytes } = collectDistStats(join(__dirname, 'dist'));
   console.log(`\nFinal: ${htmlFiles} HTML files, ${formatSize(bytes)} total`);
