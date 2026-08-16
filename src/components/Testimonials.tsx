@@ -108,8 +108,12 @@ export default function Testimonials() {
                 </p>
               </div>
               <div className="mt-6 pt-5 border-t border-white/10">
-                <p className="text-sm font-bold text-white">{featured.name}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{featured.role}, {featured.company}</p>
+                {/* Company only, deliberately. This card renders whatever sits
+                    first in the testimonials data, and naming an individual
+                    turns it into a claim about a real person holding a real
+                    role at a real company. Crediting the organisation keeps it
+                    a company reference, which is what the video supports. */}
+                <p className="text-sm font-bold text-white">{featured.company}</p>
               </div>
             </motion.div>
 
