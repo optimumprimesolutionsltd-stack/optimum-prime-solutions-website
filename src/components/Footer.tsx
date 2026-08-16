@@ -341,10 +341,15 @@ export default function Footer() {
         <div className="rounded-4xl bg-slate-900 p-8 text-white shadow-2xl shadow-slate-900/10">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              {/* self-start stops the column layout stretching this to the full
+                  card width: the parent is flex-col below sm, where the default
+                  align-items:stretch overrides w-auto and blew the white plate
+                  out to 279px with the mark marooned in the middle. sm:self-auto
+                  hands alignment back to the row's items-center above sm. */}
               <img
                 src="/tally-solutions-new-logo.png"
                 alt="TallyPrime accounting software logo — official partner Optimum Prime Solutions Kenya"
-                className="h-16 w-auto rounded-xl object-contain bg-white p-2 shadow-lg shadow-black/10"
+                className="h-16 w-auto self-start sm:self-auto rounded-xl object-contain bg-white p-2 shadow-lg shadow-black/10"
                 width={126}
                 height={64}
                 loading="lazy"
