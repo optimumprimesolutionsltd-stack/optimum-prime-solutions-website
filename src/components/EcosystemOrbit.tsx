@@ -1,12 +1,17 @@
 import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 
+// w/h are the assets' real intrinsic sizes. Three of these four are wordmarks
+// wider than they are tall, so the node below is a plate, not a circle — a
+// circle crops to the short side and leaves the logo unreadable.
 const partners = [
-  { name: 'TallyPrime',  logo: '/tally-solutions-new-logo.png', angle: 0,   color: '#dc2626', invertOnDark: false },
-  { name: 'Biz Analyst', logo: '/partner-biz-analyst.png', angle: 90, color: '#34d399', invertOnDark: false },
-  { name: 'TSplus',      logo: '/partner-tsplus.png',     angle: 180, color: '#8b5cf6', invertOnDark: false },
-  { name: 'KRA eTIMS',   logo: '/kra-logo-official.png', angle: 270, color: '#16a34a', invertOnDark: true },
+  { name: 'TallyPrime',  logo: '/tally-solutions-new-logo.png', angle: 0,   color: '#dc2626', w: 548,  h: 238 },
+  { name: 'Biz Analyst', logo: '/partner-biz-analyst.png', angle: 90, color: '#34d399', w: 512,  h: 512 },
+  { name: 'TSplus',      logo: '/partner-tsplus.png',     angle: 180, color: '#8b5cf6', w: 300,  h: 300 },
+  { name: 'KRA eTIMS',   logo: '/kra-logo-official.png', angle: 270, color: '#16a34a', w: 1858, h: 524 },
 ];
+
+const ORBIT_DURATION = 40;
 
 const cards = [
   { label: 'TallyPrime',      desc: 'Accounting, inventory & KRA compliance',         border: 'border-red-500/30',    bg: 'bg-red-500/10',    text: 'text-red-400' },
@@ -41,10 +46,12 @@ function OrbitIcon({ partner, radius, duration, delay }: {
         title={partner.name}
         whileHover={{ scale: 1.15 }}
       >
+        {/* White plate rather than a tinted circle: two of these logos ship on
+            an opaque white background and two are dark-on-transparent, so the
+            partner colour lives in the border and glow instead of behind them. */}
         <motion.div
-          className="w-16 h-16 rounded-full flex items-center justify-center p-2 shadow-2xl transition-all cursor-pointer group relative overflow-visible"
+          className="w-28 h-14 rounded-2xl bg-white flex items-center justify-center p-2 shadow-2xl transition-all cursor-pointer group relative overflow-hidden"
           style={{
-            background: `${partner.color}22`,
             border: `2px solid ${partner.color}88`,
             boxShadow: `0 0 24px ${partner.color}55`,
           }}
@@ -53,20 +60,13 @@ function OrbitIcon({ partner, radius, duration, delay }: {
             scale: 1.1,
           }}
         >
-          {/* Subtle glow background without blur that affects children */}
-          <div
-            className="absolute inset-0 rounded-full opacity-20"
-            style={{ background: partner.color }}
-          />
-          
           <img
             src={partner.logo}
             alt={partner.name}
-            className="w-full h-full object-contain relative z-10 filter drop-shadow-md"
-            width={64}
-            height={64}
+            className="max-h-full max-w-full object-contain relative z-10"
+            width={partner.w}
+            height={partner.h}
             loading="lazy"
-            style={{ imageRendering: 'auto', ...(partner.invertOnDark ? { filter: 'brightness(0) invert(1)' } : {}) }}
             onError={(e) => {
               const el = e.target as HTMLImageElement;
               el.style.display = 'none';
@@ -151,14 +151,18 @@ export default function EcosystemOrbit() {
                 transition={{ duration: 80, repeat: Infinity, ease: 'linear' as const }}
               />
 
-              {/* Orbiting partner icons */}
-              {partners.map((p, i) => (
+              {/* Orbiting partner icons. One shared duration, so the ring keeps
+                  the fixed spacing each partner's `angle` asks for — with a
+                  per-icon duration they drifted past each other, and the plates
+                  are now wide enough that drifting means colliding. 90deg apart
+                  puts 254px between plate centres, which two 112px plates clear. */}
+              {partners.map((p) => (
                 <OrbitIcon
                   key={p.name}
                   partner={p}
                   radius={180}
-                  duration={30 + i * 5}
-                  delay={-(i * (30 / partners.length))}
+                  duration={ORBIT_DURATION}
+                  delay={-(p.angle / 360) * ORBIT_DURATION}
                 />
               ))}
 
