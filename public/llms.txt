@@ -52,7 +52,6 @@ hand-written and is left alone.
 - [TallyPrime 7.1 Is Here: What's New and What It Means for Your Business](https://www.optimumprimesolutions.co.ke/blog/tallyprime-71-is-here-whats-new-and-what-it-means-for-your-business/): Tally Solutions has released TallyPrime 7.1 Beta with major upgrades to invoicing, banking, compliance, and reporting. Here's everything you need to know as a Kenyan business owner.
 - [Why Every Kenyan Business Needs TallyPrime in 2026](https://www.optimumprimesolutions.co.ke/blog/why-every-kenyan-business-needs-tally-prime-in-2025/): From the 2026 Year of Income, KRA validates the expenses you claim against electronic tax invoices. Here is why TallyPrime has moved from useful to unavoidable for Kenyan businesses.
 - [TallyPrime Cloud Hosting: Access Your Business Data From Anywhere](https://www.optimumprimesolutions.co.ke/blog/tallyprime-cloud-hosting-access-your-business-data-from-anywhere/): Learn how cloud-hosted TallyPrime gives your team secure, real-time access to accounting and inventory data from any location in Kenya and beyond.
-
 - [Tally Prime Silver vs Gold: Which Edition Is Right for You?](https://www.optimumprimesolutions.co.ke/blog/tally-prime-silver-vs-gold-which-edition-is-right-for-you/): A detailed comparison of Tally Prime Silver and Gold editions to help you choose the perfect solution for your business size.
 <!-- END GENERATED GUIDES -->
 
