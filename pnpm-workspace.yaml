@@ -1,5 +1,21 @@
+# pnpm blocks dependency postinstall scripts by default and asks which to allow.
+# These four were left as the scaffold's placeholder text, which is not a boolean,
+# so every `pnpm run` aborted with ERR_PNPM_IGNORED_BUILDS before reaching the
+# script — including `pnpm run build:ssg`.
+#
+# Local development only: CI installs with `npm ci` and npm does not gate
+# dependency build scripts, so .github/workflows/rebuild-dist.yml never hit this.
+#
+# Allowed only where the script does real work we depend on:
+#   esbuild    - install.js resolves the platform binary vite compiles with
+#   puppeteer  - install.mjs fetches the Chrome that prerender.mjs drives to
+#                render pages into dist/
+# Declined for the two whose postinstalls we do not rely on, keeping pnpm's
+# supply-chain guard meaningful rather than blanket-allowing:
+#   protobufjs     - reaches us transitively via firebase, unused in the browser bundle
+#   @firebase/util - build-time helper only
 allowBuilds:
-  '@firebase/util': set this to true or false
-  esbuild: set this to true or false
-  protobufjs: set this to true or false
-  puppeteer: set this to true or false
+  '@firebase/util': false
+  esbuild: true
+  protobufjs: false
+  puppeteer: true
