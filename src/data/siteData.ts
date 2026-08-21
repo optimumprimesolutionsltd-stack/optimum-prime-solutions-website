@@ -51,17 +51,260 @@ export interface Lead {
   reopenedAt?: string;            // when the pipeline was last restarted
   reopenCount?: number;           // how many times this lead has been restarted
   originalCreatedAt?: string;     // the first period it was domiciled in, kept when re-dated
-  // ── Closed Won ───────────────────────────────────────────────────────────
-  // Asked for at the moment the deal is marked won, because that is the only
-  // moment the figure is known and someone is looking at it. `amount` is
-  // deliberately optional and never defaulted to 0: a deal whose value nobody
-  // had to hand is UNRECORDED, and the reports say so rather than averaging a
-  // zero into the totals.
+  // ── Closed Won / licensing ─────────────────────────────────────────────────
+  // Every Tally licence carries a 9-digit serial number, so a won deal without
+  // one is an incomplete record — updateStatus gates the move to Closed Won on
+  // it. Deals won before this was introduced keep their status and can have the
+  // serial filled in later; nothing is invalidated retroactively.
+  //
+  // The figures are asked for at the moment the deal is marked won, because
+  // that is the only moment they are known and someone is looking at them.
+  // `amount` is deliberately optional and never defaulted to 0: a deal whose
+  // value nobody had to hand is UNRECORDED, and the reports say so rather than
+  // averaging a zero into the totals.
   wonAt?: string;                 // ISO, stamped when the deal is marked Closed Won
+  serialNo?: string;              // the Tally serial this deal relates to
+  clientId?: string;              // the Client record that serial resolves to
+  dealType?: DealType;            // new licence, TSS renewal, upgrade, …
   amount?: number;                // deal value in KES — numeric so it can be summed
   // Link to the delivery job created once the deal is won.
   wipJobId?: string;
 }
+
+// ── Tally licensing ─────────────────────────────────────────────────────────
+// Licences come in four combinations: Silver/Gold × Annual/Perpetual. An Annual
+// licence can be topped up to Perpetual, but only before its licence year ends
+// — after that the customer has to buy afresh, so the window is real money with
+// a deadline on it.
+export type TallyEdition = 'Silver' | 'Gold';
+export type LicenceTerm = 'Annual' | 'Perpetual';
+
+// What a deal actually sells. Renewals and upgrades are sold against a licence
+// that already exists, so they carry a serial from the moment they're created;
+// a brand-new licence only gets its serial once it's bought and activated.
+export type DealType =
+  | 'New Licence'
+  | 'TSS Renewal'
+  | 'Term Upgrade'      // Annual → Perpetual top-up
+  | 'Edition Upgrade'   // Silver → Gold
+  | 'Customization'
+  | 'Training'
+  | 'Other';
+
+export const DEAL_TYPES: DealType[] = [
+  'New Licence', 'TSS Renewal', 'Term Upgrade', 'Edition Upgrade',
+  'Customization', 'Training', 'Other',
+];
+
+// Deal types sold against an existing licence — these need a serial up front.
+export const EXISTING_LICENCE_DEALS: DealType[] = ['TSS Renewal', 'Term Upgrade', 'Edition Upgrade'];
+
+// ── The product catalogue ───────────────────────────────────────────────────
+// What a customer can actually own. A won customer rarely owns just one thing:
+// a TallyPrime licence, the TSS that keeps it current, sometimes a Tally Server
+// on top, sometimes a customization written specifically for them. The customer
+// directory has to show every one of them against the same serial, so they are
+// kept as line items rather than as one licence per customer.
+export type ProductKind =
+  | 'Tally Gold'
+  | 'Tally Silver'
+  | 'Tally Server'
+  | 'Customization'
+  | 'TSS';
+
+export const PRODUCT_KINDS: ProductKind[] = [
+  'Tally Gold', 'Tally Silver', 'Tally Server', 'Customization', 'TSS',
+];
+
+// How each kind behaves, kept as data so the directory, the win dialog and the
+// renewal reminders can never disagree about whether a product expires.
+//   term       — sold Annual or Perpetual, so the term must be chosen
+//   customName — carries the customer's own name for it (customizations only)
+//   expiry     — 'annual-only' expires when Annual and never when Perpetual;
+//                'always' always carries an end date; 'never' has none at all
+export interface ProductRule {
+  term: boolean;
+  customName: boolean;
+  expiry: 'annual-only' | 'always' | 'never';
+}
+export const PRODUCT_RULES: Record<ProductKind, ProductRule> = {
+  'Tally Gold':    { term: true,  customName: false, expiry: 'annual-only' },
+  'Tally Silver':  { term: true,  customName: false, expiry: 'annual-only' },
+  // A Tally Server licence is owned outright — no term to choose, nothing to
+  // renew. Keeping it current is what the customer's TSS line is for.
+  'Tally Server':  { term: false, customName: false, expiry: 'never' },
+  'Customization': { term: true,  customName: true,  expiry: 'annual-only' },
+  // TSS is a subscription in every case, Perpetual licences included, so it
+  // always has an end date on it.
+  'TSS':           { term: false, customName: false, expiry: 'always' },
+};
+
+export interface ClientProduct {
+  id: string;
+  kind: ProductKind;
+  // Customizations only: what the customer calls it, e.g. "Branch-wise stock
+  // ageing report". Every other kind reads from its own name.
+  name?: string;
+  term?: LicenceTerm;
+  activatedOn?: string;           // YYYY-MM-DD
+  // Only meaningful where the kind expires — see productExpires.
+  expiresOn?: string;             // YYYY-MM-DD
+  notes?: string;
+}
+
+// Whether an expiry date applies to this line at all. A Perpetual licence with
+// an expiry date on it would be a lie, so the directory hides the field rather
+// than showing a blank one.
+export const productExpires = (p: Pick<ClientProduct, 'kind' | 'term'>): boolean => {
+  const rule = PRODUCT_RULES[p.kind];
+  if (!rule) return false;
+  if (rule.expiry === 'always') return true;
+  if (rule.expiry === 'never') return false;
+  return p.term === 'Annual';
+};
+
+// How a line reads in the directory, the exports and the reminders.
+export const productLabel = (p: Pick<ClientProduct, 'kind' | 'name' | 'term'>): string => {
+  const rule = PRODUCT_RULES[p.kind];
+  const base = rule?.customName && p.name?.trim()
+    ? `${p.name.trim()} (Customization)`
+    : p.kind;
+  return rule?.term && p.term ? `${base} — ${p.term}` : base;
+};
+
+// ── Client register ─────────────────────────────────────────────────────────
+// Keyed on the Tally serial number, which is the client's real identity: it's
+// what ties licence upgrades, TSS renewals and support back to one customer.
+// Deals point at a Client rather than repeating the licence details, so next
+// year's renewal attaches to the same record instead of creating a duplicate.
+export interface Client {
+  id: string;
+  serialNo: string;               // 9-digit Tally serial — unique across clients
+  company: string;
+  contactName?: string;
+  phone?: string;
+  email?: string;
+  edition: TallyEdition;
+  term: LicenceTerm;
+  activatedOn?: string;           // YYYY-MM-DD
+  // Annual licences only: the end of the licence year, and therefore the last
+  // day the Annual → Perpetual top-up can be taken.
+  licenceExpiry?: string;         // YYYY-MM-DD
+  // TSS runs on every licence, Perpetual included — owning the licence outright
+  // does not keep updates and remote access alive.
+  tssExpiry?: string;             // YYYY-MM-DD
+  // Everything this customer owns against the serial above — the licence, its
+  // TSS, a Tally Server, any customization. The four fields above are kept as
+  // a mirror of this list (see syncClientLicence) so the renewal reminders,
+  // which key off them, carry on working unchanged.
+  products?: ClientProduct[];
+  notes?: string;
+  leadId?: string;                // the deal that first won this client
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// A Tally serial is exactly 9 digits.
+export const isValidSerial = (s: string): boolean => /^\d{9}$/.test(s.trim());
+
+// Find an existing client by serial, so a renewal links instead of duplicating.
+export const findClientBySerial = (clients: Client[] | undefined, serial: string): Client | undefined =>
+  (clients || []).find(c => c.serialNo === serial.trim());
+
+// The product lines to show for a client. Records created before the catalogue
+// existed carry only the edition/term/TSS fields, so those are read as the two
+// lines they always meant: the licence itself, and its TSS. Doing it here means
+// the directory never has to special-case an old record.
+export const clientProducts = (c: Client): ClientProduct[] => {
+  if (c.products && c.products.length > 0) return c.products;
+  const lines: ClientProduct[] = [{
+    id: `${c.id}_licence`,
+    kind: (c.edition === 'Gold' ? 'Tally Gold' : 'Tally Silver') as ProductKind,
+    term: c.term,
+    activatedOn: c.activatedOn,
+    expiresOn: c.term === 'Annual' ? c.licenceExpiry : undefined,
+  }];
+  if (c.tssExpiry) {
+    lines.push({
+      id: `${c.id}_tss`,
+      kind: 'TSS',
+      activatedOn: c.activatedOn,
+      expiresOn: c.tssExpiry,
+    });
+  }
+  return lines;
+};
+
+// Push the product lines back into the four legacy fields, so the Renewals tab
+// and the CRM report keep reading one licence per client while the directory
+// edits the full list. The first Gold/Silver line is the client's licence; the
+// first TSS line is their subscription.
+export const syncClientLicence = (c: Client): Client => {
+  const products = c.products || [];
+  if (products.length === 0) return c;
+  const licence = products.find(p => p.kind === 'Tally Gold' || p.kind === 'Tally Silver');
+  const tss = products.find(p => p.kind === 'TSS');
+  return {
+    ...c,
+    edition: licence ? (licence.kind === 'Tally Gold' ? 'Gold' : 'Silver') : c.edition,
+    term: licence?.term || c.term,
+    activatedOn: licence?.activatedOn || products[0]?.activatedOn || c.activatedOn,
+    // Only an Annual licence carries a top-up deadline; a Perpetual one must
+    // not, or Renewals would chase a window that does not exist.
+    licenceExpiry: licence && licence.term === 'Annual' ? licence.expiresOn : undefined,
+    tssExpiry: tss?.expiresOn,
+    updatedAt: new Date().toISOString(),
+  };
+};
+
+// Fold the licence details captured when a deal is closed won into a client's
+// product lines. A renewal must update the TSS line that is already there
+// rather than adding a second one, which is why this merges by kind instead of
+// appending — the serial is one customer, however many times they buy.
+export const upsertLicenceProducts = (
+  existing: ClientProduct[],
+  licence: {
+    edition: TallyEdition; term: LicenceTerm;
+    activatedOn?: string; licenceExpiry?: string; tssExpiry?: string;
+  },
+): ClientProduct[] => {
+  const out = existing.map(p => ({ ...p }));
+  const kind: ProductKind = licence.edition === 'Gold' ? 'Tally Gold' : 'Tally Silver';
+
+  const licenceLine = out.find(p => p.kind === 'Tally Gold' || p.kind === 'Tally Silver');
+  const licenceFields = {
+    kind,
+    term: licence.term,
+    activatedOn: licence.activatedOn,
+    // Only an Annual licence has a licence-year end; a Perpetual one keeps none.
+    expiresOn: licence.term === 'Annual' ? licence.licenceExpiry : undefined,
+  };
+  if (licenceLine) Object.assign(licenceLine, licenceFields);
+  else out.push({ id: `p_${Date.now()}_lic`, ...licenceFields });
+
+  // TSS only appears once there is an end date for it — an empty TSS line
+  // would show in the directory as a subscription nobody can account for.
+  if (licence.tssExpiry) {
+    const tssLine = out.find(p => p.kind === 'TSS');
+    if (tssLine) tssLine.expiresOn = licence.tssExpiry;
+    else out.push({
+      id: `p_${Date.now()}_tss`, kind: 'TSS',
+      activatedOn: licence.activatedOn, expiresOn: licence.tssExpiry,
+    });
+  }
+  return out;
+};
+
+// Days from today until a date, negative once it has passed. Used for the
+// expiry chips in the directory.
+export const daysUntilDate = (d?: string): number | null => {
+  if (!d) return null;
+  const t = new Date(d).getTime();
+  if (Number.isNaN(t)) return null;
+  const startOfToday = new Date();
+  startOfToday.setHours(0, 0, 0, 0);
+  return Math.round((t - startOfToday.getTime()) / 86400000);
+};
 
 // ── Work in progress ────────────────────────────────────────────────────────
 // Client work being delivered after the sale — training, implementation,
@@ -90,6 +333,8 @@ export interface WipJob {
   notes?: string;
   tasks?: WipTask[];              // simple delivery checklist
   leadId?: string;                // the won lead this came from, if any
+  serialNo?: string;              // the licence being delivered against
+  clientId?: string;              // the Client record for that serial
   createdAt: string;
   updatedAt?: string;
 }
@@ -100,6 +345,8 @@ export interface SiteData {
   company: CompanyInfo; contact: ContactInfo; services: ServiceItem[]; products: ProductItem[];
   testimonials: TestimonialItem[]; faqs: FaqItem[]; industries: IndustryItem[];
   blogs: BlogPost[]; leads: Lead[];
+  // Won customers and their licences, keyed on the Tally serial number.
+  clients?: Client[];
   // Client work being delivered (training, implementation, …)
   wipJobs?: WipJob[];
   // Optional mapping of page/theme -> hero image URL (use real photos of African users)
@@ -171,7 +418,7 @@ export const defaultData: SiteData = {
   ],
   faqs: [
     {id:'1',q:'What is Tally Prime?',a:'Tally Prime is a complete business management software for accounting, inventory, payroll, manufacturing, taxation, and more. It\'s used by millions of businesses worldwide and is the leading ERP solution in East Africa.',cat:'General'},
-    {id:'2',q:'How much does Tally Prime cost?',a:'Tally Prime Silver (single user) costs KES 54,000 and Tally Prime Gold (multi-user) costs KES 162,000. Both are one-time purchases with 1 year of free updates. Contact us for volume discounts.',cat:'Pricing'},
+    {id:'2',q:'How much does Tally Prime cost?',a:'Tally Prime Silver (single user) costs KES 57,600 +VAT and Tally Prime Gold (multi-user) costs KES 172,800 +VAT. Both are one-time purchases with 1 year of free updates. Contact us for volume discounts.',cat:'Pricing'},
     {id:'3',q:'Do you provide training?',a:'Yes! We provide comprehensive training covering all Tally Prime modules — accounting, inventory, payroll, manufacturing, and KRA compliance. Training can be on-site or remote.',cat:'Services'},
     {id:'4',q:'How does Tally handle KRA compliance?',a:'Tally Prime is fully configured for KRA including VAT computation, PAYE calculations, income tax reports, and supports e-filing integration for iTax returns.',cat:'KRA & Tax'},
     {id:'5',q:'Can I access Tally Prime remotely?',a:'Yes! Tally Prime Gold supports remote access. With our cloud setup, you can access your data from anywhere — perfect for teams working across multiple locations.',cat:'General'},

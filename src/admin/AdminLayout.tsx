@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Building2, Briefcase, ShoppingCart, Globe,
   HelpCircle, Users, FileText, Phone, MessageCircle, CalendarDays, Video,
-  LogOut, Menu, X, ExternalLink, Mail, Lock, Wrench
+  LogOut, Menu, X, ExternalLink, Mail, Lock, Wrench, CalendarClock, KeyRound
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import { type SiteData } from '../data/siteData';
@@ -25,6 +25,8 @@ import SubscribersManager from './editors/SubscribersManager';
 import AccessRequestsManager from './editors/AccessRequestsManager';
 import ContactsDirectory from './editors/ContactsDirectory';
 import WorkInProgressManager from './editors/WorkInProgressManager';
+import CustomerDirectory from './editors/CustomerDirectory';
+import RenewalsManager from './editors/RenewalsManager';
 import { useAdminNotifications, type AdminNotification } from './notifications/useAdminNotifications';
 import { NotificationBell, NotificationToasts } from './notifications/NotificationCenter';
 
@@ -33,6 +35,10 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'leads', label: 'Demo Leads', icon: Users },
   // Delivery after the sale — training, implementation, support.
   { id: 'wip', label: 'Work in Progress', icon: Wrench },
+  // Won customers, by serial number, with every product they hold.
+  { id: 'customers', label: 'Customer Directory', icon: KeyRound },
+  // Recurring revenue: TSS renewals and the Annual → Perpetual top-up window.
+  { id: 'renewals', label: 'Renewals & Upgrades', icon: CalendarClock },
   { id: 'workshop', label: 'Workshop RSVPs', icon: CalendarDays },
   { id: 'webinar', label: 'Webinar RSVPs', icon: Video },
   // Restricted tabs require email approval
@@ -72,7 +78,7 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
   // Other tabs require email approval via the access request system
   // Full admins can access all tabs
   // Staff need the delivery board as much as the pipeline — they do the work.
-  const baseAccessibleTabs = isFullAdmin ? new Set(tabs.map(t => t.id)) : new Set(['dashboard', 'leads', 'wip', 'workshop', 'webinar']);
+  const baseAccessibleTabs = isFullAdmin ? new Set(tabs.map(t => t.id)) : new Set(['dashboard', 'leads', 'wip', 'customers', 'renewals', 'workshop', 'webinar']);
   const accessibleTabs = baseAccessibleTabs;
   const [showAccessRequest, setShowAccessRequest] = useState(false);
   const [requestedTab, setRequestedTab] = useState<string | null>(null);
@@ -179,6 +185,9 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
         onStartWork={jobId => { setOpenJobId(jobId); setTab('wip'); }} />;
       case 'wip': return <WorkInProgressManager data={data} onSave={d => handleSave(d, 'Work in progress updated!')}
         openJobId={openJobId} onOpenConsumed={() => setOpenJobId(null)} />;
+      case 'customers': return <CustomerDirectory data={data} onSave={d => handleSave(d, 'Customer directory updated!')} />;
+      case 'renewals': return <RenewalsManager data={data} onSave={d => handleSave(d, 'Renewal raised!')}
+        onRaised={() => setTab('leads')} />;
       case 'workshop': return <WorkshopRegistrationsManager data={data} onSave={d => handleSave(d, 'Workshop updated!')}
         onBookDemo={leadId => { setScheduleLeadId(leadId); setTab('leads'); }} />;
       case 'webinar': return <WebinarRegistrationsManager data={data} onSave={d => handleSave(d, 'Webinar updated!')}
