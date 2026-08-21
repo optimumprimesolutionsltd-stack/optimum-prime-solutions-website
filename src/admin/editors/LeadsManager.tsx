@@ -946,8 +946,15 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     const lead = winLead;
     if (!lead) return;
     const serial = winForm.serialNo.trim();
-    if (!isValidSerial(serial)) {
-      setWinError('A Tally serial number is exactly 9 digits. Every licence has one — the deal can\'t be closed won without it.');
+    // A typed serial must be a real one — 9 digits, no exceptions. But an
+    // ABSENT serial does not block the win. The same reasoning the deal value
+    // gets: blocking the pipeline on a number nobody has to hand teaches people
+    // to invent one, and a fabricated serial is worse than a missing one — it
+    // silently becomes a customer record that renewals and TSS reminders then
+    // chase. Won without a serial is an incomplete record, and it says so:
+    // wonMissingSerial surfaces these to be completed when the number arrives.
+    if (serial && !isValidSerial(serial)) {
+      setWinError("A Tally serial number is exactly 9 digits. Leave it blank if you don't have it yet — the deal closes and is flagged for the serial.");
       return;
     }
     const now = new Date().toISOString();
@@ -956,9 +963,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     const wonAt = winForm.wonDate === today() ? now : new Date(winForm.wonDate).toISOString();
     const amount = winForm.amount.trim() ? Number(winForm.amount.replace(/[^\d.]/g, '')) : undefined;
 
-    const matched = findClientBySerial(data.clients, serial);
+    // The client register is keyed on the serial, so there is nothing to write
+    // to it until one exists. The deal still closes; the licence details are
+    // simply not turned into a customer record until the number arrives.
+    const matched = serial ? findClientBySerial(data.clients, serial) : undefined;
     const clientId = matched?.id || `cl_${Date.now()}`;
-    const clientRecord: Client = {
+    const clientRecord: Client | null = !serial ? null : {
       id: clientId,
       serialNo: serial,
       company: lead.company || matched?.company || lead.name,
@@ -987,9 +997,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       updatedAt: now,
     };
 
-    const clients = matched
-      ? (data.clients || []).map(c => c.id === matched.id ? clientRecord : c)
-      : [clientRecord, ...(data.clients || [])];
+    const clients = !clientRecord
+      ? (data.clients || [])
+      : matched
+        ? (data.clients || []).map(c => c.id === matched.id ? clientRecord : c)
+        : [clientRecord, ...(data.clients || [])];
 
     onSave({
       ...data,
@@ -999,8 +1011,8 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             ...l,
             status: 'Closed Won',
             wonAt,
-            serialNo: serial,
-            clientId,
+            // Only stamp the licence links when there is a licence to link to.
+            ...(serial ? { serialNo: serial, clientId } : {}),
             dealType: winForm.dealType,
             ...(amount != null && !Number.isNaN(amount) ? { amount } : {}),
           }
@@ -3284,13 +3296,14 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               <p className="text-xs text-slate-500">
                 Every Tally licence carries a 9-digit serial number, so it's captured here rather
                 than chased later. A serial we already hold links this deal to that client instead
-                of creating a second record.
+                of creating a second record. Don't have it yet? Leave it blank — the deal still
+                closes, and it will be listed as needing its serial.
               </p>
 
               {/* Serial — the gate */}
               <div>
                 <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">
-                  Tally serial number <span className="text-red-500">*</span>
+                  Tally serial number <span className="font-normal normal-case text-slate-400">(if you have it)</span>
                 </label>
                 <input value={winForm.serialNo}
                   onChange={e => { setWinForm(f => ({ ...f, serialNo: e.target.value })); setWinError(null); }}
@@ -3304,7 +3317,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   </p>
                 ) : (
                   <p className="mt-1.5 text-xs text-slate-400">
-                    A new serial creates a client record you can track renewals against.
+                    {winForm.serialNo.trim()
+                      ? 'A new serial creates a client record you can track renewals against.'
+                      : 'Left blank, the deal closes without a client record and is flagged for the serial.'}
                   </p>
                 )}
               </div>
