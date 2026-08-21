@@ -10,6 +10,7 @@ import type {
 } from '../../data/siteData';
 import {
   DEAL_TYPES, EXISTING_LICENCE_DEALS, isValidSerial, findClientBySerial,
+  clientProducts, upsertLicenceProducts,
 } from '../../data/siteData';
 import { fbSubscribe, fbSet } from '../../firebase/config';
 import KanbanBoard from './KanbanBoard';
@@ -848,6 +849,15 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       // misleading — only Annual carries the top-up deadline.
       licenceExpiry: winForm.term === 'Annual' ? (winForm.licenceExpiry || undefined) : undefined,
       tssExpiry: winForm.tssExpiry || undefined,
+      // Seed the product lines the Customer Directory reads. On a renewal this
+      // updates the lines already on the record instead of adding duplicates.
+      products: upsertLicenceProducts(matched ? clientProducts(matched) : [], {
+        edition: winForm.edition,
+        term: winForm.term,
+        activatedOn: matched?.activatedOn || winForm.wonDate,
+        licenceExpiry: winForm.licenceExpiry || undefined,
+        tssExpiry: winForm.tssExpiry || undefined,
+      }),
       leadId: matched?.leadId || lead.id,
       notes: matched?.notes,
       createdAt: matched?.createdAt || now,
