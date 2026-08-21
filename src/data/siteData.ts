@@ -51,17 +51,87 @@ export interface Lead {
   reopenedAt?: string;            // when the pipeline was last restarted
   reopenCount?: number;           // how many times this lead has been restarted
   originalCreatedAt?: string;     // the first period it was domiciled in, kept when re-dated
-  // ── Closed Won ───────────────────────────────────────────────────────────
+  // ── Closed Won / licensing ───────────────────────────────────────────────
   // Asked for at the moment the deal is marked won, because that is the only
-  // moment the figure is known and someone is looking at it. `amount` is
+  // moment the figures are known and someone is looking at them. `amount` is
   // deliberately optional and never defaulted to 0: a deal whose value nobody
   // had to hand is UNRECORDED, and the reports say so rather than averaging a
   // zero into the totals.
+  //
+  // Every Tally licence carries a 9-digit serial number, so a won deal without
+  // one is an incomplete record — updateStatus gates the move to Closed Won on
+  // it. Deals won before this was introduced keep their status and can have the
+  // serial filled in later; nothing is invalidated retroactively.
   wonAt?: string;                 // ISO, stamped when the deal is marked Closed Won
+  serialNo?: string;              // the Tally serial this deal relates to
+  clientId?: string;              // the Client record that serial resolves to
+  dealType?: DealType;            // new licence, TSS renewal, upgrade, …
   amount?: number;                // deal value in KES — numeric so it can be summed
   // Link to the delivery job created once the deal is won.
   wipJobId?: string;
 }
+
+// ── Tally licensing ─────────────────────────────────────────────────────────
+// Licences come in four combinations: Silver/Gold × Annual/Perpetual. An Annual
+// licence can be topped up to Perpetual, but only before its licence year ends
+// — after that the customer has to buy afresh, so the window is real money with
+// a deadline on it.
+export type TallyEdition = 'Silver' | 'Gold';
+export type LicenceTerm = 'Annual' | 'Perpetual';
+
+// What a deal actually sells. Renewals and upgrades are sold against a licence
+// that already exists, so they carry a serial from the moment they're created;
+// a brand-new licence only gets its serial once it's bought and activated.
+export type DealType =
+  | 'New Licence'
+  | 'TSS Renewal'
+  | 'Term Upgrade'      // Annual → Perpetual top-up
+  | 'Edition Upgrade'   // Silver → Gold
+  | 'Customization'
+  | 'Training'
+  | 'Other';
+
+export const DEAL_TYPES: DealType[] = [
+  'New Licence', 'TSS Renewal', 'Term Upgrade', 'Edition Upgrade',
+  'Customization', 'Training', 'Other',
+];
+
+// Deal types sold against an existing licence — these need a serial up front.
+export const EXISTING_LICENCE_DEALS: DealType[] = ['TSS Renewal', 'Term Upgrade', 'Edition Upgrade'];
+
+// ── Client register ─────────────────────────────────────────────────────────
+// Keyed on the Tally serial number, which is the client's real identity: it's
+// what ties licence upgrades, TSS renewals and support back to one customer.
+// Deals point at a Client rather than repeating the licence details, so next
+// year's renewal attaches to the same record instead of creating a duplicate.
+export interface Client {
+  id: string;
+  serialNo: string;               // 9-digit Tally serial — unique across clients
+  company: string;
+  contactName?: string;
+  phone?: string;
+  email?: string;
+  edition: TallyEdition;
+  term: LicenceTerm;
+  activatedOn?: string;           // YYYY-MM-DD
+  // Annual licences only: the end of the licence year, and therefore the last
+  // day the Annual → Perpetual top-up can be taken.
+  licenceExpiry?: string;         // YYYY-MM-DD
+  // TSS runs on every licence, Perpetual included — owning the licence outright
+  // does not keep updates and remote access alive.
+  tssExpiry?: string;             // YYYY-MM-DD
+  notes?: string;
+  leadId?: string;                // the deal that first won this client
+  createdAt: string;
+  updatedAt?: string;
+}
+
+// A Tally serial is exactly 9 digits.
+export const isValidSerial = (s: string): boolean => /^\d{9}$/.test(s.trim());
+
+// Find an existing client by serial, so a renewal links instead of duplicating.
+export const findClientBySerial = (clients: Client[] | undefined, serial: string): Client | undefined =>
+  (clients || []).find(c => c.serialNo === serial.trim());
 
 // ── Work in progress ────────────────────────────────────────────────────────
 // Client work being delivered after the sale — training, implementation,
@@ -90,6 +160,8 @@ export interface WipJob {
   notes?: string;
   tasks?: WipTask[];              // simple delivery checklist
   leadId?: string;                // the won lead this came from, if any
+  serialNo?: string;              // the licence being delivered against
+  clientId?: string;              // the Client record for that serial
   createdAt: string;
   updatedAt?: string;
 }
@@ -100,6 +172,8 @@ export interface SiteData {
   company: CompanyInfo; contact: ContactInfo; services: ServiceItem[]; products: ProductItem[];
   testimonials: TestimonialItem[]; faqs: FaqItem[]; industries: IndustryItem[];
   blogs: BlogPost[]; leads: Lead[];
+  // Won customers and their licences, keyed on the Tally serial number.
+  clients?: Client[];
   // Client work being delivered (training, implementation, …)
   wipJobs?: WipJob[];
   // Optional mapping of page/theme -> hero image URL (use real photos of African users)
@@ -171,7 +245,7 @@ export const defaultData: SiteData = {
   ],
   faqs: [
     {id:'1',q:'What is Tally Prime?',a:'Tally Prime is a complete business management software for accounting, inventory, payroll, manufacturing, taxation, and more. It\'s used by millions of businesses worldwide and is the leading ERP solution in East Africa.',cat:'General'},
-    {id:'2',q:'How much does Tally Prime cost?',a:'Tally Prime Silver (single user) costs KES 54,000 and Tally Prime Gold (multi-user) costs KES 162,000. Both are one-time purchases with 1 year of free updates. Contact us for volume discounts.',cat:'Pricing'},
+    {id:'2',q:'How much does Tally Prime cost?',a:'Tally Prime Silver (single user) costs KES 57,600 +VAT and Tally Prime Gold (multi-user) costs KES 172,800 +VAT. Both are one-time purchases with 1 year of free updates. Contact us for volume discounts.',cat:'Pricing'},
     {id:'3',q:'Do you provide training?',a:'Yes! We provide comprehensive training covering all Tally Prime modules — accounting, inventory, payroll, manufacturing, and KRA compliance. Training can be on-site or remote.',cat:'Services'},
     {id:'4',q:'How does Tally handle KRA compliance?',a:'Tally Prime is fully configured for KRA including VAT computation, PAYE calculations, income tax reports, and supports e-filing integration for iTax returns.',cat:'KRA & Tax'},
     {id:'5',q:'Can I access Tally Prime remotely?',a:'Yes! Tally Prime Gold supports remote access. With our cloud setup, you can access your data from anywhere — perfect for teams working across multiple locations.',cat:'General'},
