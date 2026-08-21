@@ -183,8 +183,11 @@ export default function EcosystemOrbit() {
                     boxShadow: '0 0 40px rgba(220,38,38,0.2)',
                   }}
                 >
+                  {/* The square knockout mark, not the lockup: this sits in a
+                      64px box on a near-black plate, where the black lockup
+                      would be both invisible and letterboxed to 12px tall. */}
                   <img
-                    src="/logo.png"
+                    src="/optimum-mark-knockout.png"
                     alt="Optimum Prime Solutions logo — certified TallyPrime partner and business consultant in Ruiru, Kenya"
                     className="w-16 h-16 object-contain filter drop-shadow-lg"
                     width={64}
