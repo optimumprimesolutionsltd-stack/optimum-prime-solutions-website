@@ -18,7 +18,7 @@ export default function Logo({ className = 'h-10 w-auto', loading = 'eager' }: L
         alt="Optimum Prime Solutions Ltd"
         className="h-full w-auto object-contain"
         width={200}
-        height={47}
+        height={33}
         loading={loading}
       />
     </motion.div>
