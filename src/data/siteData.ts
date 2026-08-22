@@ -69,6 +69,10 @@ export interface Lead {
   amount?: number;                // deal value in KES — numeric so it can be summed
   // Link to the delivery job created once the deal is won.
   wipJobId?: string;
+  // A 30-day evaluation the prospect asked for. Lives on the lead rather than
+  // being a pipeline stage: a trial runs alongside the pipeline, not instead of
+  // it, and a lead can perfectly well have a quote out while still evaluating.
+  trial?: LeadTrial;
 }
 
 // ── Tally licensing ─────────────────────────────────────────────────────────
@@ -98,6 +102,78 @@ export const DEAL_TYPES: DealType[] = [
 
 // Deal types sold against an existing licence — these need a serial up front.
 export const EXISTING_LICENCE_DEALS: DealType[] = ['TSS Renewal', 'Term Upgrade', 'Edition Upgrade'];
+
+// ── 30-day trials ───────────────────────────────────────────────────────────
+// A prospect can ask to run TallyPrime for 30 days before committing. It is the
+// strongest signal in the pipeline short of a signed order — they have the
+// software in front of them — and it is also the one that expires on its own if
+// nobody follows it up. A trial that lapses unnoticed is a lost deal nobody
+// decided to lose.
+//
+// Two dates, not one, and deliberately so. A trial is REQUESTED on one day and
+// ACTIVATED on another: the licence has to be issued and installed, which can
+// take days. Counting the 30 from the request would expire the trial early and
+// fire the follow-up at the wrong time, so the countdown only starts when the
+// software is actually in their hands.
+export const TRIAL_DAYS = 30;
+
+export type TrialOutcome = 'Converted' | 'Declined' | 'Lapsed';
+export const TRIAL_OUTCOMES: TrialOutcome[] = ['Converted', 'Declined', 'Lapsed'];
+
+export interface LeadTrial {
+  // Which edition they asked to try. The trial is the edition they are
+  // evaluating, so it is what the eventual quote should be for.
+  edition: TallyEdition;
+  requestedOn: string;            // YYYY-MM-DD, the day they asked
+  startedOn?: string;             // YYYY-MM-DD, the day it was activated for them
+  endsOn?: string;                // YYYY-MM-DD, derived from startedOn (see trialEnd)
+  serialNo?: string;              // trial licences carry a serial too
+  outcome?: TrialOutcome;         // set when the trial is closed out
+  outcomeOn?: string;             // YYYY-MM-DD
+  notes?: string;
+}
+
+// The last day a trial that started on `start` still works. Inclusive: a trial
+// activated on the 15th runs through to this date and is over the day after.
+//
+// Done entirely in UTC. Parsing `${start}T00:00:00` gives LOCAL midnight, and
+// toISOString then converts back to UTC — which in any timezone east of
+// Greenwich (Kenya is UTC+3) lands on the previous day and quietly expires
+// every trial 24 hours early. Fixing the arithmetic to UTC on both sides makes
+// the result the same date everywhere.
+export const trialEnd = (start: string): string => {
+  if (!start) return '';
+  const d = new Date(`${start}T00:00:00Z`);
+  if (Number.isNaN(d.getTime())) return '';
+  d.setUTCDate(d.getUTCDate() + TRIAL_DAYS);
+  return d.toISOString().split('T')[0];
+};
+
+// Where a trial has got to. 'Awaiting start' is a real and important state: the
+// customer has asked but nothing has been installed, and that is a job for us,
+// not a wait on them.
+export type TrialState =
+  | 'Awaiting start' | 'Running' | 'Ending soon' | 'Expired'
+  | 'Converted' | 'Declined' | 'Lapsed';
+
+export const trialState = (t: LeadTrial): TrialState => {
+  if (t.outcome) return t.outcome;
+  if (!t.startedOn) return 'Awaiting start';
+  const left = daysUntilDate(t.endsOn || trialEnd(t.startedOn));
+  if (left === null) return 'Running';
+  if (left < 0) return 'Expired';
+  // A week is roughly the last point at which a conversation can still change
+  // the outcome before the software stops working.
+  if (left <= 7) return 'Ending soon';
+  return 'Running';
+};
+
+// Trials that still need someone to do something: not yet started, running out,
+// or already expired without anyone recording what happened.
+export const trialNeedsAction = (t: LeadTrial): boolean => {
+  const st = trialState(t);
+  return st === 'Awaiting start' || st === 'Ending soon' || st === 'Expired';
+};
 
 // ── The product catalogue ───────────────────────────────────────────────────
 // What a customer can actually own. A won customer rarely owns just one thing:
