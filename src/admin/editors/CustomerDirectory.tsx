@@ -8,7 +8,7 @@ import type {
 } from '../../data/siteData';
 import {
   PRODUCT_KINDS, PRODUCT_RULES, productExpires, productLabel,
-  clientProducts, syncClientLicence, daysUntilDate, isValidSerial,
+  clientProducts, syncClientLicence, daysUntilDate, isValidSerial, clientOnboarded,
 } from '../../data/siteData';
 import { downloadFile } from '../crm/crmExport';
 
@@ -204,9 +204,10 @@ export default function CustomerDirectory({ data, onSave }: P) {
   const exportCsv = () => {
     const esc = (v: string) => `"${(v || '').replace(/"/g, '""')}"`;
     const lines = [
-      ['Serial Number', 'Customer', 'Contact', 'Phone', 'Email', 'Product', 'Term', 'Activated', 'Expires', 'Status'].join(','),
+      ['Serial Number', 'Customer', 'Contact', 'Phone', 'Email', 'Onboarded', 'Product', 'Term', 'Activated', 'Expires', 'Status'].join(','),
       ...rows.map(({ client, product }) => [
         client.serialNo, client.company, client.contactName || '', client.phone || '', client.email || '',
+        clientOnboarded(client) || '',
         productLabel(product), product.term || '—',
         product.activatedOn || '',
         productExpires(product) ? (product.expiresOn || '') : 'Not applicable',
@@ -314,11 +315,12 @@ export default function CustomerDirectory({ data, onSave }: P) {
       ) : (
         <div className="rounded-2xl bg-white shadow-sm border border-slate-100 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[860px] text-left">
+            <table className="w-full min-w-[980px] text-left">
               <thead className="bg-slate-50 border-b border-slate-100">
                 <tr className="text-[11px] font-bold uppercase tracking-wide text-slate-500">
                   <th className="px-4 py-3">Serial number</th>
                   <th className="px-4 py-3">Customer</th>
+                  <th className="px-4 py-3">Onboarded</th>
                   <th className="px-4 py-3">Product</th>
                   <th className="px-4 py-3">Activated</th>
                   <th className="px-4 py-3">Expires</th>
@@ -347,6 +349,11 @@ export default function CustomerDirectory({ data, onSave }: P) {
                             {client.contactName && <p className="text-xs text-slate-500">{client.contactName}</p>}
                           </>
                         ) : <span className="text-slate-300 text-xs">same customer</span>}
+                      </td>
+                      {/* One date per customer, not per product: it is when the
+                          relationship started, so it belongs with the serial. */}
+                      <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">
+                        {firstOfClient ? fmt(clientOnboarded(client)) : ''}
                       </td>
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center gap-1.5 font-semibold text-slate-800">
@@ -428,7 +435,13 @@ export default function CustomerDirectory({ data, onSave }: P) {
                   <input value={editing.phone || ''} onChange={e => setField('phone', e.target.value)}
                     className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-accent" />
                 </label>
-                <label className="block sm:col-span-2">
+                <label className="block">
+                  <span className="text-xs font-bold text-slate-600">Onboarded on</span>
+                  <input type="date" value={editing.onboardedOn || clientOnboarded(editing) || ''}
+                    onChange={e => setField('onboardedOn', e.target.value)}
+                    className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-accent" />
+                </label>
+                <label className="block">
                   <span className="text-xs font-bold text-slate-600">Email</span>
                   <input value={editing.email || ''} onChange={e => setField('email', e.target.value)}
                     className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-accent" />
