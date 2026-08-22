@@ -263,6 +263,12 @@ export interface Client {
   edition: TallyEdition;
   term: LicenceTerm;
   activatedOn?: string;           // YYYY-MM-DD
+  // The day this customer came on board — the start of the relationship, not
+  // of any one licence. Deliberately separate from a product's activatedOn: a
+  // client onboarded in 2024 who adds a Tally Server in 2026 was still
+  // onboarded in 2024, and a directory showing the Server's date instead would
+  // misreport how long they have been with us.
+  onboardedOn?: string;           // YYYY-MM-DD
   // Annual licences only: the end of the licence year, and therefore the last
   // day the Annual → Perpetual top-up can be taken.
   licenceExpiry?: string;         // YYYY-MM-DD
@@ -331,6 +337,18 @@ export const syncClientLicence = (c: Client): Client => {
     tssExpiry: tss?.expiresOn,
     updatedAt: new Date().toISOString(),
   };
+};
+
+// When this customer came on board. Falls back, for records written before the
+// field existed, to the earliest date anything of theirs was activated — the best
+// available answer, and never later than the truth.
+export const clientOnboarded = (c: Client): string | undefined => {
+  if (c.onboardedOn) return c.onboardedOn;
+  const dates = clientProducts(c)
+    .map(p => p.activatedOn)
+    .filter((d): d is string => !!d)
+    .sort();
+  return dates[0] || c.activatedOn;
 };
 
 // Fold the licence details captured when a deal is closed won into a client's
