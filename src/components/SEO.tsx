@@ -36,6 +36,22 @@ interface SEOProps {
     description: string;
     serviceType?: string;
   };
+  /**
+   * Purchasable licences, emitted as Product nodes with an Offer each. The
+   * pricing page already prints these figures as prose, which Google reads as
+   * text; competitors selling the same licences through e-commerce product
+   * pages get them read as commerce instead. This closes that gap.
+   *
+   * `price` is the bare number as a string — no currency symbol, no thousands
+   * separator, and ex-VAT to match what the page displays.
+   */
+  products?: {
+    name: string;
+    description: string;
+    price: string;
+    priceCurrency?: string;
+    brand?: string;
+  }[];
 }
 
 const BASE_URL = 'https://www.optimumprimesolutions.co.ke';
@@ -60,6 +76,7 @@ export default function SEO({
   faqs,
   article,
   service,
+  products,
 }: SEOProps) {
   const fullTitle = title.includes('Optimum Prime')
     ? title
@@ -136,6 +153,27 @@ export default function SEO({
       provider: { '@id': ORG_ID },
       areaServed: { '@type': 'Country', name: 'Kenya' },
       ...(service.serviceType ? { serviceType: service.serviceType } : {}),
+    });
+  }
+
+  if (products && products.length > 0) {
+    products.forEach((p, i) => {
+      graph.push({
+        '@type': 'Product',
+        '@id': `${canonicalUrl}#product-${i + 1}`,
+        name: p.name,
+        description: p.description,
+        category: 'Accounting Software',
+        ...(p.brand ? { brand: { '@type': 'Brand', name: p.brand } } : {}),
+        offers: {
+          '@type': 'Offer',
+          price: p.price,
+          priceCurrency: p.priceCurrency || 'KES',
+          availability: 'https://schema.org/InStock',
+          url: canonicalUrl,
+          seller: { '@id': ORG_ID },
+        },
+      });
     });
   }
 
