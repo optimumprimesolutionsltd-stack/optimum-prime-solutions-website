@@ -3,14 +3,16 @@ import {
   Search, Trash2, Mail, Phone, Building2, Calendar, ChevronDown, ChevronUp,
   Download, Upload, Plus, X, CheckCircle2, Loader2, CalendarDays, MapPin,
   User, Send, AlertCircle, FileText, Video, LayoutGrid, List,
-  RotateCcw, CalendarPlus, Briefcase, KeyRound, Trophy,
+  RotateCcw, CalendarPlus, Briefcase, KeyRound, Trophy, FlaskConical,
 } from 'lucide-react';
 import type {
   SiteData, Lead, WipJob, Client, TallyEdition, LicenceTerm, DealType,
+  LeadTrial, TrialOutcome, TrialState,
 } from '../../data/siteData';
 import {
   DEAL_TYPES, EXISTING_LICENCE_DEALS, isValidSerial, findClientBySerial,
   clientProducts, upsertLicenceProducts,
+  TRIAL_DAYS, TRIAL_OUTCOMES, trialEnd, trialState, trialNeedsAction, daysUntilDate,
 } from '../../data/siteData';
 import { fbSubscribe, fbSet, fbAuth } from '../../firebase/config';
 import KanbanBoard from './KanbanBoard';
@@ -72,6 +74,25 @@ const INDUSTRIES = [
 // Stages come from the shared pipeline module so every surface stays in sync.
 const statuses = PIPELINE_ORDER;
 const statusBadgeStyle = (status: string) => ({ backgroundColor: stageColor(status), color: '#fff' });
+
+// Dates in this panel are all YYYY-MM-DD day values, never timestamps, so they
+// are formatted at noon to keep a timezone from walking them back a day.
+const fmtDay = (d?: string): string =>
+  d ? new Date(`${d}T12:00:00`).toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'short', year: 'numeric',
+  }) : "—";
+
+// How each trial state reads and looks. Kept as data so the badge, the alert
+// strip and the lead panel cannot drift apart.
+const TRIAL_STYLE: Record<TrialState, { chip: string; label: string }> = {
+  'Awaiting start': { chip: 'bg-amber-100 text-amber-800 border-amber-200',   label: 'Trial not started' },
+  'Running':        { chip: 'bg-sky-100 text-sky-700 border-sky-200',         label: 'Trial running' },
+  'Ending soon':    { chip: 'bg-orange-100 text-orange-700 border-orange-200', label: 'Trial ending soon' },
+  'Expired':        { chip: 'bg-red-100 text-red-700 border-red-200',         label: 'Trial expired' },
+  'Converted':      { chip: 'bg-green-100 text-green-700 border-green-200',   label: 'Trial converted' },
+  'Declined':       { chip: 'bg-slate-100 text-slate-600 border-slate-200',   label: 'Trial declined' },
+  'Lapsed':         { chip: 'bg-slate-100 text-slate-600 border-slate-200',   label: 'Trial lapsed' },
+};
 
 // ── Manual booking form ──────────────────────────────────────────────────────
 interface BookingForm {
@@ -887,6 +908,83 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   // Typing a serial that already exists links the deal to that client instead of
   // creating a duplicate, which is what makes next year's TSS renewal attach to
   // the same customer record.
+  // ── 30-day trials ─────────────────────────────────────────────────────────
+  // Recorded against the lead, not as a pipeline stage: a trial runs alongside
+  // the pipeline rather than instead of it. The countdown starts on activation,
+  // not on the request, so a licence that takes three days to issue does not
+  // eat three days of the customer's evaluation.
+  const [trialLead, setTrialLead] = useState<Lead | null>(null);
+  const [trialError, setTrialError] = useState<string | null>(null);
+  const [trialForm, setTrialForm] = useState<LeadTrial>({
+    edition: 'Silver', requestedOn: '', startedOn: '', serialNo: '', notes: '',
+  });
+
+  const openTrial = (lead: Lead) => {
+    setTrialForm(lead.trial
+      ? { ...lead.trial }
+      : { edition: 'Silver', requestedOn: today(), startedOn: '', serialNo: '', notes: '' });
+    setTrialError(null);
+    setTrialLead(lead);
+  };
+
+  const confirmTrial = () => {
+    const lead = trialLead;
+    if (!lead) return;
+    if (!trialForm.requestedOn) {
+      setTrialError('When did they ask for the trial? That date is what the follow-up is measured from.');
+      return;
+    }
+    const serial = (trialForm.serialNo || '').trim();
+    // Same rule as a sold licence: a serial that is typed must be real, but a
+    // trial can perfectly well be recorded before its serial is issued.
+    if (serial && !isValidSerial(serial)) {
+      setTrialError('A trial serial is exactly 9 digits, same as any other licence. Leave it blank until it is issued.');
+      return;
+    }
+    const started = trialForm.startedOn || '';
+    const trial: LeadTrial = {
+      ...trialForm,
+      serialNo: serial || undefined,
+      startedOn: started || undefined,
+      // Derived, never typed: 30 days from activation, so the end date cannot
+      // drift away from the start it is supposed to follow.
+      endsOn: started ? trialEnd(started) : undefined,
+      notes: trialForm.notes?.trim() || undefined,
+    };
+    onSave({ ...data, leads: data.leads.map(l => l.id === lead.id ? { ...l, trial } : l) });
+    setTrialLead(null);
+    setTrialError(null);
+    setExpandedId(lead.id);
+  };
+
+  // Closing a trial out is a one-click answer to 'what happened?', so the
+  // expired list empties as decisions get made rather than growing forever.
+  const closeOutTrial = (lead: Lead, outcome: TrialOutcome) => {
+    if (!lead.trial) return;
+    onSave({
+      ...data,
+      leads: data.leads.map(l => l.id === lead.id
+        ? { ...l, trial: { ...l.trial!, outcome, outcomeOn: today() } }
+        : l),
+    });
+  };
+
+  const removeTrial = (lead: Lead) => {
+    if (!window.confirm(`Remove the trial record from ${lead.company || lead.name}? The lead itself is untouched.`)) return;
+    onSave({
+      ...data,
+      leads: data.leads.map(l => {
+        if (l.id !== lead.id) return l;
+        const { trial: _dropped, ...rest } = l;
+        return rest as Lead;
+      }),
+    });
+  };
+
+  // Trials someone has to do something about: not yet installed, running out,
+  // or finished with nobody having said how it went.
+  const trialsNeedingAction = data.leads.filter(l => l.trial && trialNeedsAction(l.trial));
+
   const [winLead, setWinLead] = useState<Lead | null>(null);
   const [winError, setWinError] = useState<string | null>(null);
   const [winForm, setWinForm] = useState({
@@ -2431,6 +2529,39 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
       {/* Won deals still waiting on a serial number. Nothing is blocked — this is
           a to-do list, worked through whenever the numbers are available. */}
+      {/* Trials that need a hand: not installed yet, running out, or over with
+          nobody having recorded what happened. A trial expires whether or not
+          anyone is watching, which is exactly why it gets a strip of its own. */}
+      {trialsNeedingAction.length > 0 && (
+        <div className="rounded-2xl border border-sky-200 bg-sky-50 p-4">
+          <div className="flex items-start gap-3">
+            <FlaskConical className="h-5 w-5 text-sky-600 shrink-0 mt-0.5" />
+            <div className="flex-1 min-w-[220px]">
+              <p className="text-sm font-semibold text-sky-900">
+                {trialsNeedingAction.length} trial{trialsNeedingAction.length === 1 ? '' : 's'} needing attention
+              </p>
+              <p className="text-xs text-sky-700 mt-1">
+                A {TRIAL_DAYS}-day trial runs out on its own. These are the ones not yet activated,
+                the ones down to their last week, and the ones that ended without anyone saying how it went.
+              </p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {trialsNeedingAction.map(l => {
+                  const st = trialState(l.trial!);
+                  return (
+                    <button key={l.id} onClick={() => { setExpandedId(l.id); openTrial(l); }}
+                      className={`inline-flex items-center gap-1.5 rounded-lg border bg-white px-3 py-1.5 text-xs font-bold hover:brightness-95 transition ${TRIAL_STYLE[st].chip}`}>
+                      <FlaskConical className="h-3 w-3" />
+                      {l.company || l.name}
+                      <span className="font-normal opacity-80">— {TRIAL_STYLE[st].label.replace('Trial ', '')}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {wonMissingSerial.length > 0 && (
         <div className="rounded-2xl border border-amber-200 bg-amber-50 p-4">
           <div className="flex items-start gap-3">
@@ -2602,6 +2733,13 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                 >
                   {l.status}
                 </span>
+                {/* A running trial is a fact about the lead, not a stage, so it
+                    rides alongside the stage badge rather than replacing it. */}
+                {l.trial && (
+                  <span className={`rounded-full border px-2 py-0.5 text-[9px] font-bold whitespace-nowrap ${TRIAL_STYLE[trialState(l.trial)].chip}`}>
+                    {l.trial.edition} trial
+                  </span>
+                )}
                 {l.requestType && (
                   <span
                     className="rounded-full px-2 py-0.5 text-[9px] font-semibold whitespace-nowrap hidden sm:inline"
@@ -2808,6 +2946,78 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                         </div>
                       )}
                     </div>
+                  )}
+
+                  {/* ── 30-day trial ── */}
+                  {l.trial ? (() => {
+                    const st = trialState(l.trial);
+                    const style = TRIAL_STYLE[st];
+                    const left = l.trial.endsOn ? daysUntilDate(l.trial.endsOn) : null;
+                    return (
+                      <div className="rounded-xl border border-sky-200 bg-sky-50 p-4 space-y-3">
+                        <div className="flex items-start justify-between gap-3 flex-wrap">
+                          <div>
+                            <p className="text-sm font-bold text-sky-900 flex items-center gap-2 flex-wrap">
+                              <FlaskConical className="h-4 w-4" />
+                              {TRIAL_DAYS}-day TallyPrime {l.trial.edition} trial
+                              <span className={`rounded-md border px-2 py-0.5 text-[11px] font-bold ${style.chip}`}>
+                                {style.label}
+                              </span>
+                            </p>
+                            <p className="text-xs text-sky-800 mt-1">
+                              Requested {fmtDay(l.trial.requestedOn)}.
+                              {l.trial.startedOn
+                                ? ` Started ${fmtDay(l.trial.startedOn)}, ends ${fmtDay(l.trial.endsOn)}${
+                                    left === null ? ''
+                                      : left < 0 ? ` (ended ${Math.abs(left)} day${Math.abs(left) === 1 ? '' : 's'} ago)`
+                                      : left === 0 ? ' (today is the last day)'
+                                      : ` (${left} day${left === 1 ? '' : 's'} left)`}.`
+                                : ' Not activated yet ' + '—' + ' the countdown starts the day they can actually use it.'}
+                            </p>
+                            {l.trial.serialNo && (
+                              <p className="text-xs text-slate-600 mt-0.5 font-mono tracking-wide">{l.trial.serialNo}</p>
+                            )}
+                            {l.trial.notes && <p className="text-xs text-slate-500 mt-0.5">{l.trial.notes}</p>}
+                          </div>
+                          <div className="flex gap-2 shrink-0">
+                            <button onClick={() => openTrial(l)}
+                              className="rounded-lg border border-sky-300 bg-white px-3 py-1.5 text-xs font-bold text-sky-700 hover:bg-sky-50 transition">
+                              Edit trial
+                            </button>
+                            <button onClick={() => removeTrial(l)} title="Remove the trial record"
+                              className="rounded-lg border border-slate-200 bg-white p-1.5 text-red-600 hover:bg-red-50 transition">
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* How did it go? Asked once the trial is over, or any time
+                            the answer is already known — a trial nobody closes out
+                            sits in the action list forever. */}
+                        {!l.trial.outcome && (
+                          <div className="flex items-center gap-2 flex-wrap border-t border-sky-200 pt-3">
+                            <span className="text-xs font-semibold text-sky-900">How did it go?</span>
+                            {TRIAL_OUTCOMES.map(o => (
+                              <button key={o} onClick={() => closeOutTrial(l, o)}
+                                className="rounded-lg border border-sky-300 bg-white px-3 py-1.5 text-xs font-bold text-sky-800 hover:bg-sky-100 transition">
+                                {o}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {l.trial.outcome && (
+                          <p className="border-t border-sky-200 pt-3 text-xs text-slate-600">
+                            Closed out as <span className="font-bold">{l.trial.outcome}</span>
+                            {l.trial.outcomeOn ? ` on ${fmtDay(l.trial.outcomeOn)}` : ''}.
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })() : (
+                    <button onClick={() => openTrial(l)}
+                      className="w-full rounded-xl border border-dashed border-sky-300 bg-sky-50/50 px-4 py-2.5 text-xs font-bold text-sky-700 hover:bg-sky-50 transition flex items-center justify-center gap-2">
+                      <FlaskConical className="h-3.5 w-3.5" /> Record a {TRIAL_DAYS}-day trial request
+                    </button>
                   )}
 
                   {/* ── Closed Lost: restart the pipeline ── */}
@@ -3277,6 +3487,100 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       )}
 
       {/* ── Restart a Closed Lost lead ── */}
+      {/* ── Record a 30-day trial ── */}
+      {trialLead && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
+          <div className="w-full max-w-lg rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between border-b border-slate-100 bg-sky-50 px-6 py-4">
+              <h3 className="font-bold text-sky-900 flex items-center gap-2">
+                <FlaskConical className="h-4 w-4" /> {TRIAL_DAYS}-day trial — {trialLead.name}
+              </h3>
+              <button onClick={() => { setTrialLead(null); setTrialError(null); }}
+                className="rounded-lg p-1.5 text-slate-400 hover:bg-white transition">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="px-6 py-5 space-y-4 max-h-[70vh] overflow-y-auto">
+              <p className="text-xs text-slate-500">
+                Which edition they are evaluating, and when. The trial is the edition the quote
+                should be for, so it is worth getting right.
+              </p>
+
+              <div>
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1.5">Edition</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['Silver', 'Gold'] as TallyEdition[]).map(ed => (
+                    <button key={ed} onClick={() => setTrialForm(f => ({ ...f, edition: ed }))}
+                      className={`rounded-xl border px-4 py-3 text-sm font-bold transition ${
+                        trialForm.edition === ed
+                          ? 'border-sky-500 bg-sky-50 text-sky-800'
+                          : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}>
+                      TallyPrime {ed}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label className="block">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Requested on</span>
+                  <input type="date" value={trialForm.requestedOn}
+                    onChange={e => { setTrialForm(f => ({ ...f, requestedOn: e.target.value })); setTrialError(null); }}
+                    className="mt-1.5 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-accent" />
+                </label>
+                <label className="block">
+                  <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Activated on</span>
+                  <input type="date" value={trialForm.startedOn || ''}
+                    onChange={e => setTrialForm(f => ({ ...f, startedOn: e.target.value }))}
+                    className="mt-1.5 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-accent" />
+                </label>
+              </div>
+
+              {/* The whole point of two dates: say plainly what the second one does. */}
+              <p className="rounded-xl bg-slate-50 border border-slate-200 px-3 py-2.5 text-xs text-slate-600">
+                {trialForm.startedOn
+                  ? <>The {TRIAL_DAYS} days run from activation, so this trial ends <span className="font-bold text-slate-900">{fmtDay(trialEnd(trialForm.startedOn))}</span>.</>
+                  : <>Leave <span className="font-semibold">Activated on</span> blank until the licence is actually working on their machine. The countdown starts then, not now — issuing it should not eat their evaluation.</>}
+              </p>
+
+              <label className="block">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Trial serial number</span>
+                <input value={trialForm.serialNo || ''} inputMode="numeric" maxLength={9}
+                  onChange={e => { setTrialForm(f => ({ ...f, serialNo: e.target.value.replace(/\D/g, '') })); setTrialError(null); }}
+                  placeholder="9 digits, once it is issued"
+                  className="mt-1.5 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-mono tracking-wide outline-none focus:border-accent" />
+              </label>
+
+              <label className="block">
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Notes</span>
+                <textarea value={trialForm.notes || ''} rows={2}
+                  onChange={e => setTrialForm(f => ({ ...f, notes: e.target.value }))}
+                  placeholder="What they want to prove out during the trial"
+                  className="mt-1.5 w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm outline-none focus:border-accent resize-none" />
+              </label>
+
+              {trialError && (
+                <p className="flex items-start gap-2 rounded-lg bg-red-50 border border-red-100 px-3 py-2 text-xs font-semibold text-red-700">
+                  <AlertCircle className="h-4 w-4 shrink-0" /> {trialError}
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-end gap-2 border-t border-slate-100 px-6 py-4">
+              <button onClick={() => { setTrialLead(null); setTrialError(null); }}
+                className="rounded-lg border border-slate-200 px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-50 transition">
+                Cancel
+              </button>
+              <button onClick={confirmTrial}
+                className="rounded-lg bg-sky-700 px-4 py-2 text-xs font-bold text-white hover:bg-sky-800 transition">
+                {trialLead.trial ? 'Save trial' : 'Record trial'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ── Close the deal: the serial gate ── */}
       {winLead && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4">
