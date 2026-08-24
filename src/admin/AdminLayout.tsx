@@ -26,6 +26,7 @@ import AccessRequestsManager from './editors/AccessRequestsManager';
 import ContactsDirectory from './editors/ContactsDirectory';
 import WorkInProgressManager from './editors/WorkInProgressManager';
 import CustomerDirectory from './editors/CustomerDirectory';
+import SerialLookup from './SerialLookup';
 import RenewalsManager from './editors/RenewalsManager';
 import { useAdminNotifications, type AdminNotification } from './notifications/useAdminNotifications';
 import { NotificationBell, NotificationToasts } from './notifications/NotificationCenter';
@@ -70,6 +71,10 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
   // A delivery job id handed over from Demo Leads when a won deal starts work —
   // the Work in Progress tab opens that job's editor.
   const [openJobId, setOpenJobId] = useState<string | null>(null);
+  // Serial lookup, reachable from every tab. The serial is what a support call
+  // opens with, and it is wanted while someone is already on the phone —
+  // navigating to the directory to read a table is several seconds too many.
+  const [lookupOpen, setLookupOpen] = useState(false);
   const [sidebar, setSidebar] = useState(false);
   const [toast, setToast] = useState('');
   const [unreadWa, setUnreadWa] = useState(0);
@@ -96,6 +101,25 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
       setUnreadWa(count);
     });
     return unsubscribe;
+  }, []);
+
+  // Ctrl/Cmd+K opens the lookup from anywhere. Guarded so it never fires while
+  // someone is mid-sentence in a field — the shortcut is for reaching the
+  // lookup, not for interrupting typing.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.key === 'k' || e.key === 'K') || !(e.ctrlKey || e.metaKey)) return;
+      const el = document.activeElement as HTMLElement | null;
+      const typing = !!el && (
+        el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT'
+        || el.isContentEditable
+      );
+      if (typing) return;
+      e.preventDefault();
+      setLookupOpen(true);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
   }, []);
 
   const notify = (m: string) => { setToast(m); setTimeout(() => setToast(''), 3000); };
@@ -318,6 +342,13 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
                 <span className="sm:hidden">{newLeads}</span>
               </button>
             )}
+            <button onClick={() => setLookupOpen(true)}
+              title="Look up a licence serial (Ctrl+K)"
+              className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-2.5 sm:px-3 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 transition-colors">
+              <KeyRound className="h-4 w-4 shrink-0" />
+              <span className="hidden sm:inline">Serial</span>
+              <kbd className="hidden lg:inline rounded border border-slate-300 bg-white px-1 text-[10px] font-sans text-slate-400">Ctrl K</kbd>
+            </button>
             <NotificationBell
               items={notifications.items}
               unreadIds={notifications.unreadIds}
@@ -339,6 +370,8 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
       </div>
 
       {/* Live pop-up for enquiries and sign-ups that land while you're here */}
+      <SerialLookup clients={data.clients || []} open={lookupOpen} onClose={() => setLookupOpen(false)} />
+
       <NotificationToasts
         toasts={notifications.toasts}
         onOpen={openNotification}
