@@ -296,7 +296,7 @@ breadcrumbs={[
                 <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
               </a>
               <a
-                href="https://www.linkedin.com/company/optimumprimesolutionsltd"
+                href="https://www.linkedin.com/company/optimum-prime-solutions-ltd"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow us on LinkedIn"
