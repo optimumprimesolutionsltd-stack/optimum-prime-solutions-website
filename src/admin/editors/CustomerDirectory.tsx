@@ -210,7 +210,7 @@ export default function CustomerDirectory({ data, onSave }: P) {
         clientOnboarded(client) || '',
         productLabel(product), product.term || '—',
         product.activatedOn || '',
-        productExpires(product) ? (product.expiresOn || '') : 'Not applicable',
+        productExpires(product) ? (product.expiresOn || '') : 'No expiry - owned outright',
         HEALTH_STYLE[healthOf(product)].text(product),
       ].map(v => esc(String(v))).join(',')),
     ];
@@ -363,13 +363,21 @@ export default function CustomerDirectory({ data, onSave }: P) {
                         {product.notes && <p className="text-xs text-slate-400 mt-0.5">{product.notes}</p>}
                       </td>
                       <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">{fmt(product.activatedOn)}</td>
-                      <td className="px-4 py-3 text-slate-600 text-xs whitespace-nowrap">
+                      {/* Greyed out, not just left empty, where no expiry can
+                          exist. A perpetual licence and a Tally Server are owned
+                          outright; on those customers TSS is the only thing that
+                          runs out, and the eye should be able to find it without
+                          reading every row. A blank cell would look like missing
+                          data, which is a different and much more alarming
+                          thing. */}
+                      <td className={`px-4 py-3 text-xs whitespace-nowrap ${
+                        productExpires(product) ? 'text-slate-600' : 'bg-slate-100 text-slate-400'}`}>
                         {productExpires(product)
                           ? (product.expiresOn ? fmt(product.expiresOn)
                               : <span className="text-amber-600 font-semibold">Not captured</span>)
-                          : <span className="text-slate-400">Not applicable</span>}
+                          : <span className="italic">—</span>}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className={`px-4 py-3 ${productExpires(product) ? '' : 'bg-slate-100'}`}>
                         <span className={`inline-block rounded-md border px-2 py-0.5 text-[11px] font-bold whitespace-nowrap ${style.chip}`}>
                           {style.text(product)}
                         </span>
