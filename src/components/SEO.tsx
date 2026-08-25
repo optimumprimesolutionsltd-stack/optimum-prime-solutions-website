@@ -78,9 +78,17 @@ export default function SEO({
   service,
   products,
 }: SEOProps) {
+  // Append the brand only when there is room for it. Appending
+  // unconditionally pushed longer titles past Google's ~60-character display
+  // budget, so the headline got cut and the brand survived — exactly backwards.
+  // A page that already names the brand is left alone.
+  const BRAND_SUFFIX = ' | Optimum Prime Solutions';
+  const TITLE_BUDGET = 60;
   const fullTitle = title.includes('Optimum Prime')
     ? title
-    : `${title} | Optimum Prime Solutions`;
+    : title.length + BRAND_SUFFIX.length <= TITLE_BUDGET
+      ? title + BRAND_SUFFIX
+      : title;
 
   const finalSocialDescription = socialDescription || description;
 

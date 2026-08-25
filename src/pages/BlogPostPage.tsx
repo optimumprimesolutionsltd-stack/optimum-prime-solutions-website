@@ -20,8 +20,30 @@ function truncateAtWord(text: string, maxLength: number): string {
 }
 
 const SEO_TITLE_SUFFIX = ' | Optimum Prime';
-function truncateTitle(title: string): string {
-  return truncateAtWord(title, 60 - SEO_TITLE_SUFFIX.length);
+const TITLE_BUDGET = 60;
+
+// The brand suffix gives way to the headline, rather than the other way round.
+//
+// This used to reserve the suffix unconditionally and give the title whatever
+// was left — 44 characters. Almost no post title fits in 44, so all ten were
+// served cut off mid-sentence with an ellipsis baked into the tag itself:
+// "Tally Prime Silver vs Gold: Which Edition… | Optimum Prime". A result that
+// looks truncated reads as broken and costs clicks, which is the opposite of
+// what a title tag is for.
+//
+// Order of preference: the whole title plus the brand; failing that the whole
+// title alone (Google appends the site name itself anyway); and only if the
+// title alone still overruns, a word-boundary trim.
+//
+// Titles are trimmed first — at least one post carries a leading tab from the
+// admin panel, which was being rendered into the tag.
+function buildTitle(rawTitle: string): string {
+  const title = rawTitle.trim().replace(/\s+/g, ' ');
+  if (title.length + SEO_TITLE_SUFFIX.length <= TITLE_BUDGET) {
+    return title + SEO_TITLE_SUFFIX;
+  }
+  if (title.length <= TITLE_BUDGET) return title;
+  return truncateAtWord(title, TITLE_BUDGET);
 }
 
 // Same idea for the meta description — the visible excerpt on the page is
@@ -119,7 +141,7 @@ export default function BlogPostPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title={`${truncateTitle(post.title)}${SEO_TITLE_SUFFIX}`}
+        title={buildTitle(post.title)}
         description={truncateDescription(post.excerpt)}
         canonical={`/blog/${getPostSlug(post)}`}
         ogType="article"
