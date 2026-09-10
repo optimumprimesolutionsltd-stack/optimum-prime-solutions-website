@@ -35,6 +35,15 @@
       ".write": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
     },
 
+    // Jamvi + Mavuno HR subscriptions, synced from each product's super-admin
+    // API by the syncSaasSubscriptions Cloud Function. Customer billing data —
+    // staff read only. Writes come from the Admin SDK, which bypasses rules;
+    // nothing writes this from a browser.
+    "saasSubscriptions": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      ".write": false
+    },
+
     // Inbox for the public contact form. A visitor may create their own entry
     // and nothing else: no reading the list, no overwriting or deleting anyone
     // else's. Staff drain it into /crm/leads.

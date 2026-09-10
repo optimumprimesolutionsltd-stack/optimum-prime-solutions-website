@@ -1,7 +1,7 @@
-import { Building2, Briefcase, ShoppingCart, Globe, HelpCircle, Users, FileText, Phone, Star, MessageCircle, CalendarDays, Video, Mail, Wrench, KeyRound } from 'lucide-react';
+import { Building2, Briefcase, ShoppingCart, Globe, HelpCircle, Users, FileText, Phone, Star, MessageCircle, CalendarDays, Video, Mail, Wrench, KeyRound, CreditCard } from 'lucide-react';
 import type { SiteData } from '../data/siteData';
 
-export type TabId = 'dashboard' | 'company' | 'services' | 'products' | 'industries' | 'faqs' | 'leads' | 'blogs' | 'contact' | 'testimonials' | 'bookdemo' | 'whatsapp' | 'workshop' | 'webinar' | 'subscribers' | 'contacts' | 'access-requests' | 'wip' | 'renewals' | 'customers';
+export type TabId = 'dashboard' | 'company' | 'services' | 'products' | 'industries' | 'faqs' | 'leads' | 'blogs' | 'contact' | 'testimonials' | 'bookdemo' | 'whatsapp' | 'workshop' | 'webinar' | 'subscribers' | 'contacts' | 'access-requests' | 'wip' | 'renewals' | 'customers' | 'subscriptions';
 
 interface P { data: SiteData; onNav: (t: TabId) => void }
 
@@ -19,6 +19,7 @@ export default function DashboardHome({ data, onNav }: P) {
     { id: 'leads', label: 'Demo Requests', icon: Users, stat: `${data.leads.length}`, desc: 'View & manage submitted leads', alert: newLeads > 0 },
     { id: 'wip', label: 'Work in Progress', icon: Wrench, stat: `${openJobs}`, desc: 'Client training, implementation & support being delivered' },
     { id: 'customers', label: 'Customer Directory', icon: KeyRound, stat: `${customers}`, desc: 'Won customers by serial number, with every product they hold' },
+    { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard, stat: 'Live', desc: 'Jamvi & Mavuno HR customers and MRR, synced automatically' },
     { id: 'workshop', label: 'Workshop RSVPs', icon: CalendarDays, stat: 'Live', desc: 'Inventory Management Breakfast Workshop signups' },
     { id: 'webinar', label: 'Webinar RSVPs', icon: Video, stat: 'Live', desc: 'Online webinar registrations & attendance' },
     { id: 'blogs', label: 'Blog Posts', icon: FileText, stat: `${data.blogs.length}`, desc: 'Create & manage blog articles' },
