@@ -278,11 +278,40 @@ export const syncSaasSubscriptions = functions
     return null;
   });
 
+// The "Sync now" button calls this from the admin SPA with an `x-sync-token`
+// header, which is not CORS-safelisted, so the browser sends a preflight. The
+// admin is served from a different origin than *.cloudfunctions.net, so without
+// these headers the preflight fails and the button never reaches the handler.
+const SAAS_SYNC_ALLOWED_ORIGINS = new Set([
+  'https://optimumprimesolutions.co.ke',
+  'https://www.optimumprimesolutions.co.ke',
+  'https://optimum-prime-website.web.app',
+  'https://optimum-prime-website.firebaseapp.com',
+  'http://localhost:5173',
+]);
+
+function applySaasSyncCors(req: functions.https.Request, res: functions.Response): void {
+  const origin = req.get('origin');
+  if (origin && SAAS_SYNC_ALLOWED_ORIGINS.has(origin)) {
+    res.set('Access-Control-Allow-Origin', origin);
+    res.set('Vary', 'Origin');
+    res.set('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.set('Access-Control-Allow-Headers', 'x-sync-token, Content-Type');
+    res.set('Access-Control-Max-Age', '3600');
+  }
+}
+
 /** Manual trigger for the CRM "Sync now" button. Guarded by a token. */
 export const syncSaasSubscriptionsNow = functions
   .region('europe-west1')
   .runWith({ timeoutSeconds: 120 })
   .https.onRequest(async (req, res) => {
+    applySaasSyncCors(req, res);
+    if (req.method === 'OPTIONS') {
+      res.status(204).send('');
+      return;
+    }
+
     const expected = process.env.SAAS_SYNC_TRIGGER_TOKEN;
     if (!expected) {
       res.status(503).json({ error: 'Endpoint not configured' });
