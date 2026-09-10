@@ -11,7 +11,7 @@ export declare const onAccessRequestApproved: functions.CloudFunction<functions.
  * HTTP endpoint to test email sending
  */
 export declare const sendTestEmail: functions.HttpsFunction;
-/** Scheduled pull, every 6 hours. */
+/** Scheduled pull, every 15 minutes. */
 export declare const syncSaasSubscriptions: functions.CloudFunction<unknown>;
 /**
  * Manual trigger for the CRM "Sync now" button. Guarded by a token.

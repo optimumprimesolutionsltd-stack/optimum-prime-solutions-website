@@ -119,7 +119,7 @@ export default function SubscriptionsManager() {
         <div>
           <h2 className="text-xl font-bold text-slate-900">Subscriptions</h2>
           <p className="text-sm text-slate-500 mt-0.5">
-            Jamvi &amp; Mavuno HR customers, synced from each product every 6 hours
+            Jamvi &amp; Mavuno HR customers, synced from each product every 15 minutes
             {lastSync && <> · last sync {new Date(lastSync).toLocaleString()}</>}
           </p>
         </div>

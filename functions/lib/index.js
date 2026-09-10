@@ -268,11 +268,11 @@ async function runSaasSync() {
     functions.logger.info('saas-sync complete', summary);
     return summary;
 }
-/** Scheduled pull, every 6 hours. */
+/** Scheduled pull, every 15 minutes. */
 exports.syncSaasSubscriptions = functions
     .region('europe-west1')
     .runWith({ timeoutSeconds: 120 })
-    .pubsub.schedule('every 6 hours')
+    .pubsub.schedule('every 15 minutes')
     .onRun(async () => {
     await runSaasSync();
     return null;
