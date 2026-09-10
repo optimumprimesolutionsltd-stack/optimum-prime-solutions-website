@@ -7,7 +7,15 @@ if (!admin.apps.length) {
 }
 const db = admin.firestore();
 
-const resend = new Resend(process.env.RESEND_API_KEY || '');
+// Lazily constructed: `new Resend('')` throws, so building it at module load
+// makes the whole codebase unloadable whenever RESEND_API_KEY is absent — which
+// broke `firebase deploy` for the non-email functions (the SaaS sync) even
+// though they never send mail.
+let _resend: Resend | null = null;
+function resendClient(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY || '');
+  return _resend;
+}
 
 const ADMIN_EMAIL = 'optimumprimesolutionsltd@gmail.com';
 const WEBSITE_URL = 'https://www.optimumprimesolutions.co.ke';
@@ -22,7 +30,7 @@ export const onAccessRequestSubmitted = functions.region('europe-west1').firesto
     const { email, requestedTab } = request;
 
     try {
-      await resend.emails.send({
+      await resendClient().emails.send({
         from: 'Optimum Prime <onboarding@resend.dev>',
         to: ADMIN_EMAIL,
         subject: `New Access Request: ${requestedTab}`,
@@ -61,7 +69,7 @@ export const onAccessRequestApproved = functions.region('europe-west1').firestor
       const { email, requestedTab } = afterData;
 
       try {
-        await resend.emails.send({
+        await resendClient().emails.send({
           from: 'Optimum Prime <onboarding@resend.dev>',
           to: email,
           subject: `✓ Access Approved: ${requestedTab}`,
@@ -90,7 +98,7 @@ export const onAccessRequestApproved = functions.region('europe-west1').firestor
       const { email, requestedTab } = afterData;
 
       try {
-        await resend.emails.send({
+        await resendClient().emails.send({
           from: 'Optimum Prime <onboarding@resend.dev>',
           to: email,
           subject: `Access Request Decision: ${requestedTab}`,
@@ -144,7 +152,7 @@ export const sendTestEmail = functions.region('europe-west1').https.onRequest(as
   }
 
   try {
-    await resend.emails.send({
+    await resendClient().emails.send({
       from: 'Optimum Prime <onboarding@resend.dev>',
       to: toEmail,
       subject: 'Test Email',
