@@ -298,10 +298,16 @@ function applySaasSyncCors(req, res) {
         res.set('Access-Control-Max-Age', '3600');
     }
 }
-/** Manual trigger for the CRM "Sync now" button. Guarded by a token. */
+/**
+ * Manual trigger for the CRM "Sync now" button. Guarded by a token.
+ *
+ * `invoker: 'public'` because the admin SPA calls this with `fetch` and no
+ * Firebase Auth bearer — reachability is intentional, and the `x-sync-token`
+ * check below is what actually protects it (same model as `sendTestEmail`).
+ */
 exports.syncSaasSubscriptionsNow = functions
     .region('europe-west1')
-    .runWith({ timeoutSeconds: 120 })
+    .runWith({ timeoutSeconds: 120, invoker: 'public' })
     .https.onRequest(async (req, res) => {
     applySaasSyncCors(req, res);
     if (req.method === 'OPTIONS') {
