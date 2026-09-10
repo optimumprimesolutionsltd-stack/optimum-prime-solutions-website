@@ -156,3 +156,149 @@ export const sendTestEmail = functions.region('europe-west1').https.onRequest(as
     res.status(500).json({ error: String(error) });
   }
 });
+
+/* ======================================================================
+ * SaaS subscription sync — Jamvi + Mavuno HR
+ *
+ * Each product exposes GET <ORGS_URL> that returns the org list when called
+ * with `Authorization: Bearer <SYNC_KEY>` (a read-only credential). We pull it
+ * on a schedule and mirror it into RTDB `saasSubscriptions/<product>_<orgId>`,
+ * which the CRM's Subscriptions tab renders. Orgs that disappear from a source
+ * are removed.
+ *
+ * Env (functions/.env, gitignored — see functions/.env.example):
+ *   MAVUNO_ORGS_URL, MAVUNO_SYNC_KEY
+ *   JAMVI_ORGS_URL,  JAMVI_SYNC_KEY        (optional until Jamvi exposes it)
+ *   SAAS_SYNC_TRIGGER_TOKEN                (guards the manual HTTP trigger)
+ * ==================================================================== */
+
+interface SaasSource {
+  product: 'mavuno' | 'jamvi';
+  label: string;
+  url?: string;
+  key?: string;
+}
+
+function saasSources(): SaasSource[] {
+  return [
+    { product: 'mavuno', label: 'Mavuno HR', url: process.env.MAVUNO_ORGS_URL, key: process.env.MAVUNO_SYNC_KEY },
+    { product: 'jamvi', label: 'Jamvi', url: process.env.JAMVI_ORGS_URL, key: process.env.JAMVI_SYNC_KEY },
+  ];
+}
+
+function mapOrgToSubscription(src: SaasSource, o: any, now: string) {
+  const admins = Array.isArray(o?.admins) ? o.admins : [];
+  const firstAdmin = admins[0];
+  const adminEmail =
+    typeof firstAdmin === 'string' ? firstAdmin : firstAdmin?.email ?? null;
+  const monthly = Number(o?.monthlyCharge ?? o?.monthlyChargeCents ?? 0) || 0;
+  return {
+    product: src.product,
+    productLabel: src.label,
+    orgId: String(o?.id ?? o?.orgId ?? ''),
+    orgName: o?.name ?? o?.orgName ?? '(unnamed)',
+    orgSlug: o?.slug ?? null,
+    plan: o?.plan ?? 'unknown',
+    status: o?.status ?? 'active',
+    billingCycle: o?.billingCycle === 'annual' ? 'annual' : 'monthly',
+    seats: Number(o?.activeEmployees ?? o?.seats ?? o?.memberCount ?? 0) || 0,
+    monthlyChargeCents: monthly,
+    cycleChargeCents: Number(o?.cycleCharge ?? o?.cycleChargeCents ?? monthly) || 0,
+    currency: o?.currencyCode ?? o?.currency ?? 'KES',
+    trialEndsAt: o?.trialEndsAt ?? null,
+    createdAt: o?.createdAt ?? null,
+    adminEmail,
+    lastSyncedAt: now,
+  };
+}
+
+async function runSaasSync(): Promise<Record<string, unknown>> {
+  const rtdb = admin.database();
+  const now = new Date().toISOString();
+  const summary: Record<string, unknown> = { ranAt: now };
+
+  // Read once — the node holds a handful of orgs, so an index isn't worth it.
+  const currentSnap = await rtdb.ref('saasSubscriptions').once('value');
+  const current: Record<string, any> = currentSnap.val() || {};
+
+  for (const src of saasSources()) {
+    if (!src.url || !src.key) {
+      summary[src.product] = 'skipped — not configured';
+      continue;
+    }
+    try {
+      const resp = await fetch(src.url, {
+        headers: { Authorization: `Bearer ${src.key}` },
+      });
+      if (!resp.ok) {
+        summary[src.product] = `error — HTTP ${resp.status}`;
+        functions.logger.error(`saas-sync ${src.product}: HTTP ${resp.status}`);
+        continue;
+      }
+      const orgs = await resp.json();
+      if (!Array.isArray(orgs)) {
+        summary[src.product] = 'error — unexpected response';
+        continue;
+      }
+
+      const updates: Record<string, unknown> = {};
+      const seen = new Set<string>();
+      for (const o of orgs) {
+        const id = String(o?.id ?? o?.orgId ?? '');
+        if (!id) continue;
+        const nodeKey = `${src.product}_${id}`;
+        seen.add(nodeKey);
+        updates[`saasSubscriptions/${nodeKey}`] = mapOrgToSubscription(src, o, now);
+      }
+      // Prune orgs that no longer exist in this source.
+      for (const k of Object.keys(current)) {
+        if (current[k]?.product === src.product && !seen.has(k)) {
+          updates[`saasSubscriptions/${k}`] = null;
+        }
+      }
+      await rtdb.ref().update(updates);
+      summary[src.product] = `${orgs.length} synced`;
+    } catch (err) {
+      summary[src.product] = `error — ${(err as Error).message}`;
+      functions.logger.error(`saas-sync ${src.product}`, err);
+    }
+  }
+
+  functions.logger.info('saas-sync complete', summary);
+  return summary;
+}
+
+/** Scheduled pull, every 6 hours. */
+export const syncSaasSubscriptions = functions
+  .region('europe-west1')
+  .runWith({ timeoutSeconds: 120 })
+  .pubsub.schedule('every 6 hours')
+  .onRun(async () => {
+    await runSaasSync();
+    return null;
+  });
+
+/** Manual trigger for the CRM "Sync now" button. Guarded by a token. */
+export const syncSaasSubscriptionsNow = functions
+  .region('europe-west1')
+  .runWith({ timeoutSeconds: 120 })
+  .https.onRequest(async (req, res) => {
+    const expected = process.env.SAAS_SYNC_TRIGGER_TOKEN;
+    if (!expected) {
+      res.status(503).json({ error: 'Endpoint not configured' });
+      return;
+    }
+    const provided =
+      (typeof req.get === 'function' ? req.get('x-sync-token') : undefined) ||
+      (typeof req.query.token === 'string' ? req.query.token : undefined);
+    if (provided !== expected) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+    try {
+      const summary = await runSaasSync();
+      res.json(summary);
+    } catch (err) {
+      res.status(500).json({ error: String(err) });
+    }
+  });

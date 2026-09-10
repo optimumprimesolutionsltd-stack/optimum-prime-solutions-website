@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import {
   LayoutDashboard, Building2, Briefcase, ShoppingCart, Globe,
   HelpCircle, Users, FileText, Phone, MessageCircle, CalendarDays, Video,
-  LogOut, Menu, X, ExternalLink, Mail, Lock, Wrench, CalendarClock, KeyRound
+  LogOut, Menu, X, ExternalLink, Mail, Lock, Wrench, CalendarClock, KeyRound,
+  CreditCard
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import { type SiteData } from '../data/siteData';
@@ -28,6 +29,7 @@ import WorkInProgressManager from './editors/WorkInProgressManager';
 import CustomerDirectory from './editors/CustomerDirectory';
 import SerialLookup from './SerialLookup';
 import RenewalsManager from './editors/RenewalsManager';
+import SubscriptionsManager from './editors/SubscriptionsManager';
 import { useAdminNotifications, type AdminNotification } from './notifications/useAdminNotifications';
 import { NotificationBell, NotificationToasts } from './notifications/NotificationCenter';
 
@@ -40,6 +42,8 @@ const tabs: { id: TabId; label: string; icon: typeof LayoutDashboard }[] = [
   { id: 'customers', label: 'Customer Directory', icon: KeyRound },
   // Recurring revenue: TSS renewals and the Annual → Perpetual top-up window.
   { id: 'renewals', label: 'Renewals & Upgrades', icon: CalendarClock },
+  // Jamvi + Mavuno HR SaaS subscriptions, synced from each product.
+  { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard },
   { id: 'workshop', label: 'Workshop RSVPs', icon: CalendarDays },
   { id: 'webinar', label: 'Webinar RSVPs', icon: Video },
   // Restricted tabs require email approval
@@ -83,7 +87,7 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
   // Other tabs require email approval via the access request system
   // Full admins can access all tabs
   // Staff need the delivery board as much as the pipeline — they do the work.
-  const baseAccessibleTabs = isFullAdmin ? new Set(tabs.map(t => t.id)) : new Set(['dashboard', 'leads', 'wip', 'customers', 'renewals', 'workshop', 'webinar']);
+  const baseAccessibleTabs = isFullAdmin ? new Set(tabs.map(t => t.id)) : new Set(['dashboard', 'leads', 'wip', 'customers', 'renewals', 'subscriptions', 'workshop', 'webinar']);
   const accessibleTabs = baseAccessibleTabs;
   const [showAccessRequest, setShowAccessRequest] = useState(false);
   const [requestedTab, setRequestedTab] = useState<string | null>(null);
@@ -212,6 +216,7 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
       case 'customers': return <CustomerDirectory data={data} onSave={d => handleSave(d, 'Customer directory updated!')} />;
       case 'renewals': return <RenewalsManager data={data} onSave={d => handleSave(d, 'Renewal raised!')}
         onRaised={() => setTab('leads')} />;
+      case 'subscriptions': return <SubscriptionsManager />;
       case 'workshop': return <WorkshopRegistrationsManager data={data} onSave={d => handleSave(d, 'Workshop updated!')}
         onBookDemo={leadId => { setScheduleLeadId(leadId); setTab('leads'); }} />;
       case 'webinar': return <WebinarRegistrationsManager data={data} onSave={d => handleSave(d, 'Webinar updated!')}
