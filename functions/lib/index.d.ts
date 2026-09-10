@@ -13,6 +13,12 @@ export declare const onAccessRequestApproved: functions.CloudFunction<functions.
 export declare const sendTestEmail: functions.HttpsFunction;
 /** Scheduled pull, every 6 hours. */
 export declare const syncSaasSubscriptions: functions.CloudFunction<unknown>;
-/** Manual trigger for the CRM "Sync now" button. Guarded by a token. */
+/**
+ * Manual trigger for the CRM "Sync now" button. Guarded by a token.
+ *
+ * `invoker: 'public'` because the admin SPA calls this with `fetch` and no
+ * Firebase Auth bearer — reachability is intentional, and the `x-sync-token`
+ * check below is what actually protects it (same model as `sendTestEmail`).
+ */
 export declare const syncSaasSubscriptionsNow: functions.HttpsFunction;
 //# sourceMappingURL=index.d.ts.map

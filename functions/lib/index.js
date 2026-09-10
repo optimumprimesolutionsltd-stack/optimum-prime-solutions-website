@@ -41,7 +41,16 @@ if (!admin.apps.length) {
     admin.initializeApp();
 }
 const db = admin.firestore();
-const resend = new resend_1.Resend(process.env.RESEND_API_KEY || '');
+// Lazily constructed: `new Resend('')` throws, so building it at module load
+// makes the whole codebase unloadable whenever RESEND_API_KEY is absent — which
+// broke `firebase deploy` for the non-email functions (the SaaS sync) even
+// though they never send mail.
+let _resend = null;
+function resendClient() {
+    if (!_resend)
+        _resend = new resend_1.Resend(process.env.RESEND_API_KEY || '');
+    return _resend;
+}
 const ADMIN_EMAIL = 'optimumprimesolutionsltd@gmail.com';
 const WEBSITE_URL = 'https://www.optimumprimesolutions.co.ke';
 /**
@@ -53,7 +62,7 @@ exports.onAccessRequestSubmitted = functions.region('europe-west1').firestore
     const request = snap.data();
     const { email, requestedTab } = request;
     try {
-        await resend.emails.send({
+        await resendClient().emails.send({
             from: 'Optimum Prime <onboarding@resend.dev>',
             to: ADMIN_EMAIL,
             subject: `New Access Request: ${requestedTab}`,
@@ -89,7 +98,7 @@ exports.onAccessRequestApproved = functions.region('europe-west1').firestore
     if (beforeData.status !== 'approved' && afterData.status === 'approved') {
         const { email, requestedTab } = afterData;
         try {
-            await resend.emails.send({
+            await resendClient().emails.send({
                 from: 'Optimum Prime <onboarding@resend.dev>',
                 to: email,
                 subject: `✓ Access Approved: ${requestedTab}`,
@@ -116,7 +125,7 @@ exports.onAccessRequestApproved = functions.region('europe-west1').firestore
     if (beforeData.status !== 'rejected' && afterData.status === 'rejected') {
         const { email, requestedTab } = afterData;
         try {
-            await resend.emails.send({
+            await resendClient().emails.send({
                 from: 'Optimum Prime <onboarding@resend.dev>',
                 to: email,
                 subject: `Access Request Decision: ${requestedTab}`,
@@ -164,7 +173,7 @@ exports.sendTestEmail = functions.region('europe-west1').https.onRequest(async (
         return;
     }
     try {
-        await resend.emails.send({
+        await resendClient().emails.send({
             from: 'Optimum Prime <onboarding@resend.dev>',
             to: toEmail,
             subject: 'Test Email',
@@ -289,10 +298,16 @@ function applySaasSyncCors(req, res) {
         res.set('Access-Control-Max-Age', '3600');
     }
 }
-/** Manual trigger for the CRM "Sync now" button. Guarded by a token. */
+/**
+ * Manual trigger for the CRM "Sync now" button. Guarded by a token.
+ *
+ * `invoker: 'public'` because the admin SPA calls this with `fetch` and no
+ * Firebase Auth bearer — reachability is intentional, and the `x-sync-token`
+ * check below is what actually protects it (same model as `sendTestEmail`).
+ */
 exports.syncSaasSubscriptionsNow = functions
     .region('europe-west1')
-    .runWith({ timeoutSeconds: 120 })
+    .runWith({ timeoutSeconds: 120, invoker: 'public' })
     .https.onRequest(async (req, res) => {
     applySaasSyncCors(req, res);
     if (req.method === 'OPTIONS') {
