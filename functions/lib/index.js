@@ -206,6 +206,11 @@ function mapOrgToSubscription(src, o, now) {
         status: o?.status ?? 'active',
         billingCycle: o?.billingCycle === 'annual' ? 'annual' : 'monthly',
         seats: Number(o?.activeEmployees ?? o?.seats ?? o?.memberCount ?? 0) || 0,
+        seatLimit: Number(o?.seatLimit ?? 0) || 0,
+        // Usage signal — how much the customer actually runs the product.
+        // Mavuno HR only; products without payroll report 0 / null.
+        payrollRuns: Number(o?.payrollRuns ?? 0) || 0,
+        lastPayrollRun: o?.lastPayrollRun ?? null,
         monthlyChargeCents: monthly,
         cycleChargeCents: Number(o?.cycleCharge ?? o?.cycleChargeCents ?? monthly) || 0,
         currency: o?.currencyCode ?? o?.currency ?? 'KES',

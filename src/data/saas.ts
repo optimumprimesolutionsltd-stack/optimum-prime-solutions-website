@@ -32,6 +32,12 @@ export interface SaasSubscription {
   billingCycle: "monthly" | "annual";
   /** Billable seats — active employees for Mavuno HR, members for Jamvi. */
   seats: number;
+  /** Seat cap on the plan; 0 when the source doesn't report one. */
+  seatLimit: number;
+  /** Mavuno HR only — completed payroll runs. 0 for products without payroll. */
+  payrollRuns: number;
+  /** Mavuno HR only — ISO date of the most recent payroll run, or null. */
+  lastPayrollRun: string | null;
   /** Effective charge per month (override wins over rate card), cents. */
   monthlyChargeCents: number;
   /** Amount per invoice — annual bills ~10x the monthly, cents. */
@@ -63,6 +69,12 @@ export const mrrByProduct = (subs: SaasSubscription[]): Record<string, number> =
     out[s.product] = (out[s.product] ?? 0) + (s.monthlyChargeCents || 0);
   }
   return out;
+};
+
+/** Whole days since the org's last payroll run; null if it has never run one. */
+export const daysSincePayroll = (s: SaasSubscription): number | null => {
+  if (!s.lastPayrollRun) return null;
+  return Math.floor((Date.now() - new Date(s.lastPayrollRun).getTime()) / 86_400_000);
 };
 
 export const trialsEndingSoon = (subs: SaasSubscription[], withinDays = 7): SaasSubscription[] => {

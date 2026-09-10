@@ -5,7 +5,7 @@ import {
 import { fbSubscribe } from '../../firebase/config';
 import {
   type SaasSubscription, SAAS_PRODUCTS, saasProductLabel,
-  monthlyMrrCents, mrrByProduct, trialsEndingSoon, renewalDate, kes,
+  monthlyMrrCents, mrrByProduct, trialsEndingSoon, renewalDate, daysSincePayroll, kes,
 } from '../../data/saas';
 
 // v1 Cloud Function, europe-west1. Guarded by SAAS_SYNC_TRIGGER_TOKEN; the
@@ -90,9 +90,10 @@ export default function SubscriptionsManager() {
   };
 
   const exportCSV = () => {
-    const headers = ['Product', 'Organisation', 'Plan', 'Status', 'Cycle', 'Seats', 'KES/month', 'Per invoice', 'Admin', 'Trial ends', 'Last synced'];
+    const headers = ['Product', 'Organisation', 'Plan', 'Status', 'Cycle', 'Seats', 'Seat limit', 'Payroll runs', 'Last payroll run', 'KES/month', 'Per invoice', 'Admin', 'Trial ends', 'Last synced'];
     const rows = filtered.map((s) => [
       s.productLabel, s.orgName, s.plan, s.status, s.billingCycle, s.seats,
+      s.seatLimit || '', s.payrollRuns, s.lastPayrollRun ?? '',
       Math.round((s.monthlyChargeCents || 0) / 100), Math.round((s.cycleChargeCents || 0) / 100),
       s.adminEmail ?? '', s.trialEndsAt ?? '', s.lastSyncedAt ?? '',
     ]);
@@ -227,6 +228,7 @@ export default function SubscriptionsManager() {
                 <th className="px-4 py-3">Product</th>
                 <th className="px-4 py-3">Plan</th>
                 <th className="px-4 py-3 text-right">Seats</th>
+                <th className="px-4 py-3">Payroll</th>
                 <th className="px-4 py-3 text-right">KES / month</th>
                 <th className="px-4 py-3">Renews</th>
                 <th className="px-4 py-3">Status</th>
@@ -235,6 +237,7 @@ export default function SubscriptionsManager() {
             <tbody>
               {filtered.map((s) => {
                 const renew = renewalDate(s);
+                const sincePayroll = daysSincePayroll(s);
                 return (
                   <tr key={`${s.product}_${s.orgId}`} className="border-b border-slate-100 last:border-0">
                     <td className="px-4 py-3">
@@ -246,7 +249,23 @@ export default function SubscriptionsManager() {
                       <span className="capitalize text-slate-700">{s.plan}</span>
                       <span className="ml-1 text-xs text-slate-400">/ {s.billingCycle}</span>
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-slate-700">{s.seats}</td>
+                    <td className="px-4 py-3 text-right tabular-nums text-slate-700">
+                      {s.seats}{s.seatLimit ? <span className="text-xs text-slate-400"> / {s.seatLimit}</span> : null}
+                    </td>
+                    <td className="px-4 py-3 text-slate-600 whitespace-nowrap">
+                      {s.payrollRuns > 0 ? (
+                        <>
+                          <span className="tabular-nums">{s.payrollRuns}</span> run{s.payrollRuns === 1 ? '' : 's'}
+                          {sincePayroll != null && (
+                            <span className="ml-1 text-xs text-slate-400">
+                              · {sincePayroll === 0 ? 'today' : `${sincePayroll}d ago`}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="text-slate-300">—</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-right tabular-nums font-medium text-slate-900">
                       {kes(s.monthlyChargeCents)}
                     </td>
