@@ -43,6 +43,7 @@ it by hand, as the next build will overwrite it. Everything else in this file is
 hand-written and is left alone.
 
 <!-- BEGIN GENERATED GUIDES -->
+- [M-Pesa Integration for TallyPrime: How Kenyan Businesses Are Automating Reconciliation](https://www.optimumprimesolutions.co.ke/blog/m-pesa-integration-for-tallyprime-how-kenyan-businesses-are-automating-reconciliation/): How M-Pesa STK Push integration inside TallyPrime automatically reconciles customer payments — no manual matching, no end-of-day catch-up.
 - [Complete Guide to KRA e-Filing with TallyPrime](https://www.optimumprimesolutions.co.ke/blog/complete-guide-to-kra-e-filing-with-tally-prime/): Step-by-step guide to filing your KRA returns from TallyPrime, updated for the 2026 rules that tie every expense you claim to a valid electronic tax invoice.
 - [Inventory Mastery Workshop: The Key Takeaways](https://www.optimumprimesolutions.co.ke/blog/inventory-mastery-workshop-recap/): Highlights from our Ruiru breakfast forum — spotting dead stock, the 80/20 rule, and practical fixes for stockouts and cash flow.
 - [Converting from Sole Proprietorship to a Limited Company: What KRA Expects](https://www.optimumprimesolutions.co.ke/blog/sole-proprietorship-to-limited-company-kenya-kra-stock-transfer/): Registering the company and getting a new KRA PIN are the easy, visible steps. Here is the paper trail most Kenyan business owners forget — moving stock from a personal PIN to the company PIN.
