@@ -1851,7 +1851,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         if (perf.rows.length === 0) return null;
 
         const colors: Record<string, string> = {
-          online: 'bg-blue-500', workshop: 'bg-amber-500', webinar: 'bg-purple-500',
+          online: 'bg-blue-500', mavuno: 'bg-teal-500', workshop: 'bg-amber-500', webinar: 'bg-purple-500',
           field: 'bg-yellow-500', email: 'bg-green-500', whatsapp: 'bg-emerald-600',
           referral: 'bg-pink-500', phone: 'bg-orange-500', direct: 'bg-indigo-500',
           other: 'bg-slate-400',
@@ -2090,7 +2090,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             and Select-all only touch the source you're looking at. */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs font-semibold text-slate-500 mr-1">Source:</span>
-          {([['All', 'All sources'], ['online', 'Online / Website'], ['field', '📣 Field / Marketing'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['email', 'Email'], ['whatsapp', 'WhatsApp'], ['referral', 'Referral'], ['phone', 'Phone'], ['direct', 'Direct'], ['needs-source', '⚠️ Needs a source']] as [SourceFilter, string][]).map(([val, label]) => {
+          {([['All', 'All sources'], ['online', 'Online / Website'], ['mavuno', '🌱 Mavuno HR'], ['field', '📣 Field / Marketing'], ['workshop', 'Workshop'], ['webinar', 'Webinar'], ['email', 'Email'], ['whatsapp', 'WhatsApp'], ['referral', 'Referral'], ['phone', 'Phone'], ['direct', 'Direct'], ['needs-source', '⚠️ Needs a source']] as [SourceFilter, string][]).map(([val, label]) => {
             const isActive = filterSource === val;
             // Counted across every pipeline stage — "Online / Website (6)" means
             // six leads came in that way, wherever they've since got to. Picking
