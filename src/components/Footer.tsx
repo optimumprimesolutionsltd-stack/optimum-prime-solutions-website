@@ -377,6 +377,27 @@ export default function Footer() {
             <Link to="/privacy-policy" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })} className="hover:text-red-600 transition-colors">
               Privacy Policy
             </Link>
+            {/* The one permitted piece of cross-promotion, per the 2026-08-22 brand
+                decision: a quiet "also from our team" footer line and nothing more.
+                Anchor text is the brand alone — deliberately NOT "payroll" or "HR" —
+                because TallyPrime has payroll of its own and this site sells
+                TallyPrime. Advertising a competing payroll product to a Tally buyer
+                is channel conflict with our own vendor.
+
+                Followed on purpose: no rel="nofollow". Passing this domain's
+                authority to a new one is the entire point; mavunohr.co.ke currently
+                has no inbound links at all. */}
+            <span className="text-slate-400">
+              Also from our team:{' '}
+              <a
+                href="https://mavunohr.co.ke/"
+                target="_blank"
+                rel="noopener"
+                className="text-slate-500 hover:text-red-600 transition-colors"
+              >
+                Mavuno HR
+              </a>
+            </span>
           </p>
           <button
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
