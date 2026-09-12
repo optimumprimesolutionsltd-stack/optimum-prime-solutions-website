@@ -52,6 +52,7 @@ export const MANUAL_SOURCES: SourceOption[] = [
 // correcting an existing lead, never as a default on a new one.
 export const SYSTEM_SOURCES: SourceOption[] = [
   { value: 'website',  label: '🌐 Website form', short: 'Website' },
+  { value: 'mavuno',   label: '🌱 Mavuno HR demo request', short: 'Mavuno HR' },
   { value: 'workshop', label: '🎓 Workshop',     short: 'Workshop' },
   { value: 'webinar',  label: '💻 Webinar',      short: 'Webinar' },
 ];
@@ -91,7 +92,7 @@ export const needsAttribution = (l: Lead): boolean => attributionGap(l) !== null
 // swept into 'email', so a lead with no source at all was reported to Tally as
 // an email enquiry.
 export type SourceCategory =
-  'workshop' | 'webinar' | 'online' | 'field' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'other';
+  'workshop' | 'webinar' | 'online' | 'mavuno' | 'field' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'other';
 
 // Sources that arrive as a one-to-one contact rather than through an event.
 // Kept as data so the mapper below can't drift from the chip list.
@@ -104,6 +105,10 @@ export const sourceCategory = (l: Lead): SourceCategory =>
   l.source === 'workshop' ? 'workshop'
   : l.source === 'webinar' ? 'webinar'
   : l.source === 'website' ? 'online'
+  // Its own bucket rather than folded into 'online'. Mavuno HR sells to a
+  // different buyer at a different price, so averaging its leads into the
+  // Tally site's would make both numbers useless.
+  : l.source === 'mavuno' ? 'mavuno'
   : l.source === 'field' ? 'field'
   // Only a recognised direct source keeps its own bucket. Anything else —
   // blank, legacy 'manual', a value from an import — lands in 'other' rather

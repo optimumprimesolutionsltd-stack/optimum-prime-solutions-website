@@ -277,8 +277,185 @@ async function runSaasSync(): Promise<Record<string, unknown>> {
     }
   }
 
+  // Demo requests and newsletter signups ride along with the subscription
+  // pull: same host, same key, same cadence. A second scheduler would be a
+  // second thing to notice had stopped.
+  Object.assign(summary, await runMavunoMarketingSync());
+
   functions.logger.info('saas-sync complete', summary);
   return summary;
+}
+
+/* ======================================================================
+ * Marketing capture sync — Mavuno HR
+ *
+ * mavunohr.co.ke has its own demo form and newsletter box. Those rows live in
+ * Mavuno's Postgres, which nobody in this CRM can see, so a demo request could
+ * sit there for a week with no one aware of it.
+ *
+ * GET <MARKETING_URL> returns everything captured in the last 30 days when
+ * called with the same read-only Bearer key the subscription sync uses. We
+ * mirror demo requests into `leads` (tagged source 'mavuno') and signups into
+ * `newsletter_subscribers`, keyed deterministically — mavuno_demo_<id> and
+ * mavuno_sub_<id> — so a repeated pull is an upsert. Neither side has to
+ * remember what was already synced, and a missed run repairs itself.
+ *
+ * ADDITIVE ONLY, and that is the whole design.
+ *
+ * A lead in this CRM gets worked: someone changes its status, adds a next
+ * step, schedules a demo, marks it Closed Won. All of that lives here and
+ * nowhere else. A sync that wrote the source record over the top every fifteen
+ * minutes would erase that work on a loop, so an existing key is never
+ * overwritten and never pruned.
+ *
+ * The one exception runs one way only: if Mavuno reports a subscriber as
+ * unsubscribed and this CRM still has them active, we mark them unsubscribed
+ * here too. The reverse is deliberately not done — re-activating someone who
+ * opted out inside the CRM would mean mailing a person who asked us not to.
+ * ==================================================================== */
+
+interface MavunoDemoRequest {
+  id: number | string;
+  name?: string;
+  email?: string;
+  company?: string | null;
+  phone?: string | null;
+  employeeCount?: string | null;
+  message?: string | null;
+  pagePath?: string | null;
+  createdAt?: string | null;
+}
+
+interface MavunoSubscriber {
+  id: number | string;
+  email?: string;
+  name?: string | null;
+  pagePath?: string | null;
+  status?: string | null;
+  createdAt?: string | null;
+}
+
+/**
+ * Where to pull from. Derived from the orgs URL so this works off the config
+ * that is already deployed — both endpoints live on the same host behind the
+ * same key, and requiring a second secret before the sync could run at all
+ * would mean shipping something that silently does nothing.
+ */
+function mavunoMarketingUrl(): string | undefined {
+  const explicit = process.env.MAVUNO_MARKETING_URL;
+  if (explicit) return explicit;
+  const orgs = process.env.MAVUNO_ORGS_URL;
+  return orgs ? orgs.replace(/\/orgs\/?$/, '/marketing-capture') : undefined;
+}
+
+/** A demo request as this CRM's `leads` node expects it. */
+function mapDemoToLead(d: MavunoDemoRequest, now: string) {
+  // Everything Mavuno collected that this CRM has no field for goes into the
+  // message, because the alternative is losing it. Headcount in particular is
+  // the single most useful thing on the form when sizing the conversation.
+  const extras = [
+    d.message?.trim(),
+    d.employeeCount ? `Team size: ${d.employeeCount}` : '',
+    d.pagePath ? `Submitted from: ${d.pagePath}` : '',
+  ].filter(Boolean);
+
+  return {
+    name: d.name || 'Unknown',
+    email: d.email || '',
+    phone: d.phone || '',
+    company: d.company || '',
+    businessType: '',
+    demoDate: '',
+    currentSoftware: '',
+    message: extras.join('\n'),
+    createdAt: d.createdAt || now,
+    status: 'New',
+    source: 'mavuno',
+    requestType: 'demo',
+    // The attribution is complete the moment it arrives — it came off a known
+    // form on a known site — so it must not land in the "needs a source" queue.
+    sourceSetBy: 'Mavuno HR sync',
+    sourceSetAt: now,
+  };
+}
+
+async function runMavunoMarketingSync(): Promise<Record<string, unknown>> {
+  const rtdb = admin.database();
+  const now = new Date().toISOString();
+
+  const url = mavunoMarketingUrl();
+  const key = process.env.MAVUNO_SYNC_KEY;
+  if (!url || !key) return { mavunoMarketing: 'skipped — not configured' };
+
+  try {
+    const resp = await fetch(url, { headers: { Authorization: `Bearer ${key}` } });
+    if (!resp.ok) {
+      functions.logger.error(`marketing-sync: HTTP ${resp.status}`);
+      return { mavunoMarketing: `error — HTTP ${resp.status}` };
+    }
+    const body: any = await resp.json();
+    const demos: MavunoDemoRequest[] = Array.isArray(body?.demoRequests) ? body.demoRequests : [];
+    const subs: MavunoSubscriber[] = Array.isArray(body?.newsletterSubscribers)
+      ? body.newsletterSubscribers
+      : [];
+
+    const updates: Record<string, unknown> = {};
+    let newLeads = 0;
+    let newSubs = 0;
+    let unsubscribed = 0;
+
+    // One small read per record rather than pulling the whole leads node. The
+    // window holds a handful of rows, and `leads` holds every lead we have ever
+    // had — reading all of it every fifteen minutes to check a few keys would
+    // be the expensive way round.
+    for (const d of demos) {
+      if (!d?.id || !d?.email) continue;
+      const nodeKey = `mavuno_demo_${d.id}`;
+      const existing = await rtdb.ref(`leads/${nodeKey}`).once('value');
+      if (existing.exists()) continue; // already here, and possibly worked since
+      updates[`leads/${nodeKey}`] = mapDemoToLead(d, now);
+      newLeads += 1;
+    }
+
+    for (const s of subs) {
+      if (!s?.id || !s?.email) continue;
+      const nodeKey = `mavuno_sub_${s.id}`;
+      const snap = await rtdb.ref(`newsletter_subscribers/${nodeKey}`).once('value');
+      const sourceUnsubscribed = s.status === 'unsubscribed';
+
+      if (!snap.exists()) {
+        updates[`newsletter_subscribers/${nodeKey}`] = {
+          email: String(s.email).trim().toLowerCase(),
+          ...(s.name ? { name: s.name } : {}),
+          status: sourceUnsubscribed ? 'unsubscribed' : 'active',
+          subscribedAt: s.createdAt || now,
+          source: 'mavuno',
+        };
+        newSubs += 1;
+        continue;
+      }
+
+      // One-way only: an unsubscribe propagates in, a re-subscribe does not.
+      if (sourceUnsubscribed && snap.val()?.status !== 'unsubscribed') {
+        updates[`newsletter_subscribers/${nodeKey}/status`] = 'unsubscribed';
+        unsubscribed += 1;
+      }
+    }
+
+    if (Object.keys(updates).length > 0) await rtdb.ref().update(updates);
+
+    const summary = {
+      mavunoMarketing: `${demos.length} demo requests, ${subs.length} subscribers seen`,
+      newLeads,
+      newSubscribers: newSubs,
+      unsubscribesApplied: unsubscribed,
+    };
+    functions.logger.info('marketing-sync complete', summary);
+    return summary;
+  } catch (err) {
+    functions.logger.error('marketing-sync', err);
+    return { mavunoMarketing: `error — ${(err as Error).message}` };
+  }
 }
 
 /** Scheduled pull, every 15 minutes. */

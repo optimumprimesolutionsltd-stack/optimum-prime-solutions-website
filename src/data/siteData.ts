@@ -28,7 +28,12 @@ export interface Lead {
   // human to confirm instead of being quietly counted as a website enquiry.
   // 'manual' is legacy and means the same thing — someone typed it in, but
   // nobody said where it came from.
-  source?: 'website' | 'manual' | 'unknown' | 'workshop' | 'webinar' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'field';
+  //
+  // 'mavuno' is a demo request from mavunohr.co.ke, synced in by the Cloud
+  // Function. Distinct from 'website' on purpose: both are web forms, but
+  // they are enquiries about different products, and a report that cannot
+  // tell a Tally enquiry from a payroll one cannot say which site is working.
+  source?: 'website' | 'mavuno' | 'manual' | 'unknown' | 'workshop' | 'webinar' | 'email' | 'whatsapp' | 'referral' | 'phone' | 'direct' | 'field';
   fieldCampaign?: string;         // which drive/area a field lead was captured on
   referredBy?: string;            // who sent a referral over — the person or company
   sourceSetBy?: string;           // staff member who recorded/confirmed the source
