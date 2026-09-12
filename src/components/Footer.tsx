@@ -370,7 +370,27 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Bottom Bar */}
+        {/* Also from our team.
+
+            Deliberately one muted line and nothing more. This site is the
+            TallyPrime partner site and stays topically focused on Tally intent;
+            Mavuno HR also competes with TallyPrime's own payroll module, so
+            promoting it here is visible channel conflict with the partner whose
+            agreement carries the revenue. Do NOT grow this into a products
+            section, a nav entry, or anything with payroll keywords in it.
+            Anchor text is the bare brand name on purpose — brand-name search is
+            what these two need to win first. */}
+        <div className="border-t border-slate-200 pt-6 pb-2 text-sm text-slate-500">
+          <span>Also from our team: </span>
+          <a href="https://mavunohr.co.ke" className="font-medium text-slate-600 transition-colors hover:text-red-600">
+            Mavuno HR
+          </a>
+          <span className="mx-2" aria-hidden="true">·</span>
+          <a href="https://jamvi.co.ke" className="font-medium text-slate-600 transition-colors hover:text-red-600">
+            Jamvi
+          </a>
+        </div>
+
         <div className="flex flex-col gap-4 border-t border-slate-200 pt-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
           <p className="flex flex-wrap items-center gap-x-4 gap-y-1">
             <span>© {new Date().getFullYear()} {data.company.name}. All rights reserved.</span>
