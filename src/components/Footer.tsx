@@ -389,23 +389,44 @@ export default function Footer() {
                 Followed on purpose: no rel="nofollow". Passing this domain's
                 authority to a new one is the entire point; mavunohr.co.ke currently
                 has no inbound links at all. */}
-            <span className="text-slate-400">
-              Also from our team:{' '}
+            <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-slate-400">
+              Also from our team:
+              {/* Marks are 16px and decorative: the anchor text beside each one
+                  already names the product, so alt="" keeps a screen reader from
+                  announcing "Mavuno HR" twice. Sized in CSS as well as via the
+                  width/height attributes so the row does not reflow while they
+                  load. */}
               <a
                 href="https://mavunohr.co.ke/"
                 target="_blank"
                 rel="noopener"
-                className="text-slate-500 hover:text-red-600 transition-colors"
+                className="inline-flex items-center gap-1.5 text-slate-500 hover:text-red-600 transition-colors"
               >
+                <img
+                  src="/brands/mavuno-hr-mark.svg"
+                  alt=""
+                  width={16}
+                  height={16}
+                  loading="lazy"
+                  className="h-4 w-4 rounded-[3px]"
+                />
                 Mavuno HR
               </a>
-              {' · '}
+              <span aria-hidden="true">·</span>
               <a
                 href="https://jamvi.co.ke/"
                 target="_blank"
                 rel="noopener"
-                className="text-slate-500 hover:text-red-600 transition-colors"
+                className="inline-flex items-center gap-1.5 text-slate-500 hover:text-red-600 transition-colors"
               >
+                <img
+                  src="/brands/jamvi-mark.png"
+                  alt=""
+                  width={16}
+                  height={16}
+                  loading="lazy"
+                  className="h-4 w-4 rounded-[3px]"
+                />
                 Jamvi
               </a>
             </span>
