@@ -22,6 +22,16 @@ async function urlsFromLiveSitemap() {
   const res = await fetch(`${SITE_ORIGIN}/sitemap.xml`, { signal: AbortSignal.timeout(20000) });
   if (!res.ok) throw new Error(`sitemap fetch failed: HTTP ${res.status}`);
   const xml = await res.text();
+
+  // Refuse a 200 that is not actually XML. If a rewrite or fallback ever serves
+  // the SPA shell at /sitemap.xml, the match below finds no <loc> and main()
+  // reports "Nothing to submit" — which reads like an empty sitemap and hides a
+  // broken one. mavunohr.co.ke shipped in exactly that state for months: every
+  // path answered 200 with the home page, /sitemap.xml included.
+  if (!xml.trimStart().startsWith('<?xml')) {
+    throw new Error('sitemap.xml did not return XML — a fallback is answering for it');
+  }
+
   return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1].trim());
 }
 
