@@ -382,7 +382,9 @@ export default function Footer() {
                 Anchor text is the brand alone — deliberately NOT "payroll" or "HR" —
                 because TallyPrime has payroll of its own and this site sells
                 TallyPrime. Advertising a competing payroll product to a Tally buyer
-                is channel conflict with our own vendor.
+                is channel conflict with our own vendor. That caveat is specific to
+                Mavuno: Jamvi is a chama and household budgeting app for consumers,
+                which TallyPrime does not address, so it carries no such conflict.
 
                 Followed on purpose: no rel="nofollow". Passing this domain's
                 authority to a new one is the entire point; mavunohr.co.ke currently
@@ -396,6 +398,15 @@ export default function Footer() {
                 className="text-slate-500 hover:text-red-600 transition-colors"
               >
                 Mavuno HR
+              </a>
+              {' · '}
+              <a
+                href="https://jamvi.co.ke/"
+                target="_blank"
+                rel="noopener"
+                className="text-slate-500 hover:text-red-600 transition-colors"
+              >
+                Jamvi
               </a>
             </span>
           </p>
