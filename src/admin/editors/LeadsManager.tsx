@@ -57,6 +57,39 @@ interface P {
 
 const BACKEND_URL = 'https://optimum-prime-lead-notifier.onrender.com';
 
+// Turns a /book-demo response into the message staff actually need: not "we
+// sent it" but who it reached. The response's meetLink is the one place this
+// ever gets persisted back onto the lead — see the three call sites below.
+interface BookDemoResult {
+  success?: boolean;
+  client_notified?: boolean;
+  team_notified?: number;
+  team_total?: number;
+  office_notified?: number;
+  office_total?: number;
+  meetLink?: string;
+}
+function describeBookDemoResult(json: BookDemoResult | null, notifyClient: boolean): string {
+  if (!json) return '⚠️ Booking saved, but the notification service did not respond — check the WhatsApp tab and confirm with the team/client directly.';
+  const parts: string[] = [];
+  if (notifyClient) {
+    parts.push(json.client_notified
+      ? 'Client notified on WhatsApp.'
+      : `⚠️ Client WhatsApp did NOT go through${json.meetLink ? ` — send this Meet link manually: ${json.meetLink}` : ' — follow up manually'}.`);
+  }
+  const teamTotal = json.team_total ?? 0;
+  if (teamTotal > 0) {
+    parts.push(json.team_notified === teamTotal
+      ? `Team (${teamTotal}/${teamTotal}) notified on WhatsApp.`
+      : `⚠️ Only ${json.team_notified ?? 0}/${teamTotal} assigned team member(s) got their WhatsApp — check the WhatsApp tab.`);
+  }
+  const officeTotal = json.office_total ?? 0;
+  if (officeTotal > 0 && json.office_notified !== officeTotal) {
+    parts.push(`⚠️ Office alert only reached ${json.office_notified ?? 0}/${officeTotal} numbers.`);
+  }
+  return parts.join(' ') || 'Booking saved.';
+}
+
 const INDUSTRIES = [
   'Manufacturing', 'Distribution & Wholesale', 'Retail', 'Construction',
   'Hardware & Building Materials', 'NGO / Non-Profit', 'School / Education',
@@ -628,6 +661,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const [bookingError, setBookingError] = useState('');
   const [bookingSubmitting, setBookingSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
+  // What /book-demo actually reported — replaces the old fixed "notified everyone"
+  // claim, which was shown regardless of whether any WhatsApp send truly succeeded.
+  const [bookingNotifyNote, setBookingNotifyNote] = useState<string | null>(null);
 
   // Schedule panel (per-lead)
   const [schedulingId, setSchedulingId] = useState<string | null>(null);
@@ -639,6 +675,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   });
   const [schedSubmitting, setSchedSubmitting] = useState(false);
   const [schedError, setSchedError]           = useState('');
+  // Shown after the schedule pop-up closes — it can't show its own success banner
+  // since closing is what "done" means for that pop-up.
+  const [schedSuccess, setSchedSuccess]       = useState<string | null>(null);
   const [escalationError, setEscalationError] = useState<string | null>(null);
 
   // Edit mode for already-scheduled leads
@@ -1469,35 +1508,49 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         { name: booking.teamMemberName, phone: booking.teamMemberPhone },
         ...booking.extraTeam.filter(m => m.name.trim()),
       ];
-      await fetch(`${BACKEND_URL}/book-demo`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          clientName: booking.clientName,
-          clientPhone: booking.clientPhone,
-          clientEmail: booking.clientEmail,
-          clientCompany: booking.clientCompany,
-          clientIndustry: booking.clientIndustry,
-          demoDate: booking.demoDate,
-          demoTime: booking.demoTime,
-          demoType: booking.demoType,
-          demoLocation: booking.demoLocation,
-          demoNotes: booking.demoNotes,
-          teamMemberName: allBookingTeam[0]?.name || '',
-          teamMemberPhone: allBookingTeam[0]?.phone || '',
-          teamMember2Name: allBookingTeam[1]?.name || '',
-          teamMember2Phone: allBookingTeam[1]?.phone || '',
-          teamMember3Name: allBookingTeam[2]?.name || '',
-          teamMember3Phone: allBookingTeam[2]?.phone || '',
-          notifyClient: booking.notifyClient,
-          source: 'manual',
-        }),
-      });
+      let bookDemoJson: BookDemoResult | null = null;
+      try {
+        const res = await fetch(`${BACKEND_URL}/book-demo`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientName: booking.clientName,
+            clientPhone: booking.clientPhone,
+            clientEmail: booking.clientEmail,
+            clientCompany: booking.clientCompany,
+            clientIndustry: booking.clientIndustry,
+            demoDate: booking.demoDate,
+            demoTime: booking.demoTime,
+            demoType: booking.demoType,
+            demoLocation: booking.demoLocation,
+            demoNotes: booking.demoNotes,
+            teamMemberName: allBookingTeam[0]?.name || '',
+            teamMemberPhone: allBookingTeam[0]?.phone || '',
+            teamMember2Name: allBookingTeam[1]?.name || '',
+            teamMember2Phone: allBookingTeam[1]?.phone || '',
+            teamMember3Name: allBookingTeam[2]?.name || '',
+            teamMember3Phone: allBookingTeam[2]?.phone || '',
+            notifyClient: booking.notifyClient,
+            source: 'manual',
+          }),
+        });
+        bookDemoJson = await res.json();
+      } catch {
+        bookDemoJson = null;
+      }
+
+      // The Meet link only ever lived in this response — persist it onto the
+      // same lead now, or every calendar invite and the admin panel's own
+      // meet-link display stays blank forever.
+      if (bookDemoJson?.meetLink) {
+        onSave({ ...data, leads: [{ ...newLead, meetLink: bookDemoJson.meetLink }, ...data.leads] });
+      }
 
       setBookingSuccess(true);
+      setBookingNotifyNote(describeBookDemoResult(bookDemoJson, booking.notifyClient));
       setBooking(emptyBooking);
       setShowBooking(false);
-      setTimeout(() => setBookingSuccess(false), 5000);
+      setTimeout(() => { setBookingSuccess(false); setBookingNotifyNote(null); }, 8000);
     } catch {
       setBookingError('Failed to send notifications. Please check your connection.');
     } finally {
@@ -1550,32 +1603,46 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       ];
 
       // Send Meet link + confirmation via backend
-      await fetch(`${BACKEND_URL}/book-demo`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          clientName: lead.name,
-          clientPhone: lead.phone,
-          clientEmail: lead.email,
-          clientCompany: lead.company,
-          clientIndustry: lead.industry || lead.businessType,
-          demoDate: schedForm.scheduledDate,
-          demoTime: schedForm.scheduledTime,
-          demoType: schedForm.demoType,
-          demoLocation: schedForm.demoLocation,
-          demoNotes: schedForm.demoNotes,
-          teamMemberName: allTeam[0]?.name || '',
-          teamMemberPhone: allTeam[0]?.phone || '',
-          teamMember2Name: allTeam[1]?.name || '',
-          teamMember2Phone: allTeam[1]?.phone || '',
-          teamMember3Name: allTeam[2]?.name || '',
-          teamMember3Phone: allTeam[2]?.phone || '',
-          notifyClient: true,
-          source: 'scheduled',
-        }),
-      });
+      let bookDemoJson: BookDemoResult | null = null;
+      try {
+        const res = await fetch(`${BACKEND_URL}/book-demo`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientName: lead.name,
+            clientPhone: lead.phone,
+            clientEmail: lead.email,
+            clientCompany: lead.company,
+            clientIndustry: lead.industry || lead.businessType,
+            demoDate: schedForm.scheduledDate,
+            demoTime: schedForm.scheduledTime,
+            demoType: schedForm.demoType,
+            demoLocation: schedForm.demoLocation,
+            demoNotes: schedForm.demoNotes,
+            teamMemberName: allTeam[0]?.name || '',
+            teamMemberPhone: allTeam[0]?.phone || '',
+            teamMember2Name: allTeam[1]?.name || '',
+            teamMember2Phone: allTeam[1]?.phone || '',
+            teamMember3Name: allTeam[2]?.name || '',
+            teamMember3Phone: allTeam[2]?.phone || '',
+            notifyClient: true,
+            source: 'scheduled',
+          }),
+        });
+        bookDemoJson = await res.json();
+      } catch {
+        bookDemoJson = null;
+      }
+
+      // Persist the Meet link the response just generated — otherwise it only
+      // ever existed in the WhatsApp messages that already went out.
+      if (bookDemoJson?.meetLink) {
+        onSave({ ...data, leads: data.leads.map(l => l.id === lead.id ? { ...updated, meetLink: bookDemoJson!.meetLink } : l) });
+      }
 
       setSchedulingId(null);
+      setSchedSuccess(describeBookDemoResult(bookDemoJson, true));
+      setTimeout(() => setSchedSuccess(null), 8000);
     } catch {
       setSchedError('Failed to send notifications. Please try again.');
     } finally {
@@ -1662,12 +1729,13 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           clearTimeout(timeoutId);
           if (res.ok) {
             try {
-              const data = await res.json();
-              if (data.success || data.message || res.status === 200) {
-                setEditSuccess('✓ Demo updated and confirmation sent to WhatsApp & email.');
-              } else {
-                setEditSuccess('✓ Demo updated. Message delivery status unclear — client may not have received it.');
+              const respJson: BookDemoResult = await res.json();
+              // The Meet link only lived in this response — persist it now, same as
+              // the fresh-booking and first-schedule paths, or it's gone for good.
+              if (respJson.meetLink) {
+                onSave({ ...data, leads: data.leads.map(l => l.id === lead.id ? { ...updated, meetLink: respJson.meetLink } : l) });
               }
+              setEditSuccess(`✓ Demo updated. ${describeBookDemoResult(respJson, true)}`);
             } catch {
               setEditSuccess('✓ Demo updated. Confirmation likely sent (delivery status unclear).');
             }
@@ -1989,11 +2057,25 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
       {/* ── Success banner ── */}
       {bookingSuccess && (
-        <div className="flex items-center gap-3 rounded-2xl bg-green-50 border border-green-200 px-5 py-4">
-          <CheckCircle2 className="h-5 w-5 text-green-600 shrink-0" />
+        <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 ${
+          bookingNotifyNote?.includes('⚠️') ? 'bg-amber-50 border-amber-200' : 'bg-green-50 border-green-200'
+        }`}>
+          <CheckCircle2 className={`h-5 w-5 shrink-0 ${bookingNotifyNote?.includes('⚠️') ? 'text-amber-600' : 'text-green-600'}`} />
           <div>
-            <p className="text-sm font-semibold text-green-800">Demo booked and lead added!</p>
-            <p className="text-xs text-green-600 mt-0.5">WhatsApp notifications sent to the office, team member, and client.</p>
+            <p className={`text-sm font-semibold ${bookingNotifyNote?.includes('⚠️') ? 'text-amber-800' : 'text-green-800'}`}>Demo booked and lead added!</p>
+            <p className={`text-xs mt-0.5 ${bookingNotifyNote?.includes('⚠️') ? 'text-amber-700' : 'text-green-600'}`}>{bookingNotifyNote}</p>
+          </div>
+        </div>
+      )}
+
+      {schedSuccess && (
+        <div className={`flex items-center gap-3 rounded-2xl border px-5 py-4 ${
+          schedSuccess.includes('⚠️') ? 'bg-amber-50 border-amber-200' : 'bg-green-50 border-green-200'
+        }`}>
+          <CheckCircle2 className={`h-5 w-5 shrink-0 ${schedSuccess.includes('⚠️') ? 'text-amber-600' : 'text-green-600'}`} />
+          <div>
+            <p className={`text-sm font-semibold ${schedSuccess.includes('⚠️') ? 'text-amber-800' : 'text-green-800'}`}>Demo scheduled!</p>
+            <p className={`text-xs mt-0.5 ${schedSuccess.includes('⚠️') ? 'text-amber-700' : 'text-green-600'}`}>{schedSuccess}</p>
           </div>
         </div>
       )}
