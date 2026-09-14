@@ -389,13 +389,14 @@ export default function Footer() {
                 Followed on purpose: no rel="nofollow". Passing this domain's
                 authority to a new one is the entire point; mavunohr.co.ke currently
                 has no inbound links at all. */}
-            <span className="inline-flex flex-wrap items-center gap-x-2 gap-y-1 text-slate-400">
+            <span className="inline-flex flex-wrap items-center gap-x-2.5 gap-y-1 text-slate-400">
               Also from our team:
-              {/* Marks are 16px and decorative: the anchor text beside each one
+              {/* Marks are 24px and decorative: the anchor text beside each one
                   already names the product, so alt="" keeps a screen reader from
                   announcing "Mavuno HR" twice. Sized in CSS as well as via the
                   width/height attributes so the row does not reflow while they
-                  load. */}
+                  load. Bumped up from an initial 16px, which read as too small
+                  next to the surrounding text-sm copy. */}
               <a
                 href="https://mavunohr.co.ke/"
                 target="_blank"
@@ -405,10 +406,10 @@ export default function Footer() {
                 <img
                   src="/brands/mavuno-hr-mark.svg"
                   alt=""
-                  width={16}
-                  height={16}
+                  width={24}
+                  height={24}
                   loading="lazy"
-                  className="h-4 w-4 rounded-[3px]"
+                  className="h-6 w-6 rounded-[5px]"
                 />
                 Mavuno HR
               </a>
@@ -422,10 +423,10 @@ export default function Footer() {
                 <img
                   src="/brands/jamvi-mark.png"
                   alt=""
-                  width={16}
-                  height={16}
+                  width={24}
+                  height={24}
                   loading="lazy"
-                  className="h-4 w-4 rounded-[3px]"
+                  className="h-6 w-6 rounded-[5px]"
                 />
                 Jamvi
               </a>
