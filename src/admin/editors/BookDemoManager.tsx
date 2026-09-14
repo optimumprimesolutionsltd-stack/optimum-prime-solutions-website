@@ -38,7 +38,10 @@ const emptyForm: BookingForm = {
   demoType: 'online', demoDate: '', demoTime: '', demoLocation: '', demoNotes: '',
   teamMemberName: '', teamMemberPhone: '',
   teamMember2Name: '', teamMember2Phone: '',
-  notifyClient: true, notifyClientEmail: false,
+  // Both default ON. WhatsApp alone is not a confirmation: outside the 24h
+  // window a customer's own message opens, Meta drops it, and email is what
+  // actually carries the agreed date and time to them.
+  notifyClient: true, notifyClientEmail: true,
 };
 
 interface BookedDemo {
