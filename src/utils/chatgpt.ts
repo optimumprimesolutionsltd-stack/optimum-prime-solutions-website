@@ -19,6 +19,14 @@ export interface ChatResponse {
   phone?: string;
   interest?: string;
   whatsapp_url?: string;
+  /**
+   * Answers to offer as tappable buttons under this reply, when the question
+   * has a small closed set of them — what to book, online or physical, which
+   * day, what time. The backend fills the day and hour ones from the real
+   * opening rules rather than letting the model invent a slot we would then
+   * have to ring back and withdraw. Absent when the question is open-ended.
+   */
+  quickReplies?: string[];
   /** Set when the reply is a local fallback because the backend was unreachable. */
   offline?: boolean;
 }
