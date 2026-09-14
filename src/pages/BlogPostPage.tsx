@@ -53,6 +53,32 @@ function truncateDescription(excerpt: string): string {
 }
 
 // Per-post contextual related resources
+// Search-result titles for posts whose headline runs past the ~60 characters
+// Google displays. The <h1> on the page keeps the fuller headline; only the
+// <title> is swapped, which is what a title tag is for — the heading speaks to
+// a reader already on the page, the title has to earn the click first.
+//
+// Wording follows Search Console: each of these leads with terms that actually
+// appear in the site's queries. "tally prime kenya" alone draws 57 impressions
+// a month at position 9.5, while "implementation" — which several of the old
+// titles led with — appears in none of the 157 queries recorded.
+//
+// Keyed by slug rather than title so editing a post's headline later cannot
+// silently detach the override. A post with no entry here just uses its own
+// title, trimmed if needed.
+const SEO_TITLE_OVERRIDES: Record<string, string> = {
+  'sole-proprietorship-to-limited-company-kenya-kra-stock-transfer':
+    'Sole Proprietorship to Limited Company in Kenya: KRA Rules',
+  'tallyprime-71-is-here-whats-new-and-what-it-means-for-your-business':
+    "TallyPrime 7.1: What's New for Kenyan Businesses",
+  'tallyprime-cloud-hosting-access-your-business-data-from-anywhere':
+    'TallyPrime Cloud Hosting Kenya: Access Data Anywhere',
+  'how-tallyprime-helps-distributors-in-kenya':
+    'TallyPrime for Distributors in Kenya: A Leaner Way',
+  'm-pesa-integration-for-tallyprime-how-kenyan-businesses-are-automating-reconciliation':
+    'M-Pesa Integration for TallyPrime: Auto Reconciliation',
+};
+
 const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: string }[]> = {
   'why-every-kenyan-business-needs-tally-prime-in-2025': [
     { label: 'TallyPrime Implementation', href: '/tallyprime/implementation', desc: 'Go live in 5 business days with full setup & training.' },
@@ -141,7 +167,7 @@ export default function BlogPostPage() {
   return (
     <main className="min-h-screen">
       <SEO
-        title={buildTitle(post.title)}
+        title={buildTitle(SEO_TITLE_OVERRIDES[getPostSlug(post)] ?? post.title)}
         description={truncateDescription(post.excerpt)}
         canonical={`/blog/${getPostSlug(post)}`}
         ogType="article"
