@@ -107,6 +107,10 @@ export function SiteProvider({ children }: { children: ReactNode }) {
             // Only a value we recognise is translated — see LEGACY_SOURCES.
             source: normaliseSource(v.source),
             industry: v.industry || v.businessType || '',
+            // A product the lead explicitly names, or one inferred from how
+            // the Mavuno bridge used to tag them - businessType carrying
+            // 'Mavuno HR (SaaS) - not a Tally lead'. Older rows keep working.
+            product: v.product || (/mavuno/i.test(String(v.businessType || '') + String(v.message || '')) ? 'Mavuno HR' : ''),
           } as Lead))
       : [];
     return { leads: [...incoming, ...siteleads], incomingIds: incoming.map(l => l.id) };

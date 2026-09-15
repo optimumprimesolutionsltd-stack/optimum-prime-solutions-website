@@ -34,6 +34,12 @@ export interface Lead {
   sourceSetBy?: string;           // staff member who recorded/confirmed the source
   sourceSetAt?: string;           // ISO, when the source was last recorded/confirmed
   industry?: string; demoNotes?: string;
+  // Which of our products this lead is actually about. Blank means Tally,
+  // which is what nearly everything here is. Set for leads that arrive from
+  // another product's site - Mavuno HR today - so nobody rings a payroll
+  // enquiry to pitch TallyPrime. This used to be smuggled into businessType
+  // as free text, where it read as an industry and was easy to miss.
+  product?: string;
   requestType?: 'demo' | 'consultation' | 'bizanalyst' | 'customization' | 'other'; // demo, consultation, biz analyst, customization/add-on/TDL, or other enquiry
   // CRM follow-up fields
   nextStep?: string;              // free-text next action, shown in CRM report
