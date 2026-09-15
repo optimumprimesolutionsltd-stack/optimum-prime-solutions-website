@@ -197,6 +197,11 @@ export default function Chatbot() {
         time: getTime(),
         // When Zawadi is unreachable, give the visitor a live route instead of a dead end.
         action: chatResult.offline ? 'whatsapp' : undefined,
+        // The buttons under this message. They have been rendered since the
+        // widget was written and nothing ever filled them in, so every answer
+        // — including "online or physical" and picking a time — had to be
+        // typed out on a phone keyboard.
+        quickReplies: chatResult.quickReplies,
       };
 
       setTimeout(() => {
@@ -300,7 +305,7 @@ export default function Chatbot() {
             {!min && (
               <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-gradient-to-b from-slate-50 to-white">
                 <AnimatePresence>
-                  {msgs.map((msg) => (
+                  {msgs.map((msg, msgIndex) => (
                     <motion.div
                       key={msg.id}
                       initial={{ opacity: 0, y: 10 }}
@@ -332,8 +337,12 @@ export default function Chatbot() {
                           </p>
                         </div>
 
-                        {/* Quick reply buttons - AI should suggest these if needed */}
-                        {msg.role === 'bot' && msg.quickReplies && msg.quickReplies.length > 0 && (
+                        {/* Quick reply buttons — only under the newest message.
+                            They answer the question just asked, so leaving them
+                            live on older ones invites a tap that sends "Online"
+                            three questions after anyone stopped asking. */}
+                        {msg.role === 'bot' && msgIndex === msgs.length - 1
+                          && msg.quickReplies && msg.quickReplies.length > 0 && (
                           <div className="flex flex-wrap gap-2 mt-1">
                             {msg.quickReplies.map((qr) => (
                               <button
