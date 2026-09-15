@@ -41,6 +41,29 @@ try {
 interface Ctx { data: SiteData; update: (d: SiteData) => void; synced: boolean }
 const C = createContext<Ctx | undefined>(undefined);
 
+// Descriptive labels older writers put in the inbox's `source` field, mapped
+// onto the CRM's own source values. The CRM recognises only the values in
+// leadSource.ts, so a lead posted with a label as specific as 'Zawadi Chatbot
+// Booking' still showed up under "no source recorded" — the bot's bookings
+// were the visible case. The notifier now writes the channel itself; this
+// keeps the entries already sitting in the inbox from arriving unattributed.
+const LEGACY_SOURCES: Record<string, string> = {
+  'zawadi chatbot booking': 'website',
+  'zawadi chatbot handoff': 'website',
+  'website — contact form': 'website',
+  'website - contact form': 'website',
+  'workshop registration page': 'workshop',
+  'webinar registration page': 'webinar',
+};
+
+// A blank source stays 'unknown': guessing is what credited the site for every
+// lead that simply forgot to say. Only a label we recognise is translated.
+const normaliseSource = (raw: unknown): string => {
+  const s = String(raw || '').trim();
+  if (!s) return 'unknown';
+  return LEGACY_SOURCES[s.toLowerCase()] || s;
+};
+
 export function SiteProvider({ children }: { children: ReactNode }) {
   const [data, setData] = useState<SiteData>(() => load());
   const [synced, setSynced] = useState(false);
@@ -81,7 +104,8 @@ export function SiteProvider({ children }: { children: ReactNode }) {
             // 'website' quietly credited the site for chatbot handoffs, tools
             // posting into the inbox, and anything else that forgot to say.
             // 'unknown' puts it in the admin's "needs a source" queue instead.
-            source: v.source === 'Zawadi Chatbot Handoff' ? 'website' : (v.source || 'unknown'),
+            // Only a value we recognise is translated — see LEGACY_SOURCES.
+            source: normaliseSource(v.source),
             industry: v.industry || v.businessType || '',
           } as Lead))
       : [];

@@ -63,6 +63,13 @@ const BACKEND_URL = 'https://optimum-prime-lead-notifier.onrender.com';
 interface BookDemoResult {
   success?: boolean;
   client_notified?: boolean;
+  // True when the client's WhatsApp went out as free text because the approved
+  // template couldn't be used. Meta accepts those with a 200 and then drops
+  // them unless the client messaged us in the last 24 hours — so a booking
+  // taken through the website widget, from someone who has never WhatsApped
+  // us, reports "notified" and arrives nowhere.
+  client_delivery_uncertain?: boolean;
+  client_email_notified?: boolean;
   team_notified?: number;
   team_total?: number;
   office_notified?: number;
@@ -73,9 +80,17 @@ function describeBookDemoResult(json: BookDemoResult | null, notifyClient: boole
   if (!json) return '⚠️ Booking saved, but the notification service did not respond — check the WhatsApp tab and confirm with the team/client directly.';
   const parts: string[] = [];
   if (notifyClient) {
-    parts.push(json.client_notified
-      ? 'Client notified on WhatsApp.'
-      : `⚠️ Client WhatsApp did NOT go through${json.meetLink ? ` — send this Meet link manually: ${json.meetLink}` : ' — follow up manually'}.`);
+    // Two channels now, and WhatsApp alone is not proof of anything: a send
+    // that fell back to free text is reported as uncertain, because outside
+    // Meta's 24h window it is dropped in silence. Email is what actually
+    // carries the agreed date and time to someone who booked on the website.
+    const wa = !!json.client_notified && !json.client_delivery_uncertain;
+    const mail = !!json.client_email_notified;
+    const manually = json.meetLink ? ` — send this Meet link manually: ${json.meetLink}` : '';
+    if (wa && mail) parts.push('Client confirmed on WhatsApp and by email.');
+    else if (wa) parts.push('Client notified on WhatsApp.');
+    else if (mail) parts.push('Client confirmed by email. ⚠️ WhatsApp did not reach them.');
+    else parts.push(`⚠️ NOTHING reached the client — call them with the date and time${manually}.`);
   }
   const teamTotal = json.team_total ?? 0;
   if (teamTotal > 0) {
