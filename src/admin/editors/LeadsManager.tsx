@@ -203,6 +203,61 @@ function StaffPicker({ value, onPick, accent = 'accent' }: {
   );
 }
 
+// A booking with two people on it needed a different control from a booking
+// with one -- StaffPicker's single "primary" value plus free-typed "extra
+// member" name/phone fields let you pick any ONE of the five, but never, say,
+// Frederick Chege alone paired with Joan, without retyping a name and phone
+// by hand. Every name still comes from the one shared roster (staff.ts), so
+// there is nothing to retype and nothing that can drift.
+function StaffMultiPicker({ value, onChange, accent = 'accent', max = 3 }: {
+  value: string[];
+  onChange: (names: string[]) => void;
+  accent?: 'accent' | 'blue';
+  max?: number;
+}) {
+  const activeStyle = accent === 'blue'
+    ? { backgroundColor: '#2563eb', color: '#fff', borderColor: '#2563eb' }
+    : { backgroundColor: '#e53e3e', color: '#fff', borderColor: '#e53e3e' };
+  const idleStyle = { backgroundColor: '#fff', color: '#475569', borderColor: '#e2e8f0' };
+
+  const toggle = (name: string) => {
+    if (value.includes(name)) {
+      onChange(value.filter(n => n !== name));
+    } else if (value.length < max) {
+      onChange([...value, name]);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <div className="flex flex-wrap gap-2">
+        {OPTIMUM_STAFF.map(s => {
+          const selected = value.includes(s.name);
+          const disabled = !selected && value.length >= max;
+          return (
+            <button key={s.email} type="button"
+              disabled={disabled}
+              onClick={() => toggle(s.name)}
+              title={disabled ? `Up to ${max} people per booking` : `${s.name} · ${s.phone} · ${s.email}`}
+              className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-semibold transition ${disabled ? 'opacity-40 cursor-not-allowed' : ''}`}
+              style={selected ? activeStyle : idleStyle}>
+              {selected ? <CheckCircle2 className="h-3.5 w-3.5" /> : <User className="h-3.5 w-3.5" />}
+              {s.name.replace(/^(Mr\.|Ms\.)\s*/, '')}
+            </button>
+          );
+        })}
+      </div>
+      {value.length > 0 ? (
+        <p className="text-[11px] text-slate-500">
+          {value.map(n => `${n} · ${staffByName(n)?.phone || ''}`).join('   ·   ')}
+        </p>
+      ) : (
+        <p className="text-[11px] text-red-500">Select at least one team member.</p>
+      )}
+    </div>
+  );
+}
+
 // ── Lead source, on the lead itself ─────────────────────────────────────────
 // The panel could always FILTER by source but never SET one, so a lead that
 // arrived without an attribution — or landed on the wrong one because the add
@@ -651,28 +706,6 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     setBooking(prev => ({ ...prev, [f]: v }));
   const setS = (f: keyof ScheduleForm, v: string) =>
     setSchedForm(prev => ({ ...prev, [f]: v }));
-
-  // ── Extra team members helpers (schedule/edit panel) ────────────────────
-  const addExtraTeam = () =>
-    setSchedForm(prev => ({ ...prev, extraTeam: [...prev.extraTeam, { name: '', phone: '' }] }));
-  const removeExtraTeam = (i: number) =>
-    setSchedForm(prev => ({ ...prev, extraTeam: prev.extraTeam.filter((_, idx) => idx !== i) }));
-  const setExtraTeam = (i: number, field: keyof TeamMember, val: string) =>
-    setSchedForm(prev => ({
-      ...prev,
-      extraTeam: prev.extraTeam.map((m, idx) => idx === i ? { ...m, [field]: val } : m),
-    }));
-
-  // ── Extra team members helpers (booking panel) ───────────────────────────
-  const addBookingExtraTeam = () =>
-    setBooking(prev => ({ ...prev, extraTeam: [...prev.extraTeam, { name: '', phone: '' }] }));
-  const removeBookingExtraTeam = (i: number) =>
-    setBooking(prev => ({ ...prev, extraTeam: prev.extraTeam.filter((_, idx) => idx !== i) }));
-  const setBookingExtraTeam = (i: number, field: keyof TeamMember, val: string) =>
-    setBooking(prev => ({
-      ...prev,
-      extraTeam: prev.extraTeam.map((m, idx) => idx === i ? { ...m, [field]: val } : m),
-    }));
 
   // ── Booked slots (for conflict detection) ───────────────────────────────
   // Excludes the lead currently being edited so its own slot isn't shown as blocked
@@ -2400,37 +2433,21 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               </div>
             </div>
 
-            {/* Team Members */}
+            {/* Team Members — any combination of up to 3, not one primary plus retyped extras */}
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Assigned Team Members</p>
-                {booking.extraTeam.length < 2 && (
-                  <button type="button" onClick={addBookingExtraTeam}
-                    className="text-xs text-accent font-semibold hover:underline flex items-center gap-1">
-                    <Plus className="h-3 w-3" /> Add member
-                  </button>
-                )}
-              </div>
-              {/* Primary — pre-filled with the demo team; one tap to switch */}
-              <StaffPicker value={booking.teamMemberName}
-                onPick={(name, phone) => { setB('teamMemberName', name); setB('teamMemberPhone', phone); }} />
-              {/* Extra members */}
-              {booking.extraTeam.map((m, i) => (
-                <div key={i} className="grid grid-cols-2 gap-2 items-center">
-                  <input value={m.name} onChange={e => setBookingExtraTeam(i, 'name', e.target.value)}
-                    placeholder={`Member ${i + 2} name`}
-                    className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
-                  <div className="flex gap-1">
-                    <input value={m.phone} onChange={e => setBookingExtraTeam(i, 'phone', e.target.value)}
-                      placeholder="+254 7XX XXX XXX"
-                      className="flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent" />
-                    <button type="button" onClick={() => removeBookingExtraTeam(i)}
-                      className="rounded-lg p-2 text-red-400 hover:bg-red-50 transition shrink-0">
-                      <X className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              ))}
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Assigned Team Members</p>
+              <StaffMultiPicker
+                value={[booking.teamMemberName, ...booking.extraTeam.map(m => m.name)].filter(Boolean)}
+                onChange={(names) => {
+                  const [first, ...rest] = names;
+                  setBooking(prev => ({
+                    ...prev,
+                    teamMemberName: first || '',
+                    teamMemberPhone: first ? staffByName(first)?.phone || '' : '',
+                    extraTeam: rest.map(n => ({ name: n, phone: staffByName(n)?.phone || '' })),
+                  }));
+                }}
+              />
             </div>
 
             {/* Notify client toggle */}
@@ -3260,37 +3277,23 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                           </div>
                         )}
 
-                        {/* Team members */}
+                        {/* Team members — any combination of up to 3, not one primary plus retyped extras */}
                         <div className="sm:col-span-2 space-y-3">
-                          <div className="flex items-center justify-between">
-                            <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
-                              <User className="h-3 w-3 inline mr-1" />Team Members *
-                            </label>
-                            {schedForm.extraTeam.length < 2 && (
-                              <button type="button" onClick={addExtraTeam}
-                                className="text-xs text-blue-600 font-semibold hover:underline flex items-center gap-1">
-                                <Plus className="h-3 w-3" /> Add member
-                              </button>
-                            )}
-                          </div>
-                          <StaffPicker value={schedForm.teamMemberName} accent="blue"
-                            onPick={(name, phone) => { setS('teamMemberName', name); setS('teamMemberPhone', phone); }} />
-                          {schedForm.extraTeam.map((m, i) => (
-                            <div key={i} className="grid grid-cols-2 gap-2 items-center">
-                              <input value={m.name} onChange={e => setExtraTeam(i, 'name', e.target.value)}
-                                placeholder={`Member ${i + 2} name`}
-                                className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
-                              <div className="flex gap-1">
-                                <input value={m.phone} onChange={e => setExtraTeam(i, 'phone', e.target.value)}
-                                  placeholder="+254 7XX XXX XXX"
-                                  className="flex-1 rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400" />
-                                <button type="button" onClick={() => removeExtraTeam(i)}
-                                  className="rounded-lg p-2 text-red-400 hover:bg-red-50 transition shrink-0">
-                                  <X className="h-4 w-4" />
-                                </button>
-                              </div>
-                            </div>
-                          ))}
+                          <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
+                            <User className="h-3 w-3 inline mr-1" />Team Members *
+                          </label>
+                          <StaffMultiPicker accent="blue"
+                            value={[schedForm.teamMemberName, ...schedForm.extraTeam.map(m => m.name)].filter(Boolean)}
+                            onChange={(names) => {
+                              const [first, ...rest] = names;
+                              setSchedForm(prev => ({
+                                ...prev,
+                                teamMemberName: first || '',
+                                teamMemberPhone: first ? staffByName(first)?.phone || '' : '',
+                                extraTeam: rest.map(n => ({ name: n, phone: staffByName(n)?.phone || '' })),
+                              }));
+                            }}
+                          />
                         </div>
 
                         {/* Notes */}
