@@ -16,6 +16,11 @@ interface BookingForm {
   clientEmail: string;
   clientCompany: string;
   clientIndustry: string;
+  // Which product this demo is for — the backend picks the client-facing
+  // WhatsApp template and wording off this. Getting it wrong is what sent a
+  // Mavuno HR client a "Your TallyPrime demo is confirmed" message: this tool
+  // predates Mavuno HR and always assumed Tally.
+  product: 'tally' | 'mavuno';
   // Demo details
   demoType: 'online' | 'physical';
   demoDate: string;
@@ -35,6 +40,7 @@ interface BookingForm {
 
 const emptyForm: BookingForm = {
   clientName: '', clientPhone: '', clientEmail: '', clientCompany: '', clientIndustry: '',
+  product: 'tally',
   demoType: 'online', demoDate: '', demoTime: '', demoLocation: '', demoNotes: '',
   teamMemberName: '', teamMemberPhone: '',
   teamMember2Name: '', teamMember2Phone: '',
@@ -48,6 +54,7 @@ interface BookedDemo {
   clientPhone: string;
   clientEmail: string;
   clientIndustry: string;
+  product: 'tally' | 'mavuno';
   demoType: 'online' | 'physical';
   demoDate: string;
   demoTime: string;
@@ -189,6 +196,35 @@ export default function BookDemoManager() {
                 placeholder="e.g. John Kamau"
                 className="w-full rounded-xl border border-slate-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-accent/30 focus:border-accent"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 mb-1.5">Product *</label>
+              <div className="flex rounded-xl overflow-hidden border border-slate-200">
+                <button
+                  type="button"
+                  onClick={() => set('product', 'tally')}
+                  className={`flex-1 py-2.5 text-sm font-semibold transition ${
+                    form.product === 'tally'
+                      ? 'bg-slate-800 text-white'
+                      : 'bg-white text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  TallyPrime
+                </button>
+                <button
+                  type="button"
+                  onClick={() => set('product', 'mavuno')}
+                  className={`flex-1 py-2.5 text-sm font-semibold transition border-l border-slate-200 ${
+                    form.product === 'mavuno'
+                      ? 'bg-emerald-600 text-white'
+                      : 'bg-white text-slate-600 hover:bg-slate-50'
+                  }`}
+                >
+                  Mavuno HR
+                </button>
+              </div>
+              <p className="text-xs text-slate-400 mt-1">Sets which product the client's WhatsApp confirmation names.</p>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
@@ -488,6 +524,11 @@ export default function BookDemoManager() {
                     <td className="px-5 py-4">
                       <p className="text-slate-700">{demo.clientCompany}</p>
                       <p className="text-xs text-slate-400">{demo.clientIndustry}</p>
+                      <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                        demo.product === 'mavuno' ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-600'
+                      }`}>
+                        {demo.product === 'mavuno' ? 'Mavuno HR' : 'TallyPrime'}
+                      </span>
                     </td>
                     <td className="px-5 py-4">
                       <p className="font-medium text-slate-800">{new Date(demo.demoDate).toLocaleDateString('en-KE', { weekday: 'short', day: 'numeric', month: 'short' })}</p>
