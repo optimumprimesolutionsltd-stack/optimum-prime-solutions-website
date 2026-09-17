@@ -19,6 +19,11 @@ export interface Lead {
   demoType?: 'online' | 'physical'; demoLocation?: string;
   teamMemberName?: string; teamMemberPhone?: string; teamMemberEmail?: string;
   extraTeam?: { name: string; phone: string; email?: string }[];
+  // Which product a demo/booking is actually for — the client WhatsApp
+  // confirmation, its email and the calendar invite all read this to say
+  // "Mavuno HR" instead of defaulting to "TallyPrime". Admin-panel only:
+  // this is set by the internal booking tools, never by a public form.
+  demoProduct?: 'tally' | 'mavuno';
   meetLink?: string; meetSent?: boolean;
   // Where the lead came from. 'field' = met on the road — field storming,
   // road shows, market visits and other outbound marketing.

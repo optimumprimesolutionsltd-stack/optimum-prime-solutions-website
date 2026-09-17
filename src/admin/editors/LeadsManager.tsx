@@ -155,6 +155,10 @@ interface BookingForm {
   demoDate: string; demoTime: string; demoLocation: string; demoNotes: string;
   teamMemberName: string; teamMemberPhone: string;
   extraTeam: TeamMember[];
+  // Admin-panel only (never shown on a public form) — picks which brand the
+  // client's WhatsApp confirmation, email and calendar invite name. Defaults
+  // to Tally: this tool predates Mavuno HR and most bookings still are Tally.
+  product: 'tally' | 'mavuno';
   notifyClient: boolean;
 }
 const emptyBooking: BookingForm = {
@@ -164,6 +168,7 @@ const emptyBooking: BookingForm = {
   demoType: 'online', demoDate: '', demoTime: '', demoLocation: '', demoNotes: '',
   teamMemberName: '', teamMemberPhone: '',
   extraTeam: [],
+  product: 'tally',
   notifyClient: true,
 };
 
@@ -181,6 +186,8 @@ interface ScheduleForm {
   teamMemberName: string; teamMemberPhone: string;
   tallyStaff1: string; tallyStaff2: string;
   extraTeam: TeamMember[];
+  // Same admin-only product switch as BookingForm — see its comment.
+  product: 'tally' | 'mavuno';
   demoNotes: string;
 }
 
@@ -257,7 +264,7 @@ function StaffPicker({ value, onPick, accent = 'accent' }: {
 // Frederick Chege alone paired with Joan, without retyping a name and phone
 // by hand. Every name still comes from the one shared roster (staff.ts), so
 // there is nothing to retype and nothing that can drift.
-function StaffMultiPicker({ value, onChange, accent = 'accent', max = 3 }: {
+function StaffMultiPicker({ value, onChange, accent = 'accent', max = OPTIMUM_STAFF.length }: {
   value: string[];
   onChange: (names: string[]) => void;
   accent?: 'accent' | 'blue';
@@ -741,7 +748,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     scheduledDate: '', scheduledTime: '', demoType: 'online',
     demoLocation: '', teamMemberName: '', teamMemberPhone: '',
     tallyStaff1: '', tallyStaff2: '',
-    extraTeam: [], demoNotes: '',
+    extraTeam: [], product: 'tally', demoNotes: '',
   });
   const [schedSubmitting, setSchedSubmitting] = useState(false);
   const [schedError, setSchedError]           = useState('');
@@ -824,6 +831,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       teamMemberPhone: lead.teamMemberPhone || DEFAULT_STAFF.phone,
       tallyStaff1: '', tallyStaff2: '',
       extraTeam: (lead as any)?.extraTeam || [],
+      product: (lead as any)?.demoProduct || 'tally',
       demoNotes: lead.demoNotes || lead.message || '',
     });
     setSchedError('');
@@ -1548,6 +1556,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         teamMemberName: booking.teamMemberName,
         teamMemberPhone: booking.teamMemberPhone,
         meetSent: false,
+        // handleScheduleSubmit and handleEditSubmit both persist this; this
+        // path never did, so a two-person Book Demo notified both people
+        // correctly but silently dropped the second one from the saved lead
+        // — reopening it later showed only the primary in the picker.
+        ...(booking.extraTeam.length > 0 ? { extraTeam: booking.extraTeam } : {}),
+        demoProduct: booking.product,
       };
       onSave({ ...data, leads: [newLead, ...data.leads] });
 
@@ -1578,6 +1592,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             teamMember2Phone: allBookingTeam[1]?.phone || '',
             teamMember3Name: allBookingTeam[2]?.name || '',
             teamMember3Phone: allBookingTeam[2]?.phone || '',
+            teamMember4Name: allBookingTeam[3]?.name || '',
+            teamMember4Phone: allBookingTeam[3]?.phone || '',
+            teamMember5Name: allBookingTeam[4]?.name || '',
+            teamMember5Phone: allBookingTeam[4]?.phone || '',
+            product: booking.product,
             notifyClient: booking.notifyClient,
             source: 'manual',
           }),
@@ -1641,6 +1660,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         demoNotes: schedForm.demoNotes,
         meetSent: true,
         ...(schedForm.extraTeam.length > 0 ? { extraTeam: schedForm.extraTeam } : {}),
+        demoProduct: schedForm.product,
       } as Lead;
       onSave({ ...data, leads: data.leads.map(l => l.id === lead.id ? updated : l) });
 
@@ -1673,6 +1693,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             teamMember2Phone: allTeam[1]?.phone || '',
             teamMember3Name: allTeam[2]?.name || '',
             teamMember3Phone: allTeam[2]?.phone || '',
+            teamMember4Name: allTeam[3]?.name || '',
+            teamMember4Phone: allTeam[3]?.phone || '',
+            teamMember5Name: allTeam[4]?.name || '',
+            teamMember5Phone: allTeam[4]?.phone || '',
+            product: schedForm.product,
             notifyClient: true,
             source: 'scheduled',
           }),
@@ -1713,6 +1738,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       teamMemberPhone: lead.teamMemberPhone || DEFAULT_STAFF.phone,
       tallyStaff1: '', tallyStaff2: '',
       extraTeam: (lead as any).extraTeam || [],
+      product: (lead as any).demoProduct || 'tally',
       demoNotes: lead.demoNotes || '',
     });
   };
@@ -1742,6 +1768,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         demoNotes: schedForm.demoNotes,
         meetSent: true,
         ...(schedForm.extraTeam.length > 0 ? { extraTeam: schedForm.extraTeam } : { extraTeam: [] }),
+        demoProduct: schedForm.product,
       } as Lead;
       onSave({ ...data, leads: data.leads.map(l => l.id === lead.id ? updated : l) });
 
@@ -1769,6 +1796,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               teamMember2Phone: allTeam[1]?.phone || '',
               teamMember3Name: allTeam[2]?.name || '',
               teamMember3Phone: allTeam[2]?.phone || '',
+              teamMember4Name: allTeam[3]?.name || '',
+              teamMember4Phone: allTeam[3]?.phone || '',
+              teamMember5Name: allTeam[4]?.name || '',
+              teamMember5Phone: allTeam[4]?.phone || '',
+              product: schedForm.product,
               notifyClient: true,
               source: 'reschedule',
             }),
@@ -2530,7 +2562,27 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
               </div>
             </div>
 
-            {/* Team Members — any combination of up to 3, not one primary plus retyped extras */}
+            {/* Product — admin-only. Picks which brand the client's WhatsApp
+                confirmation, email and calendar invite name. */}
+            <div className="space-y-2">
+              <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Product</p>
+              <div className="flex rounded-xl overflow-hidden border border-slate-200 max-w-xs">
+                <button type="button" onClick={() => setB('product', 'tally')}
+                  className={`flex-1 py-2 text-xs font-semibold transition ${
+                    booking.product === 'tally' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'
+                  }`}>
+                  TallyPrime
+                </button>
+                <button type="button" onClick={() => setB('product', 'mavuno')}
+                  className={`flex-1 py-2 text-xs font-semibold transition border-l border-slate-200 ${
+                    booking.product === 'mavuno' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'
+                  }`}>
+                  Mavuno HR
+                </button>
+              </div>
+            </div>
+
+            {/* Team Members — any combination of the whole roster, not one primary plus retyped extras */}
             <div className="space-y-3">
               <p className="text-xs font-bold text-slate-500 uppercase tracking-wider">Assigned Team Members</p>
               <StaffMultiPicker
@@ -3374,7 +3426,26 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                           </div>
                         )}
 
-                        {/* Team members — any combination of up to 3, not one primary plus retyped extras */}
+                        {/* Product — admin-only */}
+                        <div className="sm:col-span-2 space-y-2">
+                          <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">Product</label>
+                          <div className="flex rounded-xl overflow-hidden border border-slate-200 max-w-xs">
+                            <button type="button" onClick={() => setS('product', 'tally')}
+                              className={`flex-1 py-2 text-xs font-semibold transition ${
+                                schedForm.product === 'tally' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'
+                              }`}>
+                              TallyPrime
+                            </button>
+                            <button type="button" onClick={() => setS('product', 'mavuno')}
+                              className={`flex-1 py-2 text-xs font-semibold transition border-l border-slate-200 ${
+                                schedForm.product === 'mavuno' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'
+                              }`}>
+                              Mavuno HR
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Team members — any combination of the whole roster, not one primary plus retyped extras */}
                         <div className="sm:col-span-2 space-y-3">
                           <label className="text-xs font-bold text-slate-600 uppercase tracking-wider">
                             <User className="h-3 w-3 inline mr-1" />Team Members *
