@@ -7,7 +7,7 @@ import type {
   SiteData, Client, ClientProduct, ProductKind, LicenceTerm, TallyEdition,
 } from '../../data/siteData';
 import {
-  PRODUCT_KINDS, PRODUCT_RULES, productExpires, productLabel,
+  PRODUCT_KINDS, PRODUCT_RULES, productExpires, productLabel, effectiveExpiresOn,
   clientProducts, syncClientLicence, daysUntilDate, isValidSerial, clientOnboarded,
 } from '../../data/siteData';
 import { downloadFile } from '../crm/crmExport';
@@ -25,10 +25,14 @@ interface P { data: SiteData; onSave: (d: SiteData) => void }
 // A customer is identified by their Tally serial number, never by name: names
 // are typed differently every time, serials are not.
 
-const fmt = (d?: string): string =>
-  d ? new Date(`${d}T00:00:00`).toLocaleDateString('en-GB', {
-    day: 'numeric', month: 'short', year: 'numeric',
-  }) : '—';
+const fmt = (d?: string): string => {
+  if (!d) return '—';
+  const parsed = new Date(`${d}T00:00:00`);
+  // A malformed stored date used to render as the literal text "Invalid Date"
+  // rather than the same placeholder an absent one gets.
+  if (Number.isNaN(parsed.getTime())) return '—';
+  return parsed.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+};
 
 // A product line paired with the customer it belongs to, which is what the
 // table actually shows: one row per thing owned, not one row per customer.
@@ -38,8 +42,8 @@ type Health = 'expired' | 'critical' | 'soon' | 'active' | 'perpetual';
 
 const healthOf = (p: ClientProduct): Health => {
   if (!productExpires(p)) return 'perpetual';
-  const days = daysUntilDate(p.expiresOn);
-  if (days === null) return 'active';   // expires, but no date captured yet
+  const days = daysUntilDate(effectiveExpiresOn(p));
+  if (days === null) return 'active';   // expires, but no date captured or computable yet
   if (days < 0) return 'expired';
   if (days <= 30) return 'critical';
   if (days <= 90) return 'soon';
@@ -48,13 +52,13 @@ const healthOf = (p: ClientProduct): Health => {
 
 const HEALTH_STYLE: Record<Health, { chip: string; text: (p: ClientProduct) => string }> = {
   expired:   { chip: 'bg-red-100 text-red-700 border-red-200',
-               text: p => `Expired ${Math.abs(daysUntilDate(p.expiresOn) ?? 0)}d ago` },
+               text: p => `Expired ${Math.abs(daysUntilDate(effectiveExpiresOn(p)) ?? 0)}d ago` },
   critical:  { chip: 'bg-orange-100 text-orange-700 border-orange-200',
-               text: p => `${daysUntilDate(p.expiresOn)}d left` },
+               text: p => `${daysUntilDate(effectiveExpiresOn(p))}d left` },
   soon:      { chip: 'bg-amber-100 text-amber-700 border-amber-200',
-               text: p => `${daysUntilDate(p.expiresOn)}d left` },
+               text: p => `${daysUntilDate(effectiveExpiresOn(p))}d left` },
   active:    { chip: 'bg-emerald-100 text-emerald-700 border-emerald-200',
-               text: p => p.expiresOn ? `${daysUntilDate(p.expiresOn)}d left` : 'No expiry date yet' },
+               text: p => effectiveExpiresOn(p) ? `${daysUntilDate(effectiveExpiresOn(p))}d left` : 'No expiry date yet' },
   // Owned outright. Saying "active" would imply something could lapse.
   perpetual: { chip: 'bg-slate-100 text-slate-600 border-slate-200',
                text: () => 'Owned outright' },
@@ -210,7 +214,7 @@ export default function CustomerDirectory({ data, onSave }: P) {
         clientOnboarded(client) || '',
         productLabel(product), product.term || '—',
         product.activatedOn || '',
-        productExpires(product) ? (product.expiresOn || '') : 'No expiry - owned outright',
+        productExpires(product) ? (effectiveExpiresOn(product) || '') : 'No expiry - owned outright',
         HEALTH_STYLE[healthOf(product)].text(product),
       ].map(v => esc(String(v))).join(',')),
     ];
@@ -373,7 +377,7 @@ export default function CustomerDirectory({ data, onSave }: P) {
                       <td className={`px-4 py-3 text-xs whitespace-nowrap ${
                         productExpires(product) ? 'text-slate-600' : 'bg-slate-100 text-slate-400'}`}>
                         {productExpires(product)
-                          ? (product.expiresOn ? fmt(product.expiresOn)
+                          ? (effectiveExpiresOn(product) ? fmt(effectiveExpiresOn(product))
                               : <span className="text-amber-600 font-semibold">Not captured</span>)
                           : <span className="italic">—</span>}
                       </td>
@@ -528,6 +532,14 @@ export default function CustomerDirectory({ data, onSave }: P) {
                               <input type="date" value={p.expiresOn || ''}
                                 onChange={e => setProduct(p.id, { expiresOn: e.target.value })}
                                 className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-accent" />
+                              {/* Left blank, the directory already computes this from the
+                                  activation date for a fixed Annual term — shown here so
+                                  leaving it blank reads as a choice, not a gap. */}
+                              {!p.expiresOn && effectiveExpiresOn(p) && (
+                                <p className="mt-1 text-[11px] text-slate-400">
+                                  Left blank, this is treated as {fmt(effectiveExpiresOn(p))} (one licence-year from activation).
+                                </p>
+                              )}
                             </label>
                           ) : (
                             <div className="flex items-end">

@@ -244,6 +244,51 @@ export const productExpires = (p: Pick<ClientProduct, 'kind' | 'term'>): boolean
   return p.term === 'Annual';
 };
 
+// Kinds sold on a fixed one-licence-year term: the expiry is a calendar rule,
+// not a negotiated date, so it can be derived instead of typed in. TSS is
+// deliberately excluded — it always carries an expiry (see PRODUCT_RULES) but
+// renewal periods vary with what was actually paid for, so it stays manual.
+const FIXED_ANNUAL_TERM_KINDS: ProductKind[] = ['Tally Gold', 'Tally Silver', 'Customization'];
+
+// One licence-year after activation, ending the day before the anniversary so
+// day 365 begins the next term (matches how Tally itself dates a licence
+// year, e.g. activated 27 Jan 2026 expires 26 Jan 2027).
+//
+// Built entirely on UTC getters/setters and Date.UTC — parsing "YYYY-MM-DD"
+// as local time and then reading it back with toISOString() (which is always
+// UTC) rolls the date back a day for anyone east of UTC, which is where this
+// app's own users are.
+export const computedAnnualExpiry = (activatedOn?: string): string | undefined => {
+  if (!activatedOn) return undefined;
+  const [y, m, day] = activatedOn.split('-').map(Number);
+  if (!y || !m || !day) return undefined;
+  const d = new Date(Date.UTC(y, m - 1, day));
+  // Date.UTC silently overflows an out-of-range month/day (e.g. month 13,
+  // day 99) into some other valid-looking date instead of failing — reject
+  // that instead of confidently returning a nonsense expiry for corrupt data.
+  if (Number.isNaN(d.getTime()) || d.getUTCFullYear() !== y || d.getUTCMonth() !== m - 1 || d.getUTCDate() !== day) {
+    return undefined;
+  }
+  d.setUTCFullYear(d.getUTCFullYear() + 1);
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().split('T')[0];
+};
+
+// The expiry to actually use everywhere: whatever was typed in, or — for a
+// fixed Annual term — the licence-year end computed from the activation date.
+// Without this, a fresh Annual line with a known activation date still showed
+// "Not captured" until someone typed the same date a calculator could have
+// produced, and Renewals reminders never fired for it either.
+export const effectiveExpiresOn = (
+  p: Pick<ClientProduct, 'kind' | 'term' | 'activatedOn' | 'expiresOn'>,
+): string | undefined => {
+  if (p.expiresOn) return p.expiresOn;
+  if (p.term === 'Annual' && FIXED_ANNUAL_TERM_KINDS.includes(p.kind)) {
+    return computedAnnualExpiry(p.activatedOn);
+  }
+  return undefined;
+};
+
 // How a line reads in the directory, the exports and the reminders.
 export const productLabel = (p: Pick<ClientProduct, 'kind' | 'name' | 'term'>): string => {
   const rule = PRODUCT_RULES[p.kind];
@@ -337,8 +382,10 @@ export const syncClientLicence = (c: Client): Client => {
     term: licence?.term || c.term,
     activatedOn: licence?.activatedOn || products[0]?.activatedOn || c.activatedOn,
     // Only an Annual licence carries a top-up deadline; a Perpetual one must
-    // not, or Renewals would chase a window that does not exist.
-    licenceExpiry: licence && licence.term === 'Annual' ? licence.expiresOn : undefined,
+    // not, or Renewals would chase a window that does not exist. Uses the
+    // effective (possibly computed) expiry so Renewals fires even when no one
+    // has typed the licence-year end in by hand.
+    licenceExpiry: licence && licence.term === 'Annual' ? effectiveExpiresOn(licence) : undefined,
     tssExpiry: tss?.expiresOn,
     updatedAt: new Date().toISOString(),
   };
