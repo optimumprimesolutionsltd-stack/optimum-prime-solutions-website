@@ -169,8 +169,10 @@ export default function CustomerDirectory({ data, onSave }: P) {
   const setProduct = (id: string, patch: Partial<ClientProduct>) =>
     setEditing(prev => {
       if (!prev) return prev;
-      const edited = (prev.products || []).find(p => p.id === id);
-      const updated = (prev.products || []).map(p => {
+      const priorProducts = prev.products || [];
+      const edited = priorProducts.find(p => p.id === id);
+      const licence = priorProducts.find(p => p.kind === 'Tally Gold' || p.kind === 'Tally Silver');
+      const updated = priorProducts.map(p => {
         if (p.id !== id) return p;
         const next = { ...p, ...patch };
         // Changing the kind can strip the term or the expiry out from under
@@ -181,6 +183,16 @@ export default function CustomerDirectory({ data, onSave }: P) {
         else if (!next.term) next.term = 'Annual';
         if (!rule.customName) next.name = undefined;
         if (!productExpires(next)) next.expiresOn = undefined;
+        // A line just turned into TSS inherits the licence's own acquisition
+        // date immediately — TSS's free first year always runs from when the
+        // licence was bought, not from whatever date this line defaulted to
+        // when it was first added. This fires once, at the moment of
+        // becoming TSS; syncTssWithLicence below only ever tracks the first
+        // TSS line it finds, so a second one added this way needs its own
+        // date set right here rather than relying on that pass to catch it.
+        if (next.kind === 'TSS' && p.kind !== 'TSS' && licence?.activatedOn) {
+          next.activatedOn = licence.activatedOn;
+        }
         return next;
       });
       // Only resync TSS when the edit that just happened changed the
