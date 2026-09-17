@@ -3588,11 +3588,40 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                           </div>
                         )}
 
-                        {/* Who's running it — pre-filled with the demo team */}
+                        {/* Who's running it — any combination of the whole roster */}
                         <div className="sm:col-span-2">
                           <label className="block text-xs font-semibold text-slate-600 mb-1.5"><User className="h-3 w-3 inline mr-1" />Who is doing this demo / consultation? *</label>
-                          <StaffPicker value={schedForm.teamMemberName}
-                            onPick={(name, phone) => { setS('teamMemberName', name); setS('teamMemberPhone', phone); }} />
+                          <StaffMultiPicker
+                            value={[schedForm.teamMemberName, ...schedForm.extraTeam.map(m => m.name)].filter(Boolean)}
+                            onChange={(names) => {
+                              const [first, ...rest] = names;
+                              setSchedForm(prev => ({
+                                ...prev,
+                                teamMemberName: first || '',
+                                teamMemberPhone: first ? staffByName(first)?.phone || '' : '',
+                                extraTeam: rest.map(n => ({ name: n, phone: staffByName(n)?.phone || '' })),
+                              }));
+                            }}
+                          />
+                        </div>
+
+                        {/* Product — admin-only */}
+                        <div className="sm:col-span-2 space-y-2">
+                          <label className="block text-xs font-semibold text-slate-600">Product</label>
+                          <div className="flex rounded-xl overflow-hidden border border-slate-200 max-w-xs">
+                            <button type="button" onClick={() => setS('product', 'tally')}
+                              className={`flex-1 py-2 text-xs font-semibold transition ${
+                                schedForm.product === 'tally' ? 'bg-slate-800 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'
+                              }`}>
+                              TallyPrime
+                            </button>
+                            <button type="button" onClick={() => setS('product', 'mavuno')}
+                              className={`flex-1 py-2 text-xs font-semibold transition border-l border-slate-200 ${
+                                schedForm.product === 'mavuno' ? 'bg-emerald-600 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'
+                              }`}>
+                              Mavuno HR
+                            </button>
+                          </div>
                         </div>
 
                         {/* Online demos land on everyone's calendar */}
