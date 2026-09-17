@@ -167,9 +167,10 @@ export default function CustomerDirectory({ data, onSave }: P) {
     setEditing(prev => prev ? { ...prev, [field]: value } : prev);
 
   const setProduct = (id: string, patch: Partial<ClientProduct>) =>
-    setEditing(prev => prev ? {
-      ...prev,
-      products: syncTssWithLicence((prev.products || []).map(p => {
+    setEditing(prev => {
+      if (!prev) return prev;
+      const edited = (prev.products || []).find(p => p.id === id);
+      const updated = (prev.products || []).map(p => {
         if (p.id !== id) return p;
         const next = { ...p, ...patch };
         // Changing the kind can strip the term or the expiry out from under
@@ -181,8 +182,17 @@ export default function CustomerDirectory({ data, onSave }: P) {
         if (!rule.customName) next.name = undefined;
         if (!productExpires(next)) next.expiresOn = undefined;
         return next;
-      })),
-    } : prev);
+      });
+      // Only resync TSS when the edit that just happened changed the
+      // licence's own activation date (or created one via a kind change) —
+      // never as a blanket pass after every edit. Running it unconditionally
+      // meant a manually-typed TSS activation date snapped straight back to
+      // the licence's on the next keystroke, making the field look stuck.
+      const isLicenceEdit = edited
+        && (edited.kind === 'Tally Gold' || edited.kind === 'Tally Silver')
+        && ('activatedOn' in patch || 'kind' in patch);
+      return { ...prev, products: isLicenceEdit ? syncTssWithLicence(updated) : updated };
+    });
 
   const addProduct = () => setEditing(prev => prev ? {
     ...prev, products: syncTssWithLicence([...(prev.products || []), newProduct()]),
