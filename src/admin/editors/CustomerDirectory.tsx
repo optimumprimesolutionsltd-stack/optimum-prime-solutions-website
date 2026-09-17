@@ -72,6 +72,31 @@ const newProduct = (kind: ProductKind = 'Tally Silver'): ClientProduct => ({
   expiresOn: '',
 });
 
+// Every Gold/Silver licence carries TSS from day one — the first year is
+// free (see effectiveExpiresOn in siteData.ts), so a licence with no TSS
+// line is a gap in the record, not a deliberate choice. Whenever the
+// licence is added or its activation date changes, this keeps a TSS line
+// in step with it rather than leaving TSS on a stale or missing date.
+// Never touches an existing TSS line's expiresOn — a manually-typed
+// renewal date stays exactly as entered regardless of activation syncing.
+const syncTssWithLicence = (products: ClientProduct[]): ClientProduct[] => {
+  const licence = products.find(p => p.kind === 'Tally Gold' || p.kind === 'Tally Silver');
+  if (!licence || !licence.activatedOn) return products;
+  const tss = products.find(p => p.kind === 'TSS');
+  if (!tss) {
+    return [...products, {
+      id: `p_${Date.now()}_${Math.random().toString(36).slice(2, 7)}_tss`,
+      kind: 'TSS' as ProductKind,
+      activatedOn: licence.activatedOn,
+      expiresOn: '',
+    }];
+  }
+  if (tss.activatedOn !== licence.activatedOn) {
+    return products.map(p => p.id === tss.id ? { ...p, activatedOn: licence.activatedOn } : p);
+  }
+  return products;
+};
+
 export default function CustomerDirectory({ data, onSave }: P) {
   const clients = useMemo(() => data.clients || [], [data.clients]);
 
@@ -132,7 +157,7 @@ export default function CustomerDirectory({ data, onSave }: P) {
       company: '',
       edition: 'Silver' as TallyEdition,
       term: 'Annual' as LicenceTerm,
-      products: [newProduct()],
+      products: syncTssWithLicence([newProduct()]),
       createdAt: new Date().toISOString(),
     });
     setFormError('');
@@ -144,7 +169,7 @@ export default function CustomerDirectory({ data, onSave }: P) {
   const setProduct = (id: string, patch: Partial<ClientProduct>) =>
     setEditing(prev => prev ? {
       ...prev,
-      products: (prev.products || []).map(p => {
+      products: syncTssWithLicence((prev.products || []).map(p => {
         if (p.id !== id) return p;
         const next = { ...p, ...patch };
         // Changing the kind can strip the term or the expiry out from under
@@ -156,11 +181,11 @@ export default function CustomerDirectory({ data, onSave }: P) {
         if (!rule.customName) next.name = undefined;
         if (!productExpires(next)) next.expiresOn = undefined;
         return next;
-      }),
+      })),
     } : prev);
 
   const addProduct = () => setEditing(prev => prev ? {
-    ...prev, products: [...(prev.products || []), newProduct()],
+    ...prev, products: syncTssWithLicence([...(prev.products || []), newProduct()]),
   } : prev);
 
   const removeProduct = (id: string) => setEditing(prev => prev ? {
