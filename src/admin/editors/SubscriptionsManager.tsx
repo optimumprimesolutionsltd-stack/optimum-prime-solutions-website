@@ -114,6 +114,12 @@ export default function SubscriptionsManager() {
     return 'bg-green-100 text-green-700';
   };
 
+  // Which product a row belongs to used to be plain text next to the org
+  // name — readable, but not something the eye can pick out scanning a
+  // mixed list the way the Customer Directory's status chips can.
+  const productPill = (product: string) =>
+    product === 'mavuno' ? 'bg-emerald-100 text-emerald-700' : 'bg-indigo-100 text-indigo-700';
+
   return (
     <div className="mx-auto max-w-5xl space-y-5">
       <div className="flex items-start justify-between flex-wrap gap-3">
@@ -244,7 +250,11 @@ export default function SubscriptionsManager() {
                       <p className="font-medium text-slate-900">{s.orgName}</p>
                       {s.adminEmail && <p className="text-xs text-slate-400">{s.adminEmail}</p>}
                     </td>
-                    <td className="px-4 py-3 text-slate-600">{s.productLabel}</td>
+                    <td className="px-4 py-3">
+                      <span className={`rounded-full px-2.5 py-1 text-[10px] font-semibold whitespace-nowrap ${productPill(s.product)}`}>
+                        {s.productLabel}
+                      </span>
+                    </td>
                     <td className="px-4 py-3">
                       <span className="capitalize text-slate-700">{s.plan}</span>
                       <span className="ml-1 text-xs text-slate-400">/ {s.billingCycle}</span>
