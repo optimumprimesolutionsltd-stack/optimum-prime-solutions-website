@@ -245,9 +245,7 @@ export const productExpires = (p: Pick<ClientProduct, 'kind' | 'term'>): boolean
 };
 
 // Kinds sold on a fixed one-licence-year term: the expiry is a calendar rule,
-// not a negotiated date, so it can be derived instead of typed in. TSS is
-// deliberately excluded — it always carries an expiry (see PRODUCT_RULES) but
-// renewal periods vary with what was actually paid for, so it stays manual.
+// not a negotiated date, so it can be derived instead of typed in.
 const FIXED_ANNUAL_TERM_KINDS: ProductKind[] = ['Tally Gold', 'Tally Silver', 'Customization'];
 
 // One licence-year after activation, ending the day before the anniversary so
@@ -279,10 +277,20 @@ export const computedAnnualExpiry = (activatedOn?: string): string | undefined =
 // Without this, a fresh Annual line with a known activation date still showed
 // "Not captured" until someone typed the same date a calculator could have
 // produced, and Renewals reminders never fired for it either.
+//
+// TSS's first year is free and always runs from the licence's own purchase
+// date, Annual or Perpetual alike — an Annual licence's TSS expires with the
+// licence itself (both are exactly one year after activation, so they land
+// on the same date); a Perpetual licence's TSS still expires a year after
+// purchase even though the licence itself never does. Either way the first
+// TSS period follows the same calendar rule as a fixed-Annual licence — only
+// a later renewal is a real commercial date, and that gets typed in by hand,
+// which is why this is only ever a fallback and never overwrites it.
 export const effectiveExpiresOn = (
   p: Pick<ClientProduct, 'kind' | 'term' | 'activatedOn' | 'expiresOn'>,
 ): string | undefined => {
   if (p.expiresOn) return p.expiresOn;
+  if (p.kind === 'TSS') return computedAnnualExpiry(p.activatedOn);
   if (p.term === 'Annual' && FIXED_ANNUAL_TERM_KINDS.includes(p.kind)) {
     return computedAnnualExpiry(p.activatedOn);
   }
