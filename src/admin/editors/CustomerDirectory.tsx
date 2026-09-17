@@ -59,9 +59,9 @@ const HEALTH_STYLE: Record<Health, { chip: string; text: (p: ClientProduct) => s
                text: p => `${daysUntilDate(effectiveExpiresOn(p))}d left` },
   active:    { chip: 'bg-emerald-100 text-emerald-700 border-emerald-200',
                text: p => effectiveExpiresOn(p) ? `${daysUntilDate(effectiveExpiresOn(p))}d left` : 'No expiry date yet' },
-  // Owned outright. Saying "active" would imply something could lapse.
+  // Perpetual licence. Saying "active" would imply something could lapse.
   perpetual: { chip: 'bg-slate-100 text-slate-600 border-slate-200',
-               text: () => 'Owned outright' },
+               text: () => 'Perpetual licence' },
 };
 
 const newProduct = (kind: ProductKind = 'Tally Silver'): ClientProduct => ({
@@ -214,7 +214,7 @@ export default function CustomerDirectory({ data, onSave }: P) {
         clientOnboarded(client) || '',
         productLabel(product), product.term || '—',
         product.activatedOn || '',
-        productExpires(product) ? (effectiveExpiresOn(product) || '') : 'No expiry - owned outright',
+        productExpires(product) ? (effectiveExpiresOn(product) || '') : 'No expiry - perpetual licence',
         HEALTH_STYLE[healthOf(product)].text(product),
       ].map(v => esc(String(v))).join(',')),
     ];
