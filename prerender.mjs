@@ -215,6 +215,26 @@ function normaliseAnimationNoise(html) {
   return html.replace(/rotate\(-?\d+\.\d+deg\)/g, 'rotate(0deg)');
 }
 
+// Puppeteer serialises the live DOM, which means anything the page added to
+// <head> while running gets baked into the shipped HTML. Vite's dynamic-import
+// helper is one of those: when the app lazily loads a chunk it injects a
+// <link rel="modulepreload" as="script"> for it, and page.content() captures it.
+//
+// For the Firebase chunk that quietly undid the whole point of loading it
+// lazily — the tag sat in the static HTML, so every visitor's browser fetched
+// ~107KB gzipped of SDK at preload priority before the page had settled, which
+// is exactly what deferring it was meant to stop. Removing the tag costs
+// nothing: the app still imports the chunk itself the moment it needs it.
+//
+// Only runtime-injected preloads are stripped. Vite writes its own build-time
+// modulepreloads without as="script", so the entry graph is left alone.
+function stripRuntimeInjectedPreloads(html) {
+  return html.replace(
+    /<link[^>]*rel="modulepreload"[^>]*as="script"[^>]*>/g,
+    '',
+  );
+}
+
 // llms.txt is the file AI engines read to work out what a site is and which
 // pages are worth citing. Everything in it is hand-written except the guide
 // list between these markers — that had drifted to listing /blog and none of
@@ -686,7 +706,7 @@ async function prerender() {
           }
         });
 
-        const html = normaliseAnimationNoise(await page.content());
+        const html = stripRuntimeInjectedPreloads(normaliseAnimationNoise(await page.content()));
 
         const hasContent = html.includes('<h1') || html.includes('<h2') || html.includes('<main');
         if (!hasContent) {

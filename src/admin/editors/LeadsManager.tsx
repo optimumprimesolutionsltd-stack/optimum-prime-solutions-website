@@ -15,7 +15,7 @@ import {
   TRIAL_DAYS, TRIAL_OUTCOMES, trialEnd, trialState, trialNeedsAction, daysUntilDate,
   computedAnnualExpiry,
 } from '../../data/siteData';
-import { fbSubscribe, fbSet, fbAuth } from '../../firebase/config';
+import { fbSubscribe, fbSet, fbCurrentUserEmail } from '../../firebase/config';
 import KanbanBoard from './KanbanBoard';
 import ImportLeadsDialog from './ImportLeadsDialog';
 import {
@@ -1892,7 +1892,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
   // The signed-in team member, or '' when the shared office mailbox is what is
   // logged in — in which case anything stamped "recorded by" has to ask.
-  const signedInStaff = staffByEmail(fbAuth().currentUser?.email)?.name || '';
+  const signedInStaff = staffByEmail(fbCurrentUserEmail())?.name || '';
 
   // Drives and referrers already on file, offered as suggestions so a repeat
   // entry is a pick rather than a retype.

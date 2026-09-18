@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 import { type SiteData } from '../data/siteData';
-import { fbSubscribe, fbAuth } from '../firebase/config';
+import { fbSubscribe, fbCurrentUserEmail } from '../firebase/config';
 import { submitAccessRequest } from '../firebase/accessRequests';
 import DashboardHome, { type TabId } from './DashboardHome';
 import CompanyEditor from './editors/CompanyEditor';
@@ -139,7 +139,7 @@ export default function AdminLayout({ onLogout, isFullAdmin }: Props) {
     } else {
       setRequestedTab(tabId);
       // Auto-fill with current user's email
-      const userEmail = fbAuth().currentUser?.email || '';
+      const userEmail = fbCurrentUserEmail() || '';
       setRequestEmail(userEmail);
       setShowAccessRequest(true);
     }

@@ -8,10 +8,26 @@ import {
   doc,
   Timestamp,
   orderBy,
+  getFirestore,
+  type Firestore,
 } from 'firebase/firestore';
-import { getDb } from './config';
+import { fbApp } from './config';
 
-const db = getDb();
+// Firestore is only ever needed by this file, and only inside the admin panel.
+// Initialising it in config.ts put it in the shared Firebase chunk that every
+// public page loaded, so it is initialised here instead — on first use, against
+// the app config.ts has already brought up.
+let dbLoading: Promise<Firestore> | null = null;
+const getDb = (): Promise<Firestore> => {
+  if (!dbLoading) {
+    dbLoading = (async () => {
+      const app = await fbApp();
+      if (!app) throw new Error('Firebase not initialized');
+      return getFirestore(app);
+    })();
+  }
+  return dbLoading;
+};
 
 export interface AccessRequest {
   id: string;
@@ -30,6 +46,7 @@ export const submitAccessRequest = async (
   tabId: string
 ): Promise<string> => {
   try {
+    const db = await getDb();
     const docRef = await addDoc(collection(db, 'access_requests'), {
       email: email.toLowerCase().trim(),
       requestedTab: tabId,
@@ -48,6 +65,7 @@ export const submitAccessRequest = async (
 // Get all pending access requests (for admin)
 export const getPendingRequests = async (): Promise<AccessRequest[]> => {
   try {
+    const db = await getDb();
     const q = query(
       collection(db, 'access_requests'),
       where('status', '==', 'pending'),
@@ -68,6 +86,7 @@ export const getPendingRequests = async (): Promise<AccessRequest[]> => {
 // Get all access requests for a specific email
 export const getRequestsForEmail = async (email: string): Promise<AccessRequest[]> => {
   try {
+    const db = await getDb();
     const q = query(
       collection(db, 'access_requests'),
       where('email', '==', email.toLowerCase().trim()),
@@ -91,6 +110,7 @@ export const approveAccessRequest = async (
   approvedBy: string
 ): Promise<void> => {
   try {
+    const db = await getDb();
     const docRef = doc(db, 'access_requests', requestId);
     await updateDoc(docRef, {
       status: 'approved',
@@ -112,6 +132,7 @@ export const rejectAccessRequest = async (
   rejectedBy: string
 ): Promise<void> => {
   try {
+    const db = await getDb();
     const docRef = doc(db, 'access_requests', requestId);
     await updateDoc(docRef, {
       status: 'rejected',
@@ -133,6 +154,7 @@ export const hasApprovedAccess = async (
   tabId: string
 ): Promise<boolean> => {
   try {
+    const db = await getDb();
     const q = query(
       collection(db, 'access_requests'),
       where('email', '==', email.toLowerCase().trim()),
@@ -154,6 +176,7 @@ export const hasPendingRequest = async (
   tabId: string
 ): Promise<boolean> => {
   try {
+    const db = await getDb();
     const q = query(
       collection(db, 'access_requests'),
       where('email', '==', email.toLowerCase().trim()),
