@@ -195,19 +195,30 @@ export default function CustomerDirectory({ data, onSave }: P) {
         }
         return next;
       });
-      // Only resync TSS when the edit that just happened changed the
-      // licence's own activation date (or created one via a kind change) —
-      // never as a blanket pass after every edit. Running it unconditionally
-      // meant a manually-typed TSS activation date snapped straight back to
-      // the licence's on the next keystroke, making the field look stuck.
-      const isLicenceEdit = edited
-        && (edited.kind === 'Tally Gold' || edited.kind === 'Tally Silver')
-        && ('activatedOn' in patch || 'kind' in patch);
-      return { ...prev, products: isLicenceEdit ? syncTssWithLicence(updated) : updated };
+      // Only pair TSS with a licence at the moment the licence is newly
+      // created on this line — becoming Gold/Silver for the first time (this
+      // line was something else, or blank, a moment ago). Editing a
+      // pre-existing licence's own activation date afterward must never
+      // ripple into TSS: by then TSS may already be on its own independently
+      // tracked renewal, and blanket-resyncing on every edit is also what
+      // made a manually-typed TSS date snap straight back on the next
+      // keystroke, as if the field refused to accept input at all.
+      const isNewLicence = edited
+        && edited.kind !== 'Tally Gold' && edited.kind !== 'Tally Silver'
+        && patch.kind !== undefined
+        && (patch.kind === 'Tally Gold' || patch.kind === 'Tally Silver');
+      return { ...prev, products: isNewLicence ? syncTssWithLicence(updated) : updated };
     });
 
+  // Deliberately does not auto-pair TSS here: a blank line defaults to
+  // Tally Silver until staff pick otherwise, so syncing at this point could
+  // resurrect a TSS line a client had genuinely opted out of, just because
+  // "Add product" was used to add something unrelated (a Tally Server, a
+  // Customization) to a client whose existing licence predates this line.
+  // setProduct's isNewLicence check is what actually pairs TSS in — it
+  // fires once staff explicitly choose Gold/Silver for this new line.
   const addProduct = () => setEditing(prev => prev ? {
-    ...prev, products: syncTssWithLicence([...(prev.products || []), newProduct()]),
+    ...prev, products: [...(prev.products || []), newProduct()],
   } : prev);
 
   const removeProduct = (id: string) => setEditing(prev => prev ? {
