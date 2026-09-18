@@ -1107,6 +1107,62 @@ None of these reports need to be read daily. What separates owners who use Tally
 5. Budget vs. Actual — course-correct before the quarter closes
 
 Twenty minutes a month, same day every month, is enough to catch most problems while they're still cheap to fix.`},
+    {id:'10',title:'Remote and On-Site TallyPrime Support in Kenya: From Excel Migration to Ongoing Help',slug:'remote-and-on-site-support-tallyprime-kenya',excerpt:'Stuck on Excel or an old system with no one to call when it breaks? Here is how our remote support (phone, WhatsApp, video call, screen sharing) and on-site visits get you migrated to TallyPrime and keep you running afterwards.',date:'2026-09-18',category:'Support',readTime:'6 min',content:`Most businesses that come to us aren't shopping for software — they're tired of a system that's already failing them. A spreadsheet that a departing employee built and nobody else understands. Formulas that break the moment someone inserts a row. A previous accounting package that's slow, unsupported, or simply doesn't talk to the rest of the business. The common thread isn't the software; it's the fear of what happens during the switch, and the uncertainty of who to call afterwards.
+
+## Why Businesses Get Stuck on Excel (or an Old System)
+
+The reasons are almost always the same, whatever the industry:
+
+- **Fear of losing years of records** — a spreadsheet or old database that took years to build feels too risky to touch, even when everyone agrees it's not working.
+- **No one to troubleshoot it** — the person who built the Excel model has left, or the old software's vendor stopped answering calls long ago.
+- **Custom formulas and workarounds** — years of patches mean the "system" only makes sense to the one person who built it, which is itself a business risk.
+- **A previous migration went badly** — a rushed switch elsewhere left data missing or duplicated, so the business has understandably become cautious about doing it again.
+
+None of these are software problems. They're support problems — and they're exactly what remote and on-site support is built to solve.
+
+## Remote Support: Help Without Waiting for a Site Visit
+
+Most day-to-day issues don't need someone in your office — they need someone who picks up. Our remote support runs across whichever channel is fastest for you:
+
+- **Phone** — for a quick question or something urgent that needs a human voice, not a ticket queue.
+- **WhatsApp** — for the back-and-forth of sending screenshots, error messages, or a quick voice note between meetings.
+- **Video call** — for walking through a report or a setup screen together in real time.
+- **Screen sharing** — for when it's faster to just show us the problem than describe it, so we can see exactly what you're seeing and fix it live.
+
+This covers our business hours (Mon – Fri, 8:00 AM – 5:00 PM; Sat, 8:00 AM – 12:00 PM), with an average response time under 1 hour — most issues are resolved without anyone leaving their desk.
+
+## On-Site Support: When You Need Us in the Room
+
+Some things genuinely go faster in person, and we schedule on-site visits for exactly those situations:
+
+- **Initial installation and network setup** — getting multi-user access, printers, and local infrastructure configured correctly the first time.
+- **Hands-on staff training** — sitting with your accounts and store teams at their own desks, on their own data, rather than a generic demo.
+- **Complex data migration** — where physical records, old ledgers, or a legacy system need to be reviewed side-by-side with someone who can make judgment calls on the spot.
+- **Multi-branch rollouts** — coordinating go-live across more than one location without disrupting daily operations.
+
+We serve clients across Kenya and East Africa — on-site visits are scheduled nationwide, not just around Ruiru.
+
+## Migrating From Excel or Another System: What Actually Happens
+
+This is usually where the anxiety is highest, so here's the actual process, not the sales pitch:
+
+1. **Audit the existing data** — we go through your spreadsheets or old system to understand what's there, what's duplicated, and what's simply wrong.
+2. **Map it to TallyPrime's structure** — chart of accounts, stock items, customers, and suppliers get mapped before anything is imported, not after.
+3. **Import and reconcile** — historical data is transferred and checked against known balances (bank statements, stock counts, outstanding invoices) so nothing is trusted blindly.
+4. **Run in parallel briefly** — for businesses that want extra confidence, we run the old system and TallyPrime side by side for a short period before fully cutting over.
+5. **Cut over with zero downtime** — the switch itself doesn't interrupt trading; by the time it happens, the data is already proven correct.
+
+The goal is that your historical records — however messy the source — come across accurately, so the first report you pull out of TallyPrime is one you can trust.
+
+## Implementation, Training, and Support That Doesn't End at Go-Live
+
+Migration is the start, not the whole engagement. Basic setup typically takes 1–2 days; a full implementation with data migration and training across a multi-user team runs 1–2 weeks, depending on complexity. Training is available on-site or remote, and it doesn't stop at the go-live walkthrough — new staff joining later, or a manager who wants a refresher on a specific report, can book another session.
+
+After go-live, support plans (from KES 5,000/month) keep the same remote channels and on-site visits available for as long as you need them — software updates, troubleshooting, and a number to call that doesn't go stale six months in.
+
+## The Bottom Line
+
+Switching off Excel or an old system isn't really a software decision — it's a decision about who's going to be there when something needs fixing. Remote support handles the daily questions fast; on-site visits handle the moments that need someone physically present. Together, they're what turns "we know we should migrate" into an actual, low-risk move.`},
   ],
   leads: [],
   wipJobs: [],
