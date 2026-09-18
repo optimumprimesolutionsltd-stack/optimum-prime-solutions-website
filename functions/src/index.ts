@@ -350,3 +350,74 @@ export const syncSaasSubscriptionsNow = functions
       res.status(500).json({ error: String(err) });
     }
   });
+
+/* ====================================================================
+ * PRODUCT FEEDBACK
+ *
+ * Each product's own server posts feedback here directly — a push, not a
+ * poll, since a person submitting feedback is a one-off event, not an
+ * ongoing state worth re-fetching on a schedule the way subscriptions are.
+ * The caller is a server (Jamvi's api-server, eventually Mavuno's), never a
+ * browser, so this is a shared-secret bearer token rather than Firebase Auth
+ * or the admin SPA's CORS allowlist.
+ *
+ * Env vars used:
+ *   FEEDBACK_INGEST_KEY   (shared secret every product's server sends)
+ * ==================================================================== */
+
+const FEEDBACK_PRODUCTS = new Set(['jamvi', 'mavuno']);
+const FEEDBACK_MESSAGE_MAX_LENGTH = 4000;
+
+export const receiveProductFeedback = functions
+  .region('europe-west1')
+  .runWith({ timeoutSeconds: 30, invoker: 'public' })
+  .https.onRequest(async (req, res) => {
+    if (req.method !== 'POST') {
+      res.status(405).json({ error: 'Use POST' });
+      return;
+    }
+
+    const expected = process.env.FEEDBACK_INGEST_KEY;
+    if (!expected) {
+      res.status(503).json({ error: 'Endpoint not configured' });
+      return;
+    }
+    const auth = typeof req.get === 'function' ? req.get('authorization') : undefined;
+    const provided = auth?.startsWith('Bearer ') ? auth.slice(7) : undefined;
+    if (provided !== expected) {
+      res.status(403).json({ error: 'Unauthorized' });
+      return;
+    }
+
+    const body = req.body || {};
+    const product = typeof body.product === 'string' ? body.product : '';
+    const message = typeof body.message === 'string' ? body.message.trim() : '';
+    if (!FEEDBACK_PRODUCTS.has(product)) {
+      res.status(400).json({ error: `product must be one of: ${[...FEEDBACK_PRODUCTS].join(', ')}` });
+      return;
+    }
+    if (!message) {
+      res.status(400).json({ error: 'message is required' });
+      return;
+    }
+
+    const rating = Number.isFinite(body.rating) ? Math.max(1, Math.min(5, Math.round(body.rating))) : null;
+
+    try {
+      const ref = admin.database().ref('productFeedback').push();
+      await ref.set({
+        product,
+        message: message.slice(0, FEEDBACK_MESSAGE_MAX_LENGTH),
+        rating,
+        submittedBy: typeof body.submittedBy === 'string' ? body.submittedBy.slice(0, 200) : null,
+        appVersion: typeof body.appVersion === 'string' ? body.appVersion.slice(0, 100) : null,
+        context: typeof body.context === 'string' ? body.context.slice(0, 200) : null,
+        status: 'new',
+        createdAt: new Date().toISOString(),
+      });
+      res.status(201).json({ id: ref.key });
+    } catch (err) {
+      functions.logger.error('receiveProductFeedback', err);
+      res.status(500).json({ error: String(err) });
+    }
+  });

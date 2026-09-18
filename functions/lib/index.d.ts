@@ -21,4 +21,5 @@ export declare const syncSaasSubscriptions: functions.CloudFunction<unknown>;
  * check below is what actually protects it (same model as `sendTestEmail`).
  */
 export declare const syncSaasSubscriptionsNow: functions.HttpsFunction;
+export declare const receiveProductFeedback: functions.HttpsFunction;
 //# sourceMappingURL=index.d.ts.map

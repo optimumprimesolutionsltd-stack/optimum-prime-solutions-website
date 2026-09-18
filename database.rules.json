@@ -44,6 +44,21 @@
       ".write": false
     },
 
+    // In-app feedback from each product, posted by the receiveProductFeedback
+    // Cloud Function (guarded by a shared secret, not Firebase Auth — the
+    // submitter is a product's own server, not a signed-in browser). Same
+    // shape as saasSubscriptions: staff read only, Admin SDK writes only.
+    "productFeedback": {
+      ".read": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')",
+      "$feedbackId": {
+        // Status is the one field staff change from the admin panel (marking
+        // an item reviewed), so it alone is writable from the browser.
+        "status": {
+          ".write": "auth != null && (auth.token.admin === true || auth.uid === 'BsdXX3iOObRAfi5hY8c35FjeeNj1' || auth.uid === 'AbU1frdiAtYj1UxJavXbPX5p49x2' || auth.uid === 'ng7Drwl4sseFIZDYX9fzVeyz5Oe2' || auth.uid === 'qqAw6FvLycUuja7FoMoaZdLeacr1')"
+        }
+      }
+    },
+
     // Inbox for the public contact form. A visitor may create their own entry
     // and nothing else: no reading the list, no overwriting or deleting anyone
     // else's. Staff drain it into /crm/leads.
