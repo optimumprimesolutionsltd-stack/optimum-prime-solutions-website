@@ -112,8 +112,12 @@ export function useAdminNotifications(leads: Lead[]) {
     // Only inbound leads: every other source ('manual', 'field', 'workshop',
     // 'phone', …) is typed in by the team in this very panel, so announcing
     // them is just an echo of your own keystrokes.
+    //
+    // 'mavuno' counts as inbound — somebody filled in a form on mavunohr.co.ke
+    // and is waiting to be called back. It is the one source here that nobody
+    // in this panel typed, so it is the one that most needs announcing.
     const fromLeads = leads
-      .filter(l => !l.source || l.source === 'website')
+      .filter(l => !l.source || l.source === 'website' || l.source === 'mavuno')
       .map<AdminNotification>(l => {
         const kind: NotifKind =
           l.requestType === 'consultation' ? 'consultation'
