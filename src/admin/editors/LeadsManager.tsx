@@ -105,6 +105,23 @@ function describeBookDemoResult(json: BookDemoResult | null, notifyClient: boole
   return parts.join(' ') || 'Booking saved.';
 }
 
+// Which product a lead is about, when it is not the obvious one. Nearly every
+// lead here is Tally, so a blank means Tally and only the exceptions are
+// labelled. It reads `product` first and falls back to the marker the Mavuno
+// bridge used to write into businessType, so leads captured before that field
+// existed are still flagged.
+//
+// This exists because the difference was previously only legible as text in
+// the Industry column - which is exactly where someone about to pick up the
+// phone does not look.
+export const leadProduct = (l: Lead): string => {
+  if (l.product) return l.product;
+  const haystack = `${l.businessType || ''} ${l.industry || ''} ${l.message || ''}`;
+  if (/mavuno/i.test(haystack)) return 'Mavuno HR';
+  return '';
+};
+
+
 const INDUSTRIES = [
   'Manufacturing', 'Distribution & Wholesale', 'Retail', 'Construction',
   'Hardware & Building Materials', 'NGO / Non-Profit', 'School / Education',
@@ -2861,6 +2878,14 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-bold text-slate-900 truncate">{l.name}</p>
                     {l.status === 'New' && <span className="h-2 w-2 rounded-full bg-accent animate-pulse" />}
+                    {/* Loud on purpose. This is not a Tally lead, and someone
+                        about to ring them needs to know before they dial. */}
+                    {leadProduct(l) && (
+                      <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shrink-0"
+                        title={`${leadProduct(l)} enquiry - do not pitch TallyPrime`}>
+                        {leadProduct(l)}
+                      </span>
+                    )}
                     {l.source === 'manual' && (
                       <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[9px] font-semibold text-slate-500">MANUAL</span>
                     )}
@@ -3313,6 +3338,19 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                         {getValidNextStages(l.status).map(s => <option key={s.id}>{s.id}</option>)}
                       </select>
                     </div>
+                    {/* Sits directly above Send Email and WhatsApp, because this
+                        is the last thing read before someone makes contact. A
+                        payroll enquiry answered with a TallyPrime pitch loses the
+                        lead and embarrasses us. */}
+                    {leadProduct(l) && (
+                      <div className="mb-2 flex items-start gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2">
+                        <AlertCircle className="h-4 w-4 text-emerald-700 shrink-0 mt-0.5" />
+                        <p className="text-xs font-semibold text-emerald-900">
+                          This is a <strong>{leadProduct(l)}</strong> enquiry, not TallyPrime. Talk about
+                          {' '}{leadProduct(l)} — do not pitch Tally unless they raise it.
+                        </p>
+                      </div>
+                    )}
                     <div className="flex items-center gap-2 flex-wrap">
                       {l.status === 'Schedule a Demo' && (l.scheduledDate || !l.meetSent) && (
                         <button onClick={() => openEdit(l)}
