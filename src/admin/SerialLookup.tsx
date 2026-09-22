@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useRef } from 'react';
 import { KeyRound, Search, X, Copy, Check, Package } from 'lucide-react';
 import type { Client } from '../data/siteData';
 import {
-  clientProducts, productLabel, productExpires, clientOnboarded, daysUntilDate,
+  clientProducts, productLabel, productExpires, clientOnboarded, daysUntilDate, effectiveExpiresOn,
 } from '../data/siteData';
 
 // ── Why this exists ─────────────────────────────────────────────────────────
@@ -138,7 +138,13 @@ export default function SerialLookup({ clients, open, onClose }: P) {
 
                   <div className="mt-2 flex flex-wrap gap-1.5">
                     {products.map(p => {
-                      const left = productExpires(p) ? daysUntilDate(p.expiresOn) : null;
+                      // A licence or TSS line with no typed expiresOn still has a
+                      // known expiry when it is a fixed one-year-from-activation
+                      // term (see effectiveExpiresOn) — reading the raw field here
+                      // showed "no date" on a support call for a date the app
+                      // could already compute.
+                      const expiresOn = effectiveExpiresOn(p);
+                      const left = productExpires(p) ? daysUntilDate(expiresOn) : null;
                       const tone = !productExpires(p) ? 'bg-slate-100 text-slate-600'
                         : left === null ? 'bg-amber-100 text-amber-700'
                         : left < 0 ? 'bg-red-100 text-red-700'
@@ -151,7 +157,7 @@ export default function SerialLookup({ clients, open, onClose }: P) {
                           {productLabel(p)}
                           {productExpires(p) && (
                             <span className="font-normal opacity-80">
-                              {p.expiresOn
+                              {expiresOn
                                 ? left === null ? '' : left < 0 ? `· expired` : `· ${left}d`
                                 : '· no date'}
                             </span>

@@ -405,7 +405,10 @@ export const syncClientLicence = (c: Client): Client => {
     // effective (possibly computed) expiry so Renewals fires even when no one
     // has typed the licence-year end in by hand.
     licenceExpiry: licence && licence.term === 'Annual' ? effectiveExpiresOn(licence) : undefined,
-    tssExpiry: tss?.expiresOn,
+    // Same reasoning as licenceExpiry above: TSS's free first year is itself a
+    // computed fallback (see effectiveExpiresOn), and reading the raw field
+    // here left Renewals blind to a TSS line that only had an activation date.
+    tssExpiry: tss ? effectiveExpiresOn(tss) : undefined,
     updatedAt: new Date().toISOString(),
   };
 };

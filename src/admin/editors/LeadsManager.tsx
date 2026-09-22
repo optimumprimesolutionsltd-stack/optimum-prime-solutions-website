@@ -13,6 +13,7 @@ import {
   DEAL_TYPES, EXISTING_LICENCE_DEALS, isValidSerial, findClientBySerial,
   clientProducts, upsertLicenceProducts,
   TRIAL_DAYS, TRIAL_OUTCOMES, trialEnd, trialState, trialNeedsAction, daysUntilDate,
+  computedAnnualExpiry,
 } from '../../data/siteData';
 import { fbSubscribe, fbSet, fbAuth } from '../../firebase/config';
 import KanbanBoard from './KanbanBoard';
@@ -1107,14 +1108,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
 
   const today = () => new Date().toISOString().split('T')[0];
   // Licences and TSS both run a year from activation, so that's the sensible
-  // default — the admin can correct it if the paperwork says otherwise.
-  const plusOneYear = (d: string): string => {
-    if (!d) return '';
-    const dt = new Date(d);
-    if (Number.isNaN(dt.getTime())) return '';
-    dt.setFullYear(dt.getFullYear() + 1);
-    return dt.toISOString().split('T')[0];
-  };
+  // default — the admin can correct it if the paperwork says otherwise. Reuses
+  // computedAnnualExpiry rather than reimplementing the rule: a from-scratch
+  // version here previously landed a day late and, for anyone east of UTC
+  // (Kenya included), a further day off because it parsed the date in local
+  // time before round-tripping through toISOString().
+  const plusOneYear = (d: string): string => computedAnnualExpiry(d) || '';
 
   // The client a typed serial resolves to, if we already know it.
   const winMatchedClient = useMemo(
