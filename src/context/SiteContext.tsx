@@ -56,6 +56,26 @@ const LEGACY_SOURCES: Record<string, string> = {
   'webinar registration page': 'webinar',
 };
 
+// RTDB has no array type: it stores one as an object keyed '0','1','2'… and
+// hands it back as a JavaScript array only when those keys are a contiguous run
+// from zero. Any gap — which a delete or a partial write can leave behind — and
+// the same data arrives as a plain object. A bare Array.isArray() then reads a
+// full CRM as unreadable, the caller falls through to an empty list, and the
+// next save writes that empty list back over the node.
+const asLeadArray = (raw: unknown): Lead[] | null => {
+  if (Array.isArray(raw)) return raw.filter(Boolean) as Lead[];
+  if (raw && typeof raw === 'object') {
+    const entries = Object.entries(raw as Record<string, unknown>);
+    if (entries.length === 0) return null;
+    if (!entries.every(([k]) => /^[0-9]+$/.test(k))) return null;
+    return entries
+      .sort((a, b) => Number(a[0]) - Number(b[0]))
+      .map(([, v]) => v)
+      .filter(Boolean) as Lead[];
+  }
+  return null;
+};
+
 // A blank source stays 'unknown': guessing is what credited the site for every
 // lead that simply forgot to say. Only a label we recognise is translated.
 const normaliseSource = (raw: unknown): string => {
@@ -70,8 +90,53 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   // Whether /crm/leads has ever been read successfully in this session. Saves
   // write the WHOLE leads array, so until we know we can read the node we can't
   // tell an empty CRM from one we simply weren't allowed to see — and writing
-  // the empty in-memory list would destroy every lead. See `update` below.
+  // the empty in-memory list would destroy every lead. See `writeCrmLeads`.
   const crmReadable = useRef(false);
+  // The last array /crm/leads was actually read as. Every write below replaces
+  // the node wholesale, so this is what a write is compared against to notice
+  // that it is about to drop rows.
+  const lastReadLeads = useRef<Lead[]>([]);
+
+  // The one way /crm/leads is written. Two rules, both learned the hard way:
+  //
+  //  1. Never write before the node has been read. A refused read and a node
+  //     that is genuinely empty both arrive as null, so an unread CRM plus a
+  //     whole-array write is indistinguishable from "delete everything". This
+  //     is what emptied the pipeline: the inbox-ingest path below wrote the
+  //     merged list without checking, so an inbox lead arriving while the read
+  //     was still refused replaced the entire CRM with that one new lead.
+  //
+  //  2. If the write drops rows, keep the ones it drops. Deleting a lead is a
+  //     normal thing to do in the panel, so a shrinking write can't be refused
+  //     outright — but it can be made recoverable. The dropped rows are copied
+  //     to /crm/leadsTrash/<timestamp> first, and only then overwritten.
+  const writeCrmLeads = async (next: Lead[], reason: string): Promise<boolean> => {
+    if (!crmReadable.current) {
+      console.warn(
+        `[SiteContext] Refused to write crm/leads (${reason}): the CRM has not been ` +
+        'read successfully in this session, so the in-memory list is not trustworthy. ' +
+        'Reload once the leads are visible, then try again.',
+      );
+      return false;
+    }
+    const previous = lastReadLeads.current;
+    if (previous.length > next.length) {
+      const keptIds = new Set(next.map(l => l.id));
+      const dropped = previous.filter(l => !keptIds.has(l.id));
+      if (dropped.length > 0) {
+        await fbSet(`crm/leadsTrash/${new Date().toISOString().replace(/[.:]/g, '-')}`, {
+          reason,
+          at: new Date().toISOString(),
+          before: previous.length,
+          after: next.length,
+          leads: stripUndefined(dropped),
+        });
+      }
+    }
+    const ok = await fbSet('crm/leads', stripUndefined(next));
+    if (ok) lastReadLeads.current = next;
+    return ok;
+  };
 
   // siteData.leads is the single source of truth for leads. The public contact
   // form drops NEW leads into the /leads "inbox" node (it can't safely write the
@@ -181,14 +246,19 @@ export function SiteProvider({ children }: { children: ReactNode }) {
       // present — so clear the whole /leads inbox once it is safe. This means a
       // lead can never be merged twice or resurrected after it is deleted.
       // Admin-only: public pages never write siteData and don't read /leads.
-      if (isAdminRoute && latestRawLeads && Object.keys(latestRawLeads).length > 0) {
+      //
+      // None of this runs until /crm/leads has been read. The inbox is durable
+      // and its subscription re-fires on every change, so holding it for one
+      // more round-trip costs nothing; draining it against a CRM we could not
+      // read cost every lead that was in it.
+      if (isAdminRoute && crmReadable.current && latestRawLeads && Object.keys(latestRawLeads).length > 0) {
         const inboxIds = Object.keys(latestRawLeads);
         const clearInbox = () => inboxIds.forEach(id => fbSet(`leads/${id}`, null).catch(() => {}));
         if (incomingIds.length > 0) {
           latestCrmLeads = leads;
           // Only clear the inbox AFTER the ingested leads are safely persisted,
           // so a failed write can never lose a lead.
-          fbSet('crm/leads', stripUndefined(leads)).then(clearInbox).catch(() => {});
+          writeCrmLeads(leads, 'inbox ingest').then(ok => { if (ok) clearInbox(); });
         } else {
           // Inbox holds only duplicates already in siteData.leads — safe to clear.
           clearInbox();
@@ -212,7 +282,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
         ]);
         latestSiteData = fbData || {};
         latestRawLeads = rawLeads;
-        latestCrmLeads = Array.isArray(crmLeads) ? crmLeads : null;
+        latestCrmLeads = asLeadArray(crmLeads);
         latestCrmJobs = Array.isArray(crmJobs) ? crmJobs : null;
         latestCrmClients = Array.isArray(crmClients) ? crmClients : null;
 
@@ -254,7 +324,8 @@ export function SiteProvider({ children }: { children: ReactNode }) {
             // trustworthy signal that the CRM node is readable — fbGet returns
             // null for "denied" and "empty" alike and can't tell them apart.
             crmReadable.current = true;
-            latestCrmLeads = Array.isArray(crmLeads) ? crmLeads : null;
+            latestCrmLeads = asLeadArray(crmLeads);
+            lastReadLeads.current = latestCrmLeads ?? [];
             applyMerge();
           });
         }
@@ -315,29 +386,16 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     const { leads, wipJobs, clients, ...content } = d;
     fbSet('siteData', stripUndefined(content)).catch(() => {});
 
-    // These writes replace the WHOLE array rather than a delta, so saving while
-    // the CRM was never readable would replace every lead with the empty list
-    // this session happens to be holding. Refuse that specific case: no
-    // successful read, and nothing to write. Any real edit — which necessarily
-    // has leads in it — still saves normally.
-    if (crmReadable.current || (leads && leads.length > 0)) {
-      fbSet('crm/leads', stripUndefined(leads || [])).catch(() => {});
-      // Same whole-array replacement, so the same care: only write these when
-      // there is something to write, or when the CRM was genuinely read this
-      // session. A save driven purely by a leads edit must not blank the
-      // delivery board or the customer register.
-      if (wipJobs && (crmReadable.current || wipJobs.length > 0)) {
-        fbSet('crm/wipJobs', stripUndefined(wipJobs)).catch(() => {});
-      }
-      if (clients && (crmReadable.current || clients.length > 0)) {
-        fbSet('crm/clients', stripUndefined(clients)).catch(() => {});
-      }
-    } else {
-      console.warn(
-        '[SiteContext] Skipped writing crm/leads: the CRM was never read successfully ' +
-        'this session, so the empty in-memory list is not trustworthy. Reload once ' +
-        'the leads are visible, then save again.',
-      );
+    // All three of these replace the WHOLE array rather than a delta, so a save
+    // made while /crm could not be read would replace the stored list with
+    // whatever empty or partial list this session happens to be holding. They
+    // share one gate: /crm/leads must have been read at least once. A CRM that
+    // is genuinely empty still reports readable — the subscription fires with
+    // null — so a first-ever save is unaffected; only a refused read is.
+    writeCrmLeads(leads || [], 'admin save');
+    if (crmReadable.current) {
+      if (wipJobs) fbSet('crm/wipJobs', stripUndefined(wipJobs)).catch(() => {});
+      if (clients) fbSet('crm/clients', stripUndefined(clients)).catch(() => {});
     }
     // Note: we deliberately no longer mirror leads back into the /leads inbox.
     // /crm/leads is the single source of truth; writing to /leads here used
