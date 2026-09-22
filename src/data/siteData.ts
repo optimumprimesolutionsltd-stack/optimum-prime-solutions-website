@@ -450,15 +450,26 @@ export const upsertLicenceProducts = (
   if (licenceLine) Object.assign(licenceLine, licenceFields);
   else out.push({ id: `p_${Date.now()}_lic`, ...licenceFields });
 
-  // TSS only appears once there is an end date for it — an empty TSS line
-  // would show in the directory as a subscription nobody can account for.
-  if (licence.tssExpiry) {
+  // TSS exists as soon as there is a licence with an activation date, whether
+  // or not the admin typed an end date for it here — TSS's free first year is
+  // a computed fallback (see effectiveExpiresOn), not something that needs a
+  // manually-entered date just to be on the record. Requiring tssExpiry here
+  // meant a lead won without someone remembering to fill or default that field
+  // produced a client with no TSS line at all, and nothing for Renewals or the
+  // directory to fall back on later. An existing line's expiresOn is only ever
+  // overwritten with a real date, never blanked out — a renewal already on
+  // file stays exactly as entered.
+  if (licence.activatedOn) {
     const tssLine = out.find(p => p.kind === 'TSS');
-    if (tssLine) tssLine.expiresOn = licence.tssExpiry;
-    else out.push({
-      id: `p_${Date.now()}_tss`, kind: 'TSS',
-      activatedOn: licence.activatedOn, expiresOn: licence.tssExpiry,
-    });
+    if (tssLine) {
+      tssLine.activatedOn = licence.activatedOn;
+      if (licence.tssExpiry) tssLine.expiresOn = licence.tssExpiry;
+    } else {
+      out.push({
+        id: `p_${Date.now()}_tss`, kind: 'TSS',
+        activatedOn: licence.activatedOn, expiresOn: licence.tssExpiry,
+      });
+    }
   }
   return out;
 };
