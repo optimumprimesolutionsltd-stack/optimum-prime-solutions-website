@@ -174,11 +174,47 @@
     <link rel="dns-prefetch" href="https://wa.me">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet">
     <link rel="sitemap" href="/sitemap.xml">
-    <!-- Google Analytics 4 -->
-    <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-H1Y0KTGKG6"></script>
+    <!-- Consent Mode v2 defaults. Has to be queued before gtag.js loads, hence
+         its own script above the loader: everything starts denied, so GA4 sets
+         no cookies and sends only cookieless pings until the visitor accepts in
+         the consent banner. A returning visitor's stored 'granted' is replayed
+         here so their session is measured from the very first hit instead of
+         starting denied and being upgraded a second later by React.
+
+         The Meta Pixel is deliberately absent from this file — it has no
+         cookieless mode, so it is injected only after consent. Banner, storage
+         key and pixel loader all live in src/lib/consent.ts; keep the key below
+         in step with the one there. -->
     <script>
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'analytics_storage': 'denied',
+        'functionality_storage': 'granted',
+        'security_storage': 'granted',
+        'wait_for_update': 500
+      });
+      try {
+        var storedConsent = JSON.parse(window.localStorage.getItem('ops-consent-v1') || 'null');
+        if (storedConsent && storedConsent.choice === 'granted') {
+          gtag('consent', 'update', {
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
+            'analytics_storage': 'granted'
+          });
+        }
+      } catch (e) {
+        // Storage blocked (private-mode Safari) — stay denied; the banner asks.
+      }
+    </script>
+
+    <!-- Google Analytics 4 -->
+    <script async="" src="https://www.googletagmanager.com/gtag/js?id=G-H1Y0KTGKG6"></script>
+    <script>
       gtag('js', new Date());
       gtag('config', 'G-H1Y0KTGKG6', {
         'page_path': window.location.pathname,
@@ -188,24 +224,31 @@
       document.addEventListener('submit', function(e) {
         if (e.target.tagName === 'FORM') {
           gtag('event', 'form_submit', {'form_name': e.target.id || 'contact_form'});
+          // Meta's standard conversion event. Without it the pixel only ever
+          // reports page views, and Meta cannot optimise a campaign towards
+          // enquiries. Guarded rather than queued: fbq only exists once the
+          // visitor has accepted, and an enquiry from someone who declined is
+          // simply not reported.
+          if (window.fbq) window.fbq('track', 'Lead');
         }
       });
       // Track WhatsApp clicks
       document.addEventListener('click', function(e) {
         if (e.target.href && e.target.href.includes('wa.me')) {
           gtag('event', 'whatsapp_click', {'value': 1});
+          if (window.fbq) window.fbq('track', 'Contact');
         }
       });
     </script>
-    <script type="module" crossorigin="" src="/assets/index-BvmSpWFt.js"></script>
+    <script type="module" crossorigin="" src="/assets/index-BEZGjwat.js"></script>
     <link rel="modulepreload" crossorigin="" href="/assets/vendor-react-vCJmeiA8.js">
     <link rel="modulepreload" crossorigin="" href="/assets/vendor-misc-CYeW2mjc.js">
     <link rel="modulepreload" crossorigin="" href="/assets/vendor-firebase-CqXlKW_g.js">
     <link rel="modulepreload" crossorigin="" href="/assets/vendor-icons-JSX5Wm5x.js">
-    <link rel="modulepreload" crossorigin="" href="/assets/vendor-framer-Bx1P27qI.js">
     <link rel="modulepreload" crossorigin="" href="/assets/vendor-router-Bzjd4nDQ.js">
-    <link rel="stylesheet" crossorigin="" href="/assets/index-wa9fMf61.css">
-  <link rel="modulepreload" as="script" crossorigin="" href="/assets/VideoTutorialsPage-DWj5_5dd.js"><title data-prerendered-seo="">Video Tutorials — TallyPrime Kenya | Optimum Prime</title><meta name="description" content="Watch official TallyPrime video tutorials covering KRA eTIMS, getting started, accounting &amp; inventory, and invoicing for Kenyan businesses." data-prerendered-seo=""><meta property="og:title" content="Video Tutorials — TallyPrime Kenya | Optimum Prime" data-prerendered-seo=""><meta property="og:description" content="Free TallyPrime video tutorials for Kenyan businesses — eTIMS, invoicing, accounting &amp; inventory, and more." data-prerendered-seo=""><meta property="og:type" content="website" data-prerendered-seo=""><meta property="og:url" content="https://www.optimumprimesolutions.co.ke/knowledge-hub/videos/" data-prerendered-seo=""><meta property="og:image" content="https://www.optimumprimesolutions.co.ke/og-image.png" data-prerendered-seo=""><meta property="og:locale" content="en_KE" data-prerendered-seo=""><meta property="og:site_name" content="Optimum Prime Solutions" data-prerendered-seo=""><meta name="twitter:card" content="summary_large_image" data-prerendered-seo=""><meta name="twitter:title" content="Video Tutorials — TallyPrime Kenya | Optimum Prime" data-prerendered-seo=""><meta name="twitter:description" content="Free TallyPrime video tutorials for Kenyan businesses — eTIMS, invoicing, accounting &amp; inventory, and more." data-prerendered-seo=""><meta name="twitter:image" content="https://www.optimumprimesolutions.co.ke/og-image.png" data-prerendered-seo=""><link rel="canonical" href="https://www.optimumprimesolutions.co.ke/knowledge-hub/videos/" data-prerendered-seo=""></head>
+    <link rel="modulepreload" crossorigin="" href="/assets/vendor-framer-Bx1P27qI.js">
+    <link rel="stylesheet" crossorigin="" href="/assets/index-BPYR-itf.css">
+  <link rel="modulepreload" as="script" crossorigin="" href="/assets/VideoTutorialsPage-B-JFtj3n.js"><title data-prerendered-seo="">Video Tutorials — TallyPrime Kenya | Optimum Prime</title><meta name="description" content="Watch official TallyPrime video tutorials covering KRA eTIMS, getting started, accounting &amp; inventory, and invoicing for Kenyan businesses." data-prerendered-seo=""><meta property="og:title" content="Video Tutorials — TallyPrime Kenya | Optimum Prime" data-prerendered-seo=""><meta property="og:description" content="Free TallyPrime video tutorials for Kenyan businesses — eTIMS, invoicing, accounting &amp; inventory, and more." data-prerendered-seo=""><meta property="og:type" content="website" data-prerendered-seo=""><meta property="og:url" content="https://www.optimumprimesolutions.co.ke/knowledge-hub/videos/" data-prerendered-seo=""><meta property="og:image" content="https://www.optimumprimesolutions.co.ke/og-image.png" data-prerendered-seo=""><meta property="og:locale" content="en_KE" data-prerendered-seo=""><meta property="og:site_name" content="Optimum Prime Solutions" data-prerendered-seo=""><meta name="twitter:card" content="summary_large_image" data-prerendered-seo=""><meta name="twitter:title" content="Video Tutorials — TallyPrime Kenya | Optimum Prime" data-prerendered-seo=""><meta name="twitter:description" content="Free TallyPrime video tutorials for Kenyan businesses — eTIMS, invoicing, accounting &amp; inventory, and more." data-prerendered-seo=""><meta name="twitter:image" content="https://www.optimumprimesolutions.co.ke/og-image.png" data-prerendered-seo=""><link rel="canonical" href="https://www.optimumprimesolutions.co.ke/knowledge-hub/videos/" data-prerendered-seo=""></head>
   <body>
     <!-- Skip navigation for accessibility -->
     <a href="#main-content" class="skip-nav sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[9999] focus:px-4 focus:py-2 focus:bg-red-600 focus:text-white focus:rounded-lg">Skip to main content</a>
