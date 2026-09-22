@@ -1,8 +1,10 @@
-import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
 import { SiteProvider } from './context/SiteContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import { OfflineBanner } from './components/OfflineBanner';
+import ConsentBanner from './components/ConsentBanner';
+import { trackPixelPageView } from './lib/consent';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Chatbot from './components/Chatbot';
@@ -186,6 +188,23 @@ function App() {
     window.scrollTo(0, 0);
   }, [pathname]);
 
+  // Meta Pixel page views for client-side navigation. Every route is
+  // prerendered, so the landing page is a real document load that the base
+  // pixel counts itself — only the navigations after it need reporting.
+  // Comparing paths rather than counting renders keeps StrictMode's double
+  // effect invocation in development from inventing an extra page view.
+  // No-ops entirely until the visitor has accepted tracking.
+  const lastTrackedPath = useRef<string | null>(null);
+  useEffect(() => {
+    if (lastTrackedPath.current === null) {
+      lastTrackedPath.current = pathname;
+      return;
+    }
+    if (lastTrackedPath.current === pathname) return;
+    lastTrackedPath.current = pathname;
+    trackPixelPageView();
+  }, [pathname]);
+
   useEffect(() => {
     if (!user) {
       setIsFullAdmin(false);
@@ -265,6 +284,7 @@ function App() {
           <Route path="/*" element={<SiteRoutes />} />
         </Routes>
         <OfflineBanner />
+        <ConsentBanner />
       </SiteProvider>
     </ErrorBoundary>
   );

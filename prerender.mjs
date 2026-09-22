@@ -674,6 +674,18 @@ async function prerender() {
           throw new Error('no SEO head tags found to tag for client-side removal');
         }
 
+        // The consent banner is client-only state. Puppeteer runs with an
+        // empty profile, so it renders "not answered yet" on every route and
+        // would be baked into all of dist/ — flashing at visitors who answered
+        // months ago, and sitting in the HTML crawlers index. React renders it
+        // again on hydration whenever it is genuinely needed, so it is dropped
+        // from the snapshot rather than prerendered.
+        await page.evaluate(() => {
+          for (const el of document.querySelectorAll('[data-consent-ui]')) {
+            el.remove();
+          }
+        });
+
         const html = normaliseAnimationNoise(await page.content());
 
         const hasContent = html.includes('<h1') || html.includes('<h2') || html.includes('<main');
