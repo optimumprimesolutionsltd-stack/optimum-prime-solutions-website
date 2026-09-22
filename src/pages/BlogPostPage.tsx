@@ -110,6 +110,11 @@ const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: str
     { label: 'Biz Analyst — TallyPrime on Your Phone', href: '/biz-analyst', desc: 'GPS field sales tracking and profit-based commissions.' },
     { label: 'Book a Free Demo', href: '/contact#demo-form', desc: 'See it running on your own data — no obligation.' },
   ],
+  'remote-and-on-site-support-tallyprime-kenya': [
+    { label: 'TallyPrime Implementation', href: '/tallyprime/implementation', desc: 'Full setup and go-live support, on-site or remote.' },
+    { label: 'Data Migration Services', href: '/tallyprime/data-migration', desc: 'Move safely from Excel, QuickBooks, Sage, or an older Tally version.' },
+    { label: 'Book a Free Demo', href: '/contact#demo-form', desc: 'Talk to our support team before you switch — no obligation.' },
+  ],
 };
 
 export default function BlogPostPage() {
