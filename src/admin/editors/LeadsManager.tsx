@@ -1124,9 +1124,14 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const openWin = (lead: Lead) => {
     const existing = lead.serialNo ? findClientBySerial(data.clients, lead.serialNo) : undefined;
     const won = lead.wonAt ? lead.wonAt.split('T')[0] : today();
+    // An open trial already carries the serial and edition the prospect
+    // evaluated — once it converts, retyping either is pure friction. Only
+    // used when the lead has no serial/client of its own yet, so a renewal
+    // against an existing client is never overridden by a stale trial.
+    const openTrial = lead.trial && !lead.trial.outcome ? lead.trial : undefined;
     setWinForm({
-      serialNo: lead.serialNo || '',
-      edition: existing?.edition || 'Silver',
+      serialNo: lead.serialNo || openTrial?.serialNo || '',
+      edition: existing?.edition || openTrial?.edition || 'Silver',
       term: existing?.term || 'Annual',
       dealType: lead.dealType || 'New Licence',
       amount: lead.amount != null ? String(lead.amount) : '',
@@ -1224,6 +1229,12 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
             ...(serial ? { serialNo: serial, clientId } : {}),
             dealType: winForm.dealType,
             ...(amount != null && !Number.isNaN(amount) ? { amount } : {}),
+            // Winning the deal IS the trial converting — close it out here so
+            // it never takes a second, separate click, and a won lead never
+            // keeps sitting in "trials needing attention".
+            ...(l.trial && !l.trial.outcome
+              ? { trial: { ...l.trial, outcome: 'Converted' as TrialOutcome, outcomeOn: wonAt.split('T')[0] } }
+              : {}),
           }
         : l),
     });
