@@ -107,12 +107,13 @@ export type DealType =
   | 'TSS Renewal'
   | 'Term Upgrade'      // Annual → Perpetual top-up
   | 'Edition Upgrade'   // Silver → Gold
+  | 'Cloud Hosting'     // new subscription or a renewal of one already running
   | 'Customization'
   | 'Training'
   | 'Other';
 
 export const DEAL_TYPES: DealType[] = [
-  'New Licence', 'TSS Renewal', 'Term Upgrade', 'Edition Upgrade',
+  'New Licence', 'TSS Renewal', 'Term Upgrade', 'Edition Upgrade', 'Cloud Hosting',
   'Customization', 'Training', 'Other',
 ];
 
@@ -194,41 +195,52 @@ export const trialNeedsAction = (t: LeadTrial): boolean => {
 // ── The product catalogue ───────────────────────────────────────────────────
 // What a customer can actually own. A won customer rarely owns just one thing:
 // a TallyPrime licence, the TSS that keeps it current, sometimes a Tally Server
-// on top, sometimes a customization written specifically for them. The customer
-// directory has to show every one of them against the same serial, so they are
-// kept as line items rather than as one licence per customer.
+// on top, sometimes a customization written specifically for them, sometimes
+// a Cloud Hosting subscription instead of or alongside the licence itself. The
+// customer directory has to show every one of them against the same serial, so
+// they are kept as line items rather than as one licence per customer.
 export type ProductKind =
   | 'Tally Gold'
   | 'Tally Silver'
   | 'Tally Server'
   | 'Customization'
-  | 'TSS';
+  | 'TSS'
+  | 'Cloud Hosting';
 
 export const PRODUCT_KINDS: ProductKind[] = [
-  'Tally Gold', 'Tally Silver', 'Tally Server', 'Customization', 'TSS',
+  'Tally Gold', 'Tally Silver', 'Tally Server', 'Customization', 'TSS', 'Cloud Hosting',
 ];
+
+// Cloud Hosting is the one product line sold Monthly as well as Annual or
+// Perpetual — a licence is never Monthly, so this stays a separate, wider
+// type rather than adding 'Monthly' to LicenceTerm itself.
+export type ProductTerm = LicenceTerm | 'Monthly';
 
 // How each kind behaves, kept as data so the directory, the win dialog and the
 // renewal reminders can never disagree about whether a product expires.
-//   term       — sold Annual or Perpetual, so the term must be chosen
+//   term       — has a term to choose at all (Monthly/Annual/Perpetual, or just
+//                Annual/Perpetual — see productExpires for which terms expire)
 //   customName — carries the customer's own name for it (customizations only)
-//   expiry     — 'annual-only' expires when Annual and never when Perpetual;
-//                'always' always carries an end date; 'never' has none at all
+//   expiry     — 'recurring' expires on every term except Perpetual, which
+//                never does; 'always' always carries an end date; 'never' has
+//                none at all
 export interface ProductRule {
   term: boolean;
   customName: boolean;
-  expiry: 'annual-only' | 'always' | 'never';
+  expiry: 'recurring' | 'always' | 'never';
 }
 export const PRODUCT_RULES: Record<ProductKind, ProductRule> = {
-  'Tally Gold':    { term: true,  customName: false, expiry: 'annual-only' },
-  'Tally Silver':  { term: true,  customName: false, expiry: 'annual-only' },
+  'Tally Gold':    { term: true,  customName: false, expiry: 'recurring' },
+  'Tally Silver':  { term: true,  customName: false, expiry: 'recurring' },
   // A Tally Server licence is owned outright — no term to choose, nothing to
   // renew. Keeping it current is what the customer's TSS line is for.
   'Tally Server':  { term: false, customName: false, expiry: 'never' },
-  'Customization': { term: true,  customName: true,  expiry: 'annual-only' },
+  'Customization': { term: true,  customName: true,  expiry: 'recurring' },
   // TSS is a subscription in every case, Perpetual licences included, so it
   // always has an end date on it.
   'TSS':           { term: false, customName: false, expiry: 'always' },
+  // Sold Monthly, Annual, or as a one-time Perpetual (lifetime) hosting fee.
+  'Cloud Hosting': { term: true,  customName: false, expiry: 'recurring' },
 };
 
 export interface ClientProduct {
@@ -237,7 +249,7 @@ export interface ClientProduct {
   // Customizations only: what the customer calls it, e.g. "Branch-wise stock
   // ageing report". Every other kind reads from its own name.
   name?: string;
-  term?: LicenceTerm;
+  term?: ProductTerm;
   activatedOn?: string;           // YYYY-MM-DD
   // Only meaningful where the kind expires — see productExpires.
   expiresOn?: string;             // YYYY-MM-DD
@@ -252,24 +264,23 @@ export const productExpires = (p: Pick<ClientProduct, 'kind' | 'term'>): boolean
   if (!rule) return false;
   if (rule.expiry === 'always') return true;
   if (rule.expiry === 'never') return false;
-  return p.term === 'Annual';
+  return p.term !== 'Perpetual';
 };
 
 // Kinds sold on a fixed one-licence-year term: the expiry is a calendar rule,
 // not a negotiated date, so it can be derived instead of typed in.
 const FIXED_ANNUAL_TERM_KINDS: ProductKind[] = ['Tally Gold', 'Tally Silver', 'Customization'];
 
-// One licence-year after activation, ending the day before the anniversary so
-// day 365 begins the next term (matches how Tally itself dates a licence
-// year, e.g. activated 27 Jan 2026 expires 26 Jan 2027).
+// Parses "YYYY-MM-DD" as a UTC calendar date, rejecting anything that doesn't
+// round-trip. Shared by computedAnnualExpiry and computedMonthlyExpiry so the
+// two can't quietly drift apart on how they read the same string.
 //
 // Built entirely on UTC getters/setters and Date.UTC — parsing "YYYY-MM-DD"
 // as local time and then reading it back with toISOString() (which is always
 // UTC) rolls the date back a day for anyone east of UTC, which is where this
 // app's own users are.
-export const computedAnnualExpiry = (activatedOn?: string): string | undefined => {
-  if (!activatedOn) return undefined;
-  const [y, m, day] = activatedOn.split('-').map(Number);
+const parseUtcDate = (value: string): Date | undefined => {
+  const [y, m, day] = value.split('-').map(Number);
   if (!y || !m || !day) return undefined;
   const d = new Date(Date.UTC(y, m - 1, day));
   // Date.UTC silently overflows an out-of-range month/day (e.g. month 13,
@@ -278,7 +289,28 @@ export const computedAnnualExpiry = (activatedOn?: string): string | undefined =
   if (Number.isNaN(d.getTime()) || d.getUTCFullYear() !== y || d.getUTCMonth() !== m - 1 || d.getUTCDate() !== day) {
     return undefined;
   }
+  return d;
+};
+
+// One licence-year after activation, ending the day before the anniversary so
+// day 365 begins the next term (matches how Tally itself dates a licence
+// year, e.g. activated 27 Jan 2026 expires 26 Jan 2027).
+export const computedAnnualExpiry = (activatedOn?: string): string | undefined => {
+  if (!activatedOn) return undefined;
+  const d = parseUtcDate(activatedOn);
+  if (!d) return undefined;
   d.setUTCFullYear(d.getUTCFullYear() + 1);
+  d.setUTCDate(d.getUTCDate() - 1);
+  return d.toISOString().split('T')[0];
+};
+
+// Same rule as computedAnnualExpiry, one calendar month instead of one year —
+// Cloud Hosting's Monthly term. Activated 5 Feb 2026 runs through 4 Mar 2026.
+export const computedMonthlyExpiry = (activatedOn?: string): string | undefined => {
+  if (!activatedOn) return undefined;
+  const d = parseUtcDate(activatedOn);
+  if (!d) return undefined;
+  d.setUTCMonth(d.getUTCMonth() + 1);
   d.setUTCDate(d.getUTCDate() - 1);
   return d.toISOString().split('T')[0];
 };
@@ -297,11 +329,20 @@ export const computedAnnualExpiry = (activatedOn?: string): string | undefined =
 // TSS period follows the same calendar rule as a fixed-Annual licence — only
 // a later renewal is a real commercial date, and that gets typed in by hand,
 // which is why this is only ever a fallback and never overwrites it.
+//
+// Cloud Hosting follows its own chosen term instead of always being Annual:
+// Monthly and Annual both compute a calendar expiry, and Perpetual has none
+// at all — a one-time lifetime hosting fee, same idea as a Perpetual licence.
 export const effectiveExpiresOn = (
   p: Pick<ClientProduct, 'kind' | 'term' | 'activatedOn' | 'expiresOn'>,
 ): string | undefined => {
   if (p.expiresOn) return p.expiresOn;
   if (p.kind === 'TSS') return computedAnnualExpiry(p.activatedOn);
+  if (p.kind === 'Cloud Hosting') {
+    if (p.term === 'Monthly') return computedMonthlyExpiry(p.activatedOn);
+    if (p.term === 'Annual') return computedAnnualExpiry(p.activatedOn);
+    return undefined;
+  }
   if (p.term === 'Annual' && FIXED_ANNUAL_TERM_KINDS.includes(p.kind)) {
     return computedAnnualExpiry(p.activatedOn);
   }
@@ -398,7 +439,10 @@ export const syncClientLicence = (c: Client): Client => {
   return {
     ...c,
     edition: licence ? (licence.kind === 'Tally Gold' ? 'Gold' : 'Silver') : c.edition,
-    term: licence?.term || c.term,
+    // A Tally Gold/Silver line's term is never actually 'Monthly' — that's a
+    // Cloud Hosting term — but ClientProduct.term is typed for any product
+    // line, so TypeScript can't narrow it from the kind filter above alone.
+    term: (licence?.term !== 'Monthly' ? licence?.term : undefined) || c.term,
     activatedOn: licence?.activatedOn || products[0]?.activatedOn || c.activatedOn,
     // Only an Annual licence carries a top-up deadline; a Perpetual one must
     // not, or Renewals would chase a window that does not exist. Uses the

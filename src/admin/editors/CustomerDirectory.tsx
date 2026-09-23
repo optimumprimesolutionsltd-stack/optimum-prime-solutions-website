@@ -4,7 +4,7 @@ import {
   AlertCircle, CheckCircle2, Pencil, Package,
 } from 'lucide-react';
 import type {
-  SiteData, Client, ClientProduct, ProductKind, LicenceTerm, TallyEdition,
+  SiteData, Client, ClientProduct, ProductKind, ProductTerm, LicenceTerm, TallyEdition,
 } from '../../data/siteData';
 import {
   PRODUCT_KINDS, PRODUCT_RULES, productExpires, productLabel, effectiveExpiresOn,
@@ -181,6 +181,9 @@ export default function CustomerDirectory({ data, onSave }: P) {
         const rule = PRODUCT_RULES[next.kind];
         if (!rule.term) next.term = undefined;
         else if (!next.term) next.term = 'Annual';
+        // Monthly only ever belongs to Cloud Hosting — a line switched away
+        // from it (e.g. into a Tally licence) must not carry the term across.
+        else if (next.term === 'Monthly' && next.kind !== 'Cloud Hosting') next.term = 'Annual';
         if (!rule.customName) next.name = undefined;
         if (!productExpires(next)) next.expiresOn = undefined;
         // A line just turned into TSS inherits the licence's own acquisition
@@ -548,8 +551,11 @@ export default function CustomerDirectory({ data, onSave }: P) {
                             <label className="block">
                               <span className="text-[11px] font-bold text-slate-500">Term</span>
                               <select value={p.term || 'Annual'}
-                                onChange={e => setProduct(p.id, { term: e.target.value as LicenceTerm })}
+                                onChange={e => setProduct(p.id, { term: e.target.value as ProductTerm })}
                                 className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-accent">
+                                {/* Monthly is Cloud Hosting only — a Tally licence or a
+                                    customization is never billed monthly. */}
+                                {p.kind === 'Cloud Hosting' && <option value="Monthly">Monthly</option>}
                                 <option value="Annual">Annual</option>
                                 <option value="Perpetual">Perpetual</option>
                               </select>
@@ -591,11 +597,11 @@ export default function CustomerDirectory({ data, onSave }: P) {
                                 onChange={e => setProduct(p.id, { expiresOn: e.target.value })}
                                 className="mt-1 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm outline-none focus:border-accent" />
                               {/* Left blank, the directory already computes this from the
-                                  activation date for a fixed Annual term — shown here so
-                                  leaving it blank reads as a choice, not a gap. */}
+                                  activation date for a fixed Annual/Monthly term — shown
+                                  here so leaving it blank reads as a choice, not a gap. */}
                               {!p.expiresOn && effectiveExpiresOn(p) && (
                                 <p className="mt-1 text-[11px] text-slate-400">
-                                  Left blank, this is treated as {fmt(effectiveExpiresOn(p))} (one licence-year from activation).
+                                  Left blank, this is treated as {fmt(effectiveExpiresOn(p))} (one {p.term === 'Monthly' ? 'month' : 'licence-year'} from activation).
                                 </p>
                               )}
                             </label>
