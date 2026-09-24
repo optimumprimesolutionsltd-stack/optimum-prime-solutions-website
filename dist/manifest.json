@@ -3,7 +3,7 @@
   "short_name": "Optimum Prime",
   "description": "Official TallyPrime Partner in Kenya — Implementation, Licensing, Cloud Hosting, Training & Support",
   "start_url": "/",
-  "display": "standalone",
+  "display": "browser",
   "background_color": "#f8fafc",
   "theme_color": "#dc2626",
   "icons": [
