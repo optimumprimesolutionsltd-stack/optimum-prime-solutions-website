@@ -6,6 +6,22 @@ name: Rebuild dist/
 # never reaches the live site until dist/ is rebuilt and committed too.
 # This workflow does that rebuild automatically so pushing to main is
 # enough on its own.
+#
+# The rebuild commit must NOT carry [skip ci]. It used to, and the effect was
+# that production silently ran one release behind: the deploy fired on the merge
+# commit, when dist/ still held the PREVIOUS build, and the commit that actually
+# contained the new one was skipped by Vercel. Every release since had to be
+# shipped by hand with an empty commit.
+#
+# [skip ci] is not needed to stop this workflow re-triggering itself. Pushes
+# made with the default GITHUB_TOKEN do not start new workflow runs at all, and
+# the `if:` on the job below refuses a run by github-actions[bot] regardless.
+# Those two guards are what prevent a loop - not the commit message, which only
+# ever reached Vercel.
+#
+# Consequence worth knowing: each merge now produces two deployments, one for
+# the merge itself and one for the rebuilt dist/. The second is the correct one
+# and it wins. That is the intended trade.
 
 on:
   push:
@@ -16,6 +32,8 @@ permissions:
 
 jobs:
   rebuild:
+    # Load-bearing: with [skip ci] gone from the commit below, this is one of
+    # the two things stopping the workflow triggering itself.
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
@@ -38,6 +56,9 @@ jobs:
           if git diff --cached --quiet; then
             echo "dist/ already up to date, nothing to commit"
           else
-            git commit -m "build: rebuild dist/ [skip ci]"
+            # No [skip ci] here, deliberately - see the note at the top of
+            # this file. Vercel honours it, and with it the deployment that
+            # carries the freshly built dist/ never happens.
+            git commit -m "build: rebuild dist/"
             git push
           fi
