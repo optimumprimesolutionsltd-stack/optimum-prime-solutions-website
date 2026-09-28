@@ -54,7 +54,13 @@ export default defineConfig({
         // Split vendor libraries into separate cacheable chunks.
         // react + react-dom + scheduler must be in the SAME chunk to avoid circular dependency.
         manualChunks(id) {
-          // Firebase — all subpackages (firebase/app, firebase/auth, firebase/database, etc.)
+          // Firestore is admin-only (the access-request flow). Keeping it in the
+          // same chunk as app/auth/database meant a public page that lazily
+          // loaded Firebase for live updates pulled Firestore's bytes too.
+          if (id.includes('node_modules/@firebase/firestore') || id.includes('node_modules/firebase/firestore')) return 'vendor-firestore';
+          // Firebase core — app, auth and database. Dynamically imported by
+          // firebase/config.ts, so this chunk is fetched after first paint
+          // rather than modulepreloaded in index.html.
           if (id.includes('node_modules/firebase/') || id.includes('node_modules/@firebase/')) return 'vendor-firebase';
           if (id.includes('node_modules/framer-motion')) return 'vendor-framer';
           // React core, DOM, and scheduler together to avoid circular chunk warning

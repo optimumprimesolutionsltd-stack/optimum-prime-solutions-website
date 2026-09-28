@@ -1,42 +1,12 @@
 import { createContext, useContext, useState, useCallback, useEffect, useRef, type ReactNode } from 'react';
 import { load, save, type SiteData, type Lead, type WipJob, type Client, defaultData } from '../data/siteData';
 import { fbGet, fbSet, fbSubscribe, fbOnAuthStateChanged } from '../firebase/config';
-import { signInAnonymously, getAuth, onAuthStateChanged } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
 
-// New Firebase project: optimum-prime-website (migrated July 2026)
-const firebaseConfig = {
-  apiKey: "AIzaSyAY8O5LRWxcJgkYhNn1SstAylc-q959vv0",
-  authDomain: "optimum-prime-website.firebaseapp.com",
-  databaseURL: "https://optimum-prime-website-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "optimum-prime-website",
-  storageBucket: "optimum-prime-website.firebasestorage.app",
-  messagingSenderId: "784083256897",
-  appId: "1:784083256897:web:3edc73fa438f5faa2f68c0",
-  measurementId: "G-H1Y0KTGKG6"
-};
-
-try {
-  initializeApp(firebaseConfig);
-  const auth = getAuth();
-  // The RTDB rules require auth != null for the contact-form inbox and the
-  // chatbot history, so ordinary visitors need an anonymous session. But this
-  // used to call signInAnonymously() unconditionally at module load, and
-  // auth.currentUser is null synchronously at that point even when a signed-in
-  // admin's session is about to be restored from persistence. The anonymous
-  // user then replaced the admin, App.tsx gates /admin on !isAnonymous, and the
-  // panel logged itself out mid-session — taking any unsaved editor changes.
-  //
-  // Waiting for onAuthStateChanged means the decision is made with the real
-  // answer in hand. The listener is deliberately left subscribed rather than
-  // unsubscribed after the first emission, so signing out of /admin drops the
-  // visitor back to an anonymous session instead of no session at all.
-  onAuthStateChanged(auth, (user) => {
-    if (!user) signInAnonymously(auth).catch(() => {});
-  });
-} catch (e) {
-  console.log('Firebase not configured yet');
-}
+// Firebase used to be initialised here, at module load, with its own copy of
+// the config and its own anonymous-auth bootstrap. That put the whole SDK in
+// the entry chunk of every public page. Both now live in firebase/config.ts,
+// behind a dynamic import that the first fb* call triggers — which, for this
+// context, is the subscribe in the effect below, i.e. after first paint.
 
 interface Ctx { data: SiteData; update: (d: SiteData) => void; synced: boolean }
 const C = createContext<Ctx | undefined>(undefined);
