@@ -5,6 +5,7 @@ import { HelmetProvider } from "react-helmet-async";
 // @ts-ignore: CSS imported as a side effect without type declarations
 import "./index.css";
 import App from "./App";
+import { reloadForStaleChunk } from "./lib/staleChunk";
 
 // Drop the SEO head tags baked in by prerender.mjs before React renders its own.
 //
@@ -20,6 +21,12 @@ import App from "./App";
 for (const el of document.head.querySelectorAll("[data-prerendered-seo]")) {
   el.remove();
 }
+
+// A chunk from before the latest deploy failed to load — see lib/staleChunk.
+// Anything Vite's preload helper misses reaches ErrorBoundary instead.
+window.addEventListener("vite:preloadError", (event) => {
+  if (reloadForStaleChunk()) event.preventDefault();
+});
 
 const rootElement = document.getElementById("root")!;
 const root = createRoot(rootElement);
