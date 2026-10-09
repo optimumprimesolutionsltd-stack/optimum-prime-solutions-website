@@ -89,6 +89,10 @@ function getSeedBlogPosts() {
 // seed list is the fallback: if the fetch fails (offline, CI without network,
 // database rules changed) the build still produces every route it used to,
 // rather than silently shipping a site with no blog posts at all.
+// The live blogs array exactly as Firebase holds it, kept for embedding into the
+// blog pages (see blogDataScript). null when the fetch failed.
+let liveBlogs = null;
+
 async function getBlogPosts() {
   const seed = getSeedBlogPosts();
   try {
@@ -105,6 +109,7 @@ async function getBlogPosts() {
     // are available only from Firebase; the siteData scrape does not carry them,
     // which is why llms.txt regeneration is skipped outright when this fetch
     // fails rather than written with posts missing their descriptions.
+    liveBlogs = posts;
     const merged = new Map(seed.map((p) => [p.route, { lastmod: p.lastmod }]));
     for (const p of posts) {
       const route = `/blog/${getPostSlug(p)}`;
@@ -127,6 +132,23 @@ async function getBlogPosts() {
     );
     return seed;
   }
+}
+
+// Posts added in the admin panel exist only in Firebase, and the client used to
+// learn about them only once its Firebase read came back. Until then
+// BlogPostPage found no post and rendered NotFoundPage — with noindex. Google's
+// renderer never got the Firebase data, so it reported every admin-panel post
+// as "Excluded by 'noindex' tag" even though this script had prerendered it in
+// full. The blog pages therefore carry the live posts inline, and load() in
+// siteData.ts puts them into the initial data, so the post is there on the very
+// first render. Only /blog and /blog/* get it: ~55 KB of JSON is a fair price
+// for the pages that render it, not for every page on the site.
+//
+// `<` is escaped so no post text can close the script element early.
+function blogDataScript(route) {
+  if (!liveBlogs || !(route === '/blog' || route.startsWith('/blog/'))) return '';
+  const json = JSON.stringify(liveBlogs).replace(/</g, '\\u003c');
+  return `<script type="application/json" id="prerendered-blogs">${json}</script>`;
 }
 
 const SITE_ORIGIN = 'https://www.optimumprimesolutions.co.ke';
@@ -735,7 +757,8 @@ async function prerender() {
         // discarded the rendered <head> and reused index.html's head verbatim
         // for every route, which is why every page shared the homepage's title,
         // canonical, and robots tag regardless of its own SEO settings.
-        const finalHtml = /^<!doctype/i.test(html) ? html : `<!DOCTYPE html>\n${html}`;
+        const withBlogs = html.replace('</head>', () => `${blogDataScript(route)}</head>`);
+        const finalHtml = /^<!doctype/i.test(withBlogs) ? withBlogs : `<!DOCTYPE html>\n${withBlogs}`;
 
         writeFileSync(outputPath, finalHtml);
         console.log(`  ✓ ${route} (${finalHtml.length} bytes)`);

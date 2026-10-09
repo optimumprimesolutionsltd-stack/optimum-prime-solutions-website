@@ -1,3 +1,4 @@
+import { getPostSlug } from '../utils/slugify';
 export interface ServiceItem { id:string; title:string; desc:string; icon:string; features:string[]; link?:string }
 export interface ProductItem { id:string; name:string; edition:string; price:string; period:string; features:string[]; popular?:boolean; cta:string }
 export interface TestimonialItem { id:string; name:string; role:string; company:string; text:string; rating:number }
@@ -1238,5 +1239,26 @@ Switching off Excel or an old system isn't really a software decision — it's a
 };
 
 const KEY = 'ops_site_v2';
-export const load = (): SiteData => { try { const r=localStorage.getItem(KEY); if(r){ const p=JSON.parse(r); return {...defaultData,...p, leads:p.leads||[], wipJobs:p.wipJobs||[]}; } } catch{} return defaultData; };
+// The live blog posts prerender.mjs inlines into /blog and /blog/* pages.
+// Posts added in the admin panel exist only in Firebase, so without this they
+// were missing until the Firebase read came back — and BlogPostPage served
+// NotFoundPage (noindex) in the meantime, which is all Google's renderer saw.
+// It is the same array Firebase holds, so a post in both wins over the bundled
+// seed or a possibly older localStorage copy. Posts only the seed has are kept
+// rather than dropped before the sync gets a say in it.
+const prerenderedBlogs = (): BlogPost[] | null => {
+  try {
+    const el = typeof document !== 'undefined' ? document.getElementById('prerendered-blogs') : null;
+    const parsed = el?.textContent ? JSON.parse(el.textContent) : null;
+    return Array.isArray(parsed) && parsed.length ? parsed : null;
+  } catch { return null; }
+};
+const loadStored = (): SiteData => { try { const r=localStorage.getItem(KEY); if(r){ const p=JSON.parse(r); return {...defaultData,...p, leads:p.leads||[], wipJobs:p.wipJobs||[]}; } } catch{} return defaultData; };
+export const load = (): SiteData => {
+  const d = loadStored();
+  const live = prerenderedBlogs();
+  if (!live) return d;
+  const liveSlugs = new Set(live.map(getPostSlug));
+  return { ...d, blogs: [...live, ...d.blogs.filter((b) => !liveSlugs.has(getPostSlug(b)))] };
+};
 export const save = (d: SiteData) => localStorage.setItem(KEY, JSON.stringify(d));
