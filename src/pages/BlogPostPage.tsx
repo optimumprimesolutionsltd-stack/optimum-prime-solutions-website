@@ -119,13 +119,26 @@ const RELATED_RESOURCES: Record<string, { label: string; href: string; desc: str
 
 export default function BlogPostPage() {
   const { slug } = useParams<{ slug: string }>();
-  const { data } = useSite();
+  const { data, synced } = useSite();
 
   const post = data.blogs.find((b) => getPostSlug(b) === slug);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [post]);
+
+  if (!post && !synced) {
+    // Posts added in the admin panel live only in Firebase. Until the first
+    // read comes back an unknown slug may still be a real post, so this must
+    // not say "not found" yet — NotFoundPage carries noindex, and Google's
+    // renderer, which never received the Firebase data, indexed exactly that.
+    return (
+      <main className="min-h-screen flex items-center justify-center" aria-busy="true">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-300 border-t-gray-600" />
+        <span className="sr-only">Loading article…</span>
+      </main>
+    );
+  }
 
   if (!post) {
     // Post not found (e.g. a stale/old URL) — render a proper not-found
