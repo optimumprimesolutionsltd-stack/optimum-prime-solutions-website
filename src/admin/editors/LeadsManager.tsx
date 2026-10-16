@@ -480,6 +480,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     capturedBy: DEFAULT_STAFF.name,
     createdAt: new Date().toISOString().split('T')[0],
     requestType: 'demo' as 'demo' | 'consultation' | 'bizanalyst' | 'customization' | 'other',
+    // Where the lead already is in the pipeline. Most start at New, but a deal
+    // worked offline (quote already sent, already won or lost) is entered at
+    // the stage it has really reached.
+    status: 'New',
   });
   const [addLeadError, setAddLeadError] = useState('');
   const [addLeadSuccess, setAddLeadSuccess] = useState(false);
@@ -1951,7 +1955,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       createdAt: addLeadForm.createdAt
         ? new Date(`${addLeadForm.createdAt}T12:00:00`).toISOString()
         : new Date().toISOString(),
-      status: 'New',
+      // Closed Won only lands through the win dialog (it captures the serial),
+      // so the lead is saved one step short of it and the dialog opens below.
+      status: addLeadForm.status === 'Closed Won' ? 'Quote Sent' : addLeadForm.status,
+      ...(addLeadForm.status !== 'New' ? { nextStep: defaultNextStep(addLeadForm.status) } : {}),
+      ...(addLeadForm.status === 'Closed Lost' ? { lostAt: new Date().toISOString() } : {}),
       // Source, its detail, and who recorded it — written together so a lead
       // always carries the story of where it came from and who vouched for it.
       ...sourceFields(addLeadForm.source as LeadSource, addLeadForm.sourceDetail, addLeadForm.capturedBy),
@@ -1973,7 +1981,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       source: '', sourceDetail: '', capturedBy: DEFAULT_STAFF.name,
       createdAt: new Date().toISOString().split('T')[0],
       requestType: 'demo',
+      status: 'New',
     });
+    // Same follow-on flows as moving an existing lead into these stages.
+    if (addLeadForm.status === 'Closed Won') openWin(newLead);
+    else if (addLeadForm.status === 'Schedule a Demo') openScheduling(newLead);
     // A filter left on another stage or source is the classic "I added it and
     // nothing happened" — clear them so the new lead is definitely on screen.
     setFilterStatus('All');
@@ -4342,6 +4354,15 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                       <option value="bizanalyst">BizAnalyst</option>
                       <option value="customization">Customization / Add-On / TDL</option>
                       <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Pipeline Stage</label>
+                    <select
+                      value={addLeadForm.status}
+                      onChange={e => setAddLeadForm({...addLeadForm, status: e.target.value})}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                      {PIPELINE_ORDER.map(s => <option key={s} value={s}>{s}</option>)}
                     </select>
                   </div>
                 </div>
