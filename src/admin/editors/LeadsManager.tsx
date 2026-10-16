@@ -122,6 +122,30 @@ export const leadProduct = (l: Lead): string => {
   return '';
 };
 
+// What a lead can be about, as picked on the Add Lead form. TallyPrime is the
+// blank value, matching leadProduct's "blank means Tally". The rest of the
+// Tally family is labelled but still a Tally conversation; anything outside
+// it (Mavuno HR) gets the loud "do not pitch TallyPrime" warning.
+const LEAD_PRODUCTS: { value: string; label: string }[] = [
+  { value: '', label: 'TallyPrime' },
+  { value: 'Tally Server', label: 'Tally Server' },
+  { value: 'TSS Renewal', label: 'TSS Renewal' },
+  { value: 'Cloud Hosting', label: 'Cloud Hosting' },
+  { value: 'BizAnalyst', label: 'BizAnalyst' },
+  { value: 'Customization / TDL', label: 'Customization / TDL' },
+  { value: 'Mavuno HR', label: 'Mavuno HR' },
+];
+const TALLY_FAMILY = ['Tally Server', 'TSS Renewal', 'Cloud Hosting', 'BizAnalyst', 'Customization / TDL'];
+const isNonTallyProduct = (l: Lead): boolean => {
+  const p = leadProduct(l);
+  return !!p && !TALLY_FAMILY.includes(p);
+};
+
+// Not a sales stage — it is Closed Won with the delivery job already opened.
+// Offered on the Add Lead form so a client entered after the sale lands
+// straight in the Work in Progress tab.
+const ADD_LEAD_WIP = 'Work in Progress';
+
 
 const INDUSTRIES = [
   'Manufacturing', 'Distribution & Wholesale', 'Retail', 'Construction',
@@ -484,6 +508,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     // worked offline (quote already sent, already won or lost) is entered at
     // the stage it has really reached.
     status: 'New',
+    product: '',
   });
   const [addLeadError, setAddLeadError] = useState('');
   const [addLeadSuccess, setAddLeadSuccess] = useState(false);
@@ -1103,6 +1128,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
   const trialsNeedingAction = data.leads.filter(l => l.trial && trialNeedsAction(l.trial));
 
   const [winLead, setWinLead] = useState<Lead | null>(null);
+  // Set when the win came from an Add Lead at "Work in Progress": confirming
+  // the win also opens the delivery job, in the same save.
+  const [winStartsWork, setWinStartsWork] = useState(false);
   const [winError, setWinError] = useState<string | null>(null);
   const [winForm, setWinForm] = useState({
     serialNo: '', edition: 'Silver' as TallyEdition, term: 'Annual' as LicenceTerm,
@@ -1125,7 +1153,8 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     [data.clients, winForm.serialNo],
   );
 
-  const openWin = (lead: Lead) => {
+  const openWin = (lead: Lead, startsWork = false) => {
+    setWinStartsWork(startsWork);
     const existing = lead.serialNo ? findClientBySerial(data.clients, lead.serialNo) : undefined;
     const won = lead.wonAt ? lead.wonAt.split('T')[0] : today();
     // An open trial already carries the serial and edition the prospect
@@ -1221,12 +1250,18 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         ? (data.clients || []).map(c => c.id === matched.id ? clientRecord : c)
         : [clientRecord, ...(data.clients || [])];
 
+    const job = winStartsWork && !(data.wipJobs || []).some(j => j.leadId === lead.id)
+      ? buildWipJob({ ...lead, ...(serial ? { serialNo: serial, clientId } : {}) })
+      : null;
+
     onSave({
       ...data,
       clients,
+      ...(job ? { wipJobs: [job, ...(data.wipJobs || [])] } : {}),
       leads: data.leads.map(l => l.id === lead.id
         ? {
             ...l,
+            ...(job ? { wipJobId: job.id } : {}),
             status: 'Closed Won',
             wonAt,
             // Only stamp the licence links when there is a licence to link to.
@@ -1244,36 +1279,39 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
     });
     setWinLead(null);
     setWinError(null);
+    setWinStartsWork(false);
     setEscalationError(null);
     setExpandedId(lead.id);
+    if (job) onStartWork?.(job.id);
   };
 
   // ── Won deal → delivery job ──────────────────────────────────────────────
   // A won deal still has to be delivered. This opens the work (training,
   // implementation…) in the Work in Progress tab, pre-filled from the lead.
+  const buildWipJob = (lead: Lead): WipJob => ({
+    id: `wip_${Date.now()}`,
+    client: lead.name,
+    company: lead.company || '',
+    phone: lead.phone || '',
+    email: lead.email || '',
+    jobType: lead.requestType === 'customization' ? 'Customization' : 'Implementation',
+    title: `${lead.company || lead.name} — ${leadProduct(lead) || 'TallyPrime'} implementation`,
+    assignedStaff: lead.teamMemberName ? [lead.teamMemberName] : [DEFAULT_STAFF.name],
+    startDate: new Date().toISOString().split('T')[0],
+    status: 'Not Started',
+    progress: 0,
+    notes: lead.demoNotes || lead.message || '',
+    leadId: lead.id,
+    // Carry the licence through, so delivery knows which serial it's working on.
+    serialNo: lead.serialNo,
+    clientId: lead.clientId,
+    createdAt: new Date().toISOString(),
+  });
   const startWork = (lead: Lead) => {
     const existing = (data.wipJobs || []).find(j => j.leadId === lead.id);
     if (existing) { onStartWork?.(existing.id); return; }
-    const jobId = `wip_${Date.now()}`;
-    const job: WipJob = {
-      id: jobId,
-      client: lead.name,
-      company: lead.company || '',
-      phone: lead.phone || '',
-      email: lead.email || '',
-      jobType: lead.requestType === 'customization' ? 'Customization' : 'Implementation',
-      title: `${lead.company || lead.name} — TallyPrime implementation`,
-      assignedStaff: lead.teamMemberName ? [lead.teamMemberName] : [DEFAULT_STAFF.name],
-      startDate: new Date().toISOString().split('T')[0],
-      status: 'Not Started',
-      progress: 0,
-      notes: lead.demoNotes || lead.message || '',
-      leadId: lead.id,
-      // Carry the licence through, so delivery knows which serial it's working on.
-      serialNo: lead.serialNo,
-      clientId: lead.clientId,
-      createdAt: new Date().toISOString(),
-    };
+    const job = buildWipJob(lead);
+    const jobId = job.id;
     onSave({
       ...data,
       wipJobs: [job, ...(data.wipJobs || [])],
@@ -1957,8 +1995,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
         : new Date().toISOString(),
       // Closed Won only lands through the win dialog (it captures the serial),
       // so the lead is saved one step short of it and the dialog opens below.
-      status: addLeadForm.status === 'Closed Won' ? 'Quote Sent' : addLeadForm.status,
-      ...(addLeadForm.status !== 'New' ? { nextStep: defaultNextStep(addLeadForm.status) } : {}),
+      status: addLeadForm.status === 'Closed Won' || addLeadForm.status === ADD_LEAD_WIP ? 'Quote Sent' : addLeadForm.status,
+      ...(addLeadForm.status !== 'New' && addLeadForm.status !== ADD_LEAD_WIP ? { nextStep: defaultNextStep(addLeadForm.status) } : {}),
+      ...(addLeadForm.product ? { product: addLeadForm.product } : {}),
       ...(addLeadForm.status === 'Closed Lost' ? { lostAt: new Date().toISOString() } : {}),
       // Source, its detail, and who recorded it — written together so a lead
       // always carries the story of where it came from and who vouched for it.
@@ -1982,9 +2021,11 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       createdAt: new Date().toISOString().split('T')[0],
       requestType: 'demo',
       status: 'New',
+      product: '',
     });
     // Same follow-on flows as moving an existing lead into these stages.
     if (addLeadForm.status === 'Closed Won') openWin(newLead);
+    else if (addLeadForm.status === ADD_LEAD_WIP) openWin(newLead, true);
     else if (addLeadForm.status === 'Schedule a Demo') openScheduling(newLead);
     // A filter left on another stage or source is the classic "I added it and
     // nothing happened" — clear them so the new lead is definitely on screen.
@@ -2903,8 +2944,9 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                     {/* Loud on purpose. This is not a Tally lead, and someone
                         about to ring them needs to know before they dial. */}
                     {leadProduct(l) && (
-                      <span className="rounded-full bg-emerald-600 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-white shrink-0"
-                        title={`${leadProduct(l)} enquiry - do not pitch TallyPrime`}>
+                      <span className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide shrink-0 ${
+                          isNonTallyProduct(l) ? 'bg-emerald-600 text-white' : 'bg-slate-200 text-slate-700'}`}
+                        title={isNonTallyProduct(l) ? `${leadProduct(l)} enquiry - do not pitch TallyPrime` : `${leadProduct(l)} enquiry`}>
                         {leadProduct(l)}
                       </span>
                     )}
@@ -3364,7 +3406,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                         is the last thing read before someone makes contact. A
                         payroll enquiry answered with a TallyPrime pitch loses the
                         lead and embarrasses us. */}
-                    {leadProduct(l) && (
+                    {isNonTallyProduct(l) && (
                       <div className="mb-2 flex items-start gap-2 rounded-xl border border-emerald-300 bg-emerald-50 px-3 py-2">
                         <AlertCircle className="h-4 w-4 text-emerald-700 shrink-0 mt-0.5" />
                         <p className="text-xs font-semibold text-emerald-900">
@@ -4362,7 +4404,18 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                       value={addLeadForm.status}
                       onChange={e => setAddLeadForm({...addLeadForm, status: e.target.value})}
                       className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
-                      {PIPELINE_ORDER.map(s => <option key={s} value={s}>{s}</option>)}
+                      {PIPELINE_ORDER.filter(s => s !== 'Closed Lost').map(s => <option key={s} value={s}>{s}</option>)}
+                      <option value={ADD_LEAD_WIP}>Work in Progress (won, delivery started)</option>
+                      <option value="Closed Lost">Closed Lost</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-700 mb-1">Product</label>
+                    <select
+                      value={addLeadForm.product}
+                      onChange={e => setAddLeadForm({...addLeadForm, product: e.target.value})}
+                      className="w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20">
+                      {LEAD_PRODUCTS.map(o => <option key={o.label} value={o.value}>{o.label}</option>)}
                     </select>
                   </div>
                 </div>
