@@ -58,6 +58,19 @@ export function isValidTransition(fromStatus: string, toStatus: string): boolean
   return toTier >= fromTier;
 }
 
+// The one stage a lead should normally move to next — what the "Move to …"
+// buttons offer. Closed Lost is never the suggestion (it is always available,
+// just not the goal), and a closed deal has no next stage.
+export function nextStage(currentStatus: string): PipelineStage | undefined {
+  if (currentStatus === 'Closed Won' || currentStatus === 'Closed Lost') return undefined;
+  const currentTier = stageTier(currentStatus);
+  return PIPELINE_STAGES.find(s => s.id !== 'Closed Lost' && s.tier > currentTier);
+}
+
+// A stage the lead has already gone past — shown greyed out, not offered.
+export const isPassedStage = (currentStatus: string, stage: string): boolean =>
+  stage !== currentStatus && !isValidTransition(currentStatus, stage);
+
 // Get all valid next stages from the current stage
 export function getValidNextStages(currentStatus: string): PipelineStage[] {
   const currentTier = stageTier(currentStatus);
