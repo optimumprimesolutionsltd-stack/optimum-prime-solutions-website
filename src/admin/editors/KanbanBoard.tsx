@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react';
-import { GripVertical, Mail, Phone, Building2, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { GripVertical, Mail, Phone, Building2, Trash2, ChevronLeft, ChevronRight, ArrowRight } from 'lucide-react';
 import type { Lead, SiteData } from '../../data/siteData';
-import { PIPELINE_ORDER, stageColor, stageReportLabel } from '../crm/pipeline';
+import { PIPELINE_ORDER, stageColor, stageReportLabel, nextStage, isPassedStage } from '../crm/pipeline';
 import { sourceOption, sourceLabel } from '../crm/leadSource';
 
 interface Props {
@@ -14,9 +14,14 @@ interface Props {
   leads: Lead[];
   onSave: (d: SiteData) => void;
   onEditLead?: (leadId: string) => void;
+  /** Moves a lead the same way the list's Status dropdown does: forward only
+   *  (or to Closed Lost), Closed Won through the win dialog, Schedule a Demo
+   *  through the booking pop-up. Dropping a card used to write the status
+   *  straight onto the lead and skip all of that. */
+  onMove: (leadId: string, status: string) => void;
 }
 
-export default function KanbanBoard({ data, leads, onSave, onEditLead }: Props) {
+export default function KanbanBoard({ data, leads, onSave, onEditLead, onMove }: Props) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [draggedLead, setDraggedLead] = useState<Lead | null>(null);
 
@@ -44,11 +49,9 @@ export default function KanbanBoard({ data, leads, onSave, onEditLead }: Props) 
     e.preventDefault();
     if (!draggedLead) return;
 
-    const updatedLeads = data.leads.map(l =>
-      l.id === draggedLead.id ? { ...l, status: newStatus } : l
-    );
-    onSave({ ...data, leads: updatedLeads });
     setDraggedLead(null);
+    if (newStatus === draggedLead.status) return;
+    onMove(draggedLead.id, newStatus);
   };
 
   const handleDelete = (leadId: string) => {
@@ -115,11 +118,15 @@ export default function KanbanBoard({ data, leads, onSave, onEditLead }: Props) 
         {PIPELINE_ORDER.map(stage => {
           const stageLeads = leads.filter(l => l.status === stage);
           const color = stageColor(stage);
+          // While a card is being dragged, the stages it has already passed
+          // grey out — it cannot go back to them.
+          const blocked = !!draggedLead && isPassedStage(draggedLead.status, stage);
 
           return (
             <div
               key={stage}
-              className="flex-shrink-0 w-80 rounded-lg bg-slate-50 border border-slate-200 flex flex-col"
+              className={`flex-shrink-0 w-80 rounded-lg bg-slate-50 border border-slate-200 flex flex-col transition ${blocked ? 'opacity-40 grayscale' : ''}`}
+              title={blocked ? `${draggedLead?.name} has already passed ${stage}` : undefined}
             >
               {/* Stage Header */}
               <div
@@ -143,7 +150,7 @@ export default function KanbanBoard({ data, leads, onSave, onEditLead }: Props) 
               {/* Cards Container */}
               <div
                 className="flex-1 overflow-y-auto p-3 space-y-2 min-h-[500px]"
-                onDragOver={handleDragOver}
+                onDragOver={blocked ? undefined : handleDragOver}
                 onDrop={(e) => handleDrop(e, stage)}
               >
                 {stageLeads.length === 0 ? (
@@ -198,8 +205,22 @@ export default function KanbanBoard({ data, leads, onSave, onEditLead }: Props) 
                         )}
                       </div>
 
-                      {/* Delete Button */}
-                      <div className="flex justify-end pt-2 border-t border-slate-100">
+                      {/* Next move + delete */}
+                      <div className="flex items-center justify-between gap-2 pt-2 border-t border-slate-100">
+                        {(() => {
+                          const next = nextStage(lead.status);
+                          if (!next) return <span />;
+                          return (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); onMove(lead.id, next.id); }}
+                              className="flex items-center gap-1 rounded-md px-2 py-1 text-[11px] font-bold text-white hover:opacity-90 transition"
+                              style={{ backgroundColor: stageColor(next.id) }}
+                              title={`Move to ${next.id}`}
+                            >
+                              {next.id} <ArrowRight className="h-3 w-3" />
+                            </button>
+                          );
+                        })()}
                         <button
                           onClick={(e) => {
                             e.stopPropagation();

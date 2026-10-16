@@ -22,7 +22,7 @@ import {
   buildCrmReportHtml, buildUnifiedCsv, buildUnifiedXls, downloadFile, printHtml,
   type WorkshopRegistrant,
 } from '../crm/crmExport';
-import { PIPELINE_ORDER, stageColor, stageTint, defaultNextStep, isValidTransition, getValidNextStages } from '../crm/pipeline';
+import { PIPELINE_ORDER, PIPELINE_STAGES, stageColor, stageTint, defaultNextStep, isValidTransition, nextStage, isPassedStage } from '../crm/pipeline';
 import {
   MANUAL_SOURCES, ALL_SOURCES, sourceOption, sourceLabel, sourceDetail,
   attributionGap, needsAttribution, validateSourcePick, sourceFields,
@@ -864,6 +864,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
       return false;
     }
     setEscalationError(null);
+    // The booking pop-up renders inside the lead's row in the list, so a move
+    // made on the Board (or from Add Lead) has to bring that row on screen.
+    setViewMode('list');
+    setExpandedId(lead.id);
     setSchedulingId(lead.id);
     setSchedForm({
       // Pre-fill with already-saved schedule details first,
@@ -2898,6 +2902,7 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
           data={data}
           leads={filtered}
           onSave={onSave}
+          onMove={updateStatus}
           onEditLead={(leadId) => {
             const lead = data.leads.find(l => l.id === leadId);
             if (lead) {
@@ -3386,12 +3391,46 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                     onSet={(src, det, by) => setLeadSource(l.id, src, det, by)}
                   />
 
-                  {/* Auto next step — derived from the stage, shown in the CRM report */}
-                  <div className="flex items-center gap-2 text-xs text-slate-500">
-                    <span className="font-semibold">Next step:</span>
-                    <span className="rounded-lg bg-slate-50 px-2.5 py-1 font-medium text-slate-700">{defaultNextStep(l.status)}</span>
-                    <span className="text-slate-400">— set automatically from the stage</span>
+                  {/* Where the lead is in the pipeline: stages already passed
+                      are greyed out with a tick, the current one is in its
+                      colour, and any later stage can be tapped to jump to it. */}
+                  <div className="flex items-center gap-1 flex-wrap">
+                    {PIPELINE_STAGES.map(s => {
+                      const passed = isPassedStage(l.status, s.id);
+                      const current = s.id === l.status;
+                      return (
+                        <button key={s.id} type="button" disabled={passed || current}
+                          onClick={() => updateStatus(l.id, s.id)}
+                          title={passed ? `${s.id} — already passed` : current ? `Current stage: ${s.id}` : `Move to ${s.id}`}
+                          className={`rounded-full px-2.5 py-1 text-[11px] font-semibold transition ${
+                            passed ? 'bg-slate-100 text-slate-400 line-through cursor-not-allowed'
+                            : current ? 'text-white shadow-sm cursor-default'
+                            : 'border border-slate-200 bg-white text-slate-600 hover:border-slate-400'}`}
+                          style={current ? { backgroundColor: stageColor(s.id) } : undefined}>
+                          {passed ? '✓ ' : ''}{s.id}
+                        </button>
+                      );
+                    })}
                   </div>
+
+                  {/* The next move, spelled out, with one button to make it. */}
+                  {(() => {
+                    const next = nextStage(l.status);
+                    if (!next) return null;
+                    return (
+                      <div className="flex items-center justify-between gap-3 flex-wrap rounded-xl border px-3 py-2.5"
+                        style={{ borderColor: `${stageColor(next.id)}66`, backgroundColor: `${stageColor(next.id)}0d` }}>
+                        <p className="text-xs text-slate-700">
+                          <span className="font-bold">Next step:</span> {defaultNextStep(l.status)}
+                        </p>
+                        <button type="button" onClick={() => updateStatus(l.id, next.id)}
+                          className="rounded-lg px-3 py-1.5 text-xs font-bold text-white shadow-sm hover:opacity-90 transition"
+                          style={{ backgroundColor: stageColor(next.id) }}>
+                          Move to {next.id} →
+                        </button>
+                      </div>
+                    );
+                  })()}
 
                   {/* Status + actions */}
                   <div className="flex items-center justify-between border-t border-slate-100 pt-4 flex-wrap gap-3">
@@ -3399,7 +3438,10 @@ export default function LeadsManager({ data, onSave, openScheduleLeadId, onSched
                       <label className="text-xs font-semibold text-slate-600">Status:</label>
                       <select value={l.status} onChange={e => updateStatus(l.id, e.target.value)}
                         className="rounded-lg border border-slate-200 px-3 py-1.5 text-sm font-medium outline-none focus:border-accent">
-                        {getValidNextStages(l.status).map(s => <option key={s.id}>{s.id}</option>)}
+                        {PIPELINE_STAGES.map(s => {
+                          const passed = isPassedStage(l.status, s.id);
+                          return <option key={s.id} value={s.id} disabled={passed}>{passed ? `✓ ${s.id} (passed)` : s.id}</option>;
+                        })}
                       </select>
                     </div>
                     {/* Sits directly above Send Email and WhatsApp, because this
